@@ -1,0 +1,6 @@
+;QuantBox_Queue.def : µ¼³öDLLº¯Êý
+
+LIBRARY QuantBox_Queue
+EXPORTS 
+	XRequest @1
+	XRespone @2

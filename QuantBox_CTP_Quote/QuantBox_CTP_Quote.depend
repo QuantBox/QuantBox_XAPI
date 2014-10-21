@@ -1,0 +1,135 @@
+# depslib dependency file v1.0
+1413531074 source:/home/hetao/works/QuantBox_X/QuantBox_CTP_Quote/main.cpp
+	"../include/ApiHeader.h"
+	"../include/QueueEnum.h"
+	"MdUserApi.h"
+
+1413532747 source:/home/hetao/works/QuantBox_X/QuantBox_CTP_Quote/MdUserApi.cpp
+	"MdUserApi.h"
+	"../include/QueueEnum.h"
+	"../include/QueueHeader.h"
+	"../include/ApiHeader.h"
+	"../include/ApiStruct.h"
+	"../include/toolkit.h"
+	<string.h>
+	<cfloat>
+	<mutex>
+	<vector>
+
+1413515775 /home/hetao/works/QuantBox_X/QuantBox_CTP_Quote/MdUserApi.h
+	"../include/CTP/ThostFtdcMdApi.h"
+	"../include/ApiStruct.h"
+	<set>
+	<string>
+	<atomic>
+	<mutex>
+
+1407738996 /home/hetao/works/QuantBox_X/include/CTP/ThostFtdcMdApi.h
+	"ThostFtdcUserApiStruct.h"
+
+1407740253 /home/hetao/works/QuantBox_X/include/CTP/ThostFtdcUserApiStruct.h
+	"ThostFtdcUserApiDataType.h"
+
+1407740252 /home/hetao/works/QuantBox_X/include/CTP/ThostFtdcUserApiDataType.h
+
+1413534051 /home/hetao/works/QuantBox_X/include/ApiStruct.h
+	"ApiDataType.h"
+	"ApiEnum.h"
+
+1412841578 /home/hetao/works/QuantBox_X/include/ApiDataType.h
+
+1413530763 /home/hetao/works/QuantBox_X/include/ApiEnum.h
+
+1413530528 /home/hetao/works/QuantBox_X/include/QueueHeader.h
+
+1413453249 /home/hetao/works/QuantBox_X/include/ApiHeader.h
+
+1411543041 /home/hetao/works/QuantBox_X/include/toolkit.h
+	<vector>
+	<set>
+	<string>
+
+1413527343 source:/home/hetao/works/QuantBox_X/include/toolkit.cpp
+	"toolkit.h"
+	<string.h>
+	<direct.h>
+	<sys/stat.h>
+
+1413530794 /home/hetao/works/QuantBox_X/include/QueueEnum.h
+
+1413771567 source:/home/hetao/works/QuantBox_XAPI/include/toolkit.cpp
+	"stdafx.h"
+	"toolkit.h"
+	<string.h>
+	<direct.h>
+	<sys/stat.h>
+
+1413537209 /home/hetao/works/QuantBox_XAPI/include/toolkit.h
+	<vector>
+	<set>
+	<string>
+
+1413787998 source:/home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/main.cpp
+	"stdafx.h"
+	"../include/ApiHeader.h"
+	"../include/QueueEnum.h"
+	"MdUserApi.h"
+
+1413771567 /home/hetao/works/QuantBox_XAPI/include/ApiHeader.h
+	"../include/CrossPlatform.h"
+
+1413787998 /home/hetao/works/QuantBox_XAPI/include/QueueEnum.h
+
+1413538004 /home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/MdUserApi.h
+	"../include/CTP/ThostFtdcMdApi.h"
+	"../include/ApiStruct.h"
+	<set>
+	<string>
+	<atomic>
+	<mutex>
+
+1413537209 /home/hetao/works/QuantBox_XAPI/include/CTP/ThostFtdcMdApi.h
+	"ThostFtdcUserApiStruct.h"
+
+1413537209 /home/hetao/works/QuantBox_XAPI/include/CTP/ThostFtdcUserApiStruct.h
+	"ThostFtdcUserApiDataType.h"
+
+1413537209 /home/hetao/works/QuantBox_XAPI/include/CTP/ThostFtdcUserApiDataType.h
+
+1413537209 /home/hetao/works/QuantBox_XAPI/include/ApiStruct.h
+	"ApiDataType.h"
+	"ApiEnum.h"
+
+1413537209 /home/hetao/works/QuantBox_XAPI/include/ApiDataType.h
+
+1413537209 /home/hetao/works/QuantBox_XAPI/include/ApiEnum.h
+
+1413771567 source:/home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/MdUserApi.cpp
+	"stdafx.h"
+	"MdUserApi.h"
+	"../include/QueueEnum.h"
+	"../include/QueueHeader.h"
+	"../include/ApiHeader.h"
+	"../include/ApiStruct.h"
+	"../include/toolkit.h"
+	<string.h>
+	<cfloat>
+	<mutex>
+	<vector>
+
+1413771567 /home/hetao/works/QuantBox_XAPI/include/QueueHeader.h
+	"../include/CrossPlatform.h"
+
+1413771567 /home/hetao/works/QuantBox_XAPI/include/stdafx.h
+	"targetver.h"
+	<windows.h>
+
+1413771567 /home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/stdafx.h
+	"targetver.h"
+	<windows.h>
+
+1413538004 /home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/targetver.h
+	<SDKDDKVer.h>
+
+1413864648 /home/hetao/works/QuantBox_XAPI/include/CrossPlatform.h
+

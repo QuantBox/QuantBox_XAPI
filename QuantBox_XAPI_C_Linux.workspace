@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="QuantBox_Queue/QuantBox_Queue.cbp" />
+		<Project filename="QuantBox_CTP_Quote/QuantBox_CTP_Quote.cbp" />
+		<Project filename="QuantBox_CTP_Trade/QuantBox_CTP_Trade.cbp" />
+		<Project filename="QuantBox_LTS_Quote/QuantBox_LTS_Quote.cbp" />
+		<Project filename="QuantBox_LTS_Trade/QuantBox_LTS_Trade.cbp" />
+		<Project filename="QuantBox_LTS_Level2/QuantBox_LTS_Level2.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>

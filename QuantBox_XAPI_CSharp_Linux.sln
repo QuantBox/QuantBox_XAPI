@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantBox.XAPI_Linux", "QuantBox.XAPI\QuantBox.XAPI_Linux.csproj", "{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|Win32 = Debug|Win32
+		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}.Debug|Win32.Build.0 = Debug|Any CPU
+		{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}.Release|Win32.ActiveCfg = Release|Any CPU
+		{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}.Release|Win32.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = QuantBox.XAPI\QuantBox.XAPI_Linux.csproj
+		outputpath = bin
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
