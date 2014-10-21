@@ -20,6 +20,15 @@ enum ConnectionStatus :char
 	Unknown, //δ֪
 };
 
+enum DataLevelType:char
+{
+	L0,
+	L1,
+	L5,
+	L10,
+	FULL,
+};
+
 enum ResumeType :char
 {
 	Restart,
@@ -32,8 +41,6 @@ enum PutCall :char
 	Put,
 	Call,
 };
-
-
 
 enum OrderStatus :char
 {

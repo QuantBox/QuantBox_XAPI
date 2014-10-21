@@ -32,6 +32,11 @@ void CMdUserApi::Register(void* pMsgQueue)
 	m_msgQueue = pMsgQueue;
 }
 
+ConfigInfoField* CMdUserApi::Config(ConfigInfoField* pConfigInfo)
+{
+	return nullptr;
+}
+
 bool CMdUserApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	bool bRet = ((pRspInfo) && (pRspInfo->ErrorID != 0));

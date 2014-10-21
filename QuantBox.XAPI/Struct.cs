@@ -34,11 +34,13 @@ namespace QuantBox.XAPI
         /// <summary>
         /// 订阅主题
         /// </summary>
-        public int IsUsingUdp;
+        [MarshalAs(UnmanagedType.U1)]
+        public bool IsUsingUdp;
         /// <summary>
         /// 订阅主题
         /// </summary>
-        public int IsMulticast;
+        [MarshalAs(UnmanagedType.U1)]
+        public bool IsMulticast;
         /// <summary>
         /// 订阅主题
         /// </summary>
@@ -153,7 +155,7 @@ namespace QuantBox.XAPI
         /// <summary>
         /// 数量
         /// </summary>
-        public int Volume;
+        public double Volume;
         /// <summary>
         /// 成交金额
         /// </summary>

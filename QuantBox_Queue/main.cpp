@@ -47,7 +47,6 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		pQueue->StopThread();
 		break;
 	default:
-		//pQueue->Input(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 		break;
 	}
 

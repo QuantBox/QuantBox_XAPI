@@ -18,6 +18,7 @@ public:
 	virtual ~CMdUserApi(void);
 
 	void Register(void* pMsgQueue);
+	ConfigInfoField* Config(ConfigInfoField* pConfigInfo);
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,

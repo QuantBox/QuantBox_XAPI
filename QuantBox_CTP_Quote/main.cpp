@@ -32,6 +32,9 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case RequestType::Register:
 		pApi->Register(ptr1);
 		break;
+	case RequestType::Config:
+		return (void*)pApi->Config((ConfigInfoField*)ptr1);
+		break;
 	case RequestType::Connect:
 		pApi->Connect((const char*)ptr3, (ServerInfoField*)ptr1, (UserInfoField*)ptr2);
 		break;

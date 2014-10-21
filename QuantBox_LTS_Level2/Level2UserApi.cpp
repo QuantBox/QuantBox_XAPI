@@ -378,6 +378,32 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 		marketData.BidVolume5 = pL2MarketData->BidVolume5;
 		marketData.AskPrice5 = pL2MarketData->OfferPrice5;
 		marketData.AskVolume5 = pL2MarketData->OfferVolume5;
+
+		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
+		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
+		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
+		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
+
+		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
+		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
+		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
+		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
+
+		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
+		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
+		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
+		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
+
+		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
+		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
+		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
+		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
+
+		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
+		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
+		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
+		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
+
 	}
 
 	XRespone(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
@@ -532,23 +558,23 @@ void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 	sprintf(marketData.Symbol, "%s.%s", marketData.InstrumentID, marketData.ExchangeID);
 	GetExchangeTime(pL2Index, marketData.ExchangeTime);
 
-	//marketData.LastPrice = pL2Index->LastPrice;
-	//marketData.Volume = pL2Index->TotalTradeVolume;
-	//marketData.Turnover = pL2Index->TotalTradeValue;
-	////marketData.OpenInterest = pL2MarketData->OpenInterest;
-	////marketData.AveragePrice = pL2MarketData->AveragePrice;
+	marketData.LastPrice = pL2Index->LastIndex;
+	marketData.Volume = pL2Index->TotalVolume;
+	marketData.Turnover = pL2Index->TurnOver;
+	//marketData.OpenInterest = pL2Index->OpenInterest;
+	//marketData.AveragePrice = pL2Index->AveragePrice;
 
-	//marketData.OpenPrice = pL2Index->OpenPrice;
-	//marketData.HighestPrice = pL2Index->HighPrice;
-	//marketData.LowestPrice = pL2Index->LowPrice;
-	//marketData.ClosePrice = pL2Index->ClosePrice;
-	////marketData.SettlementPrice = pL2MarketData->SettlementPrice;
+	marketData.OpenPrice = pL2Index->OpenIndex;
+	marketData.HighestPrice = pL2Index->HighIndex;
+	marketData.LowestPrice = pL2Index->LowIndex;
+	marketData.ClosePrice = pL2Index->CloseIndex;
+	//marketData.SettlementPrice = pL2Index->SettlementPrice;
 
-	////marketData.UpperLimitPrice = pL2MarketData->UpperLimitPrice;
-	////marketData.LowerLimitPrice = pL2MarketData->LowerLimitPrice;
-	////marketData.PreClosePrice = pL2MarketData->PreClosePrice;
-	////marketData.PreSettlementPrice = pL2MarketData->PreSettlementPrice;
-	////marketData.PreOpenInterest = pL2MarketData->PreOpenInterest;
+	//marketData.UpperLimitPrice = pL2Index->UpperLimitPrice;
+	//marketData.LowerLimitPrice = pL2Index->LowerLimitPrice;
+	marketData.PreClosePrice = pL2Index->PreCloseIndex;
+	//marketData.PreSettlementPrice = pL2Index->PreSettlementPrice;
+	//marketData.PreOpenInterest = pL2Index->PreOpenInterest;
 
 	//marketData.BidPrice1 = pL2MarketData->BidPrice1;
 	//marketData.BidVolume1 = pL2MarketData->BidVolume1;
@@ -578,5 +604,5 @@ void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 	//	marketData.AskVolume5 = pL2MarketData->OfferVolume5;
 	//}
 
-	XRespone(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	XRespone(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, DataLevelType::L0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }

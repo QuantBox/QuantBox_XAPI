@@ -20,19 +20,19 @@ namespace QuantBox.XAPI.Callback
         protected object locker = new object();
 
         public bool IsConnected { get; protected set; }
-        private int _reconnect;
-        public int Reconnect
+        private int _reconnectInterval;
+        public int ReconnectInterval
         {
-            get { return _reconnect; }
+            get { return _reconnectInterval; }
             set {
-                _reconnect = value;
+                _reconnectInterval = value;
                 _Timer.Elapsed -= _Timer_Elapsed;
-                if (_reconnect > 1000 * 10)
+                if (_reconnectInterval >= 10)
                 {
                     _Timer.Elapsed += _Timer_Elapsed;
-                    _Timer.Interval = _reconnect;
+                    _Timer.Interval = _reconnectInterval*1000;
                 }
-                _Timer.Enabled = _reconnect > 1000 * 10;
+                _Timer.Enabled = _reconnectInterval >= 10;
             }
         }
 
@@ -55,7 +55,7 @@ namespace QuantBox.XAPI.Callback
             _XRespone = _OnRespone;
             _Queue = queue;
 
-            Reconnect = 0;
+            ReconnectInterval = 0;
         }
 
         void _Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)

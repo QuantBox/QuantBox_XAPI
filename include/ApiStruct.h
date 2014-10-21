@@ -61,14 +61,19 @@ struct TradeField
 
 struct ServerInfoField
 {
-	int IsUsingUdp;
-	int IsMulticast;
+	bool IsUsingUdp;
+	bool IsMulticast;
 	int	TopicId;
 	ResumeType	Resume;
 	BrokerIDType	BrokerID;
 	ProductInfoType	UserProductInfo;
 	AuthCodeType	AuthCode;
 	AddressType	Address;
+};
+
+struct ConfigInfoField
+{
+
 };
 
 // 用户信息
@@ -133,7 +138,7 @@ struct DepthMarketDataField
 	///最新价
 	PriceType	LastPrice;
 	///数量
-	VolumeType	Volume;
+	LargeVolumeType	Volume;
 	///成交金额
 	MoneyType	Turnover;
 	///持仓量

@@ -83,6 +83,15 @@ namespace QuantBox
         [Description("未知")]
         Unknown,
     }
+
+    enum DataLevelType : byte
+    {
+        L0,
+	    L1,
+	    L5,
+	    L10,
+	    FULL,
+    };
     public enum ResumeType : byte
     {
         Restart,
