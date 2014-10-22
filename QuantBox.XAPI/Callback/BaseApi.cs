@@ -25,6 +25,10 @@ namespace QuantBox.XAPI.Callback
         {
             get { return _reconnectInterval; }
             set {
+
+                if (_reconnectInterval == value)
+                    return;
+                
                 _reconnectInterval = value;
                 _Timer.Elapsed -= _Timer_Elapsed;
                 if (_reconnectInterval >= 10)
@@ -60,12 +64,14 @@ namespace QuantBox.XAPI.Callback
 
         void _Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
+            _Timer.Enabled = false;
             // 定时检查是否需要销毁对象重连
             if(!IsConnected)
             {
                 Disconnect();
                 Connect();
             }
+            _Timer.Enabled = true;
         }
 
 
