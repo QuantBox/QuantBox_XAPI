@@ -16,11 +16,11 @@
 
 CTraderApi::CTraderApi(void)
 {
-	m_pApi = NULL;
-	m_msgQueue = NULL;
+	m_pApi = nullptr;
+	m_msgQueue = nullptr;
 	m_lRequestID = 0;
 
-	m_hThread = NULL;
+	m_hThread = nullptr;
 	m_bRunning = false;
 }
 
@@ -89,7 +89,7 @@ void CTraderApi::Connect(const string& szPath,
 	string szAddresses = pServerInfo->Address;
 
 	char *pszPath = new char[szPath.length() + 1024];
-	srand((unsigned int)time(NULL));
+	srand((unsigned int)time(nullptr));
 	sprintf(pszPath, "%s/%s/%s/Td/%d/", szPath.c_str(), m_szBrokerId.c_str(), m_szInvestorId.c_str(), rand());
 	makedirs(pszPath);
 
@@ -114,7 +114,7 @@ void CTraderApi::Connect(const string& szPath,
 			{
 				m_pApi->RegisterFront(token);
 			}
-			token = strtok(NULL, _QUANTBOX_SEPS_);
+			token = strtok(nullptr, _QUANTBOX_SEPS_);
 		}
 		delete[] buf;
 
@@ -134,9 +134,9 @@ void CTraderApi::Disconnect()
 
 	if(m_pApi)
 	{
-		m_pApi->RegisterSpi(NULL);
+		m_pApi->RegisterSpi(nullptr);
 		m_pApi->Release();
-		m_pApi = NULL;
+		m_pApi = nullptr;
 
 		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	}
@@ -150,8 +150,8 @@ void CTraderApi::Disconnect()
 CTraderApi::SRequest* CTraderApi::MakeRequestBuf(RequestType type)
 {
 	SRequest *pRequest = new SRequest;
-	if (NULL == pRequest)
-		return NULL;
+	if (nullptr == pRequest)
+		return nullptr;
 
 	memset(pRequest,0,sizeof(SRequest));
 	pRequest->type = type;
@@ -193,7 +193,7 @@ void CTraderApi::ReleaseRequestMapBuf(int nRequestID)
 
 void CTraderApi::AddRequestMapBuf(int nRequestID,SRequest* pRequest)
 {
-	if(NULL == pRequest)
+	if(nullptr == pRequest)
 		return;
 
 	lock_guard<mutex> cl(m_csMap);
@@ -211,7 +211,7 @@ void CTraderApi::AddRequestMapBuf(int nRequestID,SRequest* pRequest)
 
 void CTraderApi::AddToSendQueue(SRequest * pRequest)
 {
-	if (NULL == pRequest)
+	if (nullptr == pRequest)
 		return;
 
 	lock_guard<mutex> cl(m_csList);
@@ -343,7 +343,7 @@ void CTraderApi::OnFrontDisconnected(int nReason)
 
 //void CTraderApi::ReqAuthenticate()
 //{
-//	if (NULL == m_pApi)
+//	if (nullptr == m_pApi)
 //		return;
 //
 //	SRequest* pRequest = MakeRequestBuf(E_ReqAuthenticateField);
@@ -386,7 +386,7 @@ void CTraderApi::OnFrontDisconnected(int nReason)
 
 void CTraderApi::ReqUserLogin()
 {
-	if (NULL == m_pApi)
+	if (nullptr == m_pApi)
 		return;
 
 	SRequest* pRequest = MakeRequestBuf(E_ReqUserLoginField);
@@ -440,7 +440,7 @@ void CTraderApi::OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, C
 
 //void CTraderApi::ReqSettlementInfoConfirm()
 //{
-//	if (NULL == m_pApi)
+//	if (nullptr == m_pApi)
 //		return;
 //
 //	SRequest* pRequest = MakeRequestBuf(E_SettlementInfoConfirmField);
@@ -483,11 +483,11 @@ int CTraderApi::ReqOrderInsert(
 	OrderField* pOrder1,
 	OrderField* pOrder2)
 {
-	if (NULL == m_pApi)
+	if (nullptr == m_pApi)
 		return 0;
 
 	SRequest* pRequest = MakeRequestBuf(E_InputOrderField);
-	if (NULL == pRequest)
+	if (nullptr == pRequest)
 		return 0;
 
 	CSecurityFtdcInputOrderField& body = pRequest->InputOrderField;
@@ -699,11 +699,11 @@ int CTraderApi::ReqOrderAction(const string& szId)
 
 int CTraderApi::ReqOrderAction(CSecurityFtdcOrderField *pOrder)
 {
-	if (NULL == m_pApi)
+	if (nullptr == m_pApi)
 		return 0;
 
 	SRequest* pRequest = MakeRequestBuf(E_InputOrderActionField);
-	if (NULL == pRequest)
+	if (nullptr == pRequest)
 		return 0;
 
 	CSecurityFtdcInputOrderActionField& body = pRequest->InputOrderActionField;
@@ -788,11 +788,11 @@ void CTraderApi::OnRtnOrder(CSecurityFtdcOrderField *pOrder)
 //	OrderField* pOrderAsk,
 //	OrderField* pOrderBid)
 //{
-//	if (NULL == m_pApi)
+//	if (nullptr == m_pApi)
 //		return 0;
 //
 //	SRequest* pRequest = MakeRequestBuf(E_InputQuoteField);
-//	if (NULL == pRequest)
+//	if (nullptr == pRequest)
 //		return 0;
 //
 //	CSecurityFtdcInputQuoteField& body = pRequest->InputQuoteField;
@@ -891,11 +891,11 @@ void CTraderApi::OnRtnOrder(CSecurityFtdcOrderField *pOrder)
 //
 //int CTraderApi::ReqQuoteAction(CSecurityFtdcQuoteField *pQuote)
 //{
-//	if (NULL == m_pApi)
+//	if (nullptr == m_pApi)
 //		return 0;
 //
 //	SRequest* pRequest = MakeRequestBuf(E_InputQuoteActionField);
-//	if (NULL == pRequest)
+//	if (nullptr == pRequest)
 //		return 0;
 //
 //	CSecurityFtdcInputQuoteActionField& body = pRequest->InputQuoteActionField;
@@ -938,11 +938,11 @@ void CTraderApi::OnRtnOrder(CSecurityFtdcOrderField *pOrder)
 
 void CTraderApi::ReqQryTradingAccount()
 {
-	if (NULL == m_pApi)
+	if (nullptr == m_pApi)
 		return;
 
 	SRequest* pRequest = MakeRequestBuf(E_QryTradingAccountField);
-	if (NULL == pRequest)
+	if (nullptr == pRequest)
 		return;
 
 	CSecurityFtdcQryTradingAccountField& body = pRequest->QryTradingAccountField;
@@ -982,11 +982,11 @@ void CTraderApi::OnRspQryTradingAccount(CSecurityFtdcTradingAccountField *pTradi
 
 void CTraderApi::ReqQryInvestorPosition(const string& szInstrumentId)
 {
-	if (NULL == m_pApi)
+	if (nullptr == m_pApi)
 		return;
 
 	SRequest* pRequest = MakeRequestBuf(E_QryInvestorPositionField);
-	if (NULL == pRequest)
+	if (nullptr == pRequest)
 		return;
 
 	CSecurityFtdcQryInvestorPositionField& body = pRequest->QryInvestorPositionField;
@@ -1009,11 +1009,11 @@ void CTraderApi::OnRspQryInvestorPosition(CSecurityFtdcInvestorPositionField *pI
 
 void CTraderApi::ReqQryInvestorPositionDetail(const string& szInstrumentId)
 {
-	if (NULL == m_pApi)
+	if (nullptr == m_pApi)
 		return;
 
 	SRequest* pRequest = MakeRequestBuf(E_QryInvestorPositionDetailField);
-	if (NULL == pRequest)
+	if (nullptr == pRequest)
 		return;
 
 	CSecurityFtdcQryInvestorPositionDetailField& body = pRequest->QryInvestorPositionDetailField;
@@ -1036,11 +1036,11 @@ void CTraderApi::OnRspQryInvestorPositionDetail(CSecurityFtdcInvestorPositionDet
 
 void CTraderApi::ReqQryInstrument(const string& szInstrumentId, const string& szExchange)
 {
-	if (NULL == m_pApi)
+	if (nullptr == m_pApi)
 		return;
 
 	SRequest* pRequest = MakeRequestBuf(E_QryInstrumentField);
-	if (NULL == pRequest)
+	if (nullptr == pRequest)
 		return;
 
 	CSecurityFtdcQryInstrumentField& body = pRequest->QryInstrumentField;
@@ -1087,11 +1087,11 @@ void CTraderApi::OnRspQryInstrument(CSecurityFtdcInstrumentField *pInstrument, C
 
 void CTraderApi::ReqQryInstrumentCommissionRate(const string& szInstrumentId)
 {
-	if (NULL == m_pApi)
+	if (nullptr == m_pApi)
 		return;
 
 	SRequest* pRequest = MakeRequestBuf(E_QryInstrumentCommissionRateField);
-	if (NULL == pRequest)
+	if (nullptr == pRequest)
 		return;
 
 	CSecurityFtdcQryInstrumentCommissionRateField& body = pRequest->QryInstrumentCommissionRateField;
@@ -1114,11 +1114,11 @@ void CTraderApi::OnRspQryInstrumentCommissionRate(CSecurityFtdcInstrumentCommiss
 
 //void CTraderApi::ReqQryInstrumentMarginRate(const string& szInstrumentId,TSecurityFtdcHedgeFlagType HedgeFlag)
 //{
-//	if (NULL == m_pApi)
+//	if (nullptr == m_pApi)
 //		return;
 //
 //	SRequest* pRequest = MakeRequestBuf(E_QryInstrumentMarginRateField);
-//	if (NULL == pRequest)
+//	if (nullptr == pRequest)
 //		return;
 //
 //	CSecurityFtdcQryInstrumentMarginRateField& body = pRequest->QryInstrumentMarginRateField;
@@ -1142,11 +1142,11 @@ void CTraderApi::OnRspQryInstrumentCommissionRate(CSecurityFtdcInstrumentCommiss
 
 void CTraderApi::ReqQryDepthMarketData(const string& szInstrumentId)
 {
-	if (NULL == m_pApi)
+	if (nullptr == m_pApi)
 		return;
 
 	SRequest* pRequest = MakeRequestBuf(E_QryDepthMarketDataField);
-	if (NULL == pRequest)
+	if (nullptr == pRequest)
 		return;
 
 	CSecurityFtdcQryDepthMarketDataField& body = pRequest->QryDepthMarketDataField;
@@ -1167,11 +1167,11 @@ void CTraderApi::OnRspQryDepthMarketData(CSecurityFtdcDepthMarketDataField *pDep
 
 //void CTraderApi::ReqQrySettlementInfo(const string& szTradingDay)
 //{
-//	if (NULL == m_pApi)
+//	if (nullptr == m_pApi)
 //		return;
 //
 //	SRequest* pRequest = MakeRequestBuf(E_QrySettlementInfoField);
-//	if (NULL == pRequest)
+//	if (nullptr == pRequest)
 //		return;
 //
 //	CSecurityFtdcQrySettlementInfoField& body = pRequest->QrySettlementInfoField;
@@ -1215,11 +1215,11 @@ void CTraderApi::OnRspError(CSecurityFtdcRspInfoField *pRspInfo, int nRequestID,
 
 void CTraderApi::ReqQryOrder()
 {
-	if (NULL == m_pApi)
+	if (nullptr == m_pApi)
 		return;
 
 	SRequest* pRequest = MakeRequestBuf(E_QryOrderField);
-	if (NULL == pRequest)
+	if (nullptr == pRequest)
 		return;
 
 	CSecurityFtdcQryOrderField& body = pRequest->QryOrderField;
@@ -1322,11 +1322,11 @@ void CTraderApi::OnRspQryOrder(CSecurityFtdcOrderField *pOrder, CSecurityFtdcRsp
 
 void CTraderApi::ReqQryTrade()
 {
-	if (NULL == m_pApi)
+	if (nullptr == m_pApi)
 		return;
 
 	SRequest* pRequest = MakeRequestBuf(E_QryTradeField);
-	if (NULL == pRequest)
+	if (nullptr == pRequest)
 		return;
 
 	CSecurityFtdcQryTradeField& body = pRequest->QryTradeField;

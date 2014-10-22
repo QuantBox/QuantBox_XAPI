@@ -10,3 +10,5 @@ rd QuantBox_LTS_Level2\Debug /S /Q
 rd QuantBox_LTS_Quote\Debug /S /Q
 rd QuantBox_LTS_Trade\Debug /S /Q
 rd QuantBox_Queue\Debug /S /Q
+rd QuantBox_XSpeed_Quote\Debug /S /Q
+rd QuantBox_XSpeed_Trade\Debug /S /Q

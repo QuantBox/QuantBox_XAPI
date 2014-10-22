@@ -2,12 +2,12 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="QuantBox_LTS_Level2" />
+		<Option title="QuantBox_XSpeed_Trade" />
 		<Option pch_mode="2" />
 		<Option compiler="clang" />
 		<Build>
 			<Target title="Debug">
-				<Option output="../bin/Debug/QuantBox_LTS_Level2" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/Debug/QuantBox_XSpeed_Trade" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="clang" />
@@ -21,7 +21,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/QuantBox_LTS_Level2" prefix_auto="1" extension_auto="1" />
+				<Option output="bin/Release/QuantBox_XSpeed_Trade" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="clang" />
@@ -42,15 +42,16 @@
 			<Add option="-fPIC" />
 		</Compiler>
 		<Linker>
+			<Add library="DFITCTraderApi" />
 			<Add library="QuantBox_Queue" />
-			<Add library="L2mduserapi" />
-			<Add directory="../include/LTS_L2/linux64" />
+			<Add directory="../include/XSpeed/linux64" />
 		</Linker>
 		<Unit filename="../include/toolkit.cpp" />
 		<Unit filename="../include/toolkit.h" />
-		<Unit filename="Level2UserApi.cpp" />
-		<Unit filename="Level2UserApi.h" />
-		<Unit filename="main.cpp" />
+		<Unit filename="TraderApi.cpp" />
+		<Unit filename="TraderApi.h" />
+		<Unit filename="TypeConvert.cpp" />
+		<Unit filename="TypeConvert.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

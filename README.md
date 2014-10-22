@@ -18,7 +18,7 @@
 
 ### 在Windows .Net项目中使用
 1. 使用Visual Studio 2013打开QuantBox\_XAPI\_Windows.sln进行编译，会生成
-> **QuantBox.XAPI.dll**:C#接口，由它进行C接口的加载<br/>
+> **QuantBox\.XAPI\.dll**:C#接口，由它进行C接口的加载<br/>
 > **QuantBox\_Queue.dll**:C接口，消息队列，行情与交易的数据先进入队列然后，由内部的线程进行触发<br/>
 > **QuantBox\_CTP\_Quote.dll**:C接口,调用CTP的行情API<br/>
 > **QuantBox\_CTP\_Trade.dll**:C接口,调用CTP的交易API<br/>
@@ -26,7 +26,7 @@
 
 ### 在Linux Mono项目中使用
 1. 使用Mono Develop打开QuantBox\_XAPI\_CSharp\_Linux.sln进行编译，会生成
-> **QuantBox.XAPI.dll**:C#接口，由它进行C接口的加载
+> **QuantBox\.XAPI\.dll**:C#接口，由它进行C接口的加载
 
 2. 使用Code::Blocks打开QuantBox\_XAPI\_C\_Linux.workspace进行编译，注意得使用Clang编译器，会生成
 > **libQuantBox\_Queue.so**:C接口，消息队列，行情与交易的数据先进入队列然后，由内部的线程进行触发<br/>

@@ -7,5 +7,7 @@
 		<Project filename="QuantBox_LTS_Quote/QuantBox_LTS_Quote.cbp" />
 		<Project filename="QuantBox_LTS_Trade/QuantBox_LTS_Trade.cbp" />
 		<Project filename="QuantBox_LTS_Level2/QuantBox_LTS_Level2.cbp" />
+		<Project filename="QuantBox_XSpeed_Quote/QuantBox_XSpeed_Quote.cbp" />
+		<Project filename="QuantBox_XSpeed_Trade/QuantBox_XSpeed_Trade.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
