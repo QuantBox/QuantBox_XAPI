@@ -56,10 +56,9 @@ void CLevel2UserApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
 	UserInfoField* pUserInfo)
 {
-	m_szBrokerId = pServerInfo->BrokerID;
-	m_szInvestorId = pUserInfo->UserID;
-	m_szPassword = pUserInfo->Password;
-	m_szAddresses = pServerInfo->Address;
+	m_szPath = szPath;
+	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
+	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
 	m_pApi = CSecurityFtdcL2MDUserApi::CreateFtdcL2MDUserApi(pServerInfo->IsMulticast);
 
@@ -70,9 +69,9 @@ void CLevel2UserApi::Connect(const string& szPath,
 		m_pApi->RegisterSpi(this);
 
 		//添加地址
-		size_t len = m_szAddresses.length() + 1;
+		size_t len = strlen(m_ServerInfo.Address) + 1;
 		char* buf = new char[len];
-		strncpy(buf, m_szAddresses.c_str(), len);
+		strncpy(buf, m_ServerInfo.Address, len);
 
 		char* token = strtok(buf, _QUANTBOX_SEPS_);
 		while (token)
@@ -98,9 +97,9 @@ void CLevel2UserApi::ReqUserLogin()
 
 	CSecurityFtdcUserLoginField request = { 0 };
 
-	strncpy(request.BrokerID, m_szBrokerId.c_str(), sizeof(TSecurityFtdcBrokerIDType));
-	strncpy(request.UserID, m_szInvestorId.c_str(), sizeof(TSecurityFtdcUserIDType));
-	strncpy(request.Password, m_szPassword.c_str(), sizeof(TSecurityFtdcPasswordType));
+	strncpy(request.BrokerID, m_ServerInfo.BrokerID, sizeof(TSecurityFtdcBrokerIDType));
+	strncpy(request.UserID, m_UserInfo.UserID, sizeof(TSecurityFtdcUserIDType));
+	strncpy(request.Password, m_UserInfo.Password, sizeof(TSecurityFtdcPasswordType));
 
 	//只有这一处用到了m_nRequestID，没有必要每次重连m_nRequestID都从0开始
 	m_pApi->ReqUserLogin(&request,++m_nRequestID);

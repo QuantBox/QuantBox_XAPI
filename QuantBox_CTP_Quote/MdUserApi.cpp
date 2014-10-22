@@ -62,14 +62,13 @@ void CMdUserApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
 	UserInfoField* pUserInfo)
 {
-	m_szBrokerId = pServerInfo->BrokerID;
-	m_szInvestorId = pUserInfo->UserID;
-	m_szPassword = pUserInfo->Password;
-	m_szAddresses = pServerInfo->Address;
+	m_szPath = szPath;
+	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
+	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
 	char *pszPath = new char[szPath.length()+1024];
 	srand((unsigned int)time(NULL));
-	sprintf(pszPath, "%s/%s/%s/Md/%d/", szPath.c_str(), m_szBrokerId.c_str(), m_szInvestorId.c_str(), rand());
+	sprintf(pszPath, "%s/%s/%s/Md/%d/", szPath.c_str(), m_ServerInfo.BrokerID, m_UserInfo.UserID, rand());
 	makedirs(pszPath);
 
 	m_pApi = CThostFtdcMdApi::CreateFtdcMdApi(pszPath, pServerInfo->IsUsingUdp, pServerInfo->IsMulticast);
@@ -82,9 +81,9 @@ void CMdUserApi::Connect(const string& szPath,
 		m_pApi->RegisterSpi(this);
 
 		//添加地址
-		size_t len = m_szAddresses.length() + 1;
+		size_t len = strlen(m_ServerInfo.Address) + 1;
 		char* buf = new char[len];
-		strncpy(buf, m_szAddresses.c_str(), len);
+		strncpy(buf, m_ServerInfo.Address, len);
 
 		char* token = strtok(buf, _QUANTBOX_SEPS_);
 		while(token)
@@ -110,9 +109,9 @@ void CMdUserApi::ReqUserLogin()
 
 	CThostFtdcReqUserLoginField request = {0};
 
-	strncpy(request.BrokerID, m_szBrokerId.c_str(),sizeof(TThostFtdcBrokerIDType));
-	strncpy(request.UserID, m_szInvestorId.c_str(),sizeof(TThostFtdcInvestorIDType));
-	strncpy(request.Password, m_szPassword.c_str(),sizeof(TThostFtdcPasswordType));
+	strncpy(request.BrokerID, m_ServerInfo.BrokerID, sizeof(TThostFtdcBrokerIDType));
+	strncpy(request.UserID, m_UserInfo.UserID, sizeof(TThostFtdcInvestorIDType));
+	strncpy(request.Password, m_UserInfo.Password, sizeof(TThostFtdcPasswordType));
 
 	//只有这一处用到了m_nRequestID，没有必要每次重连m_nRequestID都从0开始
 	m_pApi->ReqUserLogin(&request,++m_nRequestID);

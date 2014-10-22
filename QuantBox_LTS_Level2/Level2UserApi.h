@@ -11,16 +11,7 @@
 #include <map>
 
 using namespace std;
-
-
-
-
 _USING_LTS_NS_
-
-
-
-
-
 
 class CLevel2UserApi :public CSecurityFtdcL2MDUserSpi
 {
@@ -82,10 +73,7 @@ private:
 	void*						m_msgQueue;				//消息队列指针
 
 	string						m_szPath;				//生成配置文件的路径
-	set<string>					m_arrAddresses;			//服务器地址
-	string						m_szBrokerId;			//期商ID
-	string						m_szInvestorId;			//投资者ID
-	string						m_szPassword;			//密码
-	string						m_szAddresses;
+	ServerInfoField				m_ServerInfo;
+	UserInfoField				m_UserInfo;
 };
 

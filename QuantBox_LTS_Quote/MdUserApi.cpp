@@ -16,8 +16,8 @@ using namespace std;
 
 CMdUserApi::CMdUserApi(void)
 {
-	m_pApi = NULL;
-	m_msgQueue = NULL;
+	m_pApi = nullptr;
+	m_msgQueue = nullptr;
 	m_nRequestID = 0;
 }
 
@@ -56,14 +56,13 @@ void CMdUserApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
 	UserInfoField* pUserInfo)
 {
-	m_szBrokerId = pServerInfo->BrokerID;
-	m_szInvestorId = pUserInfo->UserID;
-	m_szPassword = pUserInfo->Password;
-	string szAddresses = pServerInfo->Address;
+	m_szPath = szPath;
+	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
+	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
 	char *pszPath = new char[szPath.length()+1024];
-	srand((unsigned int)time(NULL));
-	sprintf(pszPath, "%s/%s/%s/Md/%d/", szPath.c_str(), m_szBrokerId.c_str(), m_szInvestorId.c_str(), rand());
+	srand((unsigned int)time(nullptr));
+	sprintf(pszPath, "%s/%s/%s/Md/%d/", szPath.c_str(), m_ServerInfo.BrokerID, m_UserInfo.UserID, rand());
 	makedirs(pszPath);
 
 	m_pApi = CSecurityFtdcMdApi::CreateFtdcMdApi(pszPath);
@@ -76,9 +75,9 @@ void CMdUserApi::Connect(const string& szPath,
 		m_pApi->RegisterSpi(this);
 
 		//添加地址
-		size_t len = szAddresses.length()+1;
+		size_t len = strlen(m_ServerInfo.Address) + 1;
 		char* buf = new char[len];
-		strncpy(buf,szAddresses.c_str(),len);
+		strncpy(buf, m_ServerInfo.Address, len);
 
 		char* token = strtok(buf, _QUANTBOX_SEPS_);
 		while(token)
@@ -87,7 +86,7 @@ void CMdUserApi::Connect(const string& szPath,
 			{
 				m_pApi->RegisterFront(token);
 			}
-			token = strtok( NULL, _QUANTBOX_SEPS_);
+			token = strtok( nullptr, _QUANTBOX_SEPS_);
 		}
 		delete[] buf;
 
@@ -99,14 +98,14 @@ void CMdUserApi::Connect(const string& szPath,
 
 void CMdUserApi::ReqUserLogin()
 {
-	if (NULL == m_pApi)
+	if (nullptr == m_pApi)
 		return;
 
 	CSecurityFtdcReqUserLoginField request = {0};
 
-	strncpy(request.BrokerID, m_szBrokerId.c_str(),sizeof(TSecurityFtdcBrokerIDType));
-	strncpy(request.UserID, m_szInvestorId.c_str(),sizeof(TSecurityFtdcInvestorIDType));
-	strncpy(request.Password, m_szPassword.c_str(),sizeof(TSecurityFtdcPasswordType));
+	strncpy(request.BrokerID, m_ServerInfo.BrokerID, sizeof(TSecurityFtdcBrokerIDType));
+	strncpy(request.UserID, m_UserInfo.UserID, sizeof(TSecurityFtdcInvestorIDType));
+	strncpy(request.Password, m_UserInfo.Password, sizeof(TSecurityFtdcPasswordType));
 
 	//只有这一处用到了m_nRequestID，没有必要每次重连m_nRequestID都从0开始
 	m_pApi->ReqUserLogin(&request,++m_nRequestID);
@@ -118,9 +117,9 @@ void CMdUserApi::Disconnect()
 {
 	if(m_pApi)
 	{
-		m_pApi->RegisterSpi(NULL);
+		m_pApi->RegisterSpi(nullptr);
 		m_pApi->Release();
-		m_pApi = NULL;
+		m_pApi = nullptr;
 
 		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	}
@@ -129,7 +128,7 @@ void CMdUserApi::Disconnect()
 
 void CMdUserApi::Subscribe(const string& szInstrumentIDs, const string& szExchageID)
 {
-	if(NULL == m_pApi)
+	if(nullptr == m_pApi)
 		return;
 
 	vector<char*> vct;
@@ -166,7 +165,7 @@ void CMdUserApi::Subscribe(const string& szInstrumentIDs, const string& szExchag
 
 void CMdUserApi::Subscribe(const set<string>& instrumentIDs, const string& szExchageID)
 {
-	if(NULL == m_pApi)
+	if(nullptr == m_pApi)
 		return;
 
 	string szInstrumentIDs;
@@ -184,7 +183,7 @@ void CMdUserApi::Subscribe(const set<string>& instrumentIDs, const string& szExc
 
 void CMdUserApi::Unsubscribe(const string& szInstrumentIDs, const string& szExchageID)
 {
-	if(NULL == m_pApi)
+	if(nullptr == m_pApi)
 		return;
 
 	vector<char*> vct;
@@ -221,7 +220,7 @@ void CMdUserApi::Unsubscribe(const string& szInstrumentIDs, const string& szExch
 
 //void CMdUserApi::SubscribeQuote(const string& szInstrumentIDs, const string& szExchageID)
 //{
-//	if (NULL == m_pApi)
+//	if (nullptr == m_pApi)
 //		return;
 //
 //	vector<char*> vct;
@@ -249,7 +248,7 @@ void CMdUserApi::Unsubscribe(const string& szInstrumentIDs, const string& szExch
 //
 //void CMdUserApi::SubscribeQuote(const set<string>& instrumentIDs, const string& szExchageID)
 //{
-//	if (NULL == m_pApi)
+//	if (nullptr == m_pApi)
 //		return;
 //
 //	string szInstrumentIDs;
@@ -267,7 +266,7 @@ void CMdUserApi::Unsubscribe(const string& szInstrumentIDs, const string& szExch
 
 //void CMdUserApi::UnsubscribeQuote(const string& szInstrumentIDs, const string& szExchageID)
 //{
-//	if (NULL == m_pApi)
+//	if (nullptr == m_pApi)
 //		return;
 //
 //	vector<char*> vct;

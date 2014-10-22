@@ -80,17 +80,13 @@ void CTraderApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
 	UserInfoField* pUserInfo)
 {
-	m_szBrokerId = pServerInfo->BrokerID;
-	m_szInvestorId = pUserInfo->UserID;
-	m_szPassword = pUserInfo->Password;
-	m_szUserProductInfo = pServerInfo->UserProductInfo;
-	m_szAuthCode = pServerInfo->AuthCode;
-
-	string szAddresses = pServerInfo->Address;
-
+	m_szPath = szPath;
+	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
+	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
+	
 	char *pszPath = new char[szPath.length() + 1024];
 	srand((unsigned int)time(nullptr));
-	sprintf(pszPath, "%s/%s/%s/Td/%d/", szPath.c_str(), m_szBrokerId.c_str(), m_szInvestorId.c_str(), rand());
+	sprintf(pszPath, "%s/%s/%s/Td/%d/", szPath.c_str(), m_ServerInfo.BrokerID, m_UserInfo.UserID, rand());
 	makedirs(pszPath);
 
 	m_pApi = CThostFtdcTraderApi::CreateFtdcTraderApi(pszPath);
@@ -103,9 +99,9 @@ void CTraderApi::Connect(const string& szPath,
 		m_pApi->RegisterSpi(this);
 
 		//添加地址
-		size_t len = szAddresses.length()+1;
+		size_t len = strlen(m_ServerInfo.Address) + 1;
 		char* buf = new char[len];
-		strncpy(buf,szAddresses.c_str(),len);
+		strncpy(buf, m_ServerInfo.Address, len);
 
 		char* token = strtok(buf, _QUANTBOX_SEPS_);
 		while(token)
@@ -319,8 +315,8 @@ void CTraderApi::OnFrontConnected()
 	XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	//连接成功后自动请求认证或登录
-	if(m_szAuthCode.length()>0
-		&&m_szUserProductInfo.length()>0)
+	if (strlen(m_ServerInfo.AuthCode)>0
+		&& strlen(m_ServerInfo.UserProductInfo)>0)
 	{
 		//填了认证码就先认证
 		ReqAuthenticate();
@@ -354,10 +350,10 @@ void CTraderApi::ReqAuthenticate()
 
 		CThostFtdcReqAuthenticateField& body = pRequest->ReqAuthenticateField;
 
-		strncpy(body.BrokerID, m_szBrokerId.c_str(),sizeof(TThostFtdcBrokerIDType));
-		strncpy(body.UserID, m_szInvestorId.c_str(),sizeof(TThostFtdcInvestorIDType));
-		strncpy(body.UserProductInfo,m_szUserProductInfo.c_str(),sizeof(TThostFtdcProductInfoType));
-		strncpy(body.AuthCode,m_szAuthCode.c_str(),sizeof(TThostFtdcAuthCodeType));
+		strncpy(body.BrokerID, m_ServerInfo.BrokerID, sizeof(TThostFtdcBrokerIDType));
+		strncpy(body.UserID, m_UserInfo.UserID, sizeof(TThostFtdcInvestorIDType));
+		strncpy(body.UserProductInfo, m_ServerInfo.UserProductInfo, sizeof(TThostFtdcProductInfoType));
+		strncpy(body.AuthCode, m_ServerInfo.AuthCode, sizeof(TThostFtdcAuthCodeType));
 
 		AddToSendQueue(pRequest);
 	}
@@ -397,10 +393,10 @@ void CTraderApi::ReqUserLogin()
 
 		CThostFtdcReqUserLoginField& body = pRequest->ReqUserLoginField;
 
-		strncpy(body.BrokerID, m_szBrokerId.c_str(),sizeof(TThostFtdcBrokerIDType));
-		strncpy(body.UserID, m_szInvestorId.c_str(),sizeof(TThostFtdcInvestorIDType));
-		strncpy(body.Password, m_szPassword.c_str(),sizeof(TThostFtdcPasswordType));
-		strncpy(body.UserProductInfo,m_szUserProductInfo.c_str(),sizeof(TThostFtdcProductInfoType));
+		strncpy(body.BrokerID, m_ServerInfo.BrokerID, sizeof(TThostFtdcBrokerIDType));
+		strncpy(body.UserID, m_UserInfo.UserID, sizeof(TThostFtdcInvestorIDType));
+		strncpy(body.Password, m_UserInfo.Password, sizeof(TThostFtdcPasswordType));
+		strncpy(body.UserProductInfo, m_ServerInfo.UserProductInfo, sizeof(TThostFtdcProductInfoType));
 
 		AddToSendQueue(pRequest);
 	}
@@ -450,8 +446,8 @@ void CTraderApi::ReqSettlementInfoConfirm()
 
 		CThostFtdcSettlementInfoConfirmField& body = pRequest->SettlementInfoConfirmField;
 
-		strncpy(body.BrokerID, m_szBrokerId.c_str(),sizeof(TThostFtdcBrokerIDType));
-		strncpy(body.InvestorID, m_szInvestorId.c_str(),sizeof(TThostFtdcInvestorIDType));
+		strncpy(body.BrokerID, m_ServerInfo.BrokerID, sizeof(TThostFtdcBrokerIDType));
+		strncpy(body.InvestorID, m_UserInfo.UserID, sizeof(TThostFtdcInvestorIDType));
 
 		AddToSendQueue(pRequest);
 	}

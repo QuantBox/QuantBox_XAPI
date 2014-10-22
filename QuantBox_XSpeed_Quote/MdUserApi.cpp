@@ -84,10 +84,9 @@ void CMdUserApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
 	UserInfoField* pUserInfo)
 {
-	m_szBrokerId = pServerInfo->BrokerID;
-	m_szInvestorId = pUserInfo->UserID;
-	m_szPassword = pUserInfo->Password;
-	m_szAddresses = pServerInfo->Address;
+	m_szPath = szPath;
+	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
+	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
 	m_pApi = DFITCMdApi::CreateDFITCMdApi();
 
@@ -115,9 +114,9 @@ void CMdUserApi::ReqUserLogin()
 
 	DFITCUserLoginField request = {};
 
-	strncpy(request.accountID, m_szInvestorId.c_str(), sizeof(DFITCAccountIDType));
-	strncpy(request.passwd, m_szPassword.c_str(), sizeof(DFITCPasswdType));
-	request.companyID = atoi(m_szBrokerId.c_str());
+	strncpy(request.accountID, m_UserInfo.UserID, sizeof(DFITCAccountIDType));
+	strncpy(request.passwd, m_UserInfo.Password, sizeof(DFITCPasswdType));
+	request.companyID = atoi(m_ServerInfo.BrokerID);
 
 	//只有这一处用到了m_nRequestID，没有必要每次重连m_nRequestID都从0开始
 	m_pApi->ReqUserLogin(&request);
@@ -436,7 +435,7 @@ int CMdUserApi::ReqInit()
 {
 	XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	//初始化连接
-	int iRet = m_pApi->Init((char*)m_szAddresses.c_str(), this);
+	int iRet = m_pApi->Init(m_ServerInfo.Address, this);
 	if (0 == iRet)
 	{
 	}

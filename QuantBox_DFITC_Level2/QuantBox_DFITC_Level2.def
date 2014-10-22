@@ -1,0 +1,6 @@
+;QuantBox_DFITC_Level2.def : µ¼³öDLLº¯Êý
+
+LIBRARY QuantBox_DFITC_Level2
+EXPORTS 
+	XRequest @1
+

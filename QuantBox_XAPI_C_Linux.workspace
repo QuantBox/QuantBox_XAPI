@@ -9,5 +9,6 @@
 		<Project filename="QuantBox_LTS_Level2/QuantBox_LTS_Level2.cbp" />
 		<Project filename="QuantBox_XSpeed_Quote/QuantBox_XSpeed_Quote.cbp" />
 		<Project filename="QuantBox_XSpeed_Trade/QuantBox_XSpeed_Trade.cbp" />
+		<Project filename="QuantBox_DFITC_Level2/QuantBox_DFITC_Level2.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>
