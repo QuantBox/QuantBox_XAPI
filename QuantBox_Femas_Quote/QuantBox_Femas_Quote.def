@@ -1,0 +1,5 @@
+;QuantBox_Femas_Quote.def : µ¼³öDLLº¯Êý
+
+LIBRARY QuantBox_Femas_Quote
+EXPORTS 
+	XRequest @1

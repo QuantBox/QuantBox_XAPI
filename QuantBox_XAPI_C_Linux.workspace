@@ -10,5 +10,7 @@
 		<Project filename="QuantBox_XSpeed_Quote/QuantBox_XSpeed_Quote.cbp" />
 		<Project filename="QuantBox_XSpeed_Trade/QuantBox_XSpeed_Trade.cbp" />
 		<Project filename="QuantBox_DFITC_Level2/QuantBox_DFITC_Level2.cbp" />
+		<Project filename="QuantBox_Femas_Quote/QuantBox_CTP_Quote.cbp" />
+		<Project filename="QuantBox_Femas_Trade/QuantBox_Femas_Trade.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

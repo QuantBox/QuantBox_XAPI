@@ -182,6 +182,7 @@ namespace QuantBox
         Speculation,
         Arbitrage,
         Hedge,
+        MarketMaker,
     };
 
     public enum InstrumentType : byte

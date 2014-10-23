@@ -1,0 +1,6 @@
+;QuantBox_Femas_Trade.def : µ¼³öDLLº¯Êý
+
+LIBRARY QuantBox_Femas_Trade
+EXPORTS 
+	XRequest @1
+

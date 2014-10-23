@@ -30,7 +30,6 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		delete pApi;
 		return nullptr;
 	case Register:
-		// 此处注册是将消息队列的指针传入
 		pApi->Register(ptr1);
 		break;
 	case Connect:

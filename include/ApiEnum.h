@@ -121,6 +121,7 @@ enum HedgeFlagType :char
 	Speculation,
 	Arbitrage,
 	Hedge,
+	MarketMaker,
 };
 
 enum InstrumentType :char
