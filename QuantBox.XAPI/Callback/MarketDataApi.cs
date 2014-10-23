@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace QuantBox.XAPI.Callback
 {
-    public class MarketDataApi : BaseApi
+    public class MarketDataApi : BaseApi,IDisposable
     {
         public DelegateOnRtnDepthMarketData OnRtnDepthMarketData;
-        public MarketDataApi(string path1, Queue queue)
+        internal MarketDataApi(string path1, Queue queue)
             : base(path1, queue)
         {
         }

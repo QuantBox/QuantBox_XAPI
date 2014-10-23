@@ -16,7 +16,7 @@ namespace QuantBox.XAPI.Callback
         public DelegateOnRtnTrade OnRtnTrade;
 
         private Dictionary<string, StringBuilder> dict = new Dictionary<string, StringBuilder>();
-        public TraderApi(string path1, Queue queue)
+        internal TraderApi(string path1, Queue queue)
             : base(path1, queue)
         {
         }

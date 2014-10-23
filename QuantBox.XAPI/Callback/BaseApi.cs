@@ -13,7 +13,8 @@ namespace QuantBox.XAPI.Callback
         protected Proxy proxy;
         protected IntPtr Handle = IntPtr.Zero;
         protected Queue _Queue;
-        private string _Path;
+        private string _Path1;
+        private string _Path2;
 
         protected XCall _XRespone;
 
@@ -51,9 +52,9 @@ namespace QuantBox.XAPI.Callback
 
         private System.Timers.Timer _Timer = new System.Timers.Timer();
 
-        public BaseApi(string path1,Queue queue)
+        internal BaseApi(string path1,Queue queue)
         {
-            _Path = path1;
+            _Path1 = path1;
             
             // 这里是因为回调函数可能被GC回收
             _XRespone = _OnRespone;
@@ -181,7 +182,7 @@ namespace QuantBox.XAPI.Callback
                 if (proxy != null)
                     return;
 
-                proxy = new Proxy(_Path);
+                proxy = new Proxy(_Path1);
 
                 Handle = proxy.XRequest((byte)RequestType.Create, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
@@ -218,16 +219,19 @@ namespace QuantBox.XAPI.Callback
             }
         }
 
-        public virtual void Disconnect()
+        internal virtual void Disconnect()
         {
             lock(locker)
             {
+                _Timer.Enabled = false;
+
                 IsConnected = false;
 
                 if (proxy != null)
                 {
-                    // 将API与队列解绑定
-                    proxy.XRequest((byte)RequestType.Register, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+                    // 将API与队列解绑定，这句提前操作了就收不到Disconnected事件了
+                    //proxy.XRequest((byte)RequestType.Register, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+
                     proxy.XRequest((byte)RequestType.Release, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
                     proxy.Dispose();
