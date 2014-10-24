@@ -605,6 +605,7 @@ int CTraderApi::ReqOrderInsert(
 
 			OrderField* pField = new OrderField();
 			memcpy(pField, pOrder1, sizeof(OrderField));
+			strcpy(pField->ID, orderId);
 			m_id_platform_order.insert(pair<string, OrderField*>(orderId, pField));
 		}
 	}
@@ -1391,8 +1392,7 @@ void CTraderApi::OnOrder(CThostFtdcOrderField *pOrder)
 
 		// 保存SysID用于定义成交回报与订单
 		sprintf(orderSydId, "%s:%s", pOrder->ExchangeID, pOrder->OrderSysID);
-		//m_sysId_orderId.insert(pair<string, string>(string(orderSydId), string(orderId)));
-		m_sysId_orderId[orderSydId] = orderId;
+		m_sysId_orderId.insert(pair<string, string>(orderSydId, orderId));
 	}
 
 	{

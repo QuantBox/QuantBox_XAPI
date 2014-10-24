@@ -118,26 +118,20 @@ TUstpFtdcOrderPriceTypeType OrderType_2_TUstpFtdcOrderPriceTypeType(OrderType In
 
 OrderStatus CUstpFtdcOrderField_2_OrderStatus(CUstpFtdcOrderField* pIn)
 {
-	//switch (pIn->OrderStatus)
-	//{
-	//case USTP_FTDC_OS_Canceled:
-	//	if (pIn->OrderSubmitStatus == USTP_FTDC_OSS_InsertRejected)
-	//		return OrderStatus::Rejected;
-	//	return OrderStatus::Cancelled;
-	//case USTP_FTDC_OST_Unknown:
-	//	// 如果是撤单，也有可能出现这一条，如何过滤？
-	//	if (pIn->OrderSubmitStatus == USTP_FTDC_OSS_InsertSubmitted)
-	//		return OrderStatus::New;
-	//default:
-	//	if (pIn->VolumeTotal == 0)
-	//		return OrderStatus::Filled;
-	//	else if (pIn->VolumeTotal == pIn->VolumeTotalOriginal)
-	//		return OrderStatus::New;
-	//	else
-	//		return OrderStatus::PartiallyFilled;
-	//}
-
-	return OrderStatus::PartiallyFilled;
+	switch (pIn->OrderStatus)
+	{
+	case USTP_FTDC_OS_Canceled:
+		return OrderStatus::Cancelled;
+	case USTP_FTDC_OS_NoTradeQueueing:
+		return OrderStatus::New;
+	default:
+		if (pIn->VolumeRemain == 0)
+			return OrderStatus::Filled;
+		else if (pIn->VolumeRemain == pIn->Volume)
+			return OrderStatus::New;
+		else
+			return OrderStatus::PartiallyFilled;
+	}
 }
 
 OrderType CUstpFtdcOrderField_2_OrderType(CUstpFtdcOrderField* pIn)
@@ -176,22 +170,18 @@ TimeInForce CUstpFtdcOrderField_2_TimeInForce(CUstpFtdcOrderField* pIn)
 
 ExecType CUstpFtdcOrderField_2_ExecType(CUstpFtdcOrderField* pIn)
 {
-	//switch (pIn->OrderStatus)
-	//{
-	//case USTP_FTDC_OST_Canceled:
-	//	if (pIn->OrderSubmitStatus == USTP_FTDC_OSS_InsertRejected)
-	//		return ExecType::ExecRejected;
-	//	return ExecType::ExecCancelled;
-	//case USTP_FTDC_OST_Unknown:
-	//	// 如果是撤单，也有可能出现这一条，如何过滤？
-	//	if (pIn->OrderSubmitStatus == USTP_FTDC_OSS_InsertSubmitted)
-	//		return ExecType::ExecNew;
-	//case USTP_FTDC_OST_AllTraded:
-	//case USTP_FTDC_OST_PartTradedQueueing:
-	//	return ExecType::ExecTrade;
-	//default:
+	switch (pIn->OrderStatus)
+	{
+	case USTP_FTDC_OS_Canceled:
+		return ExecType::ExecCancelled;
+	case USTP_FTDC_OS_NoTradeQueueing:
 		return ExecType::ExecNew;
-	//}
+	case USTP_FTDC_OS_AllTraded:
+	case USTP_FTDC_OS_PartTradedQueueing:
+		return ExecType::ExecTrade;
+	default:
+		return ExecType::ExecNew;
+	}
 }
 
 InstrumentType CUstpFtdcRspInstrumentField_2_InstrumentType(CUstpFtdcRspInstrumentField* pIn)

@@ -51,7 +51,7 @@ namespace QuantBox.XAPI.Callback
             Marshal.FreeHGlobal(szTradingDayPtr);
         }
 
-        public string SendOrder(int OrderRef, ref OrderField order1, ref long ret)
+        public string SendOrder(int OrderRef, ref OrderField order1, ref ulong ret)
         {
             int size = Marshal.SizeOf(typeof(OrderField));
 
@@ -60,21 +60,20 @@ namespace QuantBox.XAPI.Callback
             Marshal.StructureToPtr(order1, order1Ptr, false);
             //Marshal.StructureToPtr(order2, order2Ptr, false);
 
-            IntPtr ptr = proxy.XRequest((byte)RequestType.ReqOrderInsert, Handle, IntPtr.Zero,
+            ret = proxy.XRequest((byte)RequestType.ReqOrderInsert, Handle, IntPtr.Zero,
                 OrderRef, 0,
                 order1Ptr, size, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
             Marshal.FreeHGlobal(order1Ptr);
             //Marshal.FreeHGlobal(order2Ptr);
 
-            ret = ptr.ToInt64();
             if (ret <= 0)
                 return null;
 
-            return string.Format("{0}:{1}",UserLoginField.SessionID,ptr);
+            return string.Format("{0}:{1}",UserLoginField.SessionID,ret);
         }
 
-        public string SendOrder(int OrderRef, ref OrderField order1, ref OrderField order2, ref long ret)
+        public string SendOrder(int OrderRef, ref OrderField order1, ref OrderField order2, ref ulong ret)
         {
             int size = Marshal.SizeOf(typeof(OrderField));
 
@@ -83,30 +82,29 @@ namespace QuantBox.XAPI.Callback
             Marshal.StructureToPtr(order1, order1Ptr, false);
             Marshal.StructureToPtr(order2, order2Ptr, false);
 
-            IntPtr ptr = proxy.XRequest((byte)RequestType.ReqOrderInsert, Handle, IntPtr.Zero,
+            ret = proxy.XRequest((byte)RequestType.ReqOrderInsert, Handle, IntPtr.Zero,
                 OrderRef, 0,
                 order1Ptr, size, order2Ptr, size, IntPtr.Zero, 0);
 
             Marshal.FreeHGlobal(order1Ptr);
             Marshal.FreeHGlobal(order2Ptr);
 
-            ret = ptr.ToInt64();
             if (ret <= 0)
                 return null;
 
-            return string.Format("{0}:{1}", UserLoginField.SessionID, ptr);
+            return string.Format("{0}:{1}", UserLoginField.SessionID, ret);
         }
 
-        public long CancelOrder(string szId)
+        public ulong CancelOrder(string szId)
         {
             IntPtr szIdPtr = Marshal.StringToHGlobalAnsi(szId);
 
-            IntPtr ptr = proxy.XRequest((byte)RequestType.ReqOrderAction, Handle, IntPtr.Zero, 0, 0,
+            ulong ret = proxy.XRequest((byte)RequestType.ReqOrderAction, Handle, IntPtr.Zero, 0, 0,
                 szIdPtr, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
             Marshal.FreeHGlobal(szIdPtr);
 
-            return ptr.ToInt64();
+            return ret;
         }
 
         public string SendQuote(ref OrderField order1, ref OrderField order2)
@@ -137,7 +135,7 @@ namespace QuantBox.XAPI.Callback
             Marshal.FreeHGlobal(szIdPtr);
         }
 
-        protected override IntPtr OnRespone(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
+        protected override ulong OnRespone(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
         {
             switch ((ResponeType)type)
             {
@@ -160,7 +158,7 @@ namespace QuantBox.XAPI.Callback
                     break;
             }
 
-            return IntPtr.Zero;
+            return 0;
         }
 
         private void _OnRspQryInstrument(IntPtr ptr1,int size1, double double1)

@@ -11,17 +11,17 @@ inline CMsgQueue* GetQueue(void* pMsgQueue)
 	return static_cast<CMsgQueue*>(pMsgQueue);
 }
 
-void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+long long __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	RequestType rt = (RequestType)type;
 	if (rt == RequestType::Create)
 	{
-		return new CMsgQueue();
+		return (long long)new CMsgQueue();
 	}
 
 	if (pApi1 == nullptr)
 	{
-		return nullptr;
+		return 0;
 	}
 
 	CMsgQueue* pQueue = GetQueue(pApi1);
@@ -30,7 +30,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	{
 	case RequestType::Release:
 		delete pQueue;
-		return nullptr;
+		return 0;
 	case RequestType::Register:
 		pQueue->Register(ptr1);
 		break;
@@ -50,7 +50,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		break;
 	}
 
-	return pApi1;
+	return (long long)pApi1;
 }
 
 void* __stdcall XRespone(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)

@@ -39,6 +39,7 @@ class CTraderApi :
 		E_QrySettlementInfoField,
 		E_QryOrderField,
 		E_QryTradeField,
+		E_OrderActionField,
 	};
 
 	//请求数据包结构体
@@ -57,6 +58,7 @@ class CTraderApi :
 			CUstpFtdcQryInvestorAccountField			QryInvestorAccountField;
 			CUstpFtdcQryInvestorFeeField				QryInvestorFeeField;
 			CUstpFtdcQryInvestorMarginField				QryInvestorMarginField;
+			CUstpFtdcOrderActionField					OrderActionField;
 		};
 	};
 
@@ -71,14 +73,13 @@ public:
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	int ReqOrderInsert(
+	long long ReqOrderInsert(
 		int OrderRef,
-		OrderField* pOrder1,
-		OrderField* pOrder2);
+		OrderField* pOrder1);
 
-	int ReqParkedOrderInsert(int OrderRef,
-		OrderField* pOrder1,
-		OrderField* pOrder2);
+	//int ReqParkedOrderInsert(int OrderRef,
+	//	OrderField* pOrder1,
+	//	OrderField* pOrder2);
 
 	int ReqOrderAction(const string& szId);
 	int ReqOrderAction(CUstpFtdcOrderField *pOrder);
@@ -176,7 +177,7 @@ private:
 	//合约、手续费
 	virtual void OnRspQryInstrument(CUstpFtdcRspInstrumentField *pRspInstrument, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspQryInvestorMargin(CUstpFtdcInvestorMarginField *pInvestorMargin, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	//virtual void OnRspQryInvestorFee(CUstpFtdcInvestorFeeField *pInvestorFee, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	virtual void OnRspQryInvestorFee(CUstpFtdcInvestorFeeField *pInvestorFee, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//其它
 	virtual void OnRspError(CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -185,11 +186,12 @@ private:
 private:
 	atomic<int>					m_lRequestID;			//请求ID,得保持自增
 
+	RspUserLoginField			m_RspUserLogin__;
 	CUstpFtdcRspUserLoginField	m_RspUserLogin;			//返回的登录成功响应，目前利用此内成员进行报单所属区分
 	CUstpFtdcRspUserInvestorField m_RspUserInvestor;
 
 	mutex						m_csOrderRef;
-	int							m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增
+	long long					m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增
 
 	CUstpFtdcTraderApi*			m_pApi;					//交易API
 	void*						m_msgQueue;				//消息队列指针
@@ -210,10 +212,10 @@ private:
 
 	hash_map<string, OrderField*>				m_id_platform_order;
 	hash_map<string, CUstpFtdcOrderField*>		m_id_api_order;
-	hash_map<string, string>					m_sysId_orderId;
+	//hash_map<string, string>					m_sysId_orderId;
 
 	//hash_map<string, QuoteField*>				m_id_platform_quote;
 	hash_map<string, CUstpFtdcRtnQuoteField*>		m_id_api_quote;
-	hash_map<string, string>					m_sysId_quoteId;
+	//hash_map<string, string>					m_sysId_quoteId;
 };
 

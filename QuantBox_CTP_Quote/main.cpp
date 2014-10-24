@@ -9,17 +9,17 @@ inline CMdUserApi* GetApi(void* pApi)
 	return static_cast<CMdUserApi*>(pApi);
 }
 
-void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+long long __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	RequestType rt = (RequestType)type;
 	if (rt == RequestType::Create)
 	{
-		return new CMdUserApi();
+		return (long long)new CMdUserApi();
 	}
 
 	if (pApi1 == nullptr)
 	{
-		return nullptr;
+		return 0;
 	}
 
 	CMdUserApi* pApi = GetApi(pApi1);
@@ -28,12 +28,12 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	{
 	case RequestType::Release:
 		delete pApi;
-		return nullptr;
+		return 0;
 	case RequestType::Register:
 		pApi->Register(ptr1);
 		break;
 	case RequestType::Config:
-		return (void*)pApi->Config((ConfigInfoField*)ptr1);
+		return (long long)pApi->Config((ConfigInfoField*)ptr1);
 		break;
 	case RequestType::Connect:
 		pApi->Connect((const char*)ptr3, (ServerInfoField*)ptr1, (UserInfoField*)ptr2);
@@ -58,5 +58,5 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		break;
 	}
 
-	return pApi1;
+	return (long long)pApi1;
 }

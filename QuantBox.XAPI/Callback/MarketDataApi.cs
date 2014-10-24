@@ -85,7 +85,7 @@ namespace QuantBox.XAPI.Callback
         }
         #endregion
 
-        protected override IntPtr OnRespone(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
+        protected override ulong OnRespone(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
         {
             switch ((ResponeType)type)
             {
@@ -96,7 +96,7 @@ namespace QuantBox.XAPI.Callback
                     break;
             }
 
-            return IntPtr.Zero;
+            return 0;
         }
 
         private void _OnRtnDepthMarketData(IntPtr ptr1)

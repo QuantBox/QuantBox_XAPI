@@ -110,8 +110,8 @@ void CMdUserApi::ReqUserLogin()
 
 	CUstpFtdcReqUserLoginField request = {0};
 
+	strncpy(request.UserID, m_UserInfo.UserID, sizeof(TUstpFtdcUserIDType));
 	strncpy(request.BrokerID, m_ServerInfo.BrokerID, sizeof(TUstpFtdcBrokerIDType));
-	strncpy(request.UserID, m_UserInfo.UserID, sizeof(TUstpFtdcInvestorIDType));
 	strncpy(request.Password, m_UserInfo.Password, sizeof(TUstpFtdcPasswordType));
 
 	//只有这一处用到了m_nRequestID，没有必要每次重连m_nRequestID都从0开始
@@ -247,7 +247,7 @@ void CMdUserApi::OnRspUserLogin(CUstpFtdcRspUserLoginField *pRspUserLogin, CUstp
 	else
 	{
 		field.ErrorID = pRspInfo->ErrorID;
-		strncpy(field.ErrorMsg, pRspInfo->ErrorMsg, sizeof(pRspInfo->ErrorMsg));
+		strcpy(field.ErrorMsg, pRspInfo->ErrorMsg);
 
 		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}

@@ -608,6 +608,7 @@ int CTraderApi::ReqOrderInsert(
 
 			OrderField* pField = new OrderField();
 			memcpy(pField, pOrder1, sizeof(OrderField));
+			strcpy(pField->ID, orderId);
 			m_id_platform_order.insert(pair<string, OrderField*>(orderId, pField));
 		}
 	}

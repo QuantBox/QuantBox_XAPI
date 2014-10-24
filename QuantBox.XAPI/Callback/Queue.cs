@@ -15,7 +15,7 @@ namespace QuantBox.XAPI.Callback
         public Queue(string path)
         {
             proxy = new Proxy(path);
-            Handle = proxy.XRequest((byte)RequestType.Create, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+            Handle = new IntPtr((long)proxy.XRequest((byte)RequestType.Create, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0));
         }
 
         ~Queue()

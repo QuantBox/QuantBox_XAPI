@@ -60,6 +60,9 @@ namespace QuantBox.XAPI
 
         static void Main(string[] args)
         {
+            UIntPtr a = new UIntPtr(456);
+            Console.WriteLine(a);
+            return;
             test_CTP_Main(args);
         }
 
