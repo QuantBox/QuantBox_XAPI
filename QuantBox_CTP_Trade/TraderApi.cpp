@@ -474,17 +474,17 @@ void CTraderApi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField
 		ReleaseRequestMapBuf(nRequestID);
 }
 
-int CTraderApi::ReqOrderInsert(
+char* CTraderApi::ReqOrderInsert(
 	int OrderRef,
 	OrderField* pOrder1,
 	OrderField* pOrder2)
 {
 	if (nullptr == m_pApi)
-		return 0;
+		return nullptr;
 
 	SRequest* pRequest = MakeRequestBuf(E_InputOrderField);
 	if (nullptr == pRequest)
-		return 0;
+		return nullptr;
 
 	CThostFtdcInputOrderField& body = pRequest->InputOrderField;
 
@@ -596,22 +596,23 @@ int CTraderApi::ReqOrderInsert(
 		if (n < 0)
 		{
 			nRet = n;
+			delete pRequest;
+			return nullptr;
 		}
 		else
 		{
 			// 用于各种情况下找到原订单，用于进行响应的通知
-			OrderIDType orderId = { 0 };
-			sprintf(orderId, "%d:%d:%d", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, nRet);
+			sprintf(m_orderInsert_Id, "%d:%d:%d", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, nRet);
 
 			OrderField* pField = new OrderField();
 			memcpy(pField, pOrder1, sizeof(OrderField));
-			strcpy(pField->ID, orderId);
-			m_id_platform_order.insert(pair<string, OrderField*>(orderId, pField));
+			strcpy(pField->ID, m_orderInsert_Id);
+			m_id_platform_order.insert(pair<string, OrderField*>(m_orderInsert_Id, pField));
 		}
 	}
 	delete pRequest;//用完后直接删除
 
-	return nRet;
+	return m_orderInsert_Id;
 }
 
 void CTraderApi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -662,17 +663,17 @@ void CTraderApi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CTh
 	}
 }
 
-int CTraderApi::ReqParkedOrderInsert(
+char* CTraderApi::ReqParkedOrderInsert(
 	int OrderRef,
 	OrderField* pOrder1,
 	OrderField* pOrder2)
 {
 	if (nullptr == m_pApi)
-		return 0;
+		return nullptr;
 
 	SRequest* pRequest = MakeRequestBuf(E_ParkedOrderField);
 	if (nullptr == pRequest)
-		return 0;
+		return nullptr;
 
 	CThostFtdcParkedOrderField& body = pRequest->ParkedOrderField;
 
@@ -784,21 +785,21 @@ int CTraderApi::ReqParkedOrderInsert(
 		if (n < 0)
 		{
 			nRet = n;
+			delete pRequest;
+			return nullptr;
 		}
 		else
 		{
-			// 用于各种情况下找到原订单，用于进行响应的通知
-			OrderIDType orderId = { 0 };
-			sprintf(orderId, "%d:%d:%d", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, nRet);
+			sprintf(m_orderInsert_Id, "%d:%d:%d", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, nRet);
 
 			OrderField* pField = new OrderField();
 			memcpy(pField, pOrder1, sizeof(OrderField));
-			m_id_platform_order.insert(pair<string, OrderField*>(orderId, pField));
+			m_id_platform_order.insert(pair<string, OrderField*>(m_orderInsert_Id, pField));
 		}
 	}
 	delete pRequest;//用完后直接删除
 
-	return nRet;
+	return m_orderInsert_Id;
 }
 
 void CTraderApi::OnRtnTrade(CThostFtdcTradeField *pTrade)
@@ -916,17 +917,17 @@ void CTraderApi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 	OnOrder(pOrder);
 }
 
-int CTraderApi::ReqQuoteInsert(
+char* CTraderApi::ReqQuoteInsert(
 	int QuoteRef,
 	OrderField* pOrderAsk,
 	OrderField* pOrderBid)
 {
 	if (nullptr == m_pApi)
-		return 0;
+		return nullptr;
 
 	SRequest* pRequest = MakeRequestBuf(E_InputQuoteField);
 	if (nullptr == pRequest)
-		return 0;
+		return nullptr;
 
 	CThostFtdcInputQuoteField& body = pRequest->InputQuoteField;
 
@@ -981,7 +982,7 @@ int CTraderApi::ReqQuoteInsert(
 	}
 	delete pRequest;//用完后直接删除
 
-	return nRet;
+	return m_orderInsert_Id;
 }
 
 void CTraderApi::OnRspQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

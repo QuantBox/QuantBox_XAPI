@@ -16,6 +16,9 @@
     <Filter Include="lib">
       <UniqueIdentifier>{25089efe-bce5-49c9-837e-de0fc50e6d6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{f5c820ce-6d36-440a-aa55-b339c1ee2fa0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -35,6 +38,9 @@
     </ClInclude>
     <ClInclude Include="..\include\toolkit.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ApiHeader.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

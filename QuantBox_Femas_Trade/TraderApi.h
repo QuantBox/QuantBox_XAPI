@@ -73,7 +73,7 @@ public:
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	long long ReqOrderInsert(
+	char* ReqOrderInsert(
 		int OrderRef,
 		OrderField* pOrder1);
 
@@ -189,6 +189,8 @@ private:
 	RspUserLoginField			m_RspUserLogin__;
 	CUstpFtdcRspUserLoginField	m_RspUserLogin;			//返回的登录成功响应，目前利用此内成员进行报单所属区分
 	CUstpFtdcRspUserInvestorField m_RspUserInvestor;
+
+	OrderIDType					m_orderInsert_Id;
 
 	mutex						m_csOrderRef;
 	long long					m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增

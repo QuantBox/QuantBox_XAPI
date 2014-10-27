@@ -1,5 +1,0 @@
-;QuantBox_LTS_Queue.def : µ¼³öDLLº¯Êý
-
-LIBRARY QuantBox_LTS_Queue
-EXPORTS 
-	XRequest @1

@@ -59,9 +59,4 @@
       <Filter>lib</Filter>
     </Library>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="QuantBox_CTP_Quote.def">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
 </Project>

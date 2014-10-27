@@ -52,11 +52,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="QuantBox_XSpeed_Quote.def">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Library Include="..\include\XSpeed\win32\DFITCMdApi.lib">
       <Filter>lib</Filter>
     </Library>

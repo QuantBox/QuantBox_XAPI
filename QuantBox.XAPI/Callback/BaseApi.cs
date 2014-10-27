@@ -184,7 +184,7 @@ namespace QuantBox.XAPI.Callback
 
                 proxy = new Proxy(_Path1);
 
-                Handle = new IntPtr((long)proxy.XRequest((byte)RequestType.Create, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0));
+                Handle = proxy.XRequest((byte)RequestType.Create, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
                 // 将API与队列进行绑定
                 proxy.XRequest((byte)RequestType.Register, Handle, IntPtr.Zero, 0, 0, _Queue.Handle, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
@@ -243,7 +243,7 @@ namespace QuantBox.XAPI.Callback
 
         }
 
-        private ulong _OnRespone(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
+        private IntPtr _OnRespone(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
         {
             // 队列过来的消息，如何处理？
             switch((ResponeType)type)
@@ -258,12 +258,12 @@ namespace QuantBox.XAPI.Callback
                     return OnRespone(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
             }
 
-            return 0;
+            return IntPtr.Zero;
         }
 
-        protected virtual ulong OnRespone(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
+        protected virtual IntPtr OnRespone(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
         {
-            return 0;
+            return IntPtr.Zero;
         }
 
         private void _OnConnectionStatus(double double1, IntPtr ptr1, int size1)

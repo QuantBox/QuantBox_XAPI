@@ -556,17 +556,17 @@ void CTraderApi::OnRspUserLogin(struct DFITCUserLoginInfoRtnField * pRspUserLogi
 //		ReleaseRequestMapBuf(nRequestID);
 //}
 
-int CTraderApi::ReqOrderInsert(
+char* CTraderApi::ReqOrderInsert(
 	int OrderRef,
 	OrderField* pOrder1,
 	OrderField* pOrder2)
 {
 	if (nullptr == m_pApi)
-		return 0;
+		return nullptr;
 
 	SRequest* pRequest = MakeRequestBuf(E_InsertOrderField);
 	if (nullptr == pRequest)
-		return 0;
+		return nullptr;
 
 	DFITCInsertOrderField* body = (DFITCInsertOrderField*)pRequest->pBuf;
 
@@ -622,22 +622,24 @@ int CTraderApi::ReqOrderInsert(
 		if (n < 0)
 		{
 			nRet = n;
+			delete pRequest;
+			return nullptr;
 		}
 		else
 		{
 			// 用于各种情况下找到原订单，用于进行响应的通知
 			OrderIDType orderId = { 0 };
-			sprintf(orderId, "%d:%d", m_RspUserLogin.sessionID, nRet);
+			sprintf(m_orderInsert_Id, "%d:%d", m_RspUserLogin.sessionID, nRet);
 
 			OrderField* pField = new OrderField();
 			memcpy(pField, pOrder1, sizeof(OrderField));
-			strcpy(pField->ID, orderId);
-			m_id_platform_order.insert(pair<string, OrderField*>(orderId, pField));
+			strcpy(pField->ID, m_orderInsert_Id);
+			m_id_platform_order.insert(pair<string, OrderField*>(m_orderInsert_Id, pField));
 		}
 	}
 	delete pRequest;//用完后直接删除
 
-	return nRet;
+	return m_orderInsert_Id;
 }
 
 void CTraderApi::OnRspInsertOrder(struct DFITCOrderRspDataRtnField * pOrderRtn, struct DFITCErrorRtnField * pErrorInfo)

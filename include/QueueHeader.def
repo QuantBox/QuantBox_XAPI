@@ -1,0 +1,4 @@
+;LIBRARY QueueHeader
+EXPORTS 
+	XRequest @1
+	XRespone @2

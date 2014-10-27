@@ -56,7 +56,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>QuantBox_XSpeed_Trade.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>..\include\ApiHeader.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -104,9 +104,6 @@
     </ClCompile>
     <ClCompile Include="TraderApi.cpp" />
     <ClCompile Include="TypeConvert.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="QuantBox_XSpeed_Trade.def" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\include\XSpeed\win32\DFITCTraderApi.lib" />

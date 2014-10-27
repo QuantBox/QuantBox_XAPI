@@ -71,9 +71,4 @@
       <Filter>lib</Filter>
     </Library>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="QuantBox_CTP_Trade.def">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
 </Project>

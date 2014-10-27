@@ -56,7 +56,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>QuantBox_LTS_Trade.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>..\include\ApiHeader.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -108,9 +108,6 @@
   <ItemGroup>
     <Library Include="..\include\LTS\win32\securitytraderapi.lib" />
     <Library Include="..\lib\QuantBox_Queue.lib" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="QuantBox_LTS_Trade.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

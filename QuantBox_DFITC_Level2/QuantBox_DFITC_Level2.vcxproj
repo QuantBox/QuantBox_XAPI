@@ -56,7 +56,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>QuantBox_DFITC_Level2.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>..\include\ApiHeader.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -106,9 +106,6 @@
   <ItemGroup>
     <Library Include="..\include\DFITC_L2\win32\level2Api.lib" />
     <Library Include="..\lib\QuantBox_Queue.lib" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="QuantBox_DFITC_Level2.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -57,7 +57,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ModuleDefinitionFile>QuantBox_CTP_Trade.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>..\include\ApiHeader.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,9 +117,6 @@
   <ItemGroup>
     <Library Include="..\include\CTP\win32\thosttraderapi.lib" />
     <Library Include="..\lib\QuantBox_Queue.lib" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="QuantBox_CTP_Trade.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

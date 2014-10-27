@@ -1,5 +1,0 @@
-;QuantBox_CTP_Queue.def : µ¼³öDLLº¯Êý
-
-LIBRARY QuantBox_CTP_Queue
-EXPORTS 
-	XRequest @1

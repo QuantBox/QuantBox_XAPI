@@ -1,6 +1,0 @@
-;QuantBox_CTP_Trade.def : µ¼³öDLLº¯Êý
-
-LIBRARY QuantBox_CTP_Trade
-EXPORTS 
-	XRequest @1
-

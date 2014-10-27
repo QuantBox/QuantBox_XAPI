@@ -1,5 +1,0 @@
-;QuantBox_XSpeed_Queue.def : µ¼³öDLLº¯Êý
-
-LIBRARY QuantBox_XSpeed_Queue
-EXPORTS 
-	XRequest @1

@@ -58,11 +58,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="QuantBox_XSpeed_Trade.def">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Library Include="..\include\XSpeed\win32\DFITCTraderApi.lib">
       <Filter>lib</Filter>
     </Library>

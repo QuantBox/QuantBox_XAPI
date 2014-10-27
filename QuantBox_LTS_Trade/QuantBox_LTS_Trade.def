@@ -1,5 +1,0 @@
-;QuantBox_LTS_Trade.def : µ¼³öDLLº¯Êý
-
-LIBRARY QuantBox_LTS_Trade
-EXPORTS 
-	XRequest @1

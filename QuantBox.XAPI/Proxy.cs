@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace QuantBox.XAPI
 {
-    public delegate ulong XCall(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3);
+    public delegate IntPtr XCall(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3);
 
     public class Proxy
     {
@@ -61,17 +61,17 @@ namespace QuantBox.XAPI
             //base.Dispose(disposing);
         }
 
-        public ulong XRequest(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
+        public IntPtr XRequest(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
         {
             if (_XRequest == null)
             {
                 if (_Invoke == null)
-                    return 0;
+                    return IntPtr.Zero;
 
                 //_XRequest = (XCall)_Invoke.Invoke("_XRequest@52", typeof(XCall));
 				_XRequest = (XCall)_Invoke.Invoke("XRequest", typeof(XCall));
                 if (_XRequest == null)
-                    return 0;
+                    return IntPtr.Zero;
             }
             return _XRequest(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size3, ptr3, size3);
         }

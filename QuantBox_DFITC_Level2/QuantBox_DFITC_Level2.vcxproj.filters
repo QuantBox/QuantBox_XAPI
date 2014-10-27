@@ -59,9 +59,4 @@
       <Filter>lib</Filter>
     </Library>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="QuantBox_DFITC_Level2.def">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
 </Project>

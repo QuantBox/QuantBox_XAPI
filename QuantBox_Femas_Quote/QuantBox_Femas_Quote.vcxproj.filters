@@ -52,11 +52,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="QuantBox_Femas_Quote.def">
-      <Filter>Source Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Library Include="..\include\Femas\win32\USTPmduserapi.lib">
       <Filter>lib</Filter>
     </Library>

@@ -57,7 +57,7 @@ public:
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	int ReqOrderInsert(
+	char* ReqOrderInsert(
 		int OrderRef,
 		OrderField* pOrder1,
 		OrderField* pOrder2);
@@ -188,6 +188,7 @@ private:
 	atomic<long>				m_lRequestID;			//请求ID,得保持自增
 
 	DFITCUserLoginInfoRtnField	m_RspUserLogin;			//返回的登录成功响应，目前利用此内成员进行报单所属区分
+	OrderIDType					m_orderInsert_Id;
 
 	mutex						m_csOrderRef;
 	int							m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增

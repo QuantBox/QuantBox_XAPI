@@ -8,17 +8,17 @@ inline CTraderApi* GetApi(void* pApi)
 	return static_cast<CTraderApi*>(pApi);
 }
 
-long long __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	RequestType rt = (RequestType)type;
 	if (rt == RequestType::Create)
 	{
-		return (long long)new CTraderApi();
+		return new CTraderApi();
 	}
 
 	if (pApi1 == nullptr)
 	{
-		return 0;
+		return nullptr;
 	}
 
 	CTraderApi* pApi = GetApi(pApi1);
@@ -27,7 +27,7 @@ long long __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1
 	{
 	case Release:
 		delete pApi;
-		return 0;
+		return nullptr;
 	case Register:
 		pApi->Register(ptr1);
 		break;
@@ -44,16 +44,16 @@ long long __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1
 		pApi->ReqQryInvestorAccount();
 		break;
 	case ReqOrderInsert:
-		return (long long)pApi->ReqOrderInsert((int)double1, (OrderField*)ptr1);
-	/*case ReqQuoteInsert:
-		return (void*)pApi->ReqQuoteInsert((int)double1, (OrderField*)ptr1, (OrderField*)ptr2);*/
+		return pApi->ReqOrderInsert((int)double1, (OrderField*)ptr1);
+	//case ReqQuoteInsert:
+	//	return pApi->ReqQuoteInsert((int)double1, (OrderField*)ptr1, (OrderField*)ptr2);
 	case ReqOrderAction:
-		return (long long)pApi->ReqOrderAction((const char*)ptr1);
+		return (void*)pApi->ReqOrderAction((const char*)ptr1);
 		break;
 	default:
 		// 通知
 		break;
 	}
 
-	return (long long)pApi1;
+	return pApi1;
 }

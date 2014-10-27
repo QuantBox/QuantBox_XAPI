@@ -1,5 +1,0 @@
-;QuantBox_LTS_Level2.def : µ¼³öDLLº¯Êý
-
-LIBRARY QuantBox_LTS_Level2
-EXPORTS 
-	XRequest @1

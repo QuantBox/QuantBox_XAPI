@@ -1,5 +1,0 @@
-;QuantBox_XSpeed_Trade.def : µ¼³öDLLº¯Êý
-
-LIBRARY QuantBox_XSpeed_Trade
-EXPORTS 
-	XRequest @1
