@@ -35,6 +35,7 @@ class CTraderApi :
 		E_SpecificInstrumentField,
 		E_UserLoginField,
 		E_QuoteSubscribeField,
+		E_QuoteUnSubscribeField,
 		E_QuoteInsertField,
 		E_QuoteCancelField,
 	};
@@ -92,7 +93,8 @@ public:
 	void ReqQryExchangeInstrument(const string& szExchangeId, DFITCInstrumentTypeType instrumentType);
 	void ReqQryArbitrageInstrument(const string& szExchangeId);
 	void ReqQrySpecifyInstrument(const string& szInstrumentId, const string& szExchangeId, DFITCInstrumentTypeType instrumentType);
-	void ReqQuoteSubscribe();
+	void ReqQuoteSubscribe(const string& szExchangeId, DFITCInstrumentTypeType instrumentType);
+	void ReqQuoteUnSubscribe(const string& szExchangeId, DFITCInstrumentTypeType instrumentType);
 
 private:
 	void OnOrder(DFITCOrderRtnField *pOrder);
@@ -177,8 +179,8 @@ private:
 	virtual void OnRspTradingDay(struct DFITCTradingDayRtnField * pTradingDayRtnData){};
 
 	// ×öÊÐÉÌ
-	virtual void OnRspQuoteSubscribe(struct DFITCQuoteSubscribeRspField * pRspQuoteSubscribeData){};
-	virtual void OnRtnQuoteSubscribe(struct DFITCQuoteSubscribeRtnField * pRtnQuoteSubscribeData){};
+	virtual void OnRspQuoteSubscribe(struct DFITCQuoteSubscribeRspField * pRspQuoteSubscribeData);
+	virtual void OnRtnQuoteSubscribe(struct DFITCQuoteSubscribeRtnField * pRtnQuoteSubscribeData);
 	virtual void OnRspQuoteInsert(struct DFITCQuoteRspField * pRspQuoteData, struct DFITCErrorRtnField * pErrorInfo){};
 	virtual void OnRtnQuote(struct DFITCQuoteRtnField * pRtnQuoteData){};
 	virtual void OnRspQuoteCancel(struct DFITCQuoteRspField * pRspQuoteCanceledData, struct DFITCErrorRtnField * pErrorInfo){};

@@ -10,6 +10,7 @@ namespace QuantBox.XAPI
     public delegate void DelegateOnRtnError(object sender, ref ErrorField error);
 
     public delegate void DelegateOnRtnDepthMarketData(object sender,ref DepthMarketDataField marketData);
+    public delegate void DelegateOnRtnQuoteRequest(object sender,ref QuoteRequestField quoteRequest);
     
     public delegate void DelegateOnRspQryInstrument(object sender, ref InstrumentField instrument,int size1, bool bIsLast);
     public delegate void DelegateOnRspQryTradingAccount(object sender, ref AccountField account, int size1, bool bIsLast);

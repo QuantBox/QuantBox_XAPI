@@ -457,8 +457,9 @@ void CMdUserApi::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp)
 {
 	QuoteRequestField field = { 0 };
 
-	strcpy(field.ExchangeID, pForQuoteRsp->ExchangeID);
+	strcpy(field.Symbol, pForQuoteRsp->InstrumentID);
 	strcpy(field.InstrumentID, pForQuoteRsp->InstrumentID);
+	strcpy(field.ExchangeID, pForQuoteRsp->ExchangeID);
 	strcpy(field.TradingDay, pForQuoteRsp->TradingDay);
 	strcpy(field.QuoteID, pForQuoteRsp->ForQuoteSysID);
 	strcpy(field.QuoteTime, pForQuoteRsp->ForQuoteTime);

@@ -118,6 +118,7 @@ void CTraderApi::Connect(const string& szPath,
 		m_pApi->SubscribePrivateTopic((USTP_TE_RESUME_TYPE)pServerInfo->Resume);
 		// 如果保留，成交回报会收两条
 		//m_pApi->SubscribeUserTopic((USTP_TE_RESUME_TYPE)pServerInfo->Resume);
+		m_pApi->SubscribeForQuote(USTP_TERT_RESTART); //订阅询价
 
 		//初始化连接
 		m_pApi->Init();
@@ -1264,4 +1265,18 @@ void CTraderApi::OnRtnInstrumentStatus(CUstpFtdcInstrumentStatusField *pInstrume
 {
 	//if(m_msgQueue)
 	//	m_msgQueue->Input_OnRtnInstrumentStatus(this,pInstrumentStatus);
+}
+
+void CTraderApi::OnRtnForQuote(CUstpFtdcReqForQuoteField *pReqForQuote)
+{
+	QuoteRequestField field = { 0 };
+
+	strcpy(field.Symbol, pReqForQuote->InstrumentID);
+	strcpy(field.InstrumentID, pReqForQuote->InstrumentID);
+	strcpy(field.ExchangeID, pReqForQuote->ExchangeID);
+	strcpy(field.TradingDay, pReqForQuote->TradingDay);
+	strcpy(field.QuoteID, pReqForQuote->ReqForQuoteID);
+	strcpy(field.QuoteTime, pReqForQuote->ReqForQuoteTime);
+
+	XRespone(ResponeType::OnRtnQuoteRequest, m_msgQueue, this, 0, 0, &field, sizeof(QuoteRequestField), nullptr, 0, nullptr, 0);
 }

@@ -46,6 +46,7 @@ namespace QuantBox.XAPI.Callback
 
         public DelegateOnConnectionStatus OnConnectionStatus;
         public DelegateOnRtnError OnRtnError;
+        public DelegateOnRtnQuoteRequest OnRtnQuoteRequest;
 
         public RspUserLoginField UserLoginField;
 
@@ -254,6 +255,9 @@ namespace QuantBox.XAPI.Callback
                 case ResponeType.OnRtnError:
                     _OnRtnError(ptr1);
                     break;
+                case ResponeType.OnRtnQuoteRequest:
+                    _OnRtnQuoteRequest(ptr1, size1);
+                    break;
                 default:
                     return OnRespone(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
             }
@@ -298,6 +302,16 @@ namespace QuantBox.XAPI.Callback
             ErrorField obj = PInvokeUtility.GetObjectFromIntPtr<ErrorField>(ptr1);
             
             OnRtnError(this, ref obj);
+        }
+
+        private void _OnRtnQuoteRequest(IntPtr ptr1, int size1)
+        {
+            if (OnRtnQuoteRequest == null)
+                return;
+
+            QuoteRequestField obj = PInvokeUtility.GetObjectFromIntPtr<QuoteRequestField>(ptr1);
+
+            OnRtnQuoteRequest(this, ref obj);
         }
     }
 }

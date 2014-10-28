@@ -170,6 +170,9 @@ CTraderApi::SRequest* CTraderApi::MakeRequestBuf(RequestType type)
 	case E_QuoteSubscribeField:
 		pRequest->pBuf = new DFITCQuoteSubscribeField();
 		break;
+	case E_QuoteUnSubscribeField:
+		pRequest->pBuf = new DFITCQuoteUnSubscribeField();
+		break;
 	case E_QuoteInsertField:
 		pRequest->pBuf = new DFITCQuoteInsertField();
 		break;
@@ -1608,3 +1611,59 @@ void CTraderApi::OnTrade(DFITCMatchRtnField *pTrade)
 //	//if(m_msgQueue)
 //	//	m_msgQueue->Input_OnRtnInstrumentStatus(this,pInstrumentStatus);
 //}
+
+void CTraderApi::ReqQuoteSubscribe(const string& szExchangeId, DFITCInstrumentTypeType instrumentType)
+{
+	if (NULL == m_pApi)
+		return;
+
+	SRequest* pRequest = MakeRequestBuf(E_QuoteSubscribeField);
+	if (NULL == pRequest)
+		return;
+
+	DFITCQuoteSubscribeField* body = (DFITCQuoteSubscribeField*)pRequest->pBuf;
+
+	strcpy(body->accountID, m_RspUserLogin.accountID);
+	strncpy(body->exchangeID, szExchangeId.c_str(), sizeof(DFITCExchangeIDType));
+	body->instrumentType = instrumentType;
+
+	AddToSendQueue(pRequest);
+}
+
+void CTraderApi::ReqQuoteUnSubscribe(const string& szExchangeId, DFITCInstrumentTypeType instrumentType)
+{
+	if (NULL == m_pApi)
+		return;
+
+	SRequest* pRequest = MakeRequestBuf(E_QuoteUnSubscribeField);
+	if (NULL == pRequest)
+		return;
+
+	DFITCQuoteUnSubscribeField* body = (DFITCQuoteUnSubscribeField*)pRequest->pBuf;
+
+	strcpy(body->accountID, m_RspUserLogin.accountID);
+	strncpy(body->exchangeID, szExchangeId.c_str(), sizeof(DFITCExchangeIDType));
+	body->instrumentType = instrumentType;
+
+	AddToSendQueue(pRequest);
+}
+
+
+void CTraderApi::OnRspQuoteSubscribe(struct DFITCQuoteSubscribeRspField * pRspQuoteSubscribeData)
+{
+
+}
+
+void CTraderApi::OnRtnQuoteSubscribe(struct DFITCQuoteSubscribeRtnField * pRtnQuoteSubscribeData)
+{
+	QuoteRequestField field = { 0 };
+
+	strcpy(field.Symbol, pRtnQuoteSubscribeData->instrumentID);
+	strcpy(field.InstrumentID, pRtnQuoteSubscribeData->instrumentID);
+	strcpy(field.ExchangeID, pRtnQuoteSubscribeData->exchangeID);
+	strcpy(field.TradingDay, pRtnQuoteSubscribeData->tradingDate);
+	strcpy(field.QuoteID, pRtnQuoteSubscribeData->quoteID);
+	strcpy(field.QuoteTime, pRtnQuoteSubscribeData->quoteTime);
+
+	XRespone(ResponeType::OnRtnQuoteRequest, m_msgQueue, this, 0, 0, &field, sizeof(QuoteRequestField), nullptr, 0, nullptr, 0);
+}

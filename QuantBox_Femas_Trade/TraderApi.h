@@ -183,6 +183,9 @@ private:
 	virtual void OnRspError(CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	virtual void OnRtnInstrumentStatus(CUstpFtdcInstrumentStatusField *pInstrumentStatus);
 
+	//询价回报
+	virtual void OnRtnForQuote(CUstpFtdcReqForQuoteField *pReqForQuote);
+
 private:
 	atomic<int>					m_lRequestID;			//请求ID,得保持自增
 

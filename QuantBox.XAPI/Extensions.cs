@@ -87,5 +87,11 @@ namespace QuantBox.XAPI
             return string.Format("[TradingDay={0};LoginTime={1};SessionID={2};ErrorID={3};ErrorMsg={4}]",
                 field.TradingDay,field.LoginTime,field.SessionID,field.ErrorID,field.ErrorMsg());
         }
+
+        public static string ToFormattedString(this QuoteRequestField field)
+        {
+            return string.Format("[TradingDay={0};InstrumentID={1};ExchangeID={2};QuoteID={3};QuoteTime={4}]",
+                field.TradingDay, field.InstrumentID, field.ExchangeID, field.QuoteID, field.QuoteTime);
+        }
     }
 }

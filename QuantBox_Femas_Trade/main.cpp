@@ -50,6 +50,12 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case ReqOrderAction:
 		return (void*)pApi->ReqOrderAction((const char*)ptr1);
 		break;
+	//case RequestType::SubscribeQuote:
+	//	pApi->ReqQuoteSubscribe((const char*)ptr2, DFITC_OPT_TYPE);
+	//	break;
+	//case RequestType::UnsubscribeQuote:
+	//	pApi->ReqQuoteUnSubscribe((const char*)ptr2, DFITC_OPT_TYPE);
+	//	break;
 	default:
 		// 通知
 		break;

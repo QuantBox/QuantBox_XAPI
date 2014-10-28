@@ -217,12 +217,14 @@ struct DepthMarketDataField
 ///发给做市商的询价请求
 struct QuoteRequestField
 {
-	///交易日
-	DateType	TradingDay;
+	///唯一符号
+	SymbolType			Symbol;
 	///合约代码
 	InstrumentIDType	InstrumentID;
 	///交易所代码
 	ExchangeIDType	ExchangeID;
+	///交易日
+	DateType	TradingDay;
 	///询价编号
 	OrderIDType	QuoteID;
 	///询价时间

@@ -303,10 +303,10 @@ namespace QuantBox.XAPI
     public struct QuoteRequestField
     {
         /// <summary>
-        /// 交易日
+        /// 合约代码
         /// </summary>
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
-        public string TradingDay;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string Symbol;
         /// <summary>
         /// 合约代码
         /// </summary>
@@ -317,6 +317,11 @@ namespace QuantBox.XAPI
         /// </summary>
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
         public string ExchangeID;
+        /// <summary>
+        /// 交易日
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
+        public string TradingDay;
         /// <summary>
         /// 询价编号
         /// </summary>
