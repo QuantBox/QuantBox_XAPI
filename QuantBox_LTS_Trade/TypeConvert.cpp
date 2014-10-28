@@ -89,6 +89,13 @@ OrderSide TSecurityFtdcDirectionType_2_OrderSide(TSecurityFtdcDirectionType In)
 	return OrderSide::Buy;
 }
 
+PositionSide TSecurityFtdcPosiDirectionType_2_PositionSide(TSecurityFtdcPosiDirectionType In)
+{
+	if (In == SECURITY_FTDC_PD_Short)
+		return PositionSide::Short;
+	return PositionSide::Long;
+}
+
 TSecurityFtdcOrderPriceTypeType OrderType_2_TSecurityFtdcOrderPriceTypeType(OrderType In)
 {
 	switch (In)

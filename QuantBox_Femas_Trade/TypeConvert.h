@@ -15,6 +15,7 @@ OpenCloseType TUstpFtdcOffsetFlagType_2_OpenCloseType(TUstpFtdcOffsetFlagType In
 
 TUstpFtdcDirectionType OrderSide_2_TUstpFtdcDirectionType(OrderSide In);
 OrderSide TUstpFtdcDirectionType_2_OrderSide(TUstpFtdcDirectionType In);
+PositionSide TUstpFtdcDirectionType_2_PositionSide(TUstpFtdcDirectionType In);
 
 TUstpFtdcOrderPriceTypeType OrderType_2_TUstpFtdcOrderPriceTypeType(OrderType In);
 

@@ -93,6 +93,13 @@ OrderSide TUstpFtdcDirectionType_2_OrderSide(TUstpFtdcDirectionType In)
 	return OrderSide::Buy;
 }
 
+PositionSide TUstpFtdcDirectionType_2_PositionSide(TUstpFtdcDirectionType In)
+{
+	if (In == USTP_FTDC_D_Sell)
+		return PositionSide::Short;
+	return PositionSide::Long;
+}
+
 TUstpFtdcOrderPriceTypeType OrderType_2_TUstpFtdcOrderPriceTypeType(OrderType In)
 {
 	switch (In)

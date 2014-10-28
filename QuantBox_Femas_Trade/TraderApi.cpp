@@ -955,11 +955,32 @@ void CTraderApi::ReqQryInvestorPosition(const string& szInstrumentId)
 
 void CTraderApi::OnRspQryInvestorPosition(CUstpFtdcRspInvestorPositionField *pRspInvestorPosition, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	////if(m_msgQueue)
-	////	m_msgQueue->Input_OnRspQryInvestorPosition(this,pInvestorPosition,pRspInfo,nRequestID,bIsLast);
+	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	{
+		if (pRspInvestorPosition)
+		{
+			PositionField field = { 0 };
 
-	//if (bIsLast)
-	//	ReleaseRequestMapBuf(nRequestID);
+			strcpy(field.InstrumentID, pRspInvestorPosition->InstrumentID);
+			strcpy(field.ExchangeID, pRspInvestorPosition->ExchangeID);
+
+			field.Side = TUstpFtdcDirectionType_2_PositionSide(pRspInvestorPosition->Direction);
+			field.HedgeFlag = TUstpFtdcHedgeFlagType_2_HedgeFlagType(pRspInvestorPosition->HedgeFlag);
+			field.Position = pRspInvestorPosition->Position;
+			// 今仓与昨仓是什么关系，如何计算的？
+			field.TdPosition = pRspInvestorPosition->Position - pRspInvestorPosition->YdPosition;
+			field.YdPosition = pRspInvestorPosition->YdPosition;
+
+			XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, bIsLast, 0, &field, sizeof(PositionField), nullptr, 0, nullptr, 0);
+		}
+		else
+		{
+			XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, bIsLast, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		}
+	}
+
+	if (bIsLast)
+		ReleaseRequestMapBuf(nRequestID);
 }
 
 void CTraderApi::ReqQryInstrument(const string& szInstrumentId, const string& szExchange)

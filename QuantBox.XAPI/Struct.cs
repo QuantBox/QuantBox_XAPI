@@ -531,4 +531,27 @@ namespace QuantBox.XAPI
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
         public string TradeID;
     }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct PositionField
+    {
+        /// <summary>
+        /// 合约代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 31)]
+        public string InstrumentID;
+        /// <summary>
+        /// 合约代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
+        public string ExchangeID;
+        /// <summary>
+        /// 合约代码
+        /// </summary>
+        public PositionSide Side;
+        public double Position;
+        public double TdPosition;
+        public double YdPosition;
+        public HedgeFlagType HedgeFlag;
+    }
 }

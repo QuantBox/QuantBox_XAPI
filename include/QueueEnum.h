@@ -44,6 +44,7 @@ enum ResponeType :char
 	OnRtnError,
 	OnRspQryInstrument,
 	OnRspQryTradingAccount,
+	OnRspQryInvestorPosition,
 	OnRspQrySettlementInfo,
 	OnRtnOrder,
 	OnRtnTrade,

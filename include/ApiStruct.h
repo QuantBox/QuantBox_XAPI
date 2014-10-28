@@ -7,7 +7,14 @@
 
 struct PositionField
 {
-
+	InstrumentIDType InstrumentID;
+	ExchangeIDType	ExchangeID;
+	PositionSide	Side;
+	QtyType Position;
+	QtyType TdPosition;
+	QtyType YdPosition;
+	HedgeFlagType HedgeFlag;
+	//TThostFtdcPositionDateType 还没处理
 };
 
 struct OrderField

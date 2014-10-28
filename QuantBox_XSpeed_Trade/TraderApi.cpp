@@ -426,49 +426,6 @@ void CTraderApi::OnFrontDisconnected(int nReason)
 
 }
 
-//void CTraderApi::ReqAuthenticate()
-//{
-//	if (nullptr == m_pApi)
-//		return;
-//
-//	SRequest* pRequest = MakeRequestBuf(E_ReqAuthenticateField);
-//	if (pRequest)
-//	{
-//		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Authorizing, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-//
-//		CThostFtdcReqAuthenticateField& body = pRequest->ReqAuthenticateField;
-//
-//		strncpy(body.BrokerID, m_szBrokerId.c_str(),sizeof(TThostFtdcBrokerIDType));
-//		strncpy(body.UserID, m_szInvestorId.c_str(),sizeof(TThostFtdcInvestorIDType));
-//		strncpy(body.UserProductInfo,m_szUserProductInfo.c_str(),sizeof(TThostFtdcProductInfoType));
-//		strncpy(body.AuthCode,m_szAuthCode.c_str(),sizeof(TThostFtdcAuthCodeType));
-//
-//		AddToSendQueue(pRequest);
-//	}
-//}
-
-//void CTraderApi::OnRspAuthenticate(CThostFtdcRspAuthenticateField *pRspAuthenticateField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-//{
-//	if (!IsErrorRspInfo(pRspInfo)
-//		&&pRspAuthenticateField)
-//	{
-//		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Authorized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-//
-//		ReqUserLogin();
-//	}
-//	else
-//	{
-//		RspUserLoginField field = { 0 };
-//		field.ErrorID = pRspInfo->ErrorID;
-//		strncpy(field.ErrorMsg, pRspInfo->ErrorMsg, sizeof(pRspInfo->ErrorMsg));
-//
-//		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-//	}
-//
-//	if (bIsLast)
-//		ReleaseRequestMapBuf(nRequestID);
-//}
-
 void CTraderApi::ReqUserLogin()
 {
 	if (nullptr == m_pApi)
@@ -518,46 +475,6 @@ void CTraderApi::OnRspUserLogin(struct DFITCUserLoginInfoRtnField * pRspUserLogi
 	if (pRspInfo)
 		ReleaseRequestMapBuf(pRspInfo->requestID);
 }
-
-//void CTraderApi::ReqSettlementInfoConfirm()
-//{
-//	if (nullptr == m_pApi)
-//		return;
-//
-//	SRequest* pRequest = MakeRequestBuf(E_SettlementInfoConfirmField);
-//	if (pRequest)
-//	{
-//		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Confirming, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-//
-//		CThostFtdcSettlementInfoConfirmField& body = pRequest->SettlementInfoConfirmField;
-//
-//		strncpy(body.BrokerID, m_szBrokerId.c_str(),sizeof(TThostFtdcBrokerIDType));
-//		strncpy(body.InvestorID, m_szInvestorId.c_str(),sizeof(TThostFtdcInvestorIDType));
-//
-//		AddToSendQueue(pRequest);
-//	}
-//}
-
-//void CTraderApi::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-//{
-//	if (!IsErrorRspInfo(pRspInfo)
-//		&&pSettlementInfoConfirm)
-//	{
-//		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Confirmed, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-//		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-//	}
-//	else
-//	{
-//		RspUserLoginField field = { 0 };
-//		field.ErrorID = pRspInfo->ErrorID;
-//		strncpy(field.ErrorMsg, pRspInfo->ErrorMsg, sizeof(pRspInfo->ErrorMsg));
-//
-//		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-//	}
-//
-//	if (bIsLast)
-//		ReleaseRequestMapBuf(nRequestID);
-//}
 
 char* CTraderApi::ReqOrderInsert(
 	int OrderRef,

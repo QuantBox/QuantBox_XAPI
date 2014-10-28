@@ -89,6 +89,13 @@ OrderSide TThostFtdcDirectionType_2_OrderSide(TThostFtdcDirectionType In)
 	return OrderSide::Buy;
 }
 
+PositionSide TThostFtdcPosiDirectionType_2_PositionSide(TThostFtdcPosiDirectionType In)
+{
+	if (In == THOST_FTDC_PD_Short)
+		return PositionSide::Short;
+	return PositionSide::Long;
+}
+
 TThostFtdcOrderPriceTypeType OrderType_2_TThostFtdcOrderPriceTypeType(OrderType In)
 {
 	switch (In)

@@ -1134,8 +1134,27 @@ void CTraderApi::ReqQryInvestorPosition(const string& szInstrumentId)
 
 void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	//if(m_msgQueue)
-	//	m_msgQueue->Input_OnRspQryInvestorPosition(this,pInvestorPosition,pRspInfo,nRequestID,bIsLast);
+	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	{
+		if (pInvestorPosition)
+		{
+			PositionField field = { 0 };
+
+			strcpy(field.InstrumentID, pInvestorPosition->InstrumentID);
+
+			field.Side = TThostFtdcPosiDirectionType_2_PositionSide(pInvestorPosition->PosiDirection);
+			field.HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pInvestorPosition->HedgeFlag);
+			field.Position = pInvestorPosition->Position;
+			field.TdPosition = pInvestorPosition->TodayPosition;
+			field.YdPosition = pInvestorPosition->Position - pInvestorPosition->TodayPosition;
+
+			XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, bIsLast, 0, &field, sizeof(PositionField), nullptr, 0, nullptr, 0);
+		}
+		else
+		{
+			XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, bIsLast, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		}
+	}
 
 	if (bIsLast)
 		ReleaseRequestMapBuf(nRequestID);
@@ -1161,11 +1180,7 @@ void CTraderApi::ReqQryInvestorPositionDetail(const string& szInstrumentId)
 
 void CTraderApi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	//if(m_msgQueue)
-	//	m_msgQueue->Input_OnRspQryInvestorPositionDetail(this,pInvestorPositionDetail,pRspInfo,nRequestID,bIsLast);
-
-	if (bIsLast)
-		ReleaseRequestMapBuf(nRequestID);
+	
 }
 
 void CTraderApi::ReqQryInstrument(const string& szInstrumentId, const string& szExchange)

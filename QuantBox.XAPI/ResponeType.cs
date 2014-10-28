@@ -13,6 +13,7 @@ namespace QuantBox.XAPI
         OnRtnError,
         OnRspQryInstrument,
         OnRspQryTradingAccount,
+        OnRspQryInvestorPosition,
         OnRspQrySettlementInfo,
         OnRtnOrder,
         OnRtnTrade,

@@ -998,35 +998,27 @@ void CTraderApi::ReqQryInvestorPosition(const string& szInstrumentId)
 
 void CTraderApi::OnRspQryInvestorPosition(CSecurityFtdcInvestorPositionField *pInvestorPosition, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	//if(m_msgQueue)
-	//	m_msgQueue->Input_OnRspQryInvestorPosition(this,pInvestorPosition,pRspInfo,nRequestID,bIsLast);
+	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	{
+		if (pInvestorPosition)
+		{
+			PositionField field = { 0 };
 
-	if (bIsLast)
-		ReleaseRequestMapBuf(nRequestID);
-}
+			strcpy(field.InstrumentID, pInvestorPosition->InstrumentID);
 
-void CTraderApi::ReqQryInvestorPositionDetail(const string& szInstrumentId)
-{
-	if (nullptr == m_pApi)
-		return;
+			field.Side = TSecurityFtdcPosiDirectionType_2_PositionSide(pInvestorPosition->PosiDirection);
+			field.HedgeFlag = TSecurityFtdcHedgeFlagType_2_HedgeFlagType(pInvestorPosition->HedgeFlag);
+			field.Position = pInvestorPosition->Position;
+			field.TdPosition = pInvestorPosition->TodayPosition;
+			field.YdPosition = pInvestorPosition->Position - pInvestorPosition->TodayPosition;
 
-	SRequest* pRequest = MakeRequestBuf(E_QryInvestorPositionDetailField);
-	if (nullptr == pRequest)
-		return;
-
-	CSecurityFtdcQryInvestorPositionDetailField& body = pRequest->QryInvestorPositionDetailField;
-
-	strncpy(body.BrokerID, m_RspUserLogin.BrokerID,sizeof(TSecurityFtdcBrokerIDType));
-	strncpy(body.InvestorID, m_RspUserLogin.UserID,sizeof(TSecurityFtdcInvestorIDType));
-	strncpy(body.InstrumentID,szInstrumentId.c_str(),sizeof(TSecurityFtdcInstrumentIDType));
-
-	AddToSendQueue(pRequest);
-}
-
-void CTraderApi::OnRspQryInvestorPositionDetail(CSecurityFtdcInvestorPositionDetailField *pInvestorPositionDetail, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	//if(m_msgQueue)
-	//	m_msgQueue->Input_OnRspQryInvestorPositionDetail(this,pInvestorPositionDetail,pRspInfo,nRequestID,bIsLast);
+			XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, bIsLast, 0, &field, sizeof(PositionField), nullptr, 0, nullptr, 0);
+		}
+		else
+		{
+			XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, bIsLast, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		}
+	}
 
 	if (bIsLast)
 		ReleaseRequestMapBuf(nRequestID);
