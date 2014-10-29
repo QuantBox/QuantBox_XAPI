@@ -533,6 +533,7 @@ char* CTraderApi::ReqOrderInsert(
 	case TrailingStop:
 		body.OrderPriceType = THOST_FTDC_OPT_AnyPrice;
 		body.TimeCondition = THOST_FTDC_TC_IOC;
+		body.LimitPrice = 0;
 		break;
 	case Limit:
 	case StopLimit:

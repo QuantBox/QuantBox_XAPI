@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuantBox.XAPI.Callback
 {
-    public class TraderApi : BaseApi
+    public class TraderApi : MarketDataApi
     {
         public DelegateOnRspQryInstrument OnRspQryInstrument;
         public DelegateOnRspQryTradingAccount OnRspQryTradingAccount;

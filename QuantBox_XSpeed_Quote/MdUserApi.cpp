@@ -600,7 +600,7 @@ void CMdUserApi::OnMarketData(struct DFITCDepthMarketDataField *pMarketDataField
 
 		marketData.BidPrice4 = pMarketDataField->BidPrice4;
 		marketData.BidVolume4 = pMarketDataField->BidVolume4;
-		marketData.AskPrice4 = pMarketDataField->AskPrice2;
+		marketData.AskPrice4 = pMarketDataField->AskPrice4;
 		marketData.AskVolume4 = pMarketDataField->AskVolume4;
 
 		marketData.BidPrice5 = pMarketDataField->BidPrice5;

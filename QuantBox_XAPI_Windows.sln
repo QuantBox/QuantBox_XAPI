@@ -27,6 +27,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuantBox_Femas_Quote", "Qua
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuantBox_Femas_Trade", "QuantBox_Femas_Trade\QuantBox_Femas_Trade.vcxproj", "{7E440983-F893-4E8D-B0E9-D9B02746B494}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuantBox_KingstarGold", "QuantBox_KingstarGold\QuantBox_KingstarGold.vcxproj", "{C8F7594A-F33D-445C-8ADB-5D4BAB5BD95B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -157,6 +159,16 @@ Global
 		{7E440983-F893-4E8D-B0E9-D9B02746B494}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{7E440983-F893-4E8D-B0E9-D9B02746B494}.Release|Win32.ActiveCfg = Release|Win32
 		{7E440983-F893-4E8D-B0E9-D9B02746B494}.Release|Win32.Build.0 = Release|Win32
+		{C8F7594A-F33D-445C-8ADB-5D4BAB5BD95B}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{C8F7594A-F33D-445C-8ADB-5D4BAB5BD95B}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{C8F7594A-F33D-445C-8ADB-5D4BAB5BD95B}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{C8F7594A-F33D-445C-8ADB-5D4BAB5BD95B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C8F7594A-F33D-445C-8ADB-5D4BAB5BD95B}.Debug|Win32.Build.0 = Debug|Win32
+		{C8F7594A-F33D-445C-8ADB-5D4BAB5BD95B}.Release|Any CPU.ActiveCfg = Release|Win32
+		{C8F7594A-F33D-445C-8ADB-5D4BAB5BD95B}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{C8F7594A-F33D-445C-8ADB-5D4BAB5BD95B}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{C8F7594A-F33D-445C-8ADB-5D4BAB5BD95B}.Release|Win32.ActiveCfg = Release|Win32
+		{C8F7594A-F33D-445C-8ADB-5D4BAB5BD95B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

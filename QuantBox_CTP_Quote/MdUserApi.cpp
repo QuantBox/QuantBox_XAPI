@@ -419,7 +419,7 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 
 		marketData.BidPrice4 = pDepthMarketData->BidPrice4;
 		marketData.BidVolume4 = pDepthMarketData->BidVolume4;
-		marketData.AskPrice4 = pDepthMarketData->AskPrice2;
+		marketData.AskPrice4 = pDepthMarketData->AskPrice4;
 		marketData.AskVolume4 = pDepthMarketData->AskVolume4;
 
 		marketData.BidPrice5 = pDepthMarketData->BidPrice5;
