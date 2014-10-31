@@ -315,17 +315,6 @@ void CLevel2UserApi::OnRspUnSubL2MarketData(CSecurityFtdcSpecificInstrumentField
 	}
 }
 
-//TODO:这个还有很大改进
-void GetExchangeTime(CSecurityFtdcL2MarketDataField *pL2MarketData, DepthMarketDataField* pMarketData)
-{
-	int HH = atoi(&pL2MarketData->TimeStamp[0]);
-	int mm = atoi(&pL2MarketData->TimeStamp[3]);
-	int ss = atoi(&pL2MarketData->TimeStamp[6]);
-
-	pMarketData->UpdateTime = HH * 10000 + mm * 100 + ss;
-	pMarketData->UpdateMillisec = 0;
-}
-
 void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2MarketData)
 {
 	DepthMarketDataField marketData = { 0 };
@@ -333,8 +322,10 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 	strncpy(marketData.ExchangeID, pL2MarketData->ExchangeID, sizeof(TSecurityFtdcExchangeIDType));
 
 	sprintf(marketData.Symbol, "%s.%s", marketData.InstrumentID, marketData.ExchangeID);
-	marketData.TradingDay = atoi(pL2MarketData->TradingDay);
-	GetExchangeTime(pL2MarketData, &marketData);
+
+	GetExchangeTime(pL2MarketData->TradingDay, pL2MarketData->TradingDay, pL2MarketData->TimeStamp
+		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime);
+	marketData.UpdateMillisec = 0;
 
 	marketData.LastPrice = pL2MarketData->LastPrice;
 	marketData.Volume = pL2MarketData->TotalTradeVolume;
@@ -542,17 +533,6 @@ void CLevel2UserApi::OnRspUnSubL2Index(CSecurityFtdcSpecificInstrumentField *pSp
 	}
 }
 
-//TODO:这个还有很大改进
-void GetExchangeTime(CSecurityFtdcL2IndexField *pL2Index, DepthMarketDataField* pMarketData)
-{
-	int HH = atoi(&pL2Index->TimeStamp[0]);
-	int mm = atoi(&pL2Index->TimeStamp[3]);
-	int ss = atoi(&pL2Index->TimeStamp[6]);
-
-	pMarketData->UpdateTime = HH * 10000 + mm * 100 + ss;
-	pMarketData->UpdateMillisec = 0;
-}
-
 void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 {
 	DepthMarketDataField marketData = { 0 };
@@ -560,8 +540,9 @@ void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 	strncpy(marketData.ExchangeID, pL2Index->ExchangeID, sizeof(TSecurityFtdcExchangeIDType));
 
 	sprintf(marketData.Symbol, "%s.%s", marketData.InstrumentID, marketData.ExchangeID);
-	marketData.TradingDay = atoi(pL2Index->TradingDay);
-	GetExchangeTime(pL2Index, &marketData);
+	GetExchangeTime(pL2Index->TradingDay, pL2Index->TradingDay, pL2Index->TimeStamp
+		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime);
+	marketData.UpdateMillisec = 0;
 
 	marketData.LastPrice = pL2Index->LastIndex;
 	marketData.Volume = pL2Index->TotalVolume;

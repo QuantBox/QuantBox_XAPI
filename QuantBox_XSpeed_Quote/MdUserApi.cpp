@@ -529,17 +529,6 @@ void CMdUserApi::OnRspUnSubMarketData(struct DFITCSpecificInstrumentField * pSpe
 	}
 }
 
-//TODO:这个还有很大改进
-void GetExchangeTime(struct DFITCDepthMarketDataField * pMarketDataField, DepthMarketDataField* pMarketData)
-{
-	int HH = atoi(&pMarketDataField->UpdateTime[0]);
-	int mm = atoi(&pMarketDataField->UpdateTime[3]);
-	int ss = atoi(&pMarketDataField->UpdateTime[6]);
-
-	pMarketData->UpdateTime = HH * 10000 + mm * 100 + ss;
-	pMarketData->UpdateMillisec = pMarketDataField->UpdateMillisec;
-}
-
 //行情回调，得保证此函数尽快返回
 void CMdUserApi::OnMarketData(struct DFITCDepthMarketDataField *pMarketDataField)
 {
@@ -548,8 +537,9 @@ void CMdUserApi::OnMarketData(struct DFITCDepthMarketDataField *pMarketDataField
 	strcpy(marketData.ExchangeID, pMarketDataField->exchangeID);
 
 	strcpy(marketData.Symbol, pMarketDataField->instrumentID);
-	marketData.TradingDay = atoi(pMarketDataField->tradingDay);
-	GetExchangeTime(pMarketDataField, &marketData);
+	GetExchangeTime(pMarketDataField->tradingDay, nullptr, pMarketDataField->UpdateTime
+		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime);
+	marketData.UpdateMillisec = pMarketDataField->UpdateMillisec;
 
 	//ErrorField field = { 0 };/*
 	//field.ErrorID = pRspInfo->nErrorID;*/

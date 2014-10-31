@@ -1569,17 +1569,6 @@ void CTraderApi::Unsubscribe(const string& szInstrumentIDs, const string& szExch
 	m_pApi->UnSubscribeMarketData(ppInstrumentID, iInstrumentID);
 }
 
-//TODO:这个还有很大改进
-void GetExchangeTime(CThostFtdcDepthMarketDataField *pDepthMarketData, DepthMarketDataField* pMarketData)
-{
-	int HH = atoi(&pDepthMarketData->QuoteTime[0]);
-	int mm = atoi(&pDepthMarketData->QuoteTime[3]);
-	int ss = atoi(&pDepthMarketData->QuoteTime[6]);
-
-	pMarketData->UpdateTime = HH * 10000 + mm * 100 + ss;
-	pMarketData->UpdateMillisec = 0;
-}
-
 void CTraderApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
 	DepthMarketDataField marketData = { 0 };
@@ -1587,8 +1576,10 @@ void CTraderApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	//strcpy(marketData.ExchangeID, pDepthMarketData->e);
 
 	strcpy(marketData.Symbol, pDepthMarketData->InstID);
-	marketData.TradingDay = atoi(pDepthMarketData->QuoteDate);
-	GetExchangeTime(pDepthMarketData, &marketData);
+	// 这个日期在晚上12点时会怎么样？
+	GetExchangeTime(pDepthMarketData->QuoteDate, nullptr, pDepthMarketData->QuoteTime
+		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime);
+	marketData.UpdateMillisec = 0;// pDepthMarketData->UpdateMillisec;
 
 	marketData.LastPrice = pDepthMarketData->Last;
 	marketData.Volume = pDepthMarketData->Volume;

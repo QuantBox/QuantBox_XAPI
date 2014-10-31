@@ -359,17 +359,6 @@ void CMdUserApi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecif
 	}
 }
 
-//TODO:这个还有很大改进
-void GetExchangeTime(CThostFtdcDepthMarketDataField *pDepthMarketData, DepthMarketDataField* pMarketData)
-{
-	int HH = atoi(&pDepthMarketData->UpdateTime[0]);
-	int mm = atoi(&pDepthMarketData->UpdateTime[3]);
-	int ss = atoi(&pDepthMarketData->UpdateTime[6]);
-
-	pMarketData->UpdateTime = HH * 10000 + mm * 100 + ss;
-	pMarketData->UpdateMillisec = pDepthMarketData->UpdateMillisec;
-}
-
 //行情回调，得保证此函数尽快返回
 void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
@@ -378,8 +367,10 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	strcpy(marketData.ExchangeID, pDepthMarketData->ExchangeID);
 
 	strcpy(marketData.Symbol, pDepthMarketData->InstrumentID);
-	marketData.TradingDay = atoi(pDepthMarketData->TradingDay);
-	GetExchangeTime(pDepthMarketData, &marketData);
+
+	GetExchangeTime(pDepthMarketData->TradingDay,pDepthMarketData->ActionDay,pDepthMarketData->UpdateTime
+		,&marketData.TradingDay,&marketData.ActionDay,&marketData.UpdateTime);
+	marketData.UpdateMillisec = pDepthMarketData->UpdateMillisec;
 
 	marketData.LastPrice = pDepthMarketData->LastPrice;
 	marketData.Volume = pDepthMarketData->Volume;

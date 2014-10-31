@@ -38,6 +38,19 @@ namespace QuantBox.XAPI
     {
         public static DateTime ExchangeDateTime(this DepthMarketDataField field)
         {
+            int yyyy = field.ActionDay / 10000;
+            int MM = field.ActionDay % 10000 / 100;
+            int dd = field.ActionDay % 100;
+
+            int HH = field.UpdateTime / 10000;
+            int mm = field.UpdateTime % 10000 / 100;
+            int ss = field.UpdateTime % 100;
+
+            return new DateTime(yyyy, MM, dd, HH, mm, ss, field.UpdateMillisec);
+        }
+
+        public static DateTime ExchangeDateTime_(this DepthMarketDataField field)
+        {
             // 表示传回来的时间可能有问题，要检查一下
             if(field.UpdateTime == 0)
             {

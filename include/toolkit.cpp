@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "toolkit.h"
 #include <string.h>
+#include <time.h>
 
 #if defined _WIN32 || WIN32 || _WINDOWS
     #include <direct.h>
@@ -67,6 +68,56 @@ char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vc
 	}
 
 	return buf;
+}
+
+void GetExchangeTime(char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime)
+{
+	// TradingDay处理
+	*_TradingDay = atoi(TradingDay);
+
+	// UpdateTime处理
+	int HH = atoi(&UpdateTime[0]);
+	int mm = atoi(&UpdateTime[3]);
+	int ss = atoi(&UpdateTime[6]);
+
+	*_UpdateTime = HH * 10000 + mm * 100 + ss;
+	if (*_UpdateTime == 0)
+	{
+		time_t now = time(0);
+		struct tm *ptmNow = localtime(&now);
+		int datetime = ptmNow->tm_hour * 10000 + ptmNow->tm_min * 100 + ptmNow->tm_sec;
+		if (datetime > 1500 && datetime < 234500)
+			*_UpdateTime = datetime;
+	}
+
+	// ActionDay处理
+	if ((ActionDay != nullptr) && (strlen(ActionDay) == 8))
+	{
+		*_ActionDay = atoi(ActionDay);
+	}
+	else
+	{
+		time_t now = time(0);
+		struct tm *ptmNow = localtime(&now);
+		if (HH >= 23)
+		{
+			if (ptmNow->tm_hour<1)
+			{
+				now -= 86400;
+				ptmNow = localtime(&now);
+			}
+		}
+		else if (HH<1)
+		{
+			if (ptmNow->tm_hour >= 23)
+			{
+				now += 86400;
+				ptmNow = localtime(&now);
+			}
+		}
+
+		*_ActionDay = (1900 + ptmNow->tm_year) * 10000 + (1 + ptmNow->tm_mon) * 100 + ptmNow->tm_mday;
+	}
 }
 
 void GetOnFrontDisconnectedMsg(int ErrorId, char* ErrorMsg)

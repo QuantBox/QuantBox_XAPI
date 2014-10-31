@@ -127,6 +127,7 @@ namespace QuantBox.XAPI
     public struct DepthMarketDataField
     {
         public int TradingDay;
+        public int ActionDay;
         public int UpdateTime;
         public int UpdateMillisec;
         /// <summary>

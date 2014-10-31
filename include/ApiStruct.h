@@ -125,6 +125,7 @@ struct DepthMarketDataField
 {
 	///交易所时间
 	DateIntType			TradingDay; // 交易日，用于给数据接收器划分到同一文件使用，基本没啥别的用处
+	DateIntType			ActionDay;
 	TimeIntType			UpdateTime;
 	TimeIntType			UpdateMillisec;
 
