@@ -530,32 +530,26 @@ void CMdUserApi::OnRspUnSubMarketData(struct DFITCSpecificInstrumentField * pSpe
 }
 
 //TODO:这个还有很大改进
-void GetExchangeTime(struct DFITCDepthMarketDataField * pMarketDataField, char* datatime)
+void GetExchangeTime(struct DFITCDepthMarketDataField * pMarketDataField, DepthMarketDataField* pMarketData)
 {
-	//if (strlen(pMarketDataField->ActionDay) == 8)
-	//{
-	//	sprintf(datatime, "%s %s.%03d", pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime, pDepthMarketData->UpdateMillisec);
-	//}
-	if (pMarketDataField->UpdateMillisec == 999)
-	{
-		sprintf(datatime, "%s %s.%03d", pMarketDataField->tradingDay, pMarketDataField->UpdateTime, pMarketDataField->UpdateMillisec);
-	}
-	else
-	{
-		sprintf(datatime, "%s %s.%03d", pMarketDataField->tradingDay, pMarketDataField->UpdateTime, pMarketDataField->UpdateMillisec);
-	}
+	int HH = atoi(&pMarketDataField->UpdateTime[0]);
+	int mm = atoi(&pMarketDataField->UpdateTime[3]);
+	int ss = atoi(&pMarketDataField->UpdateTime[6]);
+
+	pMarketData->UpdateTime = HH * 10000 + mm * 100 + ss;
+	pMarketData->UpdateMillisec = pMarketDataField->UpdateMillisec;
 }
 
 //行情回调，得保证此函数尽快返回
 void CMdUserApi::OnMarketData(struct DFITCDepthMarketDataField *pMarketDataField)
 {
 	DepthMarketDataField marketData = {0};
-	strncpy(marketData.InstrumentID, pMarketDataField->instrumentID, sizeof(DFITCInstrumentIDType));
-	strncpy(marketData.ExchangeID, pMarketDataField->exchangeID, sizeof(DFITCExchangeIDType));
+	strcpy(marketData.InstrumentID, pMarketDataField->instrumentID);
+	strcpy(marketData.ExchangeID, pMarketDataField->exchangeID);
 
-	strncpy(marketData.Symbol, pMarketDataField->instrumentID, sizeof(DFITCInstrumentIDType));
-	// 收到
-	GetExchangeTime(pMarketDataField, marketData.ExchangeTime);
+	strcpy(marketData.Symbol, pMarketDataField->instrumentID);
+	marketData.TradingDay = atoi(pMarketDataField->tradingDay);
+	GetExchangeTime(pMarketDataField, &marketData);
 
 	//ErrorField field = { 0 };/*
 	//field.ErrorID = pRspInfo->nErrorID;*/

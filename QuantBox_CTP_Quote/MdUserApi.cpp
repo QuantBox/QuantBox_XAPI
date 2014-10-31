@@ -360,16 +360,14 @@ void CMdUserApi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecif
 }
 
 //TODO:这个还有很大改进
-void GetExchangeTime(CThostFtdcDepthMarketDataField *pDepthMarketData,char* datatime)
+void GetExchangeTime(CThostFtdcDepthMarketDataField *pDepthMarketData, DepthMarketDataField* pMarketData)
 {
-	if (strlen(pDepthMarketData->ActionDay) == 8)
-	{
-		sprintf(datatime, "%s %s.%03d", pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime,pDepthMarketData->UpdateMillisec);
-	}
-	else
-	{
-		sprintf(datatime, "%s %s.%03d", pDepthMarketData->TradingDay, pDepthMarketData->UpdateTime, pDepthMarketData->UpdateMillisec);
-	}
+	int HH = atoi(&pDepthMarketData->UpdateTime[0]);
+	int mm = atoi(&pDepthMarketData->UpdateTime[3]);
+	int ss = atoi(&pDepthMarketData->UpdateTime[6]);
+
+	pMarketData->UpdateTime = HH * 10000 + mm * 100 + ss;
+	pMarketData->UpdateMillisec = pDepthMarketData->UpdateMillisec;
 }
 
 //行情回调，得保证此函数尽快返回
@@ -380,7 +378,8 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	strcpy(marketData.ExchangeID, pDepthMarketData->ExchangeID);
 
 	strcpy(marketData.Symbol, pDepthMarketData->InstrumentID);
-	GetExchangeTime(pDepthMarketData, marketData.ExchangeTime);
+	marketData.TradingDay = atoi(pDepthMarketData->TradingDay);
+	GetExchangeTime(pDepthMarketData, &marketData);
 
 	marketData.LastPrice = pDepthMarketData->LastPrice;
 	marketData.Volume = pDepthMarketData->Volume;

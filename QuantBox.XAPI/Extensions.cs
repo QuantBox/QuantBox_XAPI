@@ -36,18 +36,46 @@ namespace QuantBox.XAPI
 
     public static class Extensions_Misc
     {
-        public static DateTime ExchangeTime(this DepthMarketDataField field)
+        public static DateTime ExchangeDateTime(this DepthMarketDataField field)
         {
-            try
+            // 表示传回来的时间可能有问题，要检查一下
+            if(field.UpdateTime == 0)
             {
-                if (field.ExchangeTime.Length == 21)
-                    return DateTime.ParseExact(field.ExchangeTime, "yyyyMMdd HH:mm:ss.fff", null);
-                else
-                    return DateTime.Now;
+                DateTime now = DateTime.Now;
+
+                int HH = now.Hour;
+                int mm = now.Minute;
+                int ss = now.Second;
+                int datetime = HH * 10000 + mm * 100 + ss;
+
+                if (datetime > 1500 && datetime < 234500)
+                    return now;
             }
-            catch
+
             {
-                return DateTime.Now;
+                int HH = field.UpdateTime / 10000;
+                int mm = field.UpdateTime % 10000 / 100;
+                int ss = field.UpdateTime % 100;
+
+                DateTime now = DateTime.Now;
+                if (HH >= 23)
+                {
+                    if (now.Hour < 1)
+                    {
+                        // 表示行情时间慢了，系统日期减一天即可
+                        now = now.AddDays(-1);
+                    }
+                }
+                else if (HH < 1)
+                {
+                    if (now.Hour >= 23)
+                    {
+                        // 表示本地时间慢了，本地时间加一天即可
+                        now = now.AddDays(1);
+                    }
+                }
+
+                return now.Date.AddSeconds(HH * 3600 + mm * 60 + ss).AddMilliseconds(field.UpdateMillisec);
             }
         }
     }

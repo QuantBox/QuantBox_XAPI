@@ -123,17 +123,10 @@ struct RspUserLoginField
 ///深度行情
 struct DepthMarketDataField
 {
-	/////交易日
-	//TThostFtdcDateType	TradingDay;
-	/////最后修改时间
-	//TThostFtdcTimeType	UpdateTime;
-	/////最后修改毫秒
-	//TThostFtdcMillisecType	UpdateMillisec;
-	/////业务日期
-	//TThostFtdcDateType	ActionDay;
-
 	///交易所时间
-	DateTimeType		ExchangeTime;
+	DateIntType			TradingDay; // 交易日，用于给数据接收器划分到同一文件使用，基本没啥别的用处
+	TimeIntType			UpdateTime;
+	TimeIntType			UpdateMillisec;
 
 	///唯一符号
 	SymbolType			Symbol;

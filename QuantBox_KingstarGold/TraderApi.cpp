@@ -1570,16 +1570,14 @@ void CTraderApi::Unsubscribe(const string& szInstrumentIDs, const string& szExch
 }
 
 //TODO:这个还有很大改进
-void GetExchangeTime(CThostFtdcDepthMarketDataField *pDepthMarketData, char* datatime)
+void GetExchangeTime(CThostFtdcDepthMarketDataField *pDepthMarketData, DepthMarketDataField* pMarketData)
 {
-	//if (strlen(pDepthMarketData->ActionDay) == 8)
-	//{
-	//	sprintf(datatime, "%s %s.%03d", pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime, pDepthMarketData->UpdateMillisec);
-	//}
-	//else
-	{
-		sprintf(datatime, "%s %s.000", pDepthMarketData->QuoteDate, pDepthMarketData->QuoteTime);
-	}
+	int HH = atoi(&pDepthMarketData->QuoteTime[0]);
+	int mm = atoi(&pDepthMarketData->QuoteTime[3]);
+	int ss = atoi(&pDepthMarketData->QuoteTime[6]);
+
+	pMarketData->UpdateTime = HH * 10000 + mm * 100 + ss;
+	pMarketData->UpdateMillisec = 0;
 }
 
 void CTraderApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
@@ -1589,7 +1587,8 @@ void CTraderApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	//strcpy(marketData.ExchangeID, pDepthMarketData->e);
 
 	strcpy(marketData.Symbol, pDepthMarketData->InstID);
-	GetExchangeTime(pDepthMarketData, marketData.ExchangeTime);
+	marketData.TradingDay = atoi(pDepthMarketData->QuoteDate);
+	GetExchangeTime(pDepthMarketData, &marketData);
 
 	marketData.LastPrice = pDepthMarketData->Last;
 	marketData.Volume = pDepthMarketData->Volume;

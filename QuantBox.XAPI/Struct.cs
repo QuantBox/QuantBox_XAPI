@@ -126,11 +126,9 @@ namespace QuantBox.XAPI
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct DepthMarketDataField
     {
-        /// <summary>
-        /// 交易所时间
-        /// </summary>
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
-        public string ExchangeTime;
+        public int TradingDay;
+        public int UpdateTime;
+        public int UpdateMillisec;
         /// <summary>
         /// 合约代码
         /// </summary>
