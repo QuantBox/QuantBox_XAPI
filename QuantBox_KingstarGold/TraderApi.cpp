@@ -1192,7 +1192,7 @@ void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInve
 
 void CTraderApi::ReqQryInstrument(const string& szInstrumentId, const string& szExchange)
 {
-	/*if (nullptr == m_pApi)
+	if (nullptr == m_pApi)
 		return;
 
 	SRequest* pRequest = MakeRequestBuf(E_QryInstrumentField);
@@ -1201,32 +1201,32 @@ void CTraderApi::ReqQryInstrument(const string& szInstrumentId, const string& sz
 
 	CThostFtdcQryInstrumentField& body = pRequest->QryInstrumentField;
 
-	strncpy(body.InstrumentID,szInstrumentId.c_str(),sizeof(TThostFtdcInstrumentIDType));
-	strncpy(body.ExchangeID, szExchange.c_str(), sizeof(TThostFtdcExchangeIDType));
+	strncpy(body.ContractID, szInstrumentId.c_str(), sizeof(TThostFtdcInstrumentIDType));
+	//strncpy(body.ProductID, szExchange.c_str(), sizeof(TThostFtdcProductIDType));
 
-	AddToSendQueue(pRequest);*/
+	AddToSendQueue(pRequest);
 }
 
 
 void CTraderApi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	/*if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
 	{
 		if (pInstrument)
 		{
 			InstrumentField field = { 0 };
 
-			strncpy(field.InstrumentID, pInstrument->InstrumentID, sizeof(TThostFtdcInstrumentIDType));
-			strncpy(field.ExchangeID, pInstrument->ExchangeID, sizeof(TThostFtdcExchangeIDType));
+			strcpy(field.InstrumentID, pInstrument->instID);
+			strcpy(field.ExchangeID, pInstrument->exchangeID);
 
-			strncpy(field.Symbol, pInstrument->InstrumentID, sizeof(TThostFtdcInstrumentIDType));
+			strcpy(field.Symbol, pInstrument->instID);
 
-			strncpy(field.InstrumentName, pInstrument->InstrumentName, sizeof(TThostFtdcInstrumentNameType));
+			strcpy(field.InstrumentName, pInstrument->name);
 			field.Type = CThostFtdcInstrumentField_2_InstrumentType(pInstrument);
-			field.VolumeMultiple = pInstrument->VolumeMultiple;
-			field.PriceTick = pInstrument->PriceTick;
-			strncpy(field.ExpireDate, pInstrument->ExpireDate, sizeof(TThostFtdcDateType));
-			field.OptionsType = TThostFtdcOptionsTypeType_2_PutCall(pInstrument->OptionsType);
+			//field.VolumeMultiple = pInstrument->VolumeMultiple;
+			field.PriceTick = pInstrument->tick;
+			//strncpy(field.ExpireDate, pInstrument->ExpireDate, sizeof(TThostFtdcDateType));
+			//field.OptionsType = TThostFtdcOptionsTypeType_2_PutCall(pInstrument->OptionsType);
 
 			XRespone(ResponeType::OnRspQryInstrument, m_msgQueue, this, bIsLast, 0, &field, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
 		}
@@ -1237,7 +1237,7 @@ void CTraderApi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CTho
 	}
 
 	if (bIsLast)
-		ReleaseRequestMapBuf(nRequestID);*/
+		ReleaseRequestMapBuf(nRequestID);
 }
 
 //void CTraderApi::ReqQryInstrumentCommissionRate(const string& szInstrumentId)

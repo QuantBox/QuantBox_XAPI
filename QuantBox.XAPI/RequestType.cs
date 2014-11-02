@@ -13,6 +13,9 @@ namespace QuantBox.XAPI
         Register, // 注册回调
         Config,		// 配置参数
 
+        GetApiType,
+        GetApiVersion,
+
         Connect, // 开始/连接
         Disconnect, // 停止/断开
 

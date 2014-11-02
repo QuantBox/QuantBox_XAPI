@@ -244,6 +244,26 @@ namespace QuantBox.XAPI.Callback
 
         }
 
+        public ApiType GetApiType
+        {
+            get{
+                if(proxy == null)
+                    return ApiType.Level2;
+                return (ApiType)proxy.XRequest((byte)RequestType.GetApiType, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+            }
+        }
+
+        public string GetApiVersion
+        {
+            get
+            {
+                if (proxy == null)
+                    return string.Empty;
+                IntPtr ptr = proxy.XRequest((byte)RequestType.GetApiVersion, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+                return Marshal.PtrToStringAnsi(ptr);
+            }
+        }
+
         private IntPtr _OnRespone(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
         {
             // 队列过来的消息，如何处理？

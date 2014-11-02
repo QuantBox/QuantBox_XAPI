@@ -34,7 +34,10 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		break;
 	case RequestType::Config:
 		return (void*)pApi->Config((ConfigInfoField*)ptr1);
-		break;
+	case RequestType::GetApiType:
+		return (void*)ApiType::MarketData;
+	case RequestType::GetApiVersion:
+		return "0.1";
 	case RequestType::Connect:
 		pApi->Connect((const char*)ptr3, (ServerInfoField*)ptr1, (UserInfoField*)ptr2);
 		break;

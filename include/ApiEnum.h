@@ -20,6 +20,14 @@ enum ConnectionStatus :char
 	Unknown, //δ֪
 };
 
+enum ApiType :char
+{
+	Nono = 0,
+	Trade = 1,
+	MarketData = 2,
+	Level2 = 4,
+};
+
 enum DataLevelType:char
 {
 	L0,

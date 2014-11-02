@@ -84,7 +84,15 @@ namespace QuantBox
         Unknown,
     }
 
-    enum DataLevelType : byte
+    public enum ApiType : byte
+    {
+        Nono = 0,
+	    Trade = 1,
+	    MarketData = 2,
+	    Level2 = 4,
+    };
+
+    public enum DataLevelType : byte
     {
         L0,
 	    L1,
