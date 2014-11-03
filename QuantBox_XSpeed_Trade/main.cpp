@@ -12,9 +12,18 @@ inline CTraderApi* GetApi(void* pApi)
 void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	RequestType rt = (RequestType)type;
-	if (rt == RequestType::Create)
+	switch (rt)
 	{
+	case GetApiType:
+		return (void*)(ApiType::Trade|ApiType::QuoteRequest);
+	case GetApiVersion:
+		return "0.1";
+	case GetApiName:
+		return "XSpeed";
+	case Create:
 		return new CTraderApi();
+	default:
+		break;
 	}
 
 	if (pApi1 == nullptr)
@@ -54,10 +63,10 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	//case ReqOrderAction:
 	//	return (void*)pApi->ReqCancelOrder((const char*)ptr1);
 	//	break;
-	case RequestType::SubscribeQuote:
+	case SubscribeQuote:
 		pApi->ReqQuoteSubscribe((const char*)ptr2, DFITC_OPT_TYPE);
 		break;
-	case RequestType::UnsubscribeQuote:
+	case UnsubscribeQuote:
 		pApi->ReqQuoteUnSubscribe((const char*)ptr2, DFITC_OPT_TYPE);
 		break;
 	default:

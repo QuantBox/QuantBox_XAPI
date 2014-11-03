@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "../include/ApiHeader.h"
-//#include "../include/ApiStruct.h"
 #include "../include/QueueEnum.h"
 #include "TraderApi.h"
 
@@ -12,9 +11,18 @@ inline CTraderApi* GetApi(void* pApi)
 void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	RequestType rt = (RequestType)type;
-	if (rt == RequestType::Create)
+	switch (rt)
 	{
+	case GetApiType:
+		return (void*)(ApiType::Trade);
+	case GetApiVersion:
+		return "0.1";
+	case GetApiName:
+		return "CTP";
+	case Create:
 		return new CTraderApi();
+	default:
+		break;
 	}
 
 	if (pApi1 == nullptr)
@@ -62,7 +70,6 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		return (void*)pApi->ReqOrderAction((const char*)ptr1);
 		break;
 	default:
-		// 通知
 		break;
 	}
 

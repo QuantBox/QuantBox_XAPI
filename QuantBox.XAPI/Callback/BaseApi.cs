@@ -249,7 +249,7 @@ namespace QuantBox.XAPI.Callback
             get{
                 if(proxy == null)
                     return ApiType.Level2;
-                return (ApiType)proxy.XRequest((byte)RequestType.GetApiType, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+                return (ApiType)proxy.XRequest((byte)RequestType.GetApiType, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
             }
         }
 
@@ -259,7 +259,18 @@ namespace QuantBox.XAPI.Callback
             {
                 if (proxy == null)
                     return string.Empty;
-                IntPtr ptr = proxy.XRequest((byte)RequestType.GetApiVersion, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+                IntPtr ptr = proxy.XRequest((byte)RequestType.GetApiVersion, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+                return Marshal.PtrToStringAnsi(ptr);
+            }
+        }
+
+        public string GetApiName
+        {
+            get
+            {
+                if (proxy == null)
+                    return string.Empty;
+                IntPtr ptr = proxy.XRequest((byte)RequestType.GetApiName, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
                 return Marshal.PtrToStringAnsi(ptr);
             }
         }

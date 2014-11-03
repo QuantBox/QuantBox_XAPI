@@ -11,9 +11,18 @@ inline CTraderApi* GetApi(void* pApi)
 void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	RequestType rt = (RequestType)type;
-	if (rt == RequestType::Create)
+	switch (rt)
 	{
+	case GetApiType:
+		return (void*)(ApiType::Trade);
+	case GetApiVersion:
+		return "0.1";
+	case GetApiName:
+		return "Femas";
+	case Create:
 		return new CTraderApi();
+	default:
+		break;
 	}
 
 	if (pApi1 == nullptr)

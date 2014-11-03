@@ -14,9 +14,18 @@ inline CMsgQueue* GetQueue(void* pMsgQueue)
 void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	RequestType rt = (RequestType)type;
-	if (rt == RequestType::Create)
+	switch (rt)
 	{
+	case GetApiType:
+		return nullptr;
+	case GetApiVersion:
+		return "0.1";
+	case GetApiName:
+		return "Queue";
+	case Create:
 		return new CMsgQueue();
+	default:
+		break;
 	}
 
 	if (pApi1 == nullptr)
@@ -28,23 +37,25 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 
 	switch (rt)
 	{
-	case RequestType::Release:
+	case Release:
 		delete pQueue;
 		return 0;
-	case RequestType::Register:
+	case Register:
 		pQueue->Register(ptr1);
 		break;
-	case RequestType::Clear:
-		pQueue->Clear();
+	case Config:
 		break;
-	case RequestType::Process:
-		pQueue->Process();
-		break;
-	case RequestType::Connect:
+	case Connect:
 		pQueue->StartThread();
 		break;
-	case RequestType::Disconnect:
+	case Disconnect:
 		pQueue->StopThread();
+		break;
+	case Clear:
+		pQueue->Clear();
+		break;
+	case Process:
+		pQueue->Process();
 		break;
 	default:
 		break;

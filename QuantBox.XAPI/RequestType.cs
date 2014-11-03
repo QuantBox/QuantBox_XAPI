@@ -8,13 +8,14 @@ namespace QuantBox.XAPI
 {
     public enum RequestType:byte
     {
-        Create = 0, // 创建
+        GetApiType = 0,
+        GetApiVersion,
+        GetApiName,
+
+        Create, // 创建
         Release, // 销毁
         Register, // 注册回调
         Config,		// 配置参数
-
-        GetApiType,
-        GetApiVersion,
 
         Connect, // 开始/连接
         Disconnect, // 停止/断开

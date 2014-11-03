@@ -26,6 +26,7 @@ enum ApiType :char
 	Trade = 1,
 	MarketData = 2,
 	Level2 = 4,
+	QuoteRequest = 8,
 };
 
 enum DataLevelType:char

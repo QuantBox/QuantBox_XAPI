@@ -3,13 +3,14 @@
 
 enum RequestType :char
 {
-	Create = 0, // 创建
+	GetApiType = 0,
+	GetApiVersion,
+	GetApiName,
+
+	Create, // 创建
 	Release, // 销毁
 	Register, // 注册回调
 	Config,		// 配置参数
-
-	GetApiType,
-	GetApiVersion,
 
 	Connect, // 开始/连接
 	Disconnect, // 停止/断开
@@ -38,8 +39,6 @@ enum RequestType :char
 	ReqQryInstrumentCommissionRate,
 	ReqQryInstrumentMarginRate,
 	ReqQrySettlementInfo,
-	
-
 };
 
 enum ResponeType :char

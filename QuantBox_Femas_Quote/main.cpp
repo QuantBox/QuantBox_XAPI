@@ -12,9 +12,18 @@ inline CMdUserApi* GetApi(void* pApi)
 void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	RequestType rt = (RequestType)type;
-	if (rt == RequestType::Create)
+	switch (rt)
 	{
+	case GetApiType:
+		return (void*)(ApiType::MarketData | ApiType::Level2);
+	case GetApiVersion:
+		return "0.1";
+	case GetApiName:
+		return "Femas";
+	case Create:
 		return new CMdUserApi();
+	default:
+		break;
 	}
 
 	if (pApi1 == nullptr)
@@ -26,31 +35,31 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 
 	switch (rt)
 	{
-	case RequestType::Release:
+	case Release:
 		delete pApi;
 		return nullptr;
-	case RequestType::Register:
+	case Register:
 		pApi->Register(ptr1);
 		break;
-	case RequestType::Config:
+	case Config:
 		return (void*)pApi->Config((ConfigInfoField*)ptr1);
 		break;
-	case RequestType::Connect:
+	case Connect:
 		pApi->Connect((const char*)ptr3, (ServerInfoField*)ptr1, (UserInfoField*)ptr2);
 		break;
-	case RequestType::Disconnect:
+	case Disconnect:
 		pApi->Disconnect();
 		break;
-	case RequestType::Subscribe:
+	case Subscribe:
 		pApi->Subscribe((const char*)ptr1, (const char*)ptr2);
 		break;
-	case RequestType::Unsubscribe:
+	case Unsubscribe:
 		pApi->Unsubscribe((const char*)ptr1, (const char*)ptr2);
 		break;
-	//case RequestType::SubscribeQuote:
+	//case SubscribeQuote:
 	//	pApi->SubscribeQuote((const char*)ptr1, (const char*)ptr2);
 	//	break;
-	//case RequestType::UnsubscribeQuote:
+	//case UnsubscribeQuote:
 	//	pApi->UnsubscribeQuote((const char*)ptr1, (const char*)ptr2);
 	//	break;
 	default:
