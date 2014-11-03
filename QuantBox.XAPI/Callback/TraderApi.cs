@@ -155,6 +155,7 @@ namespace QuantBox.XAPI.Callback
                     _OnRtnTrade(ptr1, size1);
                     break;
                 default:
+                    base.OnRespone(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
                     break;
             }
 

@@ -16,7 +16,7 @@ namespace QuantBox.XAPI
         /// <summary>
         /// 用户代码
         /// </summary>
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         public string UserID;
         /// <summary>
         /// 密码

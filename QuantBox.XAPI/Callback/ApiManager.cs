@@ -11,17 +11,9 @@ namespace QuantBox.XAPI.Callback
     {
         public static string QueuePath;
 
-        private static ConcurrentDictionary<BaseApi, Queue> dict = new ConcurrentDictionary<BaseApi, Queue>();
+        private static ConcurrentDictionary<TraderApi, Queue> dict = new ConcurrentDictionary<TraderApi, Queue>();
 
-        public static MarketDataApi CreateMarketDataApi(string path)
-        {
-            Queue queue = new Queue(QueuePath);
-            MarketDataApi api = new MarketDataApi(path, new Queue(QueuePath));
-            dict.TryAdd(api, queue);
-            return api;
-        }
-
-        public static TraderApi CreateTraderApi(string path)
+        public static TraderApi CreateApi(string path)
         {
             Queue queue = new Queue(QueuePath);
             TraderApi api = new TraderApi(path, new Queue(QueuePath));
@@ -29,10 +21,10 @@ namespace QuantBox.XAPI.Callback
             return api;
         }
 
-        public static void Release(BaseApi api)
+        public static void ReleaseApi(BaseApi api)
         {
             Queue queue;
-            if(dict.TryRemove(api,out queue))
+            if(dict.TryRemove(api as TraderApi,out queue))
             {
                 api.Dispose();
                 queue.Dispose();

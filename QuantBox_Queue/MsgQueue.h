@@ -99,7 +99,7 @@ private:
 
 private:
 	volatile bool						m_bRunning;
-	recursive_mutex						m_mtx;
+	mutex						m_mtx;
 	thread*								m_hThread;
 	ReaderWriterQueue<ResponeItem*>		m_queue;
 	fnOnRespone							m_fnOnRespone;

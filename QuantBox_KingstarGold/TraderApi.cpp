@@ -119,8 +119,9 @@ void CTraderApi::Connect(const string& szPath,
 		//m_pApi->SubscribePrivateTopic((THOST_TE_RESUME_TYPE)pServerInfo->Resume);
 
 		//初始化连接
-		m_pApi->Init();
+		int ret = m_pApi->Init();
 		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		ReqUserLogin();		
 	}
 }
 

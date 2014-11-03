@@ -3,7 +3,7 @@
 
 void CMsgQueue::Clear()
 {
-	ResponeItem* pItem = NULL;
+	ResponeItem* pItem = nullptr;
 	//清空队列
 	while (m_queue.try_dequeue(pItem))
 	{
@@ -16,7 +16,7 @@ void CMsgQueue::Clear()
 
 bool CMsgQueue::Process()
 {
-	ResponeItem* pItem = NULL;
+	ResponeItem* pItem = nullptr;
 	if (m_queue.try_dequeue(pItem))
 	{
 		Output(pItem);
@@ -40,7 +40,8 @@ void CMsgQueue::StartThread()
 
 void CMsgQueue::StopThread()
 {
-	//m_mtx.unlock();
+	//m_mtx.lock();
+	lock_guard<mutex> cl(m_mtx);
 
     m_bRunning = false;
     if(m_hThread)
@@ -49,6 +50,7 @@ void CMsgQueue::StopThread()
         delete m_hThread;
         m_hThread = nullptr;
     }
+	//m_mtx.unlock();
 }
 
 void CMsgQueue::RunInThread()
@@ -67,6 +69,6 @@ void CMsgQueue::RunInThread()
 	}
 
 	// 清理线程
-	m_hThread = NULL;
+	m_hThread = nullptr;
 	m_bRunning = false;
 }
