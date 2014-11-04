@@ -84,12 +84,14 @@ namespace QuantBox
         Unknown,
     }
 
+    [Flags]
     public enum ApiType : byte
     {
         Nono = 0,
-	    Trade = 1,
-	    MarketData = 2,
-	    Level2 = 4,
+        Trade = 1,
+        MarketData = 2,
+        Level2 = 4,
+        QuoteRequest = 8,
     };
 
     public enum DataLevelType : byte
