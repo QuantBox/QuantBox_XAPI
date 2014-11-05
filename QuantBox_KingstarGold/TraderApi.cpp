@@ -84,14 +84,9 @@ void CTraderApi::Connect(const string& szPath,
 	m_szPath = szPath;
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
-	
-	//char *pszPath = new char[szPath.length() + 1024];
-	//srand((unsigned int)time(nullptr));
-	//sprintf(pszPath, "%s/%s/%s/Td/%d/", szPath.c_str(), m_ServerInfo.BrokerID, m_UserInfo.UserID, rand());
-	//makedirs(pszPath);
 
 	m_pApi = CGoldTradeApi::CreateGoldTradeApi();
-	//delete[] pszPath;
+
 
 	XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 

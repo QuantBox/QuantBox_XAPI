@@ -48,7 +48,10 @@ namespace QuantBox.XAPI
         /// <summary>
         /// 流恢复
         /// </summary>
-        public ResumeType ResumeType;
+        public ResumeType MarketDataTopicResumeType;
+        public ResumeType PrivateTopicResumeType; 
+        public ResumeType PublicTopicResumeType;        
+        public ResumeType UserTopicResumeType;
         /// <summary>
         /// 经纪公司代码
         /// </summary>

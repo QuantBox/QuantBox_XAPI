@@ -114,8 +114,8 @@ void CTraderApi::Connect(const string& szPath,
 		}
 		delete[] buf;
 
-		m_pApi->SubscribePublicTopic((USTP_TE_RESUME_TYPE)pServerInfo->Resume);
-		m_pApi->SubscribePrivateTopic((USTP_TE_RESUME_TYPE)pServerInfo->Resume);
+		m_pApi->SubscribePublicTopic((USTP_TE_RESUME_TYPE)pServerInfo->PublicTopicResumeType);
+		m_pApi->SubscribePrivateTopic((USTP_TE_RESUME_TYPE)pServerInfo->PrivateTopicResumeType);
 		// 如果保留，成交回报会收两条
 		//m_pApi->SubscribeUserTopic((USTP_TE_RESUME_TYPE)pServerInfo->Resume);
 		m_pApi->SubscribeForQuote(USTP_TERT_RESTART); //订阅询价

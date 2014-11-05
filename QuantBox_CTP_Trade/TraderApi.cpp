@@ -114,8 +114,8 @@ void CTraderApi::Connect(const string& szPath,
 		}
 		delete[] buf;
 
-		m_pApi->SubscribePublicTopic((THOST_TE_RESUME_TYPE)pServerInfo->Resume);
-		m_pApi->SubscribePrivateTopic((THOST_TE_RESUME_TYPE)pServerInfo->Resume);
+		m_pApi->SubscribePublicTopic((THOST_TE_RESUME_TYPE)pServerInfo->PublicTopicResumeType);
+		m_pApi->SubscribePrivateTopic((THOST_TE_RESUME_TYPE)pServerInfo->PrivateTopicResumeType);
 
 		//初始化连接
 		m_pApi->Init();

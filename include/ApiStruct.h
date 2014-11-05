@@ -71,7 +71,10 @@ struct ServerInfoField
 	bool IsUsingUdp;
 	bool IsMulticast;
 	int	TopicId;
-	ResumeType	Resume;
+	ResumeType	MarketDataTopicResumeType;
+	ResumeType	PrivateTopicResumeType;
+	ResumeType	PublicTopicResumeType;
+	ResumeType	UserTopicResumeType;
 	BrokerIDType	BrokerID;
 	ProductInfoType	UserProductInfo;
 	AuthCodeType	AuthCode;

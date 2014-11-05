@@ -196,18 +196,19 @@ namespace QuantBox.XAPI.Callback
 
             lock (locker)
             {
-                foreach (var kv in SubscribedInstruments)
+
+                foreach (var kv in _SubscribedInstruments)
                 {
-                    foreach (var kvv in kv.Value)
+                    foreach (var kvv in kv.Value.ToList())
                     {
                         Subscribe(kvv, kv.Key);
                     }
                 }
 
                 // 做市商询价
-                foreach (var kv in SubscribedQuotes)
+                foreach (var kv in _SubscribedQuotes)
                 {
-                    foreach (var kvv in kv.Value)
+                    foreach (var kvv in kv.Value.ToList())
                     {
                         SubscribeQuote(kvv, kv.Key);
                     }
