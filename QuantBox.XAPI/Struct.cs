@@ -452,6 +452,56 @@ namespace QuantBox.XAPI
     /// 订单信息
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct QuoteField
+    {
+        /// <summary>
+        /// 合约代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 31)]
+        public string InstrumentID;
+        /// <summary>
+        /// 合约代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
+        public string ExchangeID;
+
+        public double AskQty;
+        public double AskPrice;
+        public OpenCloseType AskOpenClose;
+        public HedgeFlagType AskHedgeFlag;
+
+        public double BidQty;
+        public double BidPrice;
+        public OpenCloseType BidOpenClose;
+        public HedgeFlagType BidHedgeFlag;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string ID;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string AskID;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string BidID;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string AskOrderID;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string BidOrderID;
+        public OrderStatus Status;
+        public ExecType ExecType;
+        /// <summary>
+        /// 错误代码
+        /// </summary>
+        public int ErrorID;
+        /// <summary>
+        /// 消息正文
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
+        public byte[] Text;
+    }
+
+    /// <summary>
+    /// 订单信息
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct OrderField
     {
         /// <summary>

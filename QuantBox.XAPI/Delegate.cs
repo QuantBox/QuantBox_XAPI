@@ -17,4 +17,5 @@ namespace QuantBox.XAPI
     public delegate void DelegateOnRspQrySettlementInfo(object sender, ref SettlementInfoField settlementInfo, int size1, bool bIsLast);
     public delegate void DelegateOnRtnOrder(object sender, ref OrderField order);
     public delegate void DelegateOnRtnTrade(object sender, ref TradeField trade);
+    public delegate void DelegateOnRtnQuote(object sender, ref QuoteField quote);
 }

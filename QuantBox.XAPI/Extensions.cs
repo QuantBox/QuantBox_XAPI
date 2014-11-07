@@ -23,6 +23,11 @@ namespace QuantBox.XAPI
             return PInvokeUtility.GetUnicodeString(field.Text);
         }
 
+        public static string Text(this QuoteField field)
+        {
+            return PInvokeUtility.GetUnicodeString(field.Text);
+        }
+
         public static string ErrorMsg(this RspUserLoginField field)
         {
             return PInvokeUtility.GetUnicodeString(field.ErrorMsg);
@@ -121,6 +126,22 @@ namespace QuantBox.XAPI
                 field.InstrumentID, field.ExchangeID, field.Side, field.Qty, field.Price, field.OpenClose, field.HedgeFlag,
                 field.ID, field.TradeID,
                 field.Time, field.Commission);
+        }
+
+        public static string ToFormattedString(this QuoteField field)
+        {
+            return string.Format("[InstrumentID={0};ExchangeID={1};"
+                + "AskPrice={2};AskQty={3};BidPrice={4};BidQty={5};"
+                + "ID={6};AskOrderID={7};BidOrderID={8};"
+                + "Status={9};ExecType={10};"
+                + "ErrorID={11};Text={12};"
+                + "AskOpenClose={13};AskHedgeFlag={14};BidOpenClose={15};BidHedgeFlag={16}]",
+                field.InstrumentID, field.ExchangeID,
+                field.AskPrice, field.AskQty, field.BidPrice, field.BidQty,
+                field.ID,field.AskOrderID,field.BidOrderID,
+                field.Status,field.ExecType,
+                field.ErrorID,field.Text(),
+                field.AskOpenClose,field.AskHedgeFlag,field.BidOpenClose,field.BidHedgeFlag);
         }
 
         public static string ToFormattedString(this RspUserLoginField field)

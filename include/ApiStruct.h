@@ -17,6 +17,42 @@ struct PositionField
 	//TThostFtdcPositionDateType 还没处理
 };
 
+struct QuoteField
+{
+	InstrumentIDType InstrumentID;
+	ExchangeIDType	ExchangeID;
+
+	QtyType AskQty;
+	PriceType AskPrice;
+	OpenCloseType AskOpenClose;
+	HedgeFlagType AskHedgeFlag;
+
+	QtyType BidQty;
+	PriceType BidPrice;
+	OpenCloseType BidOpenClose;
+	HedgeFlagType BidHedgeFlag;
+
+	OrderIDType ID;
+	OrderIDType AskID;
+	OrderIDType BidID;
+	OrderIDType AskOrderID;
+	OrderIDType BidOrderID;
+	OrderStatus Status;
+	ExecType ExecType;
+	ErrorIDType ErrorID;
+	ErrorMsgType Text;
+
+	/*
+	QtyType LeavesQty;
+	QtyType CumQty;
+	PriceType AvgPx;
+	
+
+	
+	
+	long DateTime;*/
+};
+
 struct OrderField
 {
 	InstrumentIDType InstrumentID;
@@ -42,12 +78,6 @@ struct OrderField
 	OrderIDType ID;
 	OrderIDType OrderID;
 	long DateTime;
-	//// 预留字段，支持bool,int,long,double
-	//double double1;
-	//double double2;
-	//// 是否要进行扩展属性的支持？
-	//void* ptr1;
-	//// 是否需要从底层传入更多信息，比如说OrderSysID
 };
 
 struct TradeField

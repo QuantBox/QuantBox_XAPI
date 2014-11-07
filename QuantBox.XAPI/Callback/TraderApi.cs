@@ -14,6 +14,7 @@ namespace QuantBox.XAPI.Callback
         public DelegateOnRspQrySettlementInfo OnRspQrySettlementInfo;
         public DelegateOnRtnOrder OnRtnOrder;
         public DelegateOnRtnTrade OnRtnTrade;
+        public DelegateOnRtnQuote OnRtnQuote;
 
         private Dictionary<string, StringBuilder> dict = new Dictionary<string, StringBuilder>();
         internal TraderApi(string path1, Queue queue)
@@ -51,7 +52,7 @@ namespace QuantBox.XAPI.Callback
             Marshal.FreeHGlobal(szTradingDayPtr);
         }
 
-        public string SendOrder(int OrderRef, ref OrderField order1, ref ulong ret)
+        public string SendOrder(int OrderRef, ref OrderField order1)
         {
             int size = Marshal.SizeOf(typeof(OrderField));
 
@@ -73,7 +74,7 @@ namespace QuantBox.XAPI.Callback
             return Marshal.PtrToStringAnsi(ptr);
         }
 
-        public string SendOrder(int OrderRef, ref OrderField order1, ref OrderField order2, ref ulong ret)
+        public string SendOrder(int OrderRef, ref OrderField order1, ref OrderField order2)
         {
             int size = Marshal.SizeOf(typeof(OrderField));
 
@@ -107,32 +108,35 @@ namespace QuantBox.XAPI.Callback
             return ptr.ToInt32();
         }
 
-        public string SendQuote(ref OrderField order1, ref OrderField order2)
+        public string SendQuote(int QuoteRef, ref QuoteField quote)
         {
-            int size = Marshal.SizeOf(typeof(OrderField));
+            int size = Marshal.SizeOf(typeof(QuoteField));
 
-            IntPtr order1Ptr = Marshal.AllocHGlobal(size);
-            IntPtr order2Ptr = Marshal.AllocHGlobal(size);
-            Marshal.StructureToPtr(order1, order1Ptr, false);
-            Marshal.StructureToPtr(order2, order2Ptr, false);
+            IntPtr quotePtr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(quote, quotePtr, false);
 
-            proxy.XRequest((byte)RequestType.ReqQuoteInsert, Handle, IntPtr.Zero, 0, 0,
-                IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+            IntPtr ptr = proxy.XRequest((byte)RequestType.ReqQuoteInsert, Handle, IntPtr.Zero,
+                QuoteRef, 0,
+                quotePtr, size, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
-            Marshal.FreeHGlobal(order1Ptr);
-            Marshal.FreeHGlobal(order2Ptr);
+            Marshal.FreeHGlobal(quotePtr);
 
-            return string.Empty;
+            if (ptr.ToInt64() == 0)
+                return null;
+
+            return Marshal.PtrToStringAnsi(ptr);
         }
 
-        public void CancelQuote(string szId)
+        public int CancelQuote(string szId)
         {
             IntPtr szIdPtr = Marshal.StringToHGlobalAnsi(szId);
 
-            proxy.XRequest((byte)RequestType.ReqQuoteAction, Handle, IntPtr.Zero, 0, 0,
+            IntPtr ptr = proxy.XRequest((byte)RequestType.ReqQuoteAction, Handle, IntPtr.Zero, 0, 0,
                 szIdPtr, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
             Marshal.FreeHGlobal(szIdPtr);
+
+            return ptr.ToInt32();
         }
 
         protected override IntPtr OnRespone(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
@@ -153,6 +157,9 @@ namespace QuantBox.XAPI.Callback
                     break;
                 case ResponeType.OnRtnTrade:
                     _OnRtnTrade(ptr1, size1);
+                    break;
+                case ResponeType.OnRtnQuote:
+                    _OnRtnQuote(ptr1, size1);
                     break;
                 default:
                     base.OnRespone(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
@@ -210,6 +217,16 @@ namespace QuantBox.XAPI.Callback
             TradeField obj = PInvokeUtility.GetObjectFromIntPtr<TradeField>(ptr1);
 
             OnRtnTrade(this, ref obj);
+        }
+
+        private void _OnRtnQuote(IntPtr ptr1, int size1)
+        {
+            if (OnRtnQuote == null)
+                return;
+
+            QuoteField obj = PInvokeUtility.GetObjectFromIntPtr<QuoteField>(ptr1);
+
+            OnRtnQuote(this, ref obj);
         }
     }
 }

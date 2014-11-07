@@ -52,6 +52,7 @@ enum ResponeType :char
 	OnRspQrySettlementInfo,
 	OnRtnOrder,
 	OnRtnTrade,
+	OnRtnQuote,
 	OnRtnQuoteRequest,
 };
 
