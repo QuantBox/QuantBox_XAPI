@@ -541,12 +541,6 @@ void CMdUserApi::OnMarketData(struct DFITCDepthMarketDataField *pMarketDataField
 		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime);
 	marketData.UpdateMillisec = pMarketDataField->UpdateMillisec;
 
-	//ErrorField field = { 0 };/*
-	//field.ErrorID = pRspInfo->nErrorID;*/
-	//strncpy(field.ErrorMsg, marketData.ExchangeTime, sizeof(marketData.ExchangeTime));
-
-	//XRespone(ResponeType::OnRtnError, m_msgQueue, this, true, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
-
 	marketData.LastPrice = pMarketDataField->lastPrice;
 	marketData.Volume = pMarketDataField->Volume;
 	marketData.Turnover = pMarketDataField->turnover;

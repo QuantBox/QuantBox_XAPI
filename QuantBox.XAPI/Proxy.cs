@@ -68,7 +68,6 @@ namespace QuantBox.XAPI
                 if (_Invoke == null)
                     return IntPtr.Zero;
 
-                //_XRequest = (XCall)_Invoke.Invoke("_XRequest@52", typeof(XCall));
 				_XRequest = (XCall)_Invoke.Invoke("XRequest", typeof(XCall));
                 if (_XRequest == null)
                     return IntPtr.Zero;

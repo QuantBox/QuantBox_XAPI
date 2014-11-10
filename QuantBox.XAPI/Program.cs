@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Threading;
 
 namespace QuantBox.XAPI
 {
@@ -60,8 +61,11 @@ namespace QuantBox.XAPI
 
         static void Main(string[] args)
         {
-            //test_KingstarGold_Main(args);
-            test_CTP_Main(args);
+            for (int i = 0; i < 10000; ++i)
+            {
+                test_CTP_Main(args);
+            }
+            Console.ReadKey();
         }
 
         static void test_Linux_Main(string[] args)
@@ -156,33 +160,30 @@ namespace QuantBox.XAPI
 		#endregion
 
         static MarketDataApi api;
+
         static void test_CTP_Main(string[] args)
         {
             ApiManager.QueuePath = @"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\QuantBox_Queue.dll";
-            api = ApiManager.CreateApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\QuantBox_CTP_Quote.dll");
+            api = ApiManager.CreateApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\QuantBox_CTP_Trade.dll");
 
             api.Server.BrokerID = "1017";
-            api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51213";
+            api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51205";
 
             api.User.UserID = "00000015";
-            api.User.Password = "123456";
+            api.User.Password = "1234561";
 
             api.OnConnectionStatus = OnConnectionStatus;
             api.OnRtnDepthMarketData = OnRtnDepthMarketData;
 
             api.Connect();
 
-            api.Subscribe("IF1411", "");
-
-            Console.ReadKey();
-
-            Console.ReadKey();
+            Thread.Sleep(5*1000);
 
             ApiManager.ReleaseApi(api);
 
-            Console.ReadKey();
+            
 
-            Console.ReadKey();
+            
 
             //api.Dispose();
             //queue.Dispose();

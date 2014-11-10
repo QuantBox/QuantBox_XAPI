@@ -68,12 +68,17 @@ namespace QuantBox.XAPI.Callback
         void _Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             _Timer.Enabled = false;
-            // 定时检查是否需要销毁对象重连
-            if(!IsConnected)
+
+            lock (locker)
             {
-                Disconnect();
-                Connect();
+                // 定时检查是否需要销毁对象重连
+                if (!IsConnected)
+                {
+                    Disconnect();
+                    Connect();
+                }
             }
+            
             _Timer.Enabled = true;
         }
 
@@ -122,8 +127,7 @@ namespace QuantBox.XAPI.Callback
 
                 Handle = proxy.XRequest((byte)RequestType.Create, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
-                // 将API与队列进行绑定
-                proxy.XRequest((byte)RequestType.Register, Handle, IntPtr.Zero, 0, 0, _Queue.Handle, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+                Register(_Queue.Handle);
 
                 _Queue.Register(Marshal.GetFunctionPointerForDelegate(_XRespone));
                 // 启动队列循环
@@ -158,6 +162,7 @@ namespace QuantBox.XAPI.Callback
                     // 将API与队列解绑定，这句提前操作了就收不到Disconnected事件了
                     //proxy.XRequest((byte)RequestType.Register, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
+                    proxy.XRequest((byte)RequestType.Disconnect, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
                     proxy.XRequest((byte)RequestType.Release, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
                     proxy.Dispose();
@@ -167,6 +172,17 @@ namespace QuantBox.XAPI.Callback
                 Handle = IntPtr.Zero;
             }
 
+        }
+
+        public void Register(IntPtr ptr1)
+        {
+            lock (this)
+            {
+                if (proxy != null)
+                {
+                    proxy.XRequest((byte)RequestType.Register, Handle, IntPtr.Zero, 0, 0, ptr1, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+                }
+            }
         }
 
         public ApiType GetApiType

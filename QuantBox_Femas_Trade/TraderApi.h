@@ -2,7 +2,7 @@
 
 #include "../include/Femas/USTPFtdcTraderApi.h"
 #include "../include/ApiStruct.h"
-#include "../include/stringHash.h"
+//#include "../include/stringHash.h"
 
 #include <set>
 #include <list>
@@ -11,7 +11,7 @@
 #include <mutex>
 #include <atomic>
 #include <thread>
-#include <hash_map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -26,9 +26,9 @@ class CTraderApi :
 		E_QryUserInvestorField,
 		E_QryInstrumentField,
 		E_InputOrderField,
-		E_InputOrderActionField,
+		//E_InputOrderActionField,
 		E_InputQuoteField,
-		E_InputQuoteActionField,
+		//E_InputQuoteActionField,
 		E_ParkedOrderField,
 		E_QryInvestorAccountField,
 		E_QryInvestorPositionField,
@@ -40,6 +40,7 @@ class CTraderApi :
 		E_QryOrderField,
 		E_QryTradeField,
 		E_OrderActionField,
+		E_QuoteActionField,
 	};
 
 	//请求数据包结构体
@@ -59,6 +60,7 @@ class CTraderApi :
 			CUstpFtdcQryInvestorFeeField				QryInvestorFeeField;
 			CUstpFtdcQryInvestorMarginField				QryInvestorMarginField;
 			CUstpFtdcOrderActionField					OrderActionField;
+			CUstpFtdcQuoteActionField					QuoteActionField;
 		};
 	};
 
@@ -84,13 +86,12 @@ public:
 	int ReqOrderAction(const string& szId);
 	int ReqOrderAction(CUstpFtdcOrderField *pOrder);
 
-	//int ReqQuoteInsert(
-	//	int QuoteRef,
-	//	OrderField* pOrderAsk,
-	//	OrderField* pOrderBid);
+	char* ReqQuoteInsert(
+		int QuoteRef,
+		QuoteField* pQuote);
 
-	//int ReqQuoteAction(CUstpFtdcRtnQuoteField *pQuote);
-	//int ReqQuoteAction(const string& szId);
+	int ReqQuoteAction(CUstpFtdcRtnQuoteField *pQuote);
+	int ReqQuoteAction(const string& szId);
 
 	void ReqQryInvestorAccount();
 	void ReqQryInvestorPosition(const string& szInstrumentId);
@@ -100,10 +101,12 @@ public:
 
 	void ReqQryOrder();
 	void ReqQryTrade();
+	void ReqQryQuote();
 
 private:
 	void OnOrder(CUstpFtdcOrderField *pOrder);
 	void OnTrade(CUstpFtdcTradeField *pTrade);
+	void OnQuote(CUstpFtdcRtnQuoteField *pQuote);
 
 	//数据包发送线程
 	static void ProcessThread(CTraderApi* lpParam)
@@ -159,14 +162,14 @@ private:
 	virtual void OnRspQryTrade(CUstpFtdcTradeField *pTrade, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	virtual void OnRtnTrade(CUstpFtdcTradeField *pTrade);
 
-	////报价录入
-	//virtual void OnRspQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	//virtual void OnErrRtnQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUstpFtdcRspInfoField *pRspInfo);
-	//virtual void OnRtnQuote(CUstpFtdcRtnQuoteField *pRtnQuote);
+	//报价录入
+	virtual void OnRspQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	virtual void OnErrRtnQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUstpFtdcRspInfoField *pRspInfo);
+	virtual void OnRtnQuote(CUstpFtdcRtnQuoteField *pRtnQuote);
 
-	////报价撤单
-	//virtual void OnRspQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	//virtual void OnErrRtnQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CUstpFtdcRspInfoField *pRspInfo);
+	//报价撤单
+	virtual void OnRspQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	virtual void OnErrRtnQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CUstpFtdcRspInfoField *pRspInfo);
 
 	//仓位
 	virtual void OnRspQryInvestorPosition(CUstpFtdcRspInvestorPositionField *pRspInvestorPosition, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -215,12 +218,12 @@ private:
 	mutex						m_csMap;
 	map<int,SRequest*>			m_reqMap;				//已发送请求池
 
-	hash_map<string, OrderField*>				m_id_platform_order;
-	hash_map<string, CUstpFtdcOrderField*>		m_id_api_order;
-	//hash_map<string, string>					m_sysId_orderId;
+	unordered_map<string, OrderField*>				m_id_platform_order;
+	unordered_map<string, CUstpFtdcOrderField*>		m_id_api_order;
+	//unordered_map<string, string>					m_sysId_orderId;
 
-	//hash_map<string, QuoteField*>				m_id_platform_quote;
-	hash_map<string, CUstpFtdcRtnQuoteField*>		m_id_api_quote;
-	//hash_map<string, string>					m_sysId_quoteId;
+	unordered_map<string, QuoteField*>				m_id_platform_quote;
+	unordered_map<string, CUstpFtdcRtnQuoteField*>		m_id_api_quote;
+	//unordered_map<string, string>					m_sysId_quoteId;
 };
 

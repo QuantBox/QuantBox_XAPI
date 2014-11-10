@@ -15,14 +15,15 @@ using namespace moodycamel;
 class CMsgQueue
 {
 public:
-	CMsgQueue():m_queue(1024)
-	{
-		m_hThread = nullptr;
-		m_bRunning = false;
+	//CMsgQueue():m_queue(1024)
+	//{
+	//	m_hThread = nullptr;
+	//	m_bRunning = false;
 
-		//回调函数地址指针
-		m_fnOnRespone = nullptr;
-	}
+	//	//回调函数地址指针
+	//	m_fnOnRespone = nullptr;
+	//}
+	CMsgQueue();
 	virtual ~CMsgQueue()
 	{
 		StopThread();
@@ -93,13 +94,20 @@ private:
 	void RunInThread();
 	void Output(ResponeItem* pItem)
 	{
-		if (m_fnOnRespone)
-			(*m_fnOnRespone)(pItem->type, pItem->pApi1, pItem->pApi2, pItem->double1, pItem->double2, pItem->ptr1, pItem->size1, pItem->ptr2, pItem->size2, pItem->ptr3, pItem->size3);
+		try
+		{
+			if (m_fnOnRespone)
+				(*m_fnOnRespone)(pItem->type, pItem->pApi1, pItem->pApi2, pItem->double1, pItem->double2, pItem->ptr1, pItem->size1, pItem->ptr2, pItem->size2, pItem->ptr3, pItem->size3);
+		}
+		catch (...)
+		{
+			m_fnOnRespone = nullptr;
+		}
 	}
 
 private:
 	volatile bool						m_bRunning;
-	mutex						m_mtx;
+	mutex							m_mtx;
 	thread*								m_hThread;
 	ReaderWriterQueue<ResponeItem*>		m_queue;
 	fnOnRespone							m_fnOnRespone;

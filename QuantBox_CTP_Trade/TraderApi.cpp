@@ -14,6 +14,21 @@
 #include <cstring>
 #include <assert.h>
 
+//#include <stdlib.h>
+//#include <crtdbg.h>  // For _CrtSetReportMode
+//
+//void myInvalidParameterHandler(const wchar_t* expression,
+//	const wchar_t* function,
+//	const wchar_t* file,
+//	unsigned int line,
+//	uintptr_t pReserved)
+//{
+//	wprintf(L"Invalid parameter detected in function %s."
+//		L" File: %s Line: %d\n", function, file, line);
+//	wprintf(L"Expression: %s\n", expression);
+//	abort();
+//}
+
 CTraderApi::CTraderApi(void)
 {
 	m_pApi = nullptr;
@@ -22,6 +37,11 @@ CTraderApi::CTraderApi(void)
 
 	m_hThread = nullptr;
 	m_bRunning = false;
+
+	//_invalid_parameter_handler oldHandler, newHandler;
+	//newHandler = myInvalidParameterHandler;
+	//oldHandler = _set_invalid_parameter_handler(newHandler);
+	//_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
 }
 
 
@@ -1059,11 +1079,6 @@ int CTraderApi::ReqQuoteAction(const string& szId)
 	if (it == m_id_api_quote.end())
 	{
 		//// <error id="QUOTE_NOT_FOUND" value="86" prompt="CTP:报价撤单找不到相应报价"/>
-		//ErrorField field = { 0 };
-		//field.ErrorID = 86;
-		//sprintf(field.ErrorMsg, "QUOTE_NOT_FOUND");
-
-		//XRespone(ResponeType::OnRtnError, m_msgQueue, this, 0, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 		return -100;
 	}
 	else
@@ -1517,7 +1532,7 @@ void CTraderApi::OnOrder(CThostFtdcOrderField *pOrder)
 			pField->Side = TThostFtdcDirectionType_2_OrderSide(pOrder->Direction);
 			pField->Price = pOrder->LimitPrice;
 			pField->StopPx = pOrder->StopPrice;
-			strcpy(pField->Text, pOrder->StatusMsg);
+			strncpy(pField->Text, pOrder->StatusMsg, sizeof(TThostFtdcErrorMsgType));
 			pField->OpenClose = TThostFtdcOffsetFlagType_2_OpenCloseType(pOrder->CombOffsetFlag[0]);
 			pField->Status = CThostFtdcOrderField_2_OrderStatus(pOrder);
 			pField->Qty = pOrder->VolumeTotalOriginal;
@@ -1539,7 +1554,7 @@ void CTraderApi::OnOrder(CThostFtdcOrderField *pOrder)
 			pField->Status = CThostFtdcOrderField_2_OrderStatus(pOrder);
 			pField->ExecType = CThostFtdcOrderField_2_ExecType(pOrder);
 			strcpy(pField->OrderID, pOrder->OrderSysID);
-			strcpy(pField->Text, pOrder->StatusMsg);
+			strncpy(pField->Text, pOrder->StatusMsg, sizeof(TThostFtdcErrorMsgType));
 		}
 
 		XRespone(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
@@ -1710,7 +1725,7 @@ void CTraderApi::OnQuote(CThostFtdcQuoteField *pQuote)
 			strcpy(pField->AskOrderID, pQuote->AskOrderSysID);
 			strcpy(pField->BidOrderID, pQuote->BidOrderSysID);
 
-			strcpy(pField->Text, pQuote->StatusMsg);
+			strncpy(pField->Text, pQuote->StatusMsg, sizeof(TThostFtdcErrorMsgType));
 			
 			//pField->ExecType = ExecType::ExecNew;
 			pField->Status = CThostFtdcQuoteField_2_OrderStatus(pQuote);
@@ -1731,7 +1746,7 @@ void CTraderApi::OnQuote(CThostFtdcQuoteField *pQuote)
 			pField->Status = CThostFtdcQuoteField_2_OrderStatus(pQuote);
 			pField->ExecType = CThostFtdcQuoteField_2_ExecType(pQuote);
 			
-			strcpy(pField->Text, pQuote->StatusMsg);
+			strncpy(pField->Text, pQuote->StatusMsg, sizeof(TThostFtdcErrorMsgType));
 		}
 
 		XRespone(ResponeType::OnRtnQuote, m_msgQueue, this, 0, 0, pField, sizeof(QuoteField), nullptr, 0, nullptr, 0);

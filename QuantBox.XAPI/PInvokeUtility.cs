@@ -17,6 +17,7 @@ namespace QuantBox.XAPI
             {
                 return string.Empty;
             }
+            // 只移除了最后一个，中间出现的不会动，导致NLog输出的有可能截断
             return encodingGB2312.GetString(str).TrimEnd('\0');
         }
 

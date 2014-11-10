@@ -123,24 +123,6 @@ TUstpFtdcOrderPriceTypeType OrderType_2_TUstpFtdcOrderPriceTypeType(OrderType In
 	}
 }
 
-OrderStatus CUstpFtdcOrderField_2_OrderStatus(CUstpFtdcOrderField* pIn)
-{
-	switch (pIn->OrderStatus)
-	{
-	case USTP_FTDC_OS_Canceled:
-		return OrderStatus::Cancelled;
-	case USTP_FTDC_OS_NoTradeQueueing:
-		return OrderStatus::New;
-	default:
-		if (pIn->VolumeRemain == 0)
-			return OrderStatus::Filled;
-		else if (pIn->VolumeRemain == pIn->Volume)
-			return OrderStatus::New;
-		else
-			return OrderStatus::PartiallyFilled;
-	}
-}
-
 OrderType CUstpFtdcOrderField_2_OrderType(CUstpFtdcOrderField* pIn)
 {
 	switch (pIn->OrderPriceType)
@@ -175,6 +157,24 @@ TimeInForce CUstpFtdcOrderField_2_TimeInForce(CUstpFtdcOrderField* pIn)
 	}
 }
 
+OrderStatus CUstpFtdcOrderField_2_OrderStatus(CUstpFtdcOrderField* pIn)
+{
+	switch (pIn->OrderStatus)
+	{
+	case USTP_FTDC_OS_Canceled:
+		return OrderStatus::Cancelled;
+	case USTP_FTDC_OS_NoTradeQueueing:
+		return OrderStatus::New;
+	default:
+		if (pIn->VolumeRemain == 0)
+			return OrderStatus::Filled;
+		else if (pIn->VolumeRemain == pIn->Volume)
+			return OrderStatus::New;
+		else
+			return OrderStatus::PartiallyFilled;
+	}
+}
+
 ExecType CUstpFtdcOrderField_2_ExecType(CUstpFtdcOrderField* pIn)
 {
 	switch (pIn->OrderStatus)
@@ -186,6 +186,47 @@ ExecType CUstpFtdcOrderField_2_ExecType(CUstpFtdcOrderField* pIn)
 	case USTP_FTDC_OS_AllTraded:
 	case USTP_FTDC_OS_PartTradedQueueing:
 		return ExecType::ExecTrade;
+	default:
+		return ExecType::ExecNew;
+	}
+}
+
+OrderStatus CUstpFtdcRtnQuoteField_2_OrderStatus(CUstpFtdcRtnQuoteField* pIn)
+{
+	switch (pIn->QuoteStatus)
+	{
+	case USTP_FTDC_QS_Inited_InFEMAS:
+	case USTP_FTDC_QS_Accepted_InTradingSystem:
+		return OrderStatus::New;
+	case USTP_FTDC_QS_Canceled_SingleLeg:
+	case USTP_FTDC_QS_Canceled_All:
+		return OrderStatus::Cancelled;
+	case USTP_FTDC_QS_Traded_SingleLeg:
+		return OrderStatus::PartiallyFilled;
+	case USTP_FTDC_QS_Traded_All:
+		return OrderStatus::Filled;
+	case USTP_FTDC_QS_Error_QuoteAction:
+		return OrderStatus::PendingCancel;
+	default:
+		return OrderStatus::New;
+	}
+}
+
+ExecType CUstpFtdcRtnQuoteField_2_ExecType(CUstpFtdcRtnQuoteField* pIn)
+{
+	switch (pIn->QuoteStatus)
+	{
+	case USTP_FTDC_QS_Inited_InFEMAS:
+	case USTP_FTDC_QS_Accepted_InTradingSystem:
+		return ExecType::ExecNew;
+	case USTP_FTDC_QS_Canceled_SingleLeg:
+	case USTP_FTDC_QS_Canceled_All:
+		return ExecType::ExecCancelled;
+	case USTP_FTDC_QS_Traded_SingleLeg:
+	case USTP_FTDC_QS_Traded_All:
+		return ExecType::ExecTrade;
+	case USTP_FTDC_QS_Error_QuoteAction:
+		return ExecType::ExecCancelReject;
 	default:
 		return ExecType::ExecNew;
 	}

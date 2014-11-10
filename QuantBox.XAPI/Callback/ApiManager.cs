@@ -9,28 +9,36 @@ namespace QuantBox.XAPI.Callback
 {
     public static class ApiManager
     {
+        private static object locker = new object();
+
         public static string QueuePath;
 
         private static ConcurrentDictionary<TraderApi, Queue> dict = new ConcurrentDictionary<TraderApi, Queue>();
 
         public static TraderApi CreateApi(string path)
         {
-            Queue queue = new Queue(QueuePath);
-            TraderApi api = new TraderApi(path, new Queue(QueuePath));
-            dict.TryAdd(api, queue);
-            return api;
+            lock (locker)
+            {
+                Queue queue = new Queue(QueuePath);
+                TraderApi api = new TraderApi(path, new Queue(QueuePath));
+                dict.TryAdd(api, queue);
+                return api;
+            }
         }
 
         public static void ReleaseApi(BaseApi api)
         {
-            Queue queue;
-            if(dict.TryRemove(api as TraderApi,out queue))
+            lock(locker)
             {
-                api.Dispose();
-                queue.Dispose();
+                Queue queue;
+                if (dict.TryRemove(api as TraderApi, out queue))
+                {
+                    api.Dispose();
+                    queue.Dispose();
 
-                api = null;
-                queue = null;
+                    api = null;
+                    queue = null;
+                }
             }
         }
     }

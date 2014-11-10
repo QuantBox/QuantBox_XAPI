@@ -68,7 +68,8 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		return pApi->ReqQuoteInsert((int)double1, (QuoteField*)ptr1);
 	case ReqOrderAction:
 		return (void*)pApi->ReqOrderAction((const char*)ptr1);
-		break;
+	case ReqQuoteAction:
+		return (void*)pApi->ReqQuoteAction((const char*)ptr1);
 	default:
 		break;
 	}

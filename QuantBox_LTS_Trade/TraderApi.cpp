@@ -945,8 +945,8 @@ void CTraderApi::ReqQryTradingAccount()
 
 	CSecurityFtdcQryTradingAccountField& body = pRequest->QryTradingAccountField;
 
-	strncpy(body.BrokerID, m_RspUserLogin.BrokerID,sizeof(TSecurityFtdcBrokerIDType));
-	strncpy(body.InvestorID, m_RspUserLogin.UserID,sizeof(TSecurityFtdcInvestorIDType));
+	strcpy(body.BrokerID, m_RspUserLogin.BrokerID);
+	strcpy(body.InvestorID, m_RspUserLogin.UserID);
 
 	AddToSendQueue(pRequest);
 }
@@ -989,8 +989,8 @@ void CTraderApi::ReqQryInvestorPosition(const string& szInstrumentId)
 
 	CSecurityFtdcQryInvestorPositionField& body = pRequest->QryInvestorPositionField;
 
-	strncpy(body.BrokerID, m_RspUserLogin.BrokerID,sizeof(TSecurityFtdcBrokerIDType));
-	strncpy(body.InvestorID, m_RspUserLogin.UserID,sizeof(TSecurityFtdcInvestorIDType));
+	strcpy(body.BrokerID, m_RspUserLogin.BrokerID);
+	strcpy(body.InvestorID, m_RspUserLogin.UserID);
 	strncpy(body.InstrumentID,szInstrumentId.c_str(),sizeof(TSecurityFtdcInstrumentIDType));
 
 	AddToSendQueue(pRequest);
@@ -1321,8 +1321,8 @@ void CTraderApi::ReqQryTrade()
 
 	CSecurityFtdcQryTradeField& body = pRequest->QryTradeField;
 
-	strncpy(body.BrokerID, m_RspUserLogin.BrokerID, sizeof(TSecurityFtdcBrokerIDType));
-	strncpy(body.InvestorID, m_RspUserLogin.UserID, sizeof(TSecurityFtdcInvestorIDType));
+	strcpy(body.BrokerID, m_RspUserLogin.BrokerID);
+	strcpy(body.InvestorID, m_RspUserLogin.UserID);
 
 	AddToSendQueue(pRequest);
 }
