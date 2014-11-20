@@ -1218,7 +1218,7 @@ void CTraderApi::OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingA
 		ReleaseRequestMapBuf(nRequestID);
 }
 
-void CTraderApi::ReqQryInvestorPosition(const string& szInstrumentId)
+void CTraderApi::ReqQryInvestorPosition(const string& szInstrumentId, const string& szExchange)
 {
 	if (nullptr == m_pApi)
 		return;
@@ -1242,17 +1242,43 @@ void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInve
 	{
 		if (pInvestorPosition)
 		{
-			PositionField field = { 0 };
+			PositionIDType positionId = { 0 };
+			sprintf(positionId, "%s:%c:%c",
+				pInvestorPosition->InstrumentID, pInvestorPosition->PosiDirection, pInvestorPosition->HedgeFlag);
 
-			strcpy(field.InstrumentID, pInvestorPosition->InstrumentID);
+			PositionField* pField = nullptr;
+			unordered_map<string, PositionField*>::iterator it = m_id_platform_position.find(positionId);
+			if (it == m_id_platform_position.end())
+			{
+				pField = new PositionField();
+				memset(pField, 0, sizeof(PositionField));
+				
+				strcpy(pField->InstrumentID, pInvestorPosition->InstrumentID);
+				pField->Side = TThostFtdcPosiDirectionType_2_PositionSide(pInvestorPosition->PosiDirection);
+				pField->HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pInvestorPosition->HedgeFlag);
 
-			field.Side = TThostFtdcPosiDirectionType_2_PositionSide(pInvestorPosition->PosiDirection);
-			field.HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pInvestorPosition->HedgeFlag);
-			field.Position = pInvestorPosition->Position;
-			field.TdPosition = pInvestorPosition->TodayPosition;
-			field.YdPosition = pInvestorPosition->Position - pInvestorPosition->TodayPosition;
+				m_id_platform_position.insert(pair<string, PositionField*>(positionId, pField));
+			}
+			else
+			{
+				pField = it->second;
+			}
+						
+			pField->Position = pInvestorPosition->Position;
+			pField->TdPosition = pInvestorPosition->TodayPosition;
+			pField->YdPosition = pInvestorPosition->Position - pInvestorPosition->TodayPosition;
 
-			XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, bIsLast, 0, &field, sizeof(PositionField), nullptr, 0, nullptr, 0);
+			// 等数据收集全了再遍历通知一次
+			if (bIsLast)
+			{
+				int cnt = 0;
+				int count = m_id_platform_position.size();
+				for (unordered_map<string, PositionField*>::iterator iter = m_id_platform_position.begin(); iter != m_id_platform_position.end(); iter++)
+				{
+					++cnt;
+					XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, cnt == count, 0, iter->second, sizeof(PositionField), nullptr, 0, nullptr, 0);
+				}
+			}
 		}
 		else
 		{

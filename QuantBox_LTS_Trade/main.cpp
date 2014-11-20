@@ -16,7 +16,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return (void*)(ApiType::Trade);
 	case GetApiVersion:
-		return "0.1";
+		return "0.2";
 	case GetApiName:
 		return "LTS";
 	case Create:
@@ -51,6 +51,9 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		break;
 	case ReqQryTradingAccount:
 		pApi->ReqQryTradingAccount();
+		break;
+	case ReqQryInvestorPosition:
+		pApi->ReqQryInvestorPosition((const char*)ptr1, (const char*)ptr2);
 		break;
 		//case ReqQrySettlementInfo:
 		//	pApi->ReqQrySettlementInfo((const char*)ptr1);

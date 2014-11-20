@@ -978,7 +978,7 @@ void CTraderApi::OnRspQryTradingAccount(CSecurityFtdcTradingAccountField *pTradi
 		ReleaseRequestMapBuf(nRequestID);
 }
 
-void CTraderApi::ReqQryInvestorPosition(const string& szInstrumentId)
+void CTraderApi::ReqQryInvestorPosition(const string& szInstrumentId, const string& szExchange)
 {
 	if (nullptr == m_pApi)
 		return;
@@ -1005,6 +1005,7 @@ void CTraderApi::OnRspQryInvestorPosition(CSecurityFtdcInvestorPositionField *pI
 			PositionField field = { 0 };
 
 			strcpy(field.InstrumentID, pInvestorPosition->InstrumentID);
+			strcpy(field.ExchangeID, pInvestorPosition->ExchangeID);
 
 			field.Side = TSecurityFtdcPosiDirectionType_2_PositionSide(pInvestorPosition->PosiDirection);
 			field.HedgeFlag = TSecurityFtdcHedgeFlagType_2_HedgeFlagType(pInvestorPosition->HedgeFlag);

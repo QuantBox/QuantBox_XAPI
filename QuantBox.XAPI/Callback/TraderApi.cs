@@ -11,6 +11,7 @@ namespace QuantBox.XAPI.Callback
     {
         public DelegateOnRspQryInstrument OnRspQryInstrument;
         public DelegateOnRspQryTradingAccount OnRspQryTradingAccount;
+        public DelegateOnRspQryInvestorPosition OnRspQryInvestorPosition;
         public DelegateOnRspQrySettlementInfo OnRspQrySettlementInfo;
         public DelegateOnRtnOrder OnRtnOrder;
         public DelegateOnRtnTrade OnRtnTrade;
@@ -38,6 +39,18 @@ namespace QuantBox.XAPI.Callback
         {
             proxy.XRequest((byte)RequestType.ReqQryTradingAccount, Handle, IntPtr.Zero, 0, 0,
                 IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+        }
+
+        public void ReqQryInvestorPosition(string szInstrument, string szExchange)
+        {
+            IntPtr szInstrumentPtr = Marshal.StringToHGlobalAnsi(szInstrument);
+            IntPtr szExchangePtr = Marshal.StringToHGlobalAnsi(szExchange);
+
+            proxy.XRequest((byte)RequestType.ReqQryInvestorPosition, Handle, IntPtr.Zero, 0, 0,
+                szInstrumentPtr, 0, szExchangePtr, 0, IntPtr.Zero, 0);
+
+            Marshal.FreeHGlobal(szInstrumentPtr);
+            Marshal.FreeHGlobal(szExchangePtr);
         }
 
         public void ReqQrySettlementInfo(string szTradingDay)
@@ -149,6 +162,9 @@ namespace QuantBox.XAPI.Callback
                 case ResponeType.OnRspQryTradingAccount:
                     _OnRspQryTradingAccount(ptr1, size1, double1);
                     break;
+                case ResponeType.OnRspQryInvestorPosition:
+                    _OnRspQryInvestorPosition(ptr1, size1, double1);
+                    break;
                 case ResponeType.OnRspQrySettlementInfo:
                     _OnRspQrySettlementInfo(ptr1, size1, double1);
                     break;
@@ -187,6 +203,16 @@ namespace QuantBox.XAPI.Callback
             AccountField obj = PInvokeUtility.GetObjectFromIntPtr<AccountField>(ptr1);
 
             OnRspQryTradingAccount(this, ref obj, size1, double1 != 0);
+        }
+
+        private void _OnRspQryInvestorPosition(IntPtr ptr1, int size1, double double1)
+        {
+            if (OnRspQryInvestorPosition == null)
+                return;
+
+            PositionField obj = PInvokeUtility.GetObjectFromIntPtr<PositionField>(ptr1);
+
+            OnRspQryInvestorPosition(this, ref obj, size1, double1 != 0);
         }
 
         private void _OnRspQrySettlementInfo(IntPtr ptr1, int size1, double double1)

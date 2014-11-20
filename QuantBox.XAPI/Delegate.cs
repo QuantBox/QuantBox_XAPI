@@ -14,6 +14,7 @@ namespace QuantBox.XAPI
     
     public delegate void DelegateOnRspQryInstrument(object sender, ref InstrumentField instrument,int size1, bool bIsLast);
     public delegate void DelegateOnRspQryTradingAccount(object sender, ref AccountField account, int size1, bool bIsLast);
+    public delegate void DelegateOnRspQryInvestorPosition(object sender, ref PositionField position, int size1, bool bIsLast);
     public delegate void DelegateOnRspQrySettlementInfo(object sender, ref SettlementInfoField settlementInfo, int size1, bool bIsLast);
     public delegate void DelegateOnRtnOrder(object sender, ref OrderField order);
     public delegate void DelegateOnRtnTrade(object sender, ref TradeField trade);

@@ -101,7 +101,7 @@ public:
 	int ReqQuoteAction(const string& szId);
 
 	void ReqQryTradingAccount();
-	void ReqQryInvestorPosition(const string& szInstrumentId);
+	void ReqQryInvestorPosition(const string& szInstrumentId, const string& szExchange);
 	void ReqQryInvestorPositionDetail(const string& szInstrumentId);
 	void ReqQryInstrument(const string& szInstrumentId, const string& szExchange);
 	void ReqQryInstrumentCommissionRate(const string& szInstrumentId);
@@ -241,5 +241,7 @@ private:
 	unordered_map<string, QuoteField*>				m_id_platform_quote;
 	unordered_map<string, CThostFtdcQuoteField*>		m_id_api_quote;
 	unordered_map<string, string>					m_sysId_quoteId;
+
+	unordered_map<string, PositionField*>			m_id_platform_position;
 };
 

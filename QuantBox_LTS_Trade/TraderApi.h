@@ -94,7 +94,7 @@ public:
 	//int ReqQuoteAction(const string& szId);
 
 	void ReqQryTradingAccount();
-	void ReqQryInvestorPosition(const string& szInstrumentId);
+	void ReqQryInvestorPosition(const string& szInstrumentId, const string& szExchange);
 	void ReqQryInvestorPositionDetail(const string& szInstrumentId);
 	void ReqQryInstrument(const string& szInstrumentId, const string& szExchange);
 	void ReqQryInstrumentCommissionRate(const string& szInstrumentId);
