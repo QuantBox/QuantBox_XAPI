@@ -118,6 +118,8 @@ private:
 	void OnTrade(CThostFtdcTradeField *pTrade);
 	void OnQuote(CThostFtdcQuoteField *pQuote);
 
+	void OnTrade(TradeField *pTrade);
+
 	//数据包发送线程
 	static void ProcessThread(CTraderApi* lpParam)
 	{

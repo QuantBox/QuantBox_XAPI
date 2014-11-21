@@ -16,6 +16,7 @@ OpenCloseType TThostFtdcOffsetFlagType_2_OpenCloseType(TThostFtdcOffsetFlagType 
 TThostFtdcDirectionType OrderSide_2_TThostFtdcDirectionType(OrderSide In);
 OrderSide TThostFtdcDirectionType_2_OrderSide(TThostFtdcDirectionType In);
 PositionSide TThostFtdcPosiDirectionType_2_PositionSide(TThostFtdcPosiDirectionType In);
+PositionSide TradeField_2_PositionSide(TradeField* pIn);
 
 TThostFtdcOrderPriceTypeType OrderType_2_TThostFtdcOrderPriceTypeType(OrderType In);
 

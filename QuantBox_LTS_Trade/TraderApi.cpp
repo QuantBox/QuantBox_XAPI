@@ -622,7 +622,7 @@ void CTraderApi::OnRspOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, CSe
 	OrderIDType orderId = { 0 };
 	sprintf(orderId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputOrder->OrderRef);
 
-	hash_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
+	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
 	if (it == m_id_platform_order.end())
 	{
 		// 没找到？不应当，这表示出错了
@@ -647,7 +647,7 @@ void CTraderApi::OnErrRtnOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, 
 	OrderIDType orderId = { 0 };
 	sprintf(orderId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputOrder->OrderRef);
 
-	hash_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
+	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
 	if (it == m_id_platform_order.end())
 	{
 		// 没找到？不应当，这表示出错了
@@ -670,12 +670,12 @@ void CTraderApi::OnErrRtnOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, 
 
 void CTraderApi::OnRtnTrade(CSecurityFtdcTradeField *pTrade)
 {
-	OnTrade(pTrade);
+	OnTrade(pTrade,false);
 }
 
 int CTraderApi::ReqOrderAction(const string& szId)
 {
-	hash_map<string, CSecurityFtdcOrderField*>::iterator it = m_id_api_order.find(szId);
+	unordered_map<string, CSecurityFtdcOrderField*>::iterator it = m_id_api_order.find(szId);
 	if (it == m_id_api_order.end())
 	{
 		// <error id="ORDER_NOT_FOUND" value="25" prompt="CTP:撤单找不到相应报单"/>
@@ -735,7 +735,7 @@ void CTraderApi::OnRspOrderAction(CSecurityFtdcInputOrderActionField *pInputOrde
 	OrderIDType orderId = { 0 };
 	sprintf(orderId, "%d:%d:%s", pInputOrderAction->FrontID, pInputOrderAction->SessionID, pInputOrderAction->OrderRef);
 
-	hash_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
+	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
 	if (it == m_id_platform_order.end())
 	{
 		// 没找到？不应当，这表示出错了
@@ -758,7 +758,7 @@ void CTraderApi::OnErrRtnOrderAction(CSecurityFtdcOrderActionField *pOrderAction
 	OrderIDType orderId = { 0 };
 	sprintf(orderId, "%d:%d:%s", pOrderAction->FrontID, pOrderAction->SessionID, pOrderAction->OrderRef);
 
-	hash_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
+	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
 	if (it == m_id_platform_order.end())
 	{
 		// 没找到？不应当，这表示出错了
@@ -778,7 +778,7 @@ void CTraderApi::OnErrRtnOrderAction(CSecurityFtdcOrderActionField *pOrderAction
 
 void CTraderApi::OnRtnOrder(CSecurityFtdcOrderField *pOrder)
 {
-	OnOrder(pOrder);
+	OnOrder(pOrder,false);
 }
 
 //int CTraderApi::ReqQuoteInsert(
@@ -996,28 +996,53 @@ void CTraderApi::ReqQryInvestorPosition(const string& szInstrumentId, const stri
 	AddToSendQueue(pRequest);
 }
 
+// 国债逆回购，持仓是Net，我归类到了Long中，如果我直接从成交中分析出来的又归到了Net中
+// 所有开平和投保类型都是空
 void CTraderApi::OnRspQryInvestorPosition(CSecurityFtdcInvestorPositionField *pInvestorPosition, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
 	{
 		if (pInvestorPosition)
 		{
-			PositionField field = { 0 };
+			PositionIDType positionId = { 0 };
+			sprintf(positionId, "%s:%s:%d:%d",
+				pInvestorPosition->InstrumentID, pInvestorPosition->ExchangeID,
+				TSecurityFtdcPosiDirectionType_2_PositionSide(pInvestorPosition->PosiDirection), TSecurityFtdcHedgeFlagType_2_HedgeFlagType(pInvestorPosition->HedgeFlag));
 
-			strcpy(field.InstrumentID, pInvestorPosition->InstrumentID);
-			strcpy(field.ExchangeID, pInvestorPosition->ExchangeID);
+			PositionField* pField = nullptr;
+			unordered_map<string, PositionField*>::iterator it = m_id_platform_position.find(positionId);
+			if (it == m_id_platform_position.end())
+			{
+				pField = new PositionField();
+				memset(pField, 0, sizeof(PositionField));
 
-			field.Side = TSecurityFtdcPosiDirectionType_2_PositionSide(pInvestorPosition->PosiDirection);
-			field.HedgeFlag = TSecurityFtdcHedgeFlagType_2_HedgeFlagType(pInvestorPosition->HedgeFlag);
-			field.Position = pInvestorPosition->Position;
-			field.TdPosition = pInvestorPosition->TodayPosition;
-			field.YdPosition = pInvestorPosition->Position - pInvestorPosition->TodayPosition;
+				strcpy(pField->InstrumentID, pInvestorPosition->InstrumentID);
+				strcpy(pField->ExchangeID, pInvestorPosition->ExchangeID);
+				pField->Side = TSecurityFtdcPosiDirectionType_2_PositionSide(pInvestorPosition->PosiDirection);
+				pField->HedgeFlag = TSecurityFtdcHedgeFlagType_2_HedgeFlagType(pInvestorPosition->HedgeFlag);
 
-			XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, bIsLast, 0, &field, sizeof(PositionField), nullptr, 0, nullptr, 0);
-		}
-		else
-		{
-			XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, bIsLast, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+				m_id_platform_position.insert(pair<string, PositionField*>(positionId, pField));
+			}
+			else
+			{
+				pField = it->second;
+			}
+
+			pField->Position = pInvestorPosition->Position;
+			pField->TdPosition = pInvestorPosition->TodayPosition;
+			pField->YdPosition = pInvestorPosition->YdPosition;
+
+			// 等数据收集全了再遍历通知一次
+			if (bIsLast)
+			{
+				int cnt = 0;
+				int count = m_id_platform_position.size();
+				for (unordered_map<string, PositionField*>::iterator iter = m_id_platform_position.begin(); iter != m_id_platform_position.end(); iter++)
+				{
+					++cnt;
+					XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, cnt == count, 0, iter->second, sizeof(PositionField), nullptr, 0, nullptr, 0);
+				}
+			}
 		}
 	}
 
@@ -1221,7 +1246,7 @@ void CTraderApi::ReqQryOrder()
 	AddToSendQueue(pRequest);
 }
 
-void CTraderApi::OnOrder(CSecurityFtdcOrderField *pOrder)
+void CTraderApi::OnOrder(CSecurityFtdcOrderField *pOrder, bool bFromQry)
 {
 	if (nullptr == pOrder)
 		return;
@@ -1233,7 +1258,7 @@ void CTraderApi::OnOrder(CSecurityFtdcOrderField *pOrder)
 	{
 		// 保存原始订单信息，用于撤单
 
-		hash_map<string, CSecurityFtdcOrderField*>::iterator it = m_id_api_order.find(orderId);
+		unordered_map<string, CSecurityFtdcOrderField*>::iterator it = m_id_api_order.find(orderId);
 		if (it == m_id_api_order.end())
 		{
 			// 找不到此订单，表示是新单
@@ -1258,7 +1283,7 @@ void CTraderApi::OnOrder(CSecurityFtdcOrderField *pOrder)
 		// 从API的订单转换成自己的结构体
 
 		OrderField* pField = nullptr;
-		hash_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
+		unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
 		if (it == m_id_platform_order.end())
 		{
 			// 开盘时发单信息还没有，所以找不到对应的单子，需要进行Order的恢复
@@ -1304,7 +1329,7 @@ void CTraderApi::OnRspQryOrder(CSecurityFtdcOrderField *pOrder, CSecurityFtdcRsp
 {
 	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
 	{
-		OnOrder(pOrder);
+		OnOrder(pOrder, true);
 	}
 
 	if (bIsLast)
@@ -1328,7 +1353,7 @@ void CTraderApi::ReqQryTrade()
 	AddToSendQueue(pRequest);
 }
 
-void CTraderApi::OnTrade(CSecurityFtdcTradeField *pTrade)
+void CTraderApi::OnTrade(CSecurityFtdcTradeField *pTrade, bool bFromQry)
 {
 	if (nullptr == pTrade)
 		return;
@@ -1347,7 +1372,7 @@ void CTraderApi::OnTrade(CSecurityFtdcTradeField *pTrade)
 
 	OrderIDType orderSysId = { 0 };
 	sprintf(orderSysId, "%s:%s", pTrade->ExchangeID, pTrade->OrderSysID);
-	hash_map<string, string>::iterator it = m_sysId_orderId.find(orderSysId);
+	unordered_map<string, string>::iterator it = m_sysId_orderId.find(orderSysId);
 	if (it == m_sysId_orderId.end())
 	{
 		// 此成交找不到对应的报单
@@ -1360,7 +1385,7 @@ void CTraderApi::OnTrade(CSecurityFtdcTradeField *pTrade)
 
 		XRespone(ResponeType::OnRtnTrade, m_msgQueue, this, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
 
-		hash_map<string, OrderField*>::iterator it2 = m_id_platform_order.find(it->second);
+		unordered_map<string, OrderField*>::iterator it2 = m_id_platform_order.find(it->second);
 		if (it2 == m_id_platform_order.end())
 		{
 			// 此成交找不到对应的报单
@@ -1371,14 +1396,75 @@ void CTraderApi::OnTrade(CSecurityFtdcTradeField *pTrade)
 			// 更新订单的状态
 			// 是否要通知接口
 		}
+
+		OnTrade(pField, bFromQry);
 	}
+}
+
+void CTraderApi::OnTrade(TradeField *pTrade, bool bFromQry)
+{
+	PositionIDType positionId = { 0 };
+	sprintf(positionId, "%s:%s:%d:%d",
+		pTrade->InstrumentID, pTrade->ExchangeID, TradeField_2_PositionSide(pTrade), pTrade->HedgeFlag);
+
+	PositionField* pField = nullptr;
+	unordered_map<string, PositionField*>::iterator it = m_id_platform_position.find(positionId);
+	if (it == m_id_platform_position.end())
+	{
+		pField = new PositionField();
+		memset(pField, 0, sizeof(PositionField));
+
+		strcpy(pField->InstrumentID, pTrade->InstrumentID);
+		strcpy(pField->ExchangeID, pTrade->ExchangeID);
+		pField->Side = TradeField_2_PositionSide(pTrade);
+		pField->HedgeFlag = TSecurityFtdcHedgeFlagType_2_HedgeFlagType(pTrade->HedgeFlag);
+
+		m_id_platform_position.insert(pair<string, PositionField*>(positionId, pField));
+	}
+	else
+	{
+		pField = it->second;
+	}
+
+	if (pTrade->Side == OrderSide::Buy)
+	{
+		pField->Position += pTrade->Qty;
+		pField->TdPosition += pTrade->Qty;
+	}
+	else
+	{
+		pField->Position -= pTrade->Qty;
+		if (pTrade->OpenClose == OpenCloseType::CloseToday)
+		{
+			pField->TdPosition -= pTrade->Qty;
+		}
+		else
+		{
+			pField->YdPosition -= pTrade->Qty;
+			// 如果昨天的被减成负数，从今天开始继续减
+			if (pField->YdPosition<0)
+			{
+				pField->TdPosition += pField->YdPosition;
+				pField->YdPosition = 0;
+			}
+		}
+
+		// 计算错误，直接重新查询
+		if (pField->Position < 0 || pField->TdPosition < 0 || pField->YdPosition < 0)
+		{
+			ReqQryInvestorPosition("", "");
+			return;
+		}
+	}
+
+	XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, false, 0, pField, sizeof(PositionField), nullptr, 0, nullptr, 0);
 }
 
 void CTraderApi::OnRspQryTrade(CSecurityFtdcTradeField *pTrade, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
 	{
-		OnTrade(pTrade);
+		OnTrade(pTrade,true);
 	}
 
 	if (bIsLast)

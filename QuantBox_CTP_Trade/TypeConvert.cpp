@@ -96,6 +96,22 @@ PositionSide TThostFtdcPosiDirectionType_2_PositionSide(TThostFtdcPosiDirectionT
 	return PositionSide::Long;
 }
 
+PositionSide TradeField_2_PositionSide(TradeField* pIn)
+{
+	if (pIn->OpenClose == OpenCloseType::Open)
+	{
+		if (pIn->Side == OrderSide::Buy)
+			return PositionSide::Long;
+		return PositionSide::Short;
+	}
+	else
+	{
+		if (pIn->Side == OrderSide::Buy)
+			return PositionSide::Short;
+		return PositionSide::Long;
+	}
+}
+
 TThostFtdcOrderPriceTypeType OrderType_2_TThostFtdcOrderPriceTypeType(OrderType In)
 {
 	switch (In)

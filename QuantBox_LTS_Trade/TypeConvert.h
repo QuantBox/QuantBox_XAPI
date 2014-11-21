@@ -16,6 +16,7 @@ OpenCloseType TSecurityFtdcOffsetFlagType_2_OpenCloseType(TSecurityFtdcOffsetFla
 TSecurityFtdcDirectionType OrderSide_2_TSecurityFtdcDirectionType(OrderSide In);
 OrderSide TSecurityFtdcDirectionType_2_OrderSide(TSecurityFtdcDirectionType In);
 PositionSide TSecurityFtdcPosiDirectionType_2_PositionSide(TSecurityFtdcPosiDirectionType In);
+PositionSide TradeField_2_PositionSide(TradeField* pIn);
 
 TSecurityFtdcOrderPriceTypeType OrderType_2_TSecurityFtdcOrderPriceTypeType(OrderType In);
 

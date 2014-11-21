@@ -96,6 +96,23 @@ PositionSide TSecurityFtdcPosiDirectionType_2_PositionSide(TSecurityFtdcPosiDire
 	return PositionSide::Long;
 }
 
+PositionSide TradeField_2_PositionSide(TradeField* pIn)
+{
+	//if (pIn->OpenClose == OpenCloseType::Open)
+	//{
+	//	if (pIn->Side == OrderSide::Buy)
+	//		return PositionSide::Long;
+	//	return PositionSide::Short;
+	//}
+	//else
+	//{
+	//	if (pIn->Side == OrderSide::Buy)
+	//		return PositionSide::Short;
+	//	return PositionSide::Long;
+	//}
+	return PositionSide::Long;
+}
+
 TSecurityFtdcOrderPriceTypeType OrderType_2_TSecurityFtdcOrderPriceTypeType(OrderType In)
 {
 	switch (In)

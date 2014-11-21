@@ -14,21 +14,6 @@
 #include <cstring>
 #include <assert.h>
 
-//#include <stdlib.h>
-//#include <crtdbg.h>  // For _CrtSetReportMode
-//
-//void myInvalidParameterHandler(const wchar_t* expression,
-//	const wchar_t* function,
-//	const wchar_t* file,
-//	unsigned int line,
-//	uintptr_t pReserved)
-//{
-//	wprintf(L"Invalid parameter detected in function %s."
-//		L" File: %s Line: %d\n", function, file, line);
-//	wprintf(L"Expression: %s\n", expression);
-//	abort();
-//}
-
 CTraderApi::CTraderApi(void)
 {
 	m_pApi = nullptr;
@@ -37,11 +22,6 @@ CTraderApi::CTraderApi(void)
 
 	m_hThread = nullptr;
 	m_bRunning = false;
-
-	//_invalid_parameter_handler oldHandler, newHandler;
-	//newHandler = myInvalidParameterHandler;
-	//oldHandler = _set_invalid_parameter_handler(newHandler);
-	//_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
 }
 
 
@@ -1236,6 +1216,10 @@ void CTraderApi::ReqQryInvestorPosition(const string& szInstrumentId, const stri
 	AddToSendQueue(pRequest);
 }
 
+// 如果是请求查询，就将数据全部返回
+// 如果是后期的成交回报，就只返回更新的记录
+// 对于中金所，同时有今昨两天的持仓时，只返回今天的两条多空数据
+// 对于上期所，目前没条件测，当成是也只有两条
 void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
@@ -1243,8 +1227,8 @@ void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInve
 		if (pInvestorPosition)
 		{
 			PositionIDType positionId = { 0 };
-			sprintf(positionId, "%s:%c:%c",
-				pInvestorPosition->InstrumentID, pInvestorPosition->PosiDirection, pInvestorPosition->HedgeFlag);
+			sprintf(positionId, "%s:%d:%c",
+				pInvestorPosition->InstrumentID, TThostFtdcPosiDirectionType_2_PositionSide(pInvestorPosition->PosiDirection), pInvestorPosition->HedgeFlag);
 
 			PositionField* pField = nullptr;
 			unordered_map<string, PositionField*>::iterator it = m_id_platform_position.find(positionId);
@@ -1658,7 +1642,67 @@ void CTraderApi::OnTrade(CThostFtdcTradeField *pTrade)
 			// 更新订单的状态
 			// 是否要通知接口
 		}
+
+		OnTrade(pField);
 	}
+}
+
+void CTraderApi::OnTrade(TradeField *pTrade)
+{
+	PositionIDType positionId = { 0 };
+	sprintf(positionId, "%s:%d:%c",
+		pTrade->InstrumentID, TradeField_2_PositionSide(pTrade), pTrade->HedgeFlag);
+
+	PositionField* pField = nullptr;
+	unordered_map<string, PositionField*>::iterator it = m_id_platform_position.find(positionId);
+	if (it == m_id_platform_position.end())
+	{
+		pField = new PositionField();
+		memset(pField, 0, sizeof(PositionField));
+
+		strcpy(pField->InstrumentID, pTrade->InstrumentID);
+		pField->Side = TradeField_2_PositionSide(pTrade);
+		pField->HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pTrade->HedgeFlag);
+
+		m_id_platform_position.insert(pair<string, PositionField*>(positionId, pField));
+	}
+	else
+	{
+		pField = it->second;
+	}
+
+	if (pTrade->OpenClose == OpenCloseType::Open)
+	{
+		pField->Position += pTrade->Qty;
+		pField->TdPosition += pTrade->Qty;
+	}
+	else
+	{
+		pField->Position -= pTrade->Qty;
+		if (pTrade->OpenClose == OpenCloseType::CloseToday)
+		{
+			pField->TdPosition -= pTrade->Qty;
+		}
+		else
+		{
+			pField->YdPosition -= pTrade->Qty;
+			// 如果昨天的被减成负数，从今天开始继续减
+			if (pField->YdPosition<0)
+			{
+				pField->TdPosition += pField->YdPosition;
+				pField->YdPosition = 0;
+			}
+		}
+		
+		// 计算错误，直接重新查询
+		if (pField->Position < 0 || pField->TdPosition < 0 || pField->YdPosition < 0)
+		{
+			ReqQryInvestorPosition("", "");
+			return;
+		}
+	}
+
+	XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, false, 0, pField, sizeof(PositionField), nullptr, 0, nullptr, 0);
 }
 
 void CTraderApi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

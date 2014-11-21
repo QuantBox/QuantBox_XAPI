@@ -2,7 +2,6 @@
 
 #include "../include/LTS/SecurityFtdcTraderApi.h"
 #include "../include/ApiStruct.h"
-#include "../include/stringHash.h"
 
 #include <set>
 #include <list>
@@ -11,7 +10,7 @@
 #include <mutex>
 #include <atomic>
 #include <thread>
-#include <hash_map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -106,8 +105,10 @@ public:
 	void ReqQryTrade();
 
 private:
-	void OnOrder(CSecurityFtdcOrderField *pOrder);
-	void OnTrade(CSecurityFtdcTradeField *pTrade);
+	void OnOrder(CSecurityFtdcOrderField *pOrder, bool bFromQry);
+	void OnTrade(CSecurityFtdcTradeField *pTrade, bool bFromQry);
+
+	void OnTrade(TradeField *pTrade, bool bFromQry);
 
 	//数据包发送线程
 	static void ProcessThread(CTraderApi* lpParam)
@@ -223,12 +224,14 @@ private:
 	mutex						m_csMap;
 	map<int,SRequest*>			m_reqMap;				//已发送请求池
 
-	hash_map<string, OrderField*>				m_id_platform_order;
-	hash_map<string, CSecurityFtdcOrderField*>		m_id_api_order;
-	hash_map<string, string>					m_sysId_orderId;
+	unordered_map<string, OrderField*>				m_id_platform_order;
+	unordered_map<string, CSecurityFtdcOrderField*>		m_id_api_order;
+	unordered_map<string, string>					m_sysId_orderId;
 
 	//hash_map<string, QuoteField*>				m_id_platform_quote;
 	//hash_map<string, CSecurityFtdcQuoteField*>		m_id_api_quote;
 	//hash_map<string, string>					m_sysId_quoteId;
+
+	unordered_map<string, PositionField*>			m_id_platform_position;
 };
 
