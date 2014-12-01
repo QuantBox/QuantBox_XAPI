@@ -300,8 +300,6 @@ struct AccountField
 	MoneyType	PreBalance;
 	///当前保证金总额
 	MoneyType	CurrMargin;
-	///手续费
-	MoneyType	Commission;
 	///平仓盈亏
 	MoneyType	CloseProfit;
 	///持仓盈亏
@@ -310,6 +308,30 @@ struct AccountField
 	MoneyType	Balance;
 	///可用资金
 	MoneyType	Available;
+
+	///入金金额
+	MoneyType	Deposit;
+	///出金金额
+	MoneyType	Withdraw;
+
+	///冻结的过户费
+	MoneyType	FrozenTransferFee;
+	///冻结的印花税
+	MoneyType	FrozenStampTax;
+	///冻结的手续费
+	MoneyType	FrozenCommission;
+	///冻结的资金
+	MoneyType	FrozenCash;
+
+	///过户费
+	MoneyType	TransferFee;
+	///印花税
+	MoneyType	StampTax;
+	///手续费
+	MoneyType	Commission;
+	///资金差额
+	MoneyType	CashIn;
+
 };
 
 ///账号

@@ -409,10 +409,6 @@ namespace QuantBox.XAPI
         /// </summary>
         public double CurrMargin;
         /// <summary>
-        /// 手续费
-        /// </summary>
-        public double Commission;
-        /// <summary>
         /// 平仓盈亏
         /// </summary>
         public double CloseProfit;
@@ -428,6 +424,46 @@ namespace QuantBox.XAPI
         /// 可用资金
         /// </summary>
         public double Available;
+        /// <summary>
+        /// 入金金额
+        /// </summary>
+        public double Deposit;
+        /// <summary>
+        /// 出金金额
+        /// </summary>
+        public double Withdraw;
+        /// <summary>
+        /// 冻结的过户费
+        /// </summary>
+        public double FrozenTransferFee;
+        /// <summary>
+        /// 冻结的印花税
+        /// </summary>
+        public double FrozenStampTax;
+        /// <summary>
+        /// 冻结的手续费
+        /// </summary>
+        public double FrozenCommission;
+        /// <summary>
+        /// 冻结的资金
+        /// </summary>
+        public double FrozenCash;
+        /// <summary>
+        /// 过户费
+        /// </summary>
+        public double TransferFee;
+        /// <summary>
+        /// 印花税
+        /// </summary>
+        public double StampTax;
+        /// <summary>
+        /// 手续费
+        /// </summary>
+        public double Commission;
+        /// <summary>
+        /// 资金差额
+        /// </summary>
+        public double CashIn;
     }
 
     /// <summary>

@@ -960,11 +960,20 @@ void CTraderApi::OnRspQryTradingAccount(CSecurityFtdcTradingAccountField *pTradi
 			AccountField field = { 0 };
 			field.PreBalance = pTradingAccount->PreBalance;
 			field.CurrMargin = pTradingAccount->CurrMargin;
-			field.Commission = pTradingAccount->Commission;
 			//field.CloseProfit = pTradingAccount->CloseProfit;
 			//field.PositionProfit = pTradingAccount->PositionProfit;
 			field.Balance = pTradingAccount->Balance;
 			field.Available = pTradingAccount->Available;
+			field.Deposit = pTradingAccount->Deposit;
+			field.Withdraw = pTradingAccount->Withdraw;
+			field.FrozenTransferFee = pTradingAccount->FrozenTransferFee;
+			field.FrozenStampTax = pTradingAccount->FrozenStampTax;
+			field.FrozenCommission = pTradingAccount->FrozenCommission;
+			field.FrozenCash = pTradingAccount->FrozenCash;
+			field.TransferFee = pTradingAccount->TransferFee;
+			field.StampTax = pTradingAccount->StampTax;
+			field.Commission = pTradingAccount->Commission;
+			field.CashIn = pTradingAccount->CashIn;
 
 			XRespone(ResponeType::OnRspQryTradingAccount, m_msgQueue, this, bIsLast, 0, &field, sizeof(AccountField), nullptr, 0, nullptr, 0);
 		}

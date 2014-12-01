@@ -1252,7 +1252,7 @@ void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInve
 			pField->TdPosition = pInvestorPosition->TodayPosition;
 			pField->YdPosition = pInvestorPosition->Position - pInvestorPosition->TodayPosition;
 
-			// 等数据收集全了再遍历通知一次
+			// 等数据收集全了再遍历通知一次，为何要这样做？因为今昨是两条记录，但我记在一个里面
 			if (bIsLast)
 			{
 				int cnt = 0;
@@ -1263,6 +1263,7 @@ void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInve
 					XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, cnt == count, 0, iter->second, sizeof(PositionField), nullptr, 0, nullptr, 0);
 				}
 			}
+			//XRespone(ResponeType::OnRspQryInvestorPosition, m_msgQueue, this, bIsLast, 0, pField, sizeof(PositionField), nullptr, 0, nullptr, 0);
 		}
 		else
 		{
