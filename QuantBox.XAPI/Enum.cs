@@ -92,6 +92,8 @@ namespace QuantBox
         MarketData = 2,
         Level2 = 4,
         QuoteRequest = 8,
+        HistoricalData = 16,
+        Instrument = 32,
     };
 
     public enum DataLevelType : byte

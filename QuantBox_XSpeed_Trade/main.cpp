@@ -15,7 +15,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	switch (rt)
 	{
 	case GetApiType:
-		return (void*)(ApiType::Trade|ApiType::QuoteRequest);
+		return (void*)(ApiType::Trade | ApiType::QuoteRequest | ApiType::Instrument);
 	case GetApiVersion:
 		return "0.1";
 	case GetApiName:

@@ -101,6 +101,7 @@ struct ServerInfoField
 	bool IsUsingUdp;
 	bool IsMulticast;
 	int	TopicId;
+	int Port;
 	ResumeType	MarketDataTopicResumeType;
 	ResumeType	PrivateTopicResumeType;
 	ResumeType	PublicTopicResumeType;

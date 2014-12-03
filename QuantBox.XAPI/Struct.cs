@@ -46,6 +46,10 @@ namespace QuantBox.XAPI
         /// </summary>
         public int TopicId;
         /// <summary>
+        /// 端口号
+        /// </summary>
+        public int Port;
+        /// <summary>
         /// 流恢复
         /// </summary>
         public ResumeType MarketDataTopicResumeType;
