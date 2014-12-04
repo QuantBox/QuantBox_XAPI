@@ -303,6 +303,25 @@ namespace QuantBox.XAPI
     }
 
     /// <summary>
+    /// Bar行情
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct BarField
+    {
+        public int Date;
+        public int Time;
+        public int BarSize;
+
+        public double Open;
+        public double High;
+        public double Low;
+        public double Close;
+        public double Volume;
+        public double OpenInterest;
+        public double Turnover;
+    }
+
+    /// <summary>
     /// 发给做市商的询价请求
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -630,10 +649,15 @@ namespace QuantBox.XAPI
         /// <summary>
         /// 合约代码
         /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string Symbol;
+        /// <summary>
+        /// 合约代码
+        /// </summary>
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 31)]
         public string InstrumentID;
         /// <summary>
-        /// 合约代码
+        /// 交易所代码
         /// </summary>
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
         public string ExchangeID;

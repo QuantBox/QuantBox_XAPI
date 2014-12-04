@@ -13,11 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="lib">
-      <UniqueIdentifier>{946c81af-2e24-4e96-b25c-fbbeca12efed}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include">
-      <UniqueIdentifier>{85e89cab-d667-4133-9504-c4becf5250d9}</UniqueIdentifier>
+      <UniqueIdentifier>{f6b5de3e-b4b5-4d8a-a07f-1f3ca82e2294}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib">
+      <UniqueIdentifier>{286534d2-741f-4ca8-a537-af9055c85021}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -30,19 +30,10 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TraderApi.h">
+    <ClInclude Include="HistoricalDataApi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TypeConvert.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\toolkit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\ApiEnum.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\ApiStruct.h">
+    <ClInclude Include="..\include\Esunny_HistoricalData\EsunnyQuot.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -53,13 +44,7 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TraderApi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TypeConvert.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\include\toolkit.cpp">
+    <ClCompile Include="HistoricalDataApi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
@@ -67,10 +52,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="..\lib\QuantBox_Queue.lib">
+    <Library Include="..\include\Esunny_HistoricalData\EsunnyQuot.lib">
       <Filter>lib</Filter>
     </Library>
-    <Library Include="..\include\CTP\win32\thosttraderapi.lib">
+    <Library Include="..\lib\QuantBox_Queue.lib">
       <Filter>lib</Filter>
     </Library>
   </ItemGroup>

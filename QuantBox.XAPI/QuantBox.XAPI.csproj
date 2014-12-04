@@ -48,9 +48,13 @@
   <ItemGroup>
     <Compile Include="Callback\ApiManager.cs" />
     <Compile Include="Callback\BaseApi.cs" />
-    <Compile Include="Callback\MarketDataApi.cs" />
+    <Compile Include="Callback\XApi.cs" />
+    <Compile Include="Callback\XApi.HistoricalData.cs" />
+    <Compile Include="Callback\XApi.QuoteRequest.cs" />
+    <Compile Include="Callback\XApi.MarketData.cs" />
     <Compile Include="Callback\Queue.cs" />
-    <Compile Include="Callback\TraderApi.cs" />
+    <Compile Include="Callback\XApi.Instrument.cs" />
+    <Compile Include="Callback\XApi.Trade.cs" />
     <Compile Include="Delegate.cs" />
     <Compile Include="DllInvoke.cs" />
     <Compile Include="Enum.cs" />

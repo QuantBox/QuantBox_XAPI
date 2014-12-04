@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\ApiEnum.h" />
+    <ClInclude Include="..\include\ApiStruct.h" />
     <ClInclude Include="..\include\toolkit.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />

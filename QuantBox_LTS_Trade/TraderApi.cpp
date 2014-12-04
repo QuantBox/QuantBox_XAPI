@@ -1025,6 +1025,7 @@ void CTraderApi::OnRspQryInvestorPosition(CSecurityFtdcInvestorPositionField *pI
 				pField = new PositionField();
 				memset(pField, 0, sizeof(PositionField));
 
+				sprintf(pField->Symbol, "%s.%s", pInvestorPosition->InstrumentID, pInvestorPosition->ExchangeID);
 				strcpy(pField->InstrumentID, pInvestorPosition->InstrumentID);
 				strcpy(pField->ExchangeID, pInvestorPosition->ExchangeID);
 				pField->Side = TSecurityFtdcPosiDirectionType_2_PositionSide(pInvestorPosition->PosiDirection);

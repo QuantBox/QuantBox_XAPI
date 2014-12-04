@@ -44,5 +44,8 @@ namespace QuantBox.XAPI
         ReqQryInstrumentCommissionRate,
         ReqQryInstrumentMarginRate,
         ReqQrySettlementInfo,
+
+        ReqQryHistoricalTicks,
+        ReqQryHistoricalBars,
     }
 }

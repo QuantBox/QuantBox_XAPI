@@ -7,8 +7,13 @@
 
 struct PositionField
 {
-	InstrumentIDType InstrumentID;
+	///唯一符号
+	SymbolType			Symbol;
+	///合约代码
+	InstrumentIDType	InstrumentID;
+	///交易所代码
 	ExchangeIDType	ExchangeID;
+
 	PositionSide	Side;
 	QtyType Position;
 	QtyType TdPosition;
@@ -247,7 +252,29 @@ struct DepthMarketDataField
 	VolumeType	AskVolume5;
 };
 
+///Bar行情
+struct BarField
+{
+	///交易所时间
+	DateIntType			Date;
+	TimeIntType			Time;
+	BarSizeType			BarSize;
 
+	///开
+	PriceType	Open;
+	///高
+	PriceType	High;
+	///低
+	PriceType	Low;
+	///收
+	PriceType	Close;
+	///数量
+	LargeVolumeType	Volume;
+	///持仓量
+	LargeVolumeType	OpenInterest;
+	///成交金额
+	MoneyType	Turnover;
+};
 
 ///发给做市商的询价请求
 struct QuoteRequestField

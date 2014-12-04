@@ -1070,6 +1070,7 @@ void CTraderApi::OnRspQryInvestorPosition(CUstpFtdcRspInvestorPositionField *pRs
 		{
 			PositionField field = { 0 };
 
+			strcpy(field.Symbol, pRspInvestorPosition->InstrumentID);
 			strcpy(field.InstrumentID, pRspInvestorPosition->InstrumentID);
 			strcpy(field.ExchangeID, pRspInvestorPosition->ExchangeID);
 

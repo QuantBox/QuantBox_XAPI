@@ -74,7 +74,7 @@ namespace QuantBox.XAPI
             //return;
             Queue queue = new Queue(@"libQuantBox_Queue.so");
             //Queue queue2 = new Queue(@"libQuantBox_Queue.so");
-            MarketDataApi api = new MarketDataApi(@"/home/hetao/works/QuantBox_X/QuantBox.XAPI/bin/libQuantBox_CTP_Quote.so", queue);
+            XApi api = new XApi(@"/home/hetao/works/QuantBox_X/QuantBox.XAPI/bin/libQuantBox_CTP_Quote.so", queue);
             //TraderApi api2 = new TraderApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\TAPI\CTP\QuantBox.C2CTP.Trade.dll", queue2);
 
             api.Server.BrokerID = "1017";
@@ -118,8 +118,8 @@ namespace QuantBox.XAPI
         {
             Queue queue = new Queue(@"QuantBox_Queue.dll");
             Queue queue2 = new Queue(@"QuantBox_Queue.dll");
-            MarketDataApi api = new MarketDataApi("QuantBox_LTS_Quote.dll", queue);
-            TraderApi api2 = new TraderApi("QuantBox_C2LTS_Trade.dll", queue2);
+            XApi api = new XApi("QuantBox_LTS_Quote.dll", queue);
+            XApi api2 = new XApi("QuantBox_C2LTS_Trade.dll", queue2);
 
             api.Server.BrokerID = "2010";
             api.Server.Address = "tcp://211.144.195.163:44513";
@@ -159,7 +159,7 @@ namespace QuantBox.XAPI
         }
 		#endregion
 
-        static MarketDataApi api;
+        static XApi api;
 
         static void test_CTP_Main(string[] args)
         {

@@ -1237,7 +1237,9 @@ void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInve
 				pField = new PositionField();
 				memset(pField, 0, sizeof(PositionField));
 				
+				strcpy(pField->Symbol, pInvestorPosition->InstrumentID);
 				strcpy(pField->InstrumentID, pInvestorPosition->InstrumentID);
+				//strcpy(pField->ExchangeID, );
 				pField->Side = TThostFtdcPosiDirectionType_2_PositionSide(pInvestorPosition->PosiDirection);
 				pField->HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pInvestorPosition->HedgeFlag);
 

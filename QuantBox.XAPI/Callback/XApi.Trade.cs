@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace QuantBox.XAPI.Callback
 {
-    public class TraderApi : MarketDataApi
+    public partial class XApi
     {
-        public DelegateOnRspQryInstrument OnRspQryInstrument;
         public DelegateOnRspQryTradingAccount OnRspQryTradingAccount;
         public DelegateOnRspQryInvestorPosition OnRspQryInvestorPosition;
         public DelegateOnRspQrySettlementInfo OnRspQrySettlementInfo;
@@ -18,22 +17,6 @@ namespace QuantBox.XAPI.Callback
         public DelegateOnRtnQuote OnRtnQuote;
 
         private Dictionary<string, StringBuilder> dict = new Dictionary<string, StringBuilder>();
-        internal TraderApi(string path1, Queue queue)
-            : base(path1, queue)
-        {
-        }
-
-        public void ReqQryInstrument(string szInstrument, string szExchange)
-        {
-            IntPtr szInstrumentPtr = Marshal.StringToHGlobalAnsi(szInstrument);
-            IntPtr szExchangePtr = Marshal.StringToHGlobalAnsi(szExchange);
-
-            proxy.XRequest((byte)RequestType.ReqQryInstrument, Handle, IntPtr.Zero, 0, 0,
-                szInstrumentPtr, 0, szExchangePtr, 0, IntPtr.Zero, 0);
-
-            Marshal.FreeHGlobal(szInstrumentPtr);
-            Marshal.FreeHGlobal(szExchangePtr);
-        }
 
         public void ReqQryTradingAccount()
         {
@@ -150,49 +133,6 @@ namespace QuantBox.XAPI.Callback
             Marshal.FreeHGlobal(szIdPtr);
 
             return ptr.ToInt32();
-        }
-
-        protected override IntPtr OnRespone(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3)
-        {
-            switch ((ResponeType)type)
-            {
-                case ResponeType.OnRspQryInstrument:
-                    _OnRspQryInstrument(ptr1,size1, double1);
-                    break;
-                case ResponeType.OnRspQryTradingAccount:
-                    _OnRspQryTradingAccount(ptr1, size1, double1);
-                    break;
-                case ResponeType.OnRspQryInvestorPosition:
-                    _OnRspQryInvestorPosition(ptr1, size1, double1);
-                    break;
-                case ResponeType.OnRspQrySettlementInfo:
-                    _OnRspQrySettlementInfo(ptr1, size1, double1);
-                    break;
-                case ResponeType.OnRtnOrder:
-                    _OnRtnOrder(ptr1, size1);
-                    break;
-                case ResponeType.OnRtnTrade:
-                    _OnRtnTrade(ptr1, size1);
-                    break;
-                case ResponeType.OnRtnQuote:
-                    _OnRtnQuote(ptr1, size1);
-                    break;
-                default:
-                    base.OnRespone(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
-                    break;
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private void _OnRspQryInstrument(IntPtr ptr1,int size1, double double1)
-        {
-            if (OnRspQryInstrument == null)
-                return;
-
-            InstrumentField obj = PInvokeUtility.GetObjectFromIntPtr<InstrumentField>(ptr1);
-
-            OnRspQryInstrument(this, ref obj, size1, double1 != 0);
         }
 
         private void _OnRspQryTradingAccount(IntPtr ptr1, int size1, double double1)

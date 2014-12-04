@@ -13,14 +13,14 @@ namespace QuantBox.XAPI.Callback
 
         public static string QueuePath;
 
-        private static ConcurrentDictionary<TraderApi, Queue> dict = new ConcurrentDictionary<TraderApi, Queue>();
+        private static ConcurrentDictionary<XApi, Queue> dict = new ConcurrentDictionary<XApi, Queue>();
 
-        public static TraderApi CreateApi(string path)
+        public static XApi CreateApi(string path)
         {
             lock (locker)
             {
                 Queue queue = new Queue(QueuePath);
-                TraderApi api = new TraderApi(path, new Queue(QueuePath));
+                XApi api = new XApi(path, new Queue(QueuePath));
                 dict.TryAdd(api, queue);
                 return api;
             }
@@ -31,7 +31,7 @@ namespace QuantBox.XAPI.Callback
             lock(locker)
             {
                 Queue queue;
-                if (dict.TryRemove(api as TraderApi, out queue))
+                if (dict.TryRemove(api as XApi, out queue))
                 {
                     api.Dispose();
                     queue.Dispose();

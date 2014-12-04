@@ -42,8 +42,8 @@ public:
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	int RequestHistory(const char *market, const char *stk, int period);
-	int RequestTrace(const char *market, const char *stk, const char *date);
+	int ReqQryHistoricalTicks(const string& szInstrument, const string& szExchange, int datetime1, int datetime2);
+	int ReqQryHistoricalBars(const string& szInstrument, const string& szExchange, int datetime1, int datetime2, long barSize);
 
 private:
 
@@ -82,7 +82,7 @@ private:
 private:
 	atomic<long>				m_lRequestID;			//请求ID,得保持自增
 
-	IEsunnyQuotClient*				m_pApi;					//交易API
+	IEsunnyQuotClient*			m_pApi;					//交易API
 	void*						m_msgQueue;				//消息队列指针
 
 	string						m_szPath;				//生成配置文件的路径
