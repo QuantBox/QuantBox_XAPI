@@ -1338,6 +1338,7 @@ void CTraderApi::OnTrade(CUstpFtdcTradeField *pTrade)
 		return;
 
 	TradeField* pField = new TradeField();
+
 	strcpy(pField->InstrumentID, pTrade->InstrumentID);
 	strcpy(pField->ExchangeID, pTrade->ExchangeID);
 	pField->Side = TUstpFtdcDirectionType_2_OrderSide(pTrade->Direction);

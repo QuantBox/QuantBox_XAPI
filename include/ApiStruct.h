@@ -252,13 +252,13 @@ struct DepthMarketDataField
 	VolumeType	AskVolume5;
 };
 
+
 ///Bar行情
 struct BarField
 {
 	///交易所时间
 	DateIntType			Date;
 	TimeIntType			Time;
-	BarSizeType			BarSize;
 
 	///开
 	PriceType	Open;
@@ -369,5 +369,27 @@ struct SettlementInfoField
 	DateType	TradingDay;
 	///消息正文
 	ContentType	Content;
+};
+
+struct HistoricalDataRequestField
+{
+	///唯一符号
+	SymbolType			Symbol;
+	///合约代码
+	InstrumentIDType	InstrumentID;
+	///交易所代码
+	ExchangeIDType	ExchangeID;
+
+	int Date1;
+	int Date2;
+	int Time1;
+	int Time2;
+
+	DataObjetType DataType;
+	BarType BarType;
+	long BarSize;
+
+	int RequestId;
+	int Count;
 };
 #endif

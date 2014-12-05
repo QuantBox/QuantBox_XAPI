@@ -74,10 +74,10 @@ namespace QuantBox.XAPI.Callback
                     break;
 
                 case ResponeType.OnRspQryHistoricalTicks:
-                    _OnRspQryHistoricalTicks(ptr1, size1, double1);
+                    _OnRspQryHistoricalTicks(ptr1, size1, double1, double2);
                     break;
                 case ResponeType.OnRspQryHistoricalBars:
-                    _OnRspQryHistoricalBars(ptr1, size1, double1);
+                    _OnRspQryHistoricalBars(ptr1, size1, double1, double2);
                     break;
 
                 default:

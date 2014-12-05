@@ -16,7 +16,7 @@ namespace QuantBox.XAPI.Callback
         protected IntPtr Handle = IntPtr.Zero;
         protected Queue _Queue;
         private string _Path1;
-        private string _Path2;
+        //private string _Path2;
 
         protected XCall _XRespone;
 

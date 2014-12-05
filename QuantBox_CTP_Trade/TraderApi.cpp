@@ -1663,6 +1663,7 @@ void CTraderApi::OnTrade(TradeField *pTrade)
 		pField = new PositionField();
 		memset(pField, 0, sizeof(PositionField));
 
+		strcpy(pField->Symbol, pTrade->InstrumentID);
 		strcpy(pField->InstrumentID, pTrade->InstrumentID);
 		pField->Side = TradeField_2_PositionSide(pTrade);
 		pField->HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pTrade->HedgeFlag);

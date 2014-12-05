@@ -1424,6 +1424,7 @@ void CTraderApi::OnTrade(TradeField *pTrade, bool bFromQry)
 		pField = new PositionField();
 		memset(pField, 0, sizeof(PositionField));
 
+		sprintf(pField->Symbol, "%s.%s", pTrade->InstrumentID, pTrade->ExchangeID);
 		strcpy(pField->InstrumentID, pTrade->InstrumentID);
 		strcpy(pField->ExchangeID, pTrade->ExchangeID);
 		pField->Side = TradeField_2_PositionSide(pTrade);

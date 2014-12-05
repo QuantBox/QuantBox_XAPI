@@ -590,5 +590,5 @@ void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 	//	marketData.AskVolume5 = pL2MarketData->OfferVolume5;
 	//}
 
-	XRespone(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, DataLevelType::L0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	XRespone(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, DepthLevelType::L0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }

@@ -388,7 +388,7 @@ namespace QuantBox.XAPI
         /// <summary>
         /// 类型
         /// </summary>
-        public InstrumentType Type;
+        public InstrumentType_ Type;
         /// <summary>
         /// 合约数量乘数
         /// </summary>
@@ -414,7 +414,7 @@ namespace QuantBox.XAPI
         /// <summary>
         /// 期权类型
         /// </summary>
-        public PutCall OptionsType;
+        public PutCall_ OptionsType;
     }
 
     /// <summary>
@@ -544,8 +544,8 @@ namespace QuantBox.XAPI
         public string AskOrderID;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
         public string BidOrderID;
-        public OrderStatus Status;
-        public ExecType ExecType;
+        public OrderStatus_ Status;
+        public ExecType_ ExecType;
         /// <summary>
         /// 错误代码
         /// </summary>
@@ -576,20 +576,20 @@ namespace QuantBox.XAPI
         /// <summary>
         /// 订单类型
         /// </summary>
-        public OrderType Type;
+        public OrderType_ Type;
         /// <summary>
         /// 合约代码
         /// </summary>
-        public OrderSide Side;
+        public OrderSide_ Side;
         public double Qty;
         public double Price;
         public OpenCloseType OpenClose;
         public HedgeFlagType HedgeFlag;
         public double StopPx;
-        public TimeInForce TimeInForce;
+        public TimeInForce_ TimeInForce;
 
-        public OrderStatus Status;
-        public ExecType ExecType; 
+        public OrderStatus_ Status;
+        public ExecType_ ExecType; 
         public double LeavesQty;
         public double CumQty;
         public double AvgPx;
@@ -629,7 +629,7 @@ namespace QuantBox.XAPI
         /// <summary>
         /// 合约代码
         /// </summary>
-        public OrderSide Side;
+        public OrderSide_ Side;
         public double Qty;
         public double Price;
         public OpenCloseType OpenClose;
@@ -664,10 +664,45 @@ namespace QuantBox.XAPI
         /// <summary>
         /// 合约代码
         /// </summary>
-        public PositionSide Side;
+        public PositionSide_ Side;
         public double Position;
         public double TdPosition;
         public double YdPosition;
         public HedgeFlagType HedgeFlag;
+    }
+
+    /// <summary>
+    /// 合约信息
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct HistoricalDataRequestField
+    {
+        /// <summary>
+        /// 合约代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string Symbol;
+        /// <summary>
+        /// 合约代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 31)]
+        public string InstrumentID;
+        /// <summary>
+        /// 交易所代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
+        public string ExchangeID;
+
+        public int Date1;
+        public int Date2;
+        public int Time1;
+        public int Time2;
+
+        public DataObjetType_ DataType;
+        public BarType_ BarType;
+        public int BarSize;
+
+        public int RequestId;
+        public int Count;
     }
 }

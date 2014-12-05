@@ -21,7 +21,7 @@ namespace QuantBox.XAPI
             Instrument = position.InstrumentID;
             Exchange = position.ExchangeID;
 
-            if (position.Side == PositionSide.Long)
+            if (position.Side == PositionSide_.Long)
             {
                 Long = position;
             }

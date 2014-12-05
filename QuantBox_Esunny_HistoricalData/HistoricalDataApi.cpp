@@ -311,8 +311,9 @@ int __cdecl CHistoricalDataApi::OnRspHistoryQuot(struct STKHISDATA *pHisData)
 		field.Close = item.fClose;
 		field.Volume = item.fVolume;
 		field.Turnover = item.fAmount;
+		
 
-		XRespone(ResponeType::OnRspQryHistoricalBars, m_msgQueue, this, i >= pHisData->nCount - 1, 0, &field, sizeof(BarField), nullptr, 0, nullptr, 0);
+		XRespone(ResponeType::OnRspQryHistoricalBars, m_msgQueue, this, i >= pHisData->nCount - 1, i, &field, sizeof(BarField), nullptr, 0, nullptr, 0);
 	}
 	return 0;
 }
@@ -352,35 +353,36 @@ int __cdecl CHistoricalDataApi::OnRspMarketInfo(struct MarketInfo *pMarketInfo, 
 	return 0;
 }
 
-int CHistoricalDataApi::ReqQryHistoricalTicks(const string& szInstrument, const string& szExchange, int datetime1, int datetime2)
+int CHistoricalDataApi::ReqQryHistoricalTicks(HistoricalDataRequestField* request)
 {
-	char buf1[20] = {0};
-	sprintf(buf1, "%d", datetime1);
-	m_pApi->RequestTrace(szExchange.c_str(), szInstrument.c_str(), buf1);
+	//char buf1[20] = {0};
+	//sprintf(buf1, "%d", datetime1);
+	//m_pApi->RequestTrace(szExchange.c_str(), szInstrument.c_str(), buf1);
 
 	return 0;
 }
 
-int CHistoricalDataApi::ReqQryHistoricalBars(const string& szInstrument, const string& szExchange, int datetime1, int datetime2, long barSize)
+int CHistoricalDataApi::ReqQryHistoricalBars(HistoricalDataRequestField* request)
 {
 	// 传成API可识别的BarSize
-	int period = 0;
-	switch (barSize)
-	{
-	case 60:
-		period = 1;
-		break;
-	case 60 * 5:
-		period = 2;
-		break;
-	case 3600:
-		period = 3;
-		break;
-	case 86400:
-		period = 4;
-		break;
-	default:
-		return -100;
-	}
-	return m_pApi->RequestHistory(szExchange.c_str(), szInstrument.c_str(), period);
+	//int period = 0;
+	//switch (barSize)
+	//{
+	//case 60:
+	//	period = 1;
+	//	break;
+	//case 60 * 5:
+	//	period = 2;
+	//	break;
+	//case 3600:
+	//	period = 3;
+	//	break;
+	//case 86400:
+	//	period = 4;
+	//	break;
+	//default:
+	//	return -100;
+	//}
+	//return m_pApi->RequestHistory(szExchange.c_str(), szInstrument.c_str(), period);
+	return 0;
 }

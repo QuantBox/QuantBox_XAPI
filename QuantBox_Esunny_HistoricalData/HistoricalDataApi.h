@@ -42,8 +42,8 @@ public:
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	int ReqQryHistoricalTicks(const string& szInstrument, const string& szExchange, int datetime1, int datetime2);
-	int ReqQryHistoricalBars(const string& szInstrument, const string& szExchange, int datetime1, int datetime2, long barSize);
+	int ReqQryHistoricalTicks(HistoricalDataRequestField* request);
+	int ReqQryHistoricalBars(HistoricalDataRequestField* request);
 
 private:
 
