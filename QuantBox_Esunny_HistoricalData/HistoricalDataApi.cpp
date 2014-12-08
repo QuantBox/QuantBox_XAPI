@@ -12,6 +12,46 @@
 #include <cstring>
 #include <assert.h>
 
+void DateTimeChat2Int(char* time, int& yyyyMMdd, int& hhmmss)
+{
+	int yyyy = atoi(&time[0]);
+	int MM = atoi(&time[5]);
+	int dd = atoi(&time[8]);
+	int hh = atoi(&time[11]);
+	int mm = atoi(&time[14]);
+	int ss = atoi(&time[17]);
+
+	yyyyMMdd = yyyy * 10000 + MM * 100 + dd;
+	hhmmss = hh * 10000 + mm * 100 + ss;
+}
+
+int GetNextTradingDate(int date)
+{
+	int yyyy = date / 10000;
+	int MM = date % 10000 / 100;
+	int dd = date % 100;
+
+	tm start_tm;
+	memset(&start_tm, 0, sizeof(tm));
+	start_tm.tm_year = yyyy - 1900;
+	start_tm.tm_mon = MM - 1;
+	start_tm.tm_mday = dd;
+
+	time_t temp_time_t = mktime(&start_tm);
+	temp_time_t += 86400;
+	while (true)
+	{
+		tm* next_tm = localtime(&temp_time_t);
+		if (next_tm->tm_wday == 0 || next_tm->tm_wday == 6)
+			temp_time_t += 86400;
+		else
+		{
+			return (next_tm->tm_year + 1900) * 10000 + (next_tm->tm_mon + 1) * 100 + (next_tm->tm_mday);
+		}
+	}
+}
+
+
 CHistoricalDataApi::CHistoricalDataApi(void)
 {
 	m_pApi = nullptr;
@@ -317,62 +357,29 @@ int __cdecl CHistoricalDataApi::OnStkQuot(struct STKDATA *pData)
 
 int __cdecl CHistoricalDataApi::OnRspHistoryQuot(struct STKHISDATA *pHisData)
 {
+	BarField* pFields = new BarField[pHisData->nCount];
+
 	for (size_t i = 0; i < pHisData->nCount; i++)
 	{
 		HISTORYDATA item = pHisData->HisData[i];
 
-		BarField field = { 0 };
-		field.Open = item.fOpen;
-		field.High = item.fHigh;
-		field.Low = item.fLow;
-		field.Close = item.fClose;
-		field.Volume = item.fVolume;
-		field.Turnover = item.fAmount;
-		
-
-		XRespone(ResponeType::OnRspQryHistoricalBars, m_msgQueue, this, i >= pHisData->nCount - 1, i, &field, sizeof(BarField), nullptr, 0, nullptr, 0);
+		BarField* pF = &pFields[i];
+		memset(pF, 0, sizeof(BarField));
+		DateTimeChat2Int(item.time, pF->Date, pF->Time);
+		pF->Open = item.fOpen;
+		pF->High = item.fHigh;
+		pF->Low = item.fLow;
+		pF->Close = item.fClose;
+		pF->Volume = item.fVolume;
+		pF->Turnover = item.fAmount;
 	}
+
+	XRespone(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, true, 0, pFields, sizeof(BarField)*pHisData->nCount, &m_RequestBar, sizeof(HistoricalDataRequestField), nullptr, 0);
+
 	return 0;
 }
 
-void DateTimeChat2Int(char* time,int& yyyyMMdd,int& hhmmss)
-{
-	int yyyy = atoi(&time[0]);
-	int MM = atoi(&time[5]);
-	int dd = atoi(&time[8]);
-	int hh = atoi(&time[11]);
-	int mm = atoi(&time[14]);
-	int ss = atoi(&time[17]);
 
-	yyyyMMdd = yyyy * 10000 + MM * 100 + dd;
-	hhmmss = hh * 10000 + mm * 100 + ss;
-}
-
-int GetNextTradingDate(int date)
-{
-	int yyyy = date / 10000;
-	int MM = date % 10000 / 100;
-	int dd = date % 100;
-
-	tm start_tm;
-	memset(&start_tm, 0, sizeof(tm));
-	start_tm.tm_year = yyyy - 1900;
-	start_tm.tm_mon = MM - 1;
-	start_tm.tm_mday = dd;
-
-	time_t temp_time_t = mktime(&start_tm);
-	temp_time_t += 86400;
-	while (true)
-	{
-		tm* next_tm = localtime(&temp_time_t);
-		if (next_tm->tm_wday == 0 || next_tm->tm_wday == 6)
-			temp_time_t += 86400;
-		else
-		{
-			return (next_tm->tm_year + 1900) * 10000 + (next_tm->tm_mon + 1) * 100 + (next_tm->tm_mday);
-		}
-	}
-}
 
 int CHistoricalDataApi::ReqQryHistoricalTicks(HistoricalDataRequestField* request)
 {
@@ -445,8 +452,6 @@ int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 		memcpy(pRequest->pBuf, &m_RequestTick, sizeof(HistoricalDataRequestField));
 		AddToSendQueue(pRequest);
 	}
-
-	
 
 	return 0;
 }
@@ -525,5 +530,10 @@ int CHistoricalDataApi::ReqQryHistoricalBars(HistoricalDataRequestField* request
 	int period = BarSize2Period(request->BarSize);
 	if (period == 0)
 		return -100;
+
+	++m_nHdRequestId;
+	request->RequestId = m_nHdRequestId;
+	memcpy(&m_RequestBar, request, sizeof(HistoricalDataRequestField));
+
 	return m_pApi->RequestHistory(request->ExchangeID, request->InstrumentID, period);
 }
