@@ -20,6 +20,8 @@ CHistoricalDataApi::CHistoricalDataApi(void)
 
 	m_hThread = nullptr;
 	m_bRunning = false;
+
+	m_nHdRequestId = 0;
 }
 
 
@@ -111,6 +113,12 @@ CHistoricalDataApi::SRequest* CHistoricalDataApi::MakeRequestBuf(RequestType typ
 	{
 	case E_Init:
 		pRequest->pBuf = nullptr;
+		break;
+	case E_ReqQryHistoricalTicks:
+		pRequest->pBuf = new HistoricalDataRequestField;
+		break;
+	case E_ReqQryHistoricalBars:
+		pRequest->pBuf = new HistoricalDataRequestField;
 		break;
 	default:
 		assert(false);
@@ -211,6 +219,15 @@ void CHistoricalDataApi::RunInThread()
 			iRet = ReqInit();
 			if (iRet != 0 && m_bRunning)
                 this_thread::sleep_for(chrono::milliseconds(1000 * 20));
+			break;
+		case E_ReqQryHistoricalTicks:
+		{
+										HistoricalDataRequestField* pHDR = (HistoricalDataRequestField*)pRequest->pBuf;
+										// 请求太快了，后面会没有回应
+										if (pHDR->CurrentDate != pHDR->Date1)
+											this_thread::sleep_for(chrono::milliseconds(1000 * 3));
+										iRet = ReqQryHistoricalTicks_(pHDR, lRequest);
+		}
 			break;
 		default:
 			assert(false);
@@ -318,16 +335,119 @@ int __cdecl CHistoricalDataApi::OnRspHistoryQuot(struct STKHISDATA *pHisData)
 	return 0;
 }
 
+void DateTimeChat2Int(char* time,int& yyyyMMdd,int& hhmmss)
+{
+	int yyyy = atoi(&time[0]);
+	int MM = atoi(&time[5]);
+	int dd = atoi(&time[8]);
+	int hh = atoi(&time[11]);
+	int mm = atoi(&time[14]);
+	int ss = atoi(&time[17]);
+
+	yyyyMMdd = yyyy * 10000 + MM * 100 + dd;
+	hhmmss = hh * 10000 + mm * 100 + ss;
+}
+
+int GetNextTradingDate(int date)
+{
+	int yyyy = date / 10000;
+	int MM = date % 10000 / 100;
+	int dd = date % 100;
+
+	tm start_tm;
+	memset(&start_tm, 0, sizeof(tm));
+	start_tm.tm_year = yyyy - 1900;
+	start_tm.tm_mon = MM - 1;
+	start_tm.tm_mday = dd;
+
+	time_t temp_time_t = mktime(&start_tm);
+	temp_time_t += 86400;
+	while (true)
+	{
+		tm* next_tm = localtime(&temp_time_t);
+		if (next_tm->tm_wday == 0 || next_tm->tm_wday == 6)
+			temp_time_t += 86400;
+		else
+		{
+			return (next_tm->tm_year + 1900) * 10000 + (next_tm->tm_mon + 1) * 100 + (next_tm->tm_mday);
+		}
+	}
+}
+
+int CHistoricalDataApi::ReqQryHistoricalTicks(HistoricalDataRequestField* request)
+{
+	if (request->Date1 > request->Date2)
+	{
+		return 0;
+	}
+
+	SRequest* pRequest = MakeRequestBuf(E_ReqQryHistoricalTicks);
+	if (nullptr == pRequest)
+		return 0;
+
+	++m_nHdRequestId;
+	request->RequestId = m_nHdRequestId;
+	request->CurrentDate = request->Date1;
+	memcpy(pRequest->pBuf, request, sizeof(HistoricalDataRequestField));
+	AddToSendQueue(pRequest);
+
+	return m_nHdRequestId;
+}
+
+int CHistoricalDataApi::ReqQryHistoricalTicks_(HistoricalDataRequestField* request,int lRequest)
+{
+	request->lRequest = lRequest;
+	if (request->CurrentDate > request->Date2)
+	{
+		return 0;
+	}
+	
+	memcpy(&m_RequestTick, request, sizeof(HistoricalDataRequestField));
+
+	char buf1[20] = { 0 };
+	sprintf(buf1, "%d", request->CurrentDate);
+	return m_pApi->RequestTrace(request->ExchangeID, request->InstrumentID, buf1);
+}
+
 int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 {
+	TickField* pFields = new TickField[pTraceData->nCount];
+
 	for (size_t i = 0; i < pTraceData->nCount; i++)
 	{
 		STOCKTRACEDATA item = pTraceData->TraceData[i];
 
-		DepthMarketDataField field = { 0 };
-
-		XRespone(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, i >= pTraceData->nCount - 1, 0, &field, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+		TickField* pF = &pFields[i];
+		memset(pF, 0, sizeof(TickField));
+		DateTimeChat2Int(item.time, pF->Date, pF->Time);
+		pF->LastPrice = item.m_NewPrice;
+		pF->Volume = item.m_Volume;
+		pF->OpenInterest = item.m_Amount;
+		pF->BidPrice1 = item.m_BuyPrice;
+		pF->AskPrice1 = item.m_SellPrice;
+		pF->BidSize1 = item.m_BuyVol;
+		pF->AskSize1 = item.m_SellVol;
 	}
+
+	ReleaseRequestMapBuf(m_RequestTick.lRequest);
+
+	bool bIsLast = m_RequestTick.CurrentDate >= m_RequestTick.Date2;
+
+	XRespone(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, bIsLast, 0, pFields, sizeof(TickField)*pTraceData->nCount, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
+
+	if (!bIsLast)
+	{
+		SRequest* pRequest = MakeRequestBuf(E_ReqQryHistoricalTicks);
+		if (nullptr == pRequest)
+			return 0;
+
+		m_RequestTick.CurrentDate = GetNextTradingDate(m_RequestTick.CurrentDate);
+		memcpy(pRequest->pBuf, &m_RequestTick, sizeof(HistoricalDataRequestField));
+		AddToSendQueue(pRequest);
+	}
+
+	
+
 	return 0;
 }
 
@@ -353,36 +473,57 @@ int __cdecl CHistoricalDataApi::OnRspMarketInfo(struct MarketInfo *pMarketInfo, 
 	return 0;
 }
 
-int CHistoricalDataApi::ReqQryHistoricalTicks(HistoricalDataRequestField* request)
-{
-	//char buf1[20] = {0};
-	//sprintf(buf1, "%d", datetime1);
-	//m_pApi->RequestTrace(szExchange.c_str(), szInstrument.c_str(), buf1);
 
-	return 0;
+int Period2BarSize(int period)
+{
+	int barSize = 0;
+	switch (period)
+	{
+	case 1:
+		barSize = 60;
+		break;
+	case 2:
+		barSize = 300;
+		break;
+	case 3:
+		barSize = 3600;
+		break;
+	case 4:
+		barSize = 86400;
+		break;
+	default:
+		break;
+	}
+	return barSize;
+}
+
+int BarSize2Period(int barSize)
+{
+	int period = 0;
+	switch (barSize)
+	{
+	case 60:
+		period = 1;
+		break;
+	case 60 * 5:
+		period = 2;
+		break;
+	case 3600:
+		period = 3;
+		break;
+	case 86400:
+		period = 4;
+		break;
+	default:
+		break;
+	}
+	return period;
 }
 
 int CHistoricalDataApi::ReqQryHistoricalBars(HistoricalDataRequestField* request)
 {
-	// 传成API可识别的BarSize
-	//int period = 0;
-	//switch (barSize)
-	//{
-	//case 60:
-	//	period = 1;
-	//	break;
-	//case 60 * 5:
-	//	period = 2;
-	//	break;
-	//case 3600:
-	//	period = 3;
-	//	break;
-	//case 86400:
-	//	period = 4;
-	//	break;
-	//default:
-	//	return -100;
-	//}
-	//return m_pApi->RequestHistory(szExchange.c_str(), szInstrument.c_str(), period);
-	return 0;
+	int period = BarSize2Period(request->BarSize);
+	if (period == 0)
+		return -100;
+	return m_pApi->RequestHistory(request->ExchangeID, request->InstrumentID, period);
 }

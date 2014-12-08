@@ -12,46 +12,50 @@ namespace QuantBox.XAPI.Callback
         public DelegateOnRspQryHistoricalTicks OnRspQryHistoricalTicks;
         public DelegateOnRspQryHistoricalBars OnRspQryHistoricalBars;
 
-        public void ReqQryHistoricalTicks(ref HistoricalDataRequestField request)
+        public int ReqQryHistoricalTicks(ref HistoricalDataRequestField request)
         {
             IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(HistoricalDataRequestField)));
             Marshal.StructureToPtr(request, ptr, false);
 
-            proxy.XRequest((byte)RequestType.ReqQryHistoricalTicks, Handle, IntPtr.Zero, 0, 0,
+            IntPtr ret = proxy.XRequest((byte)RequestType.ReqQryHistoricalTicks, Handle, IntPtr.Zero, 0, 0,
                 ptr, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
             Marshal.FreeHGlobal(ptr);
+
+            return ret.ToInt32();
         }
 
-        public void ReqQryHistoricalBars(ref HistoricalDataRequestField request)
+        public int ReqQryHistoricalBars(ref HistoricalDataRequestField request)
         {
             IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(HistoricalDataRequestField)));
             Marshal.StructureToPtr(request, ptr, false);
 
-            proxy.XRequest((byte)RequestType.ReqQryHistoricalBars, Handle, IntPtr.Zero, 0, 0,
+            IntPtr ret = proxy.XRequest((byte)RequestType.ReqQryHistoricalBars, Handle, IntPtr.Zero, 0, 0,
                 ptr, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
             Marshal.FreeHGlobal(ptr);
+
+            return ret.ToInt32();
         }
 
 
-        private void _OnRspQryHistoricalTicks(IntPtr ptr1, int size1, double double1, double double2)
+        private void _OnRspQryHistoricalTicks(IntPtr ptr1, int size1, IntPtr ptr2, int size2, double double1)
         {
             if (OnRspQryHistoricalTicks == null)
                 return;
 
-            DepthMarketDataField obj = PInvokeUtility.GetObjectFromIntPtr<DepthMarketDataField>(ptr1);
+            HistoricalDataRequestField obj = PInvokeUtility.GetObjectFromIntPtr<HistoricalDataRequestField>(ptr2);
 
-            OnRspQryHistoricalTicks(this, ref obj, size1, double1 != 0,(int)double2);
+            OnRspQryHistoricalTicks(this, ptr1, size1,ref obj, size2, double1 != 0);
         }
-        private void _OnRspQryHistoricalBars(IntPtr ptr1, int size1, double double1, double double2)
+        private void _OnRspQryHistoricalBars(IntPtr ptr1, int size1, IntPtr ptr2, int size2, double double1)
         {
             if (OnRspQryHistoricalBars == null)
                 return;
 
-            BarField obj = PInvokeUtility.GetObjectFromIntPtr<BarField>(ptr1);
+            HistoricalDataRequestField obj = PInvokeUtility.GetObjectFromIntPtr<HistoricalDataRequestField>(ptr2);
 
-            OnRspQryHistoricalBars(this, ref obj, size1, double1 != 0, (int)double2);
+            OnRspQryHistoricalBars(this, ptr1, size1,ref obj, size2, double1 != 0);
         }
     }
 }

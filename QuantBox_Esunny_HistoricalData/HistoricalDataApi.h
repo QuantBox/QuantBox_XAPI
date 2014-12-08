@@ -12,6 +12,7 @@
 #include <atomic>
 #include <thread>
 #include <hash_map>
+#include <time.h>
 
 using namespace std;
 
@@ -22,6 +23,8 @@ class CHistoricalDataApi :
 	enum RequestType
 	{
 		E_Init,
+		E_ReqQryHistoricalTicks,
+		E_ReqQryHistoricalBars,
 	};
 
 	//请求数据包结构体
@@ -46,6 +49,7 @@ public:
 	int ReqQryHistoricalBars(HistoricalDataRequestField* request);
 
 private:
+	int ReqQryHistoricalTicks_(HistoricalDataRequestField* request, int lRequest);
 
 	//数据包发送线程
 	static void ProcessThread(CHistoricalDataApi* lpParam)
@@ -98,5 +102,10 @@ private:
 
 	mutex						m_csMap;
 	map<int,SRequest*>			m_reqMap;				//已发送请求池
+
+	HistoricalDataRequestField	m_RequestTick;
+	HistoricalDataRequestField	m_RequestBar;
+
+	int							m_nHdRequestId;	// 
 };
 

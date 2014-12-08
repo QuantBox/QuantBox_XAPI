@@ -20,6 +20,6 @@ namespace QuantBox.XAPI
     public delegate void DelegateOnRtnTrade(object sender, ref TradeField trade);
     public delegate void DelegateOnRtnQuote(object sender, ref QuoteField quote);
 
-    public delegate void DelegateOnRspQryHistoricalTicks(object sender, ref DepthMarketDataField marketData, int size1, bool bIsLast,int pos);
-    public delegate void DelegateOnRspQryHistoricalBars(object sender, ref BarField bar, int size1, bool bIsLast,int pos);
+    public delegate void DelegateOnRspQryHistoricalTicks(object sender, IntPtr pTicks, int size1, ref HistoricalDataRequestField request, int size2, bool bIsLast);
+    public delegate void DelegateOnRspQryHistoricalBars(object sender, IntPtr pBars, int size1, ref HistoricalDataRequestField request, int size2, bool bIsLast);
 }

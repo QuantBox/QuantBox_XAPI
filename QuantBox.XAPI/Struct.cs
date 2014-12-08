@@ -303,6 +303,25 @@ namespace QuantBox.XAPI
     }
 
     /// <summary>
+    /// Tick行情
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct TickField
+    {
+        public int Date;
+        public int Time;
+        public int Millisecond;
+
+        public double LastPrice;
+        public double Volume;
+        public double OpenInterest;
+        public double BidPrice1;
+        public double AskPrice1;
+        public int BidSize1;
+        public int AskSize1;
+    }
+
+    /// <summary>
     /// Bar行情
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -703,6 +722,7 @@ namespace QuantBox.XAPI
         public int BarSize;
 
         public int RequestId;
-        public int Count;
+        public int CurrentDate;
+        public int lRequest;
     }
 }

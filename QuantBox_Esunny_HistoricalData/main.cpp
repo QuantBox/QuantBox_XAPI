@@ -47,11 +47,9 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		pApi->Disconnect();
 		break;
 	case ReqQryHistoricalTicks:
-		pApi->ReqQryHistoricalTicks((HistoricalDataRequestField*)ptr1);
-		break;
+		return (void*)pApi->ReqQryHistoricalTicks((HistoricalDataRequestField*)ptr1);
 	case ReqQryHistoricalBars:
-		pApi->ReqQryHistoricalBars((HistoricalDataRequestField*)ptr1);
-		break;
+		return (void*)pApi->ReqQryHistoricalBars((HistoricalDataRequestField*)ptr1);
 	default:
 		break;
 	}

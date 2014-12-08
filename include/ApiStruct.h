@@ -252,6 +252,25 @@ struct DepthMarketDataField
 	VolumeType	AskVolume5;
 };
 
+///Tick行情
+struct TickField
+{
+	///交易所时间
+	DateIntType			Date;
+	TimeIntType			Time;
+	TimeIntType			Millisecond;
+
+	PriceType	LastPrice;
+	///数量
+	LargeVolumeType	Volume;
+	///持仓量
+	LargeVolumeType	OpenInterest;
+	PriceType	BidPrice1;
+	PriceType	AskPrice1;
+	VolumeType	BidSize1;
+	VolumeType	AskSize1;
+};
+
 
 ///Bar行情
 struct BarField
@@ -390,6 +409,7 @@ struct HistoricalDataRequestField
 	long BarSize;
 
 	int RequestId;
-	int Count;
+	int CurrentDate;
+	int lRequest;
 };
 #endif
