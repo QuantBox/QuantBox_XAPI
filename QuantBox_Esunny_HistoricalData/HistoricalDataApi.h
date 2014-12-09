@@ -50,6 +50,7 @@ public:
 
 private:
 	int ReqQryHistoricalTicks_(HistoricalDataRequestField* request, int lRequest);
+	int ReqQryHistoricalBars_(HistoricalDataRequestField* request, int lRequest);
 
 	//数据包发送线程
 	static void ProcessThread(CHistoricalDataApi* lpParam)

@@ -155,8 +155,6 @@ CHistoricalDataApi::SRequest* CHistoricalDataApi::MakeRequestBuf(RequestType typ
 		pRequest->pBuf = nullptr;
 		break;
 	case E_ReqQryHistoricalTicks:
-		pRequest->pBuf = new HistoricalDataRequestField;
-		break;
 	case E_ReqQryHistoricalBars:
 		pRequest->pBuf = new HistoricalDataRequestField;
 		break;
@@ -269,6 +267,14 @@ void CHistoricalDataApi::RunInThread()
 										iRet = ReqQryHistoricalTicks_(pHDR, lRequest);
 		}
 			break;
+		case E_ReqQryHistoricalBars:
+		{
+										HistoricalDataRequestField* pHDR = (HistoricalDataRequestField*)pRequest->pBuf;
+										// 请求太快了，后面会没有回应
+										this_thread::sleep_for(chrono::milliseconds(1000 * 3));
+										iRet = ReqQryHistoricalBars_(pHDR, lRequest);
+		}
+			break;
 		default:
 			assert(false);
 			break;
@@ -371,10 +377,15 @@ int __cdecl CHistoricalDataApi::OnRspHistoryQuot(struct STKHISDATA *pHisData)
 		pF->Low = item.fLow;
 		pF->Close = item.fClose;
 		pF->Volume = item.fVolume;
-		pF->Turnover = item.fAmount;
+		pF->OpenInterest = item.fAmount;
 	}
 
-	XRespone(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, true, 0, pFields, sizeof(BarField)*pHisData->nCount, &m_RequestBar, sizeof(HistoricalDataRequestField), nullptr, 0);
+	XRespone(ResponeType::OnRspQryHistoricalBars, m_msgQueue, this, true, 0, pFields, sizeof(BarField)*pHisData->nCount, &m_RequestBar, sizeof(HistoricalDataRequestField), nullptr, 0);
+
+	ReleaseRequestMapBuf(m_RequestBar.lRequest);
+
+	if (pFields)
+		delete[] pFields;
 
 	return 0;
 }
@@ -436,11 +447,14 @@ int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 		pF->AskSize1 = item.m_SellVol;
 	}
 
-	ReleaseRequestMapBuf(m_RequestTick.lRequest);
-
 	bool bIsLast = m_RequestTick.CurrentDate >= m_RequestTick.Date2;
 
 	XRespone(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, bIsLast, 0, pFields, sizeof(TickField)*pTraceData->nCount, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
+
+	ReleaseRequestMapBuf(m_RequestTick.lRequest);
+
+	if (pFields)
+		delete[] pFields;
 
 	if (!bIsLast)
 	{
@@ -527,13 +541,26 @@ int BarSize2Period(int barSize)
 
 int CHistoricalDataApi::ReqQryHistoricalBars(HistoricalDataRequestField* request)
 {
-	int period = BarSize2Period(request->BarSize);
-	if (period == 0)
-		return -100;
+	SRequest* pRequest = MakeRequestBuf(E_ReqQryHistoricalBars);
+	if (nullptr == pRequest)
+		return 0;
 
 	++m_nHdRequestId;
 	request->RequestId = m_nHdRequestId;
+	memcpy(pRequest->pBuf, request, sizeof(HistoricalDataRequestField));
+	AddToSendQueue(pRequest);
+
+	return m_nHdRequestId;
+}
+
+int CHistoricalDataApi::ReqQryHistoricalBars_(HistoricalDataRequestField* request, int lRequest)
+{
+	request->lRequest = lRequest;
 	memcpy(&m_RequestBar, request, sizeof(HistoricalDataRequestField));
+
+	int period = BarSize2Period(request->BarSize);
+	if (period == 0)
+		return 0;
 
 	return m_pApi->RequestHistory(request->ExchangeID, request->InstrumentID, period);
 }

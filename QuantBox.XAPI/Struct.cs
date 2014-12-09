@@ -329,7 +329,6 @@ namespace QuantBox.XAPI
     {
         public int Date;
         public int Time;
-        public int BarSize;
 
         public double Open;
         public double High;
