@@ -158,6 +158,9 @@ CHistoricalDataApi::SRequest* CHistoricalDataApi::MakeRequestBuf(RequestType typ
 	case E_ReqQryHistoricalBars:
 		pRequest->pBuf = new HistoricalDataRequestField;
 		break;
+	case E_ReqQryHistoricalTicks_Check:
+		pRequest->pBuf = nullptr;
+		break;
 	default:
 		assert(false);
 		break;
@@ -274,6 +277,9 @@ void CHistoricalDataApi::RunInThread()
 										this_thread::sleep_for(chrono::milliseconds(1000 * 3));
 										iRet = ReqQryHistoricalBars_(pHDR, lRequest);
 		}
+			break;
+		case E_ReqQryHistoricalTicks_Check:
+			iRet = ReqQryHistoricalTicks_Check();
 			break;
 		default:
 			assert(false);
@@ -424,11 +430,65 @@ int CHistoricalDataApi::ReqQryHistoricalTicks_(HistoricalDataRequestField* reque
 
 	char buf1[20] = { 0 };
 	sprintf(buf1, "%d", request->CurrentDate);
-	return m_pApi->RequestTrace(request->ExchangeID, request->InstrumentID, buf1);
+	int iRet = m_pApi->RequestTrace(request->ExchangeID, request->InstrumentID, buf1);
+	if (iRet == 0)
+	{
+		// 每天早上如9点前，前是查了没有返回的，所以要延时检查,没有就发回一个结束的标识
+		SRequest* pRequest = MakeRequestBuf(E_ReqQryHistoricalTicks_Check);
+		if (nullptr == pRequest)
+			return 0;
+
+		m_timer_1 = time(NULL);
+		AddToSendQueue(pRequest);
+	}
+	else
+	{
+		RtnEmptyRspQryHistoricalTicks();
+	}
+	return 0;
+}
+
+int CHistoricalDataApi::ReqQryHistoricalTicks_Check()
+{
+	m_timer_2 = time(NULL);
+	if (m_timer_1 == 0)
+		return 0;
+
+	if (m_timer_2 - m_timer_1 > 10)
+	{
+		RtnEmptyRspQryHistoricalTicks();
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+int CHistoricalDataApi::RtnEmptyRspQryHistoricalTicks()
+{
+	bool bIsLast = m_RequestTick.CurrentDate >= m_RequestTick.Date2;
+
+	XRespone(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, bIsLast, 0, 0, 0, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
+
+	if (!bIsLast)
+	{
+		SRequest* pRequest = MakeRequestBuf(E_ReqQryHistoricalTicks);
+		if (nullptr == pRequest)
+			return 0;
+
+		m_RequestTick.CurrentDate = GetNextTradingDate(m_RequestTick.CurrentDate);
+		memcpy(pRequest->pBuf, &m_RequestTick, sizeof(HistoricalDataRequestField));
+		AddToSendQueue(pRequest);
+	}
+
+	return 0;
 }
 
 int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 {
+	m_timer_1 = 0;
+
 	TickField* pFields = new TickField[pTraceData->nCount];
 
 	for (size_t i = 0; i < pTraceData->nCount; i++)

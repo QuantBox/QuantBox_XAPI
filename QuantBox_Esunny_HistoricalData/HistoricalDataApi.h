@@ -25,6 +25,7 @@ class CHistoricalDataApi :
 		E_Init,
 		E_ReqQryHistoricalTicks,
 		E_ReqQryHistoricalBars,
+		E_ReqQryHistoricalTicks_Check,
 	};
 
 	//请求数据包结构体
@@ -51,6 +52,9 @@ public:
 private:
 	int ReqQryHistoricalTicks_(HistoricalDataRequestField* request, int lRequest);
 	int ReqQryHistoricalBars_(HistoricalDataRequestField* request, int lRequest);
+
+	int ReqQryHistoricalTicks_Check();
+	int RtnEmptyRspQryHistoricalTicks();
 
 	//数据包发送线程
 	static void ProcessThread(CHistoricalDataApi* lpParam)
@@ -107,6 +111,8 @@ private:
 	HistoricalDataRequestField	m_RequestTick;
 	HistoricalDataRequestField	m_RequestBar;
 
-	int							m_nHdRequestId;	// 
+	int							m_nHdRequestId;	//
+	time_t						m_timer_1;
+	time_t						m_timer_2;
 };
 
