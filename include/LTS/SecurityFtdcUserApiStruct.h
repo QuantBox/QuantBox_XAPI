@@ -172,6 +172,8 @@ struct CSecurityFtdcInvestorField
 	TSecurityFtdcTraderIDType	SHBranchID;
 	///深圳营业部编号
 	TSecurityFtdcTraderIDType	SZBranchID;
+	///所属结算系统类型
+	TSecurityFtdcSettleSystemTypeType	SettleSystemType;
 };
 
 ///交易编码
@@ -573,7 +575,7 @@ struct CSecurityFtdcInstrumentCommissionRateField
 	TSecurityFtdcRatioType	TradeFeeByVolume;
 	///交易附加费率
 	TSecurityFtdcRatioType	MarginByMoney;
-	///最小过户费
+	///最小交易费
 	TSecurityFtdcPriceType	MinTradeFee;
 };
 
@@ -592,6 +594,80 @@ struct CSecurityFtdcExcessStockInfoField
 	TSecurityFtdcVolumeType	ExcessVolume;
 	///余券冻结数量
 	TSecurityFtdcVolumeType	ExcessFrozenVolume;
+};
+
+///ETF合约
+struct CSecurityFtdcETFInstrumentField
+{
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///ETF证券代码
+	TSecurityFtdcInstrumentIDType	ETFInstrumentID;
+	///ETF对应申赎代码
+	TSecurityFtdcInstrumentIDType	ETFPurRedInstrumentID;
+	///最小申购赎回单位对应的ETF份数
+	TSecurityFtdcVolumeType	CreationRedemptionUnit;
+	///最大现金替代比例
+	TSecurityFtdcRatioType	Maxcashratio;
+	///基金当天申购赎回状态
+	TSecurityFtdcCreationredemptionStatusType	Creationredemption;
+	///预估金额
+	TSecurityFtdcMoneyType	EstimateCashComponent;
+};
+
+///ETF股票篮
+struct CSecurityFtdcETFBasketField
+{
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///ETF证券代码
+	TSecurityFtdcInstrumentIDType	ETFInstrumentID;
+	///股票证券代码
+	TSecurityFtdcInstrumentIDType	StockInstrumentID;
+	///股票证券名称
+	TSecurityFtdcInstrumentNameType	StockInstrumentName;
+	///股票数量
+	TSecurityFtdcVolumeType	Volume;
+	///替代标志
+	TSecurityFtdcETFCurrenceReplaceStatusType	CurrenceReplaceStatus;
+	///溢价比例
+	TSecurityFtdcRatioType	Premium;
+	///总金额
+	TSecurityFtdcMoneyType	Amount;
+};
+
+///OF合约
+struct CSecurityFtdcOFInstrumentField
+{
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///OF基金代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+	///基金当天申购赎回状态
+	TSecurityFtdcCreationredemptionStatusType	Creationredemption;
+	///基金净值
+	TSecurityFtdcPriceType	NetPrice;
+};
+
+///ETF合约
+struct CSecurityFtdcSFInstrumentField
+{
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///基金代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+	///SF基金代码
+	TSecurityFtdcInstrumentIDType	SFInstrumentID;
+	///基金当天拆分合并状态
+	TSecurityFtdcSplitMergeStatusType	SplitMergeStatus;
+	///最小拆分数量
+	TSecurityFtdcVolumeType	MinSplitVolume;
+	///最小合并数量
+	TSecurityFtdcVolumeType	MinMergeVolume;
+	///拆分/合并比例
+	TSecurityFtdcVolumeType	VolumeRatio;
+	///基金净值
+	TSecurityFtdcPriceType	NetPrice;
 };
 
 ///交易所交易员报盘机
@@ -1063,6 +1139,10 @@ struct CSecurityFtdcTradeField
 	TSecurityFtdcDateType	TradingDay;
 	///经纪公司报单编号
 	TSecurityFtdcSequenceNoType	BrokerOrderSeq;
+	///成交金额
+	TSecurityFtdcMoneyType	TradeAmount;
+	///成交序号
+	TSecurityFtdcTradeIndexType	TradeIndex;
 };
 
 ///投资者持仓
@@ -1142,7 +1222,7 @@ struct CSecurityFtdcInvestorPositionField
 	TSecurityFtdcVolumeType	RepurchasePosition;
 	///ETF申赎空头冻结
 	TSecurityFtdcVolumeType	PurRedShortFrozen;
-	///融资买入出数量
+	///融资买入数量
 	TSecurityFtdcVolumeType	MarginTradeVolume;
 	///融资买入金额
 	TSecurityFtdcMoneyType	MarginTradeAmount;
@@ -1385,6 +1465,51 @@ struct CSecurityFtdcQryExcessStockInfoField
 	TSecurityFtdcInstrumentIDType	InstrumentID;
 };
 
+///查询投资者帐户关系
+struct CSecurityFtdcQryInvestorAccountField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+};
+
+///查询ETF合约
+struct CSecurityFtdcQryETFInstrumentField
+{
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///ETF证券代码
+	TSecurityFtdcInstrumentIDType	ETFInstrumentID;
+};
+
+///查询ETF股票篮
+struct CSecurityFtdcQryETFBasketField
+{
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///ETF证券代码
+	TSecurityFtdcInstrumentIDType	ETFInstrumentID;
+};
+
+///查询OF合约
+struct CSecurityFtdcQryOFInstrumentField
+{
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///ETF证券代码
+	TSecurityFtdcInstrumentIDType	OFInstrumentID;
+};
+
+///查询SF合约
+struct CSecurityFtdcQrySFInstrumentField
+{
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///ETF证券代码
+	TSecurityFtdcInstrumentIDType	SFInstrumentID;
+};
+
 ///查询交易员报盘机
 struct CSecurityFtdcQryTraderOfferField
 {
@@ -1605,6 +1730,10 @@ struct CSecurityFtdcInvestorAccountField
 	TSecurityFtdcAccountTypeType	AccountType;
 	///是否活跃
 	TSecurityFtdcBoolType	IsActive;
+	///上交所交易单元号
+	TSecurityFtdcTraderIDType	SHBranchPBU;
+	///深交所交易单元号
+	TSecurityFtdcTraderIDType	SZBranchPBU;
 };
 
 ///用户IP
@@ -2039,6 +2168,27 @@ struct CSecurityFtdcQryFundTransferSerialField
 	TSecurityFtdcAccountIDType	AccountID;
 	///账户类型
 	TSecurityFtdcAccountTypeType	AccountType;
+};
+
+///获取数据库信息
+struct CSecurityFtdcFetchDBInfoField
+{
+	///用户代码
+	TSecurityFtdcUserIDType	UserID;
+	///密码
+	TSecurityFtdcPasswordType	Password;
+	///数据库索引
+	TSecurityFtdcUserNameType	DBIndex;
+	///数据库IP地址
+	TSecurityFtdcIPAddressType	IPAddress;
+	///数据库IP端口
+	TSecurityFtdcIPPortType	IPPort;
+	///数据库名称
+	TSecurityFtdcUserNameType	DBName;
+	///数据库用户名
+	TSecurityFtdcUserIDType	DBUserID;
+	///数据库密码
+	TSecurityFtdcPasswordType	DBPassword;
 };
 
 

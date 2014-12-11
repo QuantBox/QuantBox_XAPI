@@ -16,6 +16,9 @@
     <Filter Include="lib">
       <UniqueIdentifier>{d78e75ed-cfc4-4b24-8b16-31b0573c1899}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{7686464a-38f3-4dd5-89a6-f64cb61281a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -35,6 +38,15 @@
     </ClInclude>
     <ClInclude Include="..\include\toolkit.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\LTS\SecurityFtdcTraderApi.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\LTS\SecurityFtdcUserApiDataType.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\LTS\SecurityFtdcUserApiStruct.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
