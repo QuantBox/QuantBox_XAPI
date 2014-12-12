@@ -264,9 +264,9 @@ void CTraderApi::RunInThread()
 		//case E_QryInvestorPositionDetailField:
 		//	iRet=m_pApi->ReqQryInvestorPositionDetail(&pRequest->QryInvestorPositionDetailField,lRequest);
 		//	break;
-		case E_QryInstrumentCommissionRateField:
-			iRet = m_pApi->ReqQryInstrumentCommissionRate(&pRequest->QryInstrumentCommissionRateField,lRequest);
-			break;
+		//case E_QryInstrumentCommissionRateField:
+		//	iRet = m_pApi->ReqQryInstrumentCommissionRate(&pRequest->QryInstrumentCommissionRateField,lRequest);
+		//	break;
 		//case E_QryInstrumentMarginRateField:
 		//	iRet = m_pApi->ReqQryInstrumentMarginRate(&pRequest->QryInstrumentMarginRateField,lRequest);
 		//	break;
@@ -1090,14 +1090,22 @@ void CTraderApi::OnRspQryInstrument(CSecurityFtdcInstrumentField *pInstrument, C
 			strncpy(field.ExchangeID, pInstrument->ExchangeID, sizeof(TSecurityFtdcExchangeIDType));
 
 			sprintf(field.Symbol,"%s.%s",pInstrument->InstrumentID,pInstrument->ExchangeID);
-			//strncpy(field.Symbol, pInstrument->InstrumentID, sizeof(TSecurityFtdcInstrumentIDType));
 
 			strncpy(field.InstrumentName, pInstrument->InstrumentName, sizeof(TSecurityFtdcInstrumentNameType));
 			field.Type = CSecurityFtdcInstrumentField_2_InstrumentType(pInstrument);
 			field.VolumeMultiple = pInstrument->VolumeMultiple;
-			field.PriceTick = pInstrument->PriceTick;
+			field.PriceTick = CSecurityFtdcInstrumentField_2_PriceTick(pInstrument);
 			strncpy(field.ExpireDate, pInstrument->ExpireDate, sizeof(TSecurityFtdcDateType));
-			//field.OptionsType = TSecurityFtdcOptionsTypeType_2_PutCall(pInstrument->OptionsType);
+			field.OptionsType = CSecurityFtdcInstrumentField_2_PutCall(pInstrument);
+			field.StrikePrice = pInstrument->ExecPrice;
+
+			// 期权的标的物
+			if (strlen(pInstrument->InstrumentID) == 8)
+			{
+				strncpy(field.UnderlyingInstrID, pInstrument->ExchangeInstID, 6);
+				sprintf(&field.UnderlyingInstrID[6], ".%s", pInstrument->ExchangeID);
+			}
+			
 
 			XRespone(ResponeType::OnRspQryInstrument, m_msgQueue, this, bIsLast, 0, &field, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
 		}

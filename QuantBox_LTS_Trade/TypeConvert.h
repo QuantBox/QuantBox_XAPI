@@ -5,7 +5,7 @@
 #include "../include/ApiStruct.h"
 
 
-//PutCall TSecurityFtdcOptionsTypeType_2_PutCall(TSecurityFtdcOptionsTypeType In);
+
 
 HedgeFlagType TSecurityFtdcHedgeFlagType_2_HedgeFlagType(TSecurityFtdcHedgeFlagType In);
 TSecurityFtdcHedgeFlagType HedgeFlagType_2_TSecurityFtdcHedgeFlagType(HedgeFlagType In);
@@ -26,3 +26,5 @@ TimeInForce CSecurityFtdcOrderField_2_TimeInForce(CSecurityFtdcOrderField* pIn);
 ExecType CSecurityFtdcOrderField_2_ExecType(CSecurityFtdcOrderField* pIn);
 
 InstrumentType CSecurityFtdcInstrumentField_2_InstrumentType(CSecurityFtdcInstrumentField* pIn);
+PutCall CSecurityFtdcInstrumentField_2_PutCall(CSecurityFtdcInstrumentField* pIn);
+PriceType CSecurityFtdcInstrumentField_2_PriceTick(CSecurityFtdcInstrumentField* pIn);

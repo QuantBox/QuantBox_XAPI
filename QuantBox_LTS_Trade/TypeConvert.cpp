@@ -12,12 +12,6 @@
 /// OpenQuant中使用ExecutionReport问题是因为OQ自己有OrderManager，如果其它软件要看到委托和成交列表是没法得到的
 /// 所以接口应当返回委托与成交回报
 
-//PutCall TSecurityFtdcOptionsTypeType_2_PutCall(TSecurityFtdcOptionsTypeType In)
-//{
-//	if (In == SECURITY_FTDC_CP_CallOptions)
-//		return PutCall::Call;
-//	return PutCall::Put;
-//}
 
 HedgeFlagType TSecurityFtdcHedgeFlagType_2_HedgeFlagType(TSecurityFtdcHedgeFlagType In)
 {
@@ -227,6 +221,36 @@ InstrumentType CSecurityFtdcInstrumentField_2_InstrumentType(CSecurityFtdcInstru
 	//case SECURITY_FTDC_PC_SpotOption:
 	//	return InstrumentType::Option;
 	default:
+		if (strlen(pIn->InstrumentID) == 8)
+		{
+			return InstrumentType::Option;
+		}
 		return InstrumentType::Stock;
 	}
+}
+
+PutCall CSecurityFtdcInstrumentField_2_PutCall(CSecurityFtdcInstrumentField* pIn)
+{
+	if (strlen(pIn->InstrumentID) == 8)
+	{
+		if (pIn->ExchangeInstID[6] == 'C')
+		{
+			return PutCall::Call;
+		}
+	}
+	return PutCall::Put;
+}
+
+PriceType CSecurityFtdcInstrumentField_2_PriceTick(CSecurityFtdcInstrumentField* pIn)
+{
+	if (pIn->PriceTick != 0)
+		return pIn->PriceTick;
+	
+	// 期权为0.001
+	if (strlen(pIn->InstrumentID) == 8)
+	{
+		return 0.001;
+	}
+	
+	return 0.01;
 }
