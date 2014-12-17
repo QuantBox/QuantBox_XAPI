@@ -371,7 +371,7 @@ int __cdecl CHistoricalDataApi::OnRspHistoryQuot(struct STKHISDATA *pHisData)
 {
 	BarField* pFields = new BarField[pHisData->nCount];
 
-	for (size_t i = 0; i < pHisData->nCount; i++)
+	for (short i = 0; i < pHisData->nCount; i++)
 	{
 		HISTORYDATA item = pHisData->HisData[i];
 
@@ -503,8 +503,8 @@ int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 		pF->OpenInterest = item.m_Amount;
 		pF->BidPrice1 = item.m_BuyPrice;
 		pF->AskPrice1 = item.m_SellPrice;
-		pF->BidSize1 = item.m_BuyVol;
-		pF->AskSize1 = item.m_SellVol;
+		pF->BidSize1 = (VolumeType)item.m_BuyVol;
+		pF->AskSize1 = (VolumeType)item.m_SellVol;
 	}
 
 	bool bIsLast = m_RequestTick.CurrentDate >= m_RequestTick.Date2;
@@ -532,7 +532,7 @@ int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 
 int __cdecl CHistoricalDataApi::OnRspMarketInfo(struct MarketInfo *pMarketInfo, int bLast)
 {
-	for (size_t i = 0; i < pMarketInfo->stocknum; i++)
+	for (unsigned short i = 0; i < pMarketInfo->stocknum; i++)
 	{
 		StockInfo item = pMarketInfo->stockdata[i];
 

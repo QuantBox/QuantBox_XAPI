@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <thread>
 #include <mutex>
@@ -15,14 +15,6 @@ using namespace moodycamel;
 class CMsgQueue
 {
 public:
-	//CMsgQueue():m_queue(1024)
-	//{
-	//	m_hThread = nullptr;
-	//	m_bRunning = false;
-
-	//	//回调函数地址指针
-	//	m_fnOnRespone = nullptr;
-	//}
 	CMsgQueue();
 	virtual ~CMsgQueue()
 	{
@@ -112,4 +104,3 @@ private:
 	ReaderWriterQueue<ResponeItem*>		m_queue;
 	fnOnRespone							m_fnOnRespone;
 };
-

@@ -496,7 +496,7 @@ char* CTraderApi::ReqOrderInsert(
 	// 价格
 	body->insertPrice = pOrder1->Price;
 	// 数量
-	body->orderAmount = pOrder1->Qty;
+	body->orderAmount = (DFITCAmountType)pOrder1->Qty;
 	// 买卖
 	body->buySellType = OrderSide_2_DFITCBuySellTypeType(pOrder1->Side);
 	// 开平

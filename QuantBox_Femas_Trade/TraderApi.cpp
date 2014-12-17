@@ -764,7 +764,7 @@ char* CTraderApi::ReqQuoteInsert(
 	body.AskVolume = (int)pQuote->AskQty;
 	body.BidVolume = (int)pQuote->BidQty;
 
-	int nRet = 0;
+	long long nRet = 0;
 	{
 		//可能报单太快，m_nMaxOrderRef还没有改变就提交了
 		lock_guard<mutex> cl(m_csOrderRef);
