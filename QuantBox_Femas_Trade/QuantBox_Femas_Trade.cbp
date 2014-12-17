@@ -53,6 +53,7 @@
 		<Unit filename="TraderApi.h" />
 		<Unit filename="TypeConvert.cpp" />
 		<Unit filename="TypeConvert.h" />
+		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

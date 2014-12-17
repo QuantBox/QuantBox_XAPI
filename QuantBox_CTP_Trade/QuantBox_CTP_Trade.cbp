@@ -42,7 +42,7 @@
 			<Add option="-fPIC" />
 		</Compiler>
 		<Linker>
-			<Add library="thostmduserapi" />
+			<Add library="thosttraderapi" />
 			<Add library="QuantBox_Queue" />
 			<Add directory="../include/CTP/linux64" />
 		</Linker>
@@ -53,6 +53,7 @@
 		<Unit filename="TraderApi.h" />
 		<Unit filename="TypeConvert.cpp" />
 		<Unit filename="TypeConvert.h" />
+		<Unit filename="main.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

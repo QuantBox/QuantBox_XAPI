@@ -19,9 +19,9 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return nullptr;
 	case GetApiVersion:
-		return "0.1";
+		return (void*)"0.1";
 	case GetApiName:
-		return "Queue";
+		return (void*)"Queue";
 	case Create:
 		return new CMsgQueue();
 	default:

@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>QuantBox.XAPI</RootNamespace>
     <AssemblyName>QuantBox.XAPI</AssemblyName>
@@ -37,12 +37,20 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="NLog">
+      <HintPath>..\packages\NLog.3.1.0.0\lib\net45\NLog.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Callback\ApiManager.cs" />
     <Compile Include="Callback\BaseApi.cs" />
-    <Compile Include="Callback\MarketDataApi.cs" />
     <Compile Include="Callback\Queue.cs" />
-    <Compile Include="Callback\TraderApi.cs" />
+    <Compile Include="Callback\XApi.cs" />
+    <Compile Include="Callback\XApi.HistoricalData.cs" />
+    <Compile Include="Callback\XApi.Instrument.cs" />
+    <Compile Include="Callback\XApi.MarketData.cs" />
+    <Compile Include="Callback\XApi.QuoteRequest.cs" />
+    <Compile Include="Callback\XApi.Trade.cs" />
     <Compile Include="Delegate.cs" />
     <Compile Include="DllInvoke.cs" />
     <Compile Include="Enum.cs" />

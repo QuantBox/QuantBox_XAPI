@@ -17,9 +17,9 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return (void*)(ApiType::MarketData | ApiType::QuoteRequest);
 	case GetApiVersion:
-		return "0.1";
+		return (void*)"0.1";
 	case GetApiName:
-		return "CTP";
+		return (void*)"CTP";
 	case Create:
 		return new CMdUserApi();
 	default:

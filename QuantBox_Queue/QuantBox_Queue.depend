@@ -38,7 +38,7 @@
 
 1413530669 /home/hetao/works/QuantBox_X/include/QueueStruct.h
 
-1413771567 source:/home/hetao/works/QuantBox_XAPI/QuantBox_Queue/main.cpp
+1418803816 source:/home/hetao/works/QuantBox_XAPI/QuantBox_Queue/main.cpp
 	"stdafx.h"
 	"MsgQueue.h"
 	"../include/QueueHeader.h"
@@ -46,20 +46,21 @@
 	"../include/QueueStruct.h"
 	"../include/ApiHeader.h"
 
-1413544592 /home/hetao/works/QuantBox_XAPI/QuantBox_Queue/MsgQueue.h
+1418803759 /home/hetao/works/QuantBox_XAPI/QuantBox_Queue/MsgQueue.h
 	<thread>
 	<mutex>
 	<cstring>
+	<condition_variable>
 	"../include/QueueHeader.h"
 	"../include/QueueStruct.h"
 	"readerwriterqueue.h"
 
-1413771567 /home/hetao/works/QuantBox_XAPI/include/QueueHeader.h
+1418803756 /home/hetao/works/QuantBox_XAPI/include/QueueHeader.h
 	"../include/CrossPlatform.h"
 
-1413537207 /home/hetao/works/QuantBox_XAPI/include/QueueStruct.h
+1418803758 /home/hetao/works/QuantBox_XAPI/include/QueueStruct.h
 
-1413537209 /home/hetao/works/QuantBox_XAPI/QuantBox_Queue/readerwriterqueue.h
+1418803759 /home/hetao/works/QuantBox_XAPI/QuantBox_Queue/readerwriterqueue.h
 	"atomicops.h"
 	<type_traits>
 	<utility>
@@ -68,7 +69,7 @@
 	<cstdint>
 	<cstdlib>
 
-1413537209 /home/hetao/works/QuantBox_XAPI/QuantBox_Queue/atomicops.h
+1418803759 /home/hetao/works/QuantBox_XAPI/QuantBox_Queue/atomicops.h
 	<cassert>
 	<intrin.h>
 	<ppcintrinsics.h>
@@ -76,21 +77,21 @@
 	<atomic>
 	<utility>
 
-1413537207 /home/hetao/works/QuantBox_XAPI/include/QueueEnum.h
+1418803757 /home/hetao/works/QuantBox_XAPI/include/QueueEnum.h
 
-1413771567 /home/hetao/works/QuantBox_XAPI/include/ApiHeader.h
+1418803758 /home/hetao/works/QuantBox_XAPI/include/ApiHeader.h
 	"../include/CrossPlatform.h"
 
-1413771567 source:/home/hetao/works/QuantBox_XAPI/QuantBox_Queue/MsgQueue.cpp
+1418803759 source:/home/hetao/works/QuantBox_XAPI/QuantBox_Queue/MsgQueue.cpp
 	"stdafx.h"
 	"MsgQueue.h"
 
-1413771567 /home/hetao/works/QuantBox_XAPI/QuantBox_Queue/stdafx.h
+1418803759 /home/hetao/works/QuantBox_XAPI/QuantBox_Queue/stdafx.h
 	"targetver.h"
 	<windows.h>
 
-1413537209 /home/hetao/works/QuantBox_XAPI/QuantBox_Queue/targetver.h
+1418803759 /home/hetao/works/QuantBox_XAPI/QuantBox_Queue/targetver.h
 	<SDKDDKVer.h>
 
-1413771567 /home/hetao/works/QuantBox_XAPI/include/CrossPlatform.h
+1418803756 /home/hetao/works/QuantBox_XAPI/include/CrossPlatform.h
 

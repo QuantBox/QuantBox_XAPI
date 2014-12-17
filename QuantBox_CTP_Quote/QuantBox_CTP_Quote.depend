@@ -57,30 +57,31 @@
 
 1413530794 /home/hetao/works/QuantBox_X/include/QueueEnum.h
 
-1413771567 source:/home/hetao/works/QuantBox_XAPI/include/toolkit.cpp
+1418803758 source:/home/hetao/works/QuantBox_XAPI/include/toolkit.cpp
 	"stdafx.h"
 	"toolkit.h"
 	<string.h>
+	<time.h>
 	<direct.h>
 	<sys/stat.h>
 
-1413537209 /home/hetao/works/QuantBox_XAPI/include/toolkit.h
+1418803758 /home/hetao/works/QuantBox_XAPI/include/toolkit.h
 	<vector>
 	<set>
 	<string>
 
-1413787998 source:/home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/main.cpp
+1418803943 source:/home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/main.cpp
 	"stdafx.h"
 	"../include/ApiHeader.h"
 	"../include/QueueEnum.h"
 	"MdUserApi.h"
 
-1413771567 /home/hetao/works/QuantBox_XAPI/include/ApiHeader.h
+1418803758 /home/hetao/works/QuantBox_XAPI/include/ApiHeader.h
 	"../include/CrossPlatform.h"
 
-1413787998 /home/hetao/works/QuantBox_XAPI/include/QueueEnum.h
+1418803757 /home/hetao/works/QuantBox_XAPI/include/QueueEnum.h
 
-1413538004 /home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/MdUserApi.h
+1418803758 /home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/MdUserApi.h
 	"../include/CTP/ThostFtdcMdApi.h"
 	"../include/ApiStruct.h"
 	<set>
@@ -88,23 +89,23 @@
 	<atomic>
 	<mutex>
 
-1413537209 /home/hetao/works/QuantBox_XAPI/include/CTP/ThostFtdcMdApi.h
+1418803756 /home/hetao/works/QuantBox_XAPI/include/CTP/ThostFtdcMdApi.h
 	"ThostFtdcUserApiStruct.h"
 
-1413537209 /home/hetao/works/QuantBox_XAPI/include/CTP/ThostFtdcUserApiStruct.h
+1418803756 /home/hetao/works/QuantBox_XAPI/include/CTP/ThostFtdcUserApiStruct.h
 	"ThostFtdcUserApiDataType.h"
 
-1413537209 /home/hetao/works/QuantBox_XAPI/include/CTP/ThostFtdcUserApiDataType.h
+1418803756 /home/hetao/works/QuantBox_XAPI/include/CTP/ThostFtdcUserApiDataType.h
 
-1413537209 /home/hetao/works/QuantBox_XAPI/include/ApiStruct.h
+1418803758 /home/hetao/works/QuantBox_XAPI/include/ApiStruct.h
 	"ApiDataType.h"
 	"ApiEnum.h"
 
-1413537209 /home/hetao/works/QuantBox_XAPI/include/ApiDataType.h
+1418803757 /home/hetao/works/QuantBox_XAPI/include/ApiDataType.h
 
-1413537209 /home/hetao/works/QuantBox_XAPI/include/ApiEnum.h
+1418803756 /home/hetao/works/QuantBox_XAPI/include/ApiEnum.h
 
-1413771567 source:/home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/MdUserApi.cpp
+1418803758 source:/home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/MdUserApi.cpp
 	"stdafx.h"
 	"MdUserApi.h"
 	"../include/QueueEnum.h"
@@ -117,19 +118,19 @@
 	<mutex>
 	<vector>
 
-1413771567 /home/hetao/works/QuantBox_XAPI/include/QueueHeader.h
+1418803756 /home/hetao/works/QuantBox_XAPI/include/QueueHeader.h
 	"../include/CrossPlatform.h"
 
-1413771567 /home/hetao/works/QuantBox_XAPI/include/stdafx.h
+1418803758 /home/hetao/works/QuantBox_XAPI/include/stdafx.h
 	"targetver.h"
 	<windows.h>
 
-1413771567 /home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/stdafx.h
+1418803758 /home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/stdafx.h
 	"targetver.h"
 	<windows.h>
 
-1413538004 /home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/targetver.h
+1418803758 /home/hetao/works/QuantBox_XAPI/QuantBox_CTP_Quote/targetver.h
 	<SDKDDKVer.h>
 
-1413864648 /home/hetao/works/QuantBox_XAPI/include/CrossPlatform.h
+1418803756 /home/hetao/works/QuantBox_XAPI/include/CrossPlatform.h
 

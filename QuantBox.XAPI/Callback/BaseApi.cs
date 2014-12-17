@@ -91,7 +91,7 @@ namespace QuantBox.XAPI.Callback
         private bool disposed;
 
         // 一定要先调用API的，再调用队列的，否则会出错
-        public void Dispose()
+		public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);

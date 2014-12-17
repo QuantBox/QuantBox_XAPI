@@ -16,9 +16,9 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return (void*)(ApiType::Trade | ApiType::Instrument);
 	case GetApiVersion:
-		return "0.2";
+		return (void*)"0.2";
 	case GetApiName:
-		return "CTP";
+		return (void*)"CTP";
 	case Create:
 		return new CTraderApi();
 	default:
