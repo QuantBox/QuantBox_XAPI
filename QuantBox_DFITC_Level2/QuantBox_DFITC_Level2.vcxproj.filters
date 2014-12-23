@@ -55,8 +55,5 @@
     <Library Include="..\include\DFITC_L2\win32\level2Api.lib">
       <Filter>lib</Filter>
     </Library>
-    <Library Include="..\lib\QuantBox_Queue.lib">
-      <Filter>lib</Filter>
-    </Library>
   </ItemGroup>
 </Project>

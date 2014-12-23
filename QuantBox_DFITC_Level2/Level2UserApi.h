@@ -3,7 +3,13 @@
 #include "../include/DFITC_L2/DFITCL2Api.h"
 
 #include "../include/ApiStruct.h"
-#include "../include/stringHash.h"
+
+#ifdef _WIN64
+#pragma comment(lib, "../lib/QuantBox_Queue_x64.lib")
+#else
+#pragma comment(lib, "../include/DFITC_L2/win32/level2Api.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x86.lib")
+#endif
 
 #include <set>
 #include <string>

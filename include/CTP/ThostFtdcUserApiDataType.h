@@ -241,6 +241,8 @@ typedef char TThostFtdcIdentifiedCardNoType[51];
 #define THOST_FTDC_ICT_BusinessRegistration  'H'
 ///港澳永久性居民身份证
 #define THOST_FTDC_ICT_HKMCIDCard  'I'
+///人行开户许可证
+#define THOST_FTDC_ICT_AccountsPermits 'J'
 ///其他证件
 #define THOST_FTDC_ICT_OtherCard 'x'
 
@@ -735,6 +737,8 @@ typedef char TThostFtdcClientIDTypeType;
 #define THOST_FTDC_OPT_BidPrice1PlusTwoTicks 'E'
 ///买一价浮动上浮3个ticks
 #define THOST_FTDC_OPT_BidPrice1PlusThreeTicks 'F'
+///五档价
+#define THOST_FTDC_OPT_FiveLevelPrice 'G'
 
 typedef char TThostFtdcOrderPriceTypeType;
 

@@ -2,7 +2,13 @@
 
 #include "../include/Esunny_HistoricalData/EsunnyQuot.h"
 #include "../include/ApiStruct.h"
-#include "../include/stringHash.h"
+
+#ifdef _WIN64
+#pragma comment(lib, "../lib/QuantBox_Queue_x64.lib")
+#else
+#pragma comment(lib, "../include/Esunny_HistoricalData/win32/EsunnyQuot.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x86.lib")
+#endif
 
 #include <set>
 #include <list>

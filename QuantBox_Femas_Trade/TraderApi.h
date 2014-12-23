@@ -2,7 +2,14 @@
 
 #include "../include/Femas/USTPFtdcTraderApi.h"
 #include "../include/ApiStruct.h"
-//#include "../include/stringHash.h"
+
+#ifdef _WIN64
+#pragma comment(lib, "../include/Femas/win64/USTPtraderapi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x64.lib")
+#else
+#pragma comment(lib, "../include/Femas/win32/USTPtraderapi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x86.lib")
+#endif
 
 #include <set>
 #include <list>

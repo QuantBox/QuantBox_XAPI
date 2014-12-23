@@ -4,4 +4,16 @@
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\OpenQuant.x86.exe</StartProgram>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug64|AnyCPU'">
+    <StartProgram>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\OpenQuant.x86.exe</StartProgram>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <StartProgram>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\OpenQuant.x86.exe</StartProgram>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug64|x64'">
+    <StartProgram>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\OpenQuant.x86.exe</StartProgram>
+    <StartAction>Program</StartAction>
+  </PropertyGroup>
 </Project>

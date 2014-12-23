@@ -2,7 +2,15 @@
 
 #include "../include/Kingstar_Gold/GoldTradeApi.h"
 #include "../include/ApiStruct.h"
-#include "../include/stringHash.h"
+
+#ifdef _WIN64
+#pragma comment(lib, "../include/Kingstar_Gold/win64/goldtradeapi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x64.lib")
+#else
+#pragma comment(lib, "../include/Kingstar_Gold/win32/goldtradeapi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x86.lib")
+#endif
+
 
 #include <set>
 #include <list>

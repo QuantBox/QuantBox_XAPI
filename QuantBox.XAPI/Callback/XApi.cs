@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuantBox.XAPI.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace QuantBox.XAPI.Callback
 {
-    public partial class XApi : BaseApi,IDisposable
+    public partial class XApi : BaseApi, IDisposable, IXApi
     {
         internal XApi(string path1, Queue queue)
             : base(path1, queue)

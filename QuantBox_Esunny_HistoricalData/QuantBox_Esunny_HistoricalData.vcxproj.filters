@@ -16,9 +16,6 @@
     <Filter Include="include">
       <UniqueIdentifier>{f6b5de3e-b4b5-4d8a-a07f-1f3ca82e2294}</UniqueIdentifier>
     </Filter>
-    <Filter Include="lib">
-      <UniqueIdentifier>{286534d2-741f-4ca8-a537-af9055c85021}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -50,13 +47,5 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\include\Esunny_HistoricalData\EsunnyQuot.lib">
-      <Filter>lib</Filter>
-    </Library>
-    <Library Include="..\lib\QuantBox_Queue.lib">
-      <Filter>lib</Filter>
-    </Library>
   </ItemGroup>
 </Project>

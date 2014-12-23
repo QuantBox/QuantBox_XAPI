@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="lib">
-      <UniqueIdentifier>{946c81af-2e24-4e96-b25c-fbbeca12efed}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include">
       <UniqueIdentifier>{85e89cab-d667-4133-9504-c4becf5250d9}</UniqueIdentifier>
     </Filter>
@@ -65,13 +62,5 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\lib\QuantBox_Queue.lib">
-      <Filter>lib</Filter>
-    </Library>
-    <Library Include="..\include\CTP\win32\thosttraderapi.lib">
-      <Filter>lib</Filter>
-    </Library>
   </ItemGroup>
 </Project>

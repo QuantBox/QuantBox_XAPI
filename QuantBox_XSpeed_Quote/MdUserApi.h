@@ -3,6 +3,14 @@
 #include "../include/XSpeed/DFITCMdApi.h"
 #include "../include/ApiStruct.h"
 
+#ifdef _WIN64
+#pragma comment(lib, "../include/XSpeed/win64/DFITCMdApi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x64.lib")
+#else
+#pragma comment(lib, "../include/XSpeed/win32/DFITCMdApi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x86.lib")
+#endif
+
 #include <set>
 #include <list>
 #include <map>

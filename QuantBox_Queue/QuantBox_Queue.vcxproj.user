@@ -5,4 +5,19 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>C:\Program Files\SmartQuant Ltd\OpenQuant 2014</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerCommand>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\OpenQuant.x86.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>C:\Program Files\SmartQuant Ltd\OpenQuant 2014</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug64|Win32'">
+    <LocalDebuggerCommand>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\OpenQuant.x86.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>C:\Program Files\SmartQuant Ltd\OpenQuant 2014</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug64|x64'">
+    <LocalDebuggerCommand>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\OpenQuant.x64.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>C:\Program Files\SmartQuant Ltd\OpenQuant 2014</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
 </Project>

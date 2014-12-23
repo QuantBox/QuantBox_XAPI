@@ -1,7 +1,16 @@
 #pragma once
 
-#include "../include/CTP/ThostFtdcMdApi.h"
 #include "../include/ApiStruct.h"
+
+#include "../include/CTP/ThostFtdcMdApi.h"
+
+#ifdef _WIN64
+#pragma comment(lib, "../include/CTP/win64/thostmduserapi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x64.lib")
+#else
+#pragma comment(lib, "../include/CTP/win32/thostmduserapi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x86.lib")
+#endif
 
 #include <set>
 #include <string>

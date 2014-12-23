@@ -1258,7 +1258,7 @@ void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInve
 			if (bIsLast)
 			{
 				int cnt = 0;
-				int count = m_id_platform_position.size();
+				size_t count = m_id_platform_position.size();
 				for (unordered_map<string, PositionField*>::iterator iter = m_id_platform_position.begin(); iter != m_id_platform_position.end(); iter++)
 				{
 					++cnt;

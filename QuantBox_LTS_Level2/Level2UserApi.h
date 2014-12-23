@@ -2,7 +2,14 @@
 
 #include "../include/LTS_L2/SecurityFtdcL2MDUserApi.h"
 #include "../include/ApiStruct.h"
-#include "../include/stringHash.h"
+
+#ifdef _WIN64
+#pragma comment(lib, "../include/LTS_L2/win64/L2mduserapi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x64.lib")
+#else
+#pragma comment(lib, "../include/LTS_L2/win32/L2mduserapi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x86.lib")
+#endif
 
 #include <set>
 #include <string>

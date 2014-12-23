@@ -3,6 +3,14 @@
 #include "../include/LTS/SecurityFtdcMdApi.h"
 #include "../include/ApiStruct.h"
 
+#ifdef _WIN64
+#pragma comment(lib, "../include/LTS/win64/securitymduserapi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x64.lib")
+#else
+#pragma comment(lib, "../include/LTS/win32/securitymduserapi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x86.lib")
+#endif
+
 #include <set>
 #include <string>
 #include <atomic>

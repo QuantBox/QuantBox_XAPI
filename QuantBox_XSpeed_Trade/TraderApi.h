@@ -2,7 +2,14 @@
 
 #include "../include/XSpeed/DFITCTraderApi.h"
 #include "../include/ApiStruct.h"
-#include "../include/stringHash.h"
+
+#ifdef _WIN64
+#pragma comment(lib, "../include/XSpeed/win64/DFITCTraderApi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x64.lib")
+#else
+#pragma comment(lib, "../include/XSpeed/win32/DFITCTraderApi.lib")
+#pragma comment(lib, "../lib/QuantBox_Queue_x86.lib")
+#endif
 
 #include <set>
 #include <list>

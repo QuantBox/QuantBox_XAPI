@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="lib">
-      <UniqueIdentifier>{5213a032-7837-465f-870d-9b9d2939f98e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -50,13 +47,5 @@
     <ClCompile Include="..\include\toolkit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\include\CTP\win32\thostmduserapi.lib">
-      <Filter>lib</Filter>
-    </Library>
-    <Library Include="..\lib\QuantBox_Queue.lib">
-      <Filter>lib</Filter>
-    </Library>
   </ItemGroup>
 </Project>

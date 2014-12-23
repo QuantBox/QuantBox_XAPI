@@ -17,11 +17,11 @@ void makedirs(const char* dir)
 	if (nullptr == dir)
 		return;
 
-	int len = strlen(dir);
+	size_t len = strlen(dir);
 
 	char * p = new char[len+1];
 	strcpy(p,dir);
-	for (int i=0;i<len;++i)
+	for (size_t i = 0; i<len; ++i)
 	{
 		char ch = p[i];
 		if ('\\' == ch ||'/' == ch)

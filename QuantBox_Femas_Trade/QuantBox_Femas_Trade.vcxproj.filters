@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="lib">
-      <UniqueIdentifier>{25089efe-bce5-49c9-837e-de0fc50e6d6f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="include">
       <UniqueIdentifier>{f5c820ce-6d36-440a-aa55-b339c1ee2fa0}</UniqueIdentifier>
     </Filter>
@@ -62,13 +59,5 @@
     <ClCompile Include="..\include\toolkit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\include\Femas\win32\USTPtraderapi.lib">
-      <Filter>lib</Filter>
-    </Library>
-    <Library Include="..\lib\QuantBox_Queue.lib">
-      <Filter>lib</Filter>
-    </Library>
   </ItemGroup>
 </Project>
