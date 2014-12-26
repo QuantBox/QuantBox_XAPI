@@ -26,3 +26,4 @@ rd QuantBox_Queue\x64\Debug64 /S /Q
 rd QuantBox_Queue\Debug64 /S /Q
 rd QuantBox_XSpeed_Quote\Debug /S /Q
 rd QuantBox_XSpeed_Trade\Debug /S /Q
+rd QuantBox_XSpeedStock_Quote\Debug /S /Q

@@ -34,7 +34,7 @@ void makedirs(const char* dir)
 	delete[] p;
 }
 
-char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vct, set<char*>& st, int modify, set<string>& st2)
+char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vct, set<char*>& st, int modify, set<string>& st2, int before, const char* prefix)
 {
 	vct.clear();
 	st.clear();
@@ -47,7 +47,8 @@ char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vc
 		||strlen(seps)==0)
 		return nullptr;
 
-	size_t len = strlen(szString)+1;
+	//这里不知道要添加的字符有多长，很悲剧
+	size_t len = strlen(szString)*1.5+1;
 	char* buf = new char[len];
 	strncpy(buf,szString,len);
 
@@ -56,10 +57,27 @@ char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vc
 	{
 		if (strlen(token)>0)
 		{
+			char temp[64] = {0};
+			if (prefix)
+			{
+				if (before>0)
+				{
+					sprintf(temp, "%s%s", prefix,token);
+				}
+				else
+				{
+					sprintf(temp, "%s%s", token,prefix);
+				}
+			}
+			else
+			{
+				sprintf(temp, "%s", token);
+			}
+
 			if (modify > 0)
-				st2.insert(token);
+				st2.insert(temp);
 			else if (modify<0)
-				st2.erase(token);
+				st2.erase(temp);
 
 			vct.push_back(token);
 			st.insert(token);
@@ -70,11 +88,8 @@ char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vc
 	return buf;
 }
 
-void GetExchangeTime(char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime)
+int GetUpdateTime(char* UpdateTime, int* _UpdateTime)
 {
-	// TradingDay处理
-	*_TradingDay = atoi(TradingDay);
-
 	// UpdateTime处理
 	int HH = atoi(&UpdateTime[0]);
 	int mm = atoi(&UpdateTime[3]);
@@ -89,6 +104,31 @@ void GetExchangeTime(char* TradingDay, char* ActionDay, char* UpdateTime, int* _
 		if (datetime > 1500 && datetime < 234500)
 			*_UpdateTime = datetime;
 	}
+	
+	return HH;
+}
+
+void GetExchangeTime(char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime)
+{
+	// TradingDay处理
+	*_TradingDay = atoi(TradingDay);
+
+	// UpdateTime处理
+	int HH = GetUpdateTime(UpdateTime, _UpdateTime);
+
+	/*int HH = atoi(&UpdateTime[0]);
+	int mm = atoi(&UpdateTime[3]);
+	int ss = atoi(&UpdateTime[6]);
+
+	*_UpdateTime = HH * 10000 + mm * 100 + ss;
+	if (*_UpdateTime == 0)
+	{
+		time_t now = time(0);
+		struct tm *ptmNow = localtime(&now);
+		int datetime = ptmNow->tm_hour * 10000 + ptmNow->tm_min * 100 + ptmNow->tm_sec;
+		if (datetime > 1500 && datetime < 234500)
+			*_UpdateTime = datetime;
+	}*/
 
 	// ActionDay处理
 	if ((ActionDay != nullptr) && (strlen(ActionDay) == 8))
