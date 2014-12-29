@@ -14,8 +14,8 @@ void makedirs(const char* dir);
 typedef void fnGetSetFromStringProcess(char* token);
 char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vct, set<char*>& st, int modify, set<string>& st2, int before = 1, const char* prefix = nullptr);
 
-int GetUpdateTime(char* UpdateTime, int* _UpdateTime);
-void GetExchangeTime(char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime);
+int GetUpdateTime(char* UpdateTime, int* _UpdateTime, int* UpdateMillisec);
+void GetExchangeTime(char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime, int* UpdateMillisec);
 
 //根据OnFrontDisconnected(int nReason)的值填上错误消息
 void GetOnFrontDisconnectedMsg(int ErrorId, char* ErrorMsg);

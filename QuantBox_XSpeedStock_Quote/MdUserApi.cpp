@@ -26,7 +26,7 @@ char* ExchangeID_2to3(char* exchange)
 	case 'Z':
 		return "SZE";
 	case 'K':
-		return "HKEx";
+		return "HK";
 	default:
 		break;
 	}
@@ -596,9 +596,7 @@ void CMdUserApi::OnStockMarketData(struct DFITCStockDepthMarketDataField *pMarke
 
 	marketData.TradingDay = pMarketDataField->staticDataField.tradingDay;
 	marketData.ActionDay = pMarketDataField->staticDataField.tradingDay;
-	GetUpdateTime(pMarketDataField->sharedDataField.updateTime, &marketData.UpdateTime);
-
-	//marketData.UpdateMillisec = 0;
+	GetUpdateTime(pMarketDataField->sharedDataField.updateTime, &marketData.UpdateTime, &marketData.UpdateMillisec);
 
 	marketData.LastPrice = pMarketDataField->sharedDataField.latestPrice;
 	marketData.Volume = pMarketDataField->sharedDataField.tradeQty;
@@ -680,6 +678,8 @@ void CMdUserApi::OnStockMarketData(struct DFITCStockDepthMarketDataField *pMarke
 void CMdUserApi::ReqQryInstrument(const string& szInstrumentId, const string& szExchange)
 {
 	ReqStockAvailableQuotQry(szInstrumentId, "SH");
+	ReqStockAvailableQuotQry(szInstrumentId, "SZ");
+	ReqStockAvailableQuotQry(szInstrumentId, "HK");
 }
 
 void CMdUserApi::ReqStockAvailableQuotQry(const string& szInstrumentId, const string& szExchange)
@@ -727,10 +727,11 @@ void CMdUserApi::OnRspStockAvailableQuot(struct DFITCRspQuotQryField * pAvailabl
 		}
 	}
 
-	if (flag&&pRspInfo)
-		ReleaseRequestMapBuf(pRspInfo->requestID);
 	if (flag)
 	{
-		int x = 1;
+		if (pRspInfo)
+			ReleaseRequestMapBuf(pRspInfo->requestID);
+		if (pAvailableQuotInfo)
+			ReleaseRequestMapBuf(pAvailableQuotInfo->requestID);
 	}
 }

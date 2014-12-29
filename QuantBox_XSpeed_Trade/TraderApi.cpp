@@ -1160,8 +1160,13 @@ void CTraderApi::OnRspQryExchangeInstrument(struct DFITCExchangeInstrumentRtnFie
 		}
 	}
 
-	if (bIsLast&&pErrorInfo)
-		ReleaseRequestMapBuf(pErrorInfo->requestID);
+	if (bIsLast)
+	{
+		if (pErrorInfo)
+			ReleaseRequestMapBuf(pErrorInfo->requestID);
+		if (pInstrumentData)
+			ReleaseRequestMapBuf(pInstrumentData->lRequestID);
+	}
 }
 
 
@@ -1210,8 +1215,13 @@ void CTraderApi::OnRspArbitrageInstrument(struct DFITCAbiInstrumentRtnField * pA
 		}
 	}
 
-	if (bIsLast&&pErrorInfo)
-		ReleaseRequestMapBuf(pErrorInfo->requestID);
+	if (bIsLast)
+	{
+		if (pErrorInfo)
+			ReleaseRequestMapBuf(pErrorInfo->requestID);
+		if (pAbiInstrumentData)
+			ReleaseRequestMapBuf(pAbiInstrumentData->lRequestID);
+	}
 }
 
 //void CTraderApi::ReqQryInstrumentCommissionRate(const string& szInstrumentId)
