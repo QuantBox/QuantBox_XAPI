@@ -951,6 +951,8 @@ char* CTraderApi::ReqQuoteInsert(
 	body.AskVolume = (int)pQuote->AskQty;
 	body.BidVolume = (int)pQuote->BidQty;
 
+	strncpy(body.ForQuoteSysID, pQuote->QuoteReqID, sizeof(TThostFtdcOrderSysIDType));
+
 	int nRet = 0;
 	{
 		//可能报单太快，m_nMaxOrderRef还没有改变就提交了
@@ -989,7 +991,6 @@ char* CTraderApi::ReqQuoteInsert(
 			memcpy(pField, pQuote, sizeof(QuoteField));
 			strcpy(pField->ID, m_orderInsert_Id);
 			strcpy(pField->AskID, m_orderInsert_Id);
-			//strcpy(pField->BidID, m_orderInsert_Id);
 			sprintf(pField->BidID, "%d:%d:%d", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, nRet + 1);
 			
 			m_id_platform_quote.insert(pair<string, QuoteField*>(m_orderInsert_Id, pField));

@@ -370,8 +370,7 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 
 	//TODO:CTP大连没有ActionDay，所以API中是将TradingDay填到了这里，所以这里这种用法可能会出错，要测
 	GetExchangeTime(pDepthMarketData->TradingDay,pDepthMarketData->ActionDay,pDepthMarketData->UpdateTime
-		,&marketData.TradingDay,&marketData.ActionDay,&marketData.UpdateTime);
-	marketData.UpdateMillisec = pDepthMarketData->UpdateMillisec;
+		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime, &marketData.UpdateMillisec);
 
 	marketData.LastPrice = pDepthMarketData->LastPrice;
 	marketData.Volume = pDepthMarketData->Volume;

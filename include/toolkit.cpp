@@ -160,19 +160,22 @@ void GetOnFrontDisconnectedMsg(int ErrorId, char* ErrorMsg)
 	switch (ErrorId)
 	{
 	case 0x1001:
-		strcpy(ErrorMsg,"0x1001 4097 网络读失败");
+		strcpy(ErrorMsg, "0x1001 4097 网络读失败");
 		break;
 	case 0x1002:
-		strcpy(ErrorMsg,"0x1002 4098 网络写失败");
+		strcpy(ErrorMsg, "0x1002 4098 网络写失败");
 		break;
 	case 0x2001:
-		strcpy(ErrorMsg,"0x2001 8193 接收心跳超时");
+		strcpy(ErrorMsg, "0x2001 8193 接收心跳超时");
 		break;
 	case 0x2002:
-		strcpy(ErrorMsg,"0x2002 8194 发送心跳失败");
+		strcpy(ErrorMsg, "0x2002 8194 发送心跳失败");
 		break;
 	case 0x2003:
-		strcpy(ErrorMsg,"0x2003 8195 收到错误报文");
+		strcpy(ErrorMsg, "0x2003 8195 收到错误报文");
+		break;
+	case 0x2004:
+		strcpy(ErrorMsg, "0x2004 8196 服务器主动断开");
 		break;
 	default:
 		sprintf(ErrorMsg, "%x %d 未知错误", ErrorId, ErrorId);

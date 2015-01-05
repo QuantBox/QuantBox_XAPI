@@ -37,6 +37,9 @@ struct QuoteField
 	OpenCloseType BidOpenClose;
 	HedgeFlagType BidHedgeFlag;
 
+	///Ñ¯¼Û±àºÅ
+	OrderIDType	QuoteReqID;
+
 	OrderIDType ID;
 	OrderIDType AskID;
 	OrderIDType BidID;

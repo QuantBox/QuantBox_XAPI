@@ -95,6 +95,7 @@
 	<error id="NEED_RETRY" value="90" prompt="CTP：查询未就绪，请稍后重试"/>
 	<error id="EXCHANGE_RTNERROR" value="91" prompt="CTP：交易所返回的错误"/>
 	<error id="QUOTE_DERIVEDORDER_ACTIONERROR" value="92" prompt="CTP:报价衍生单要等待交易所返回才能撤单"/>
+	<error id="INSTRUMENTMAP_NOT_FOUND" value="93" prompt="CTP:找不到组合合约映射"/>
 	<!--灾备系统错误代码 -->		
 	<error id="NO_TRADING_RIGHT_IN_SEPC_DR" value="101" prompt="CTP:用户在本系统没有报单权限"/>
 	<error id="NO_DR_NO" value="102" prompt="CTP:系统缺少灾备标示号"/>
@@ -138,7 +139,7 @@
   <error id="INVALID_MAC" value="1036" prompt="CTP:银期转账：MAC值验证失败"/>
   <error id="NOT_SUPPORT_SECAGENT_BY_BANK" value="1037" prompt="CTP:银期转账：不支持银行端发起的二级代理商转账和查询"/>
   <error id="PINKEY_SYNCING" value="1038" prompt="CTP:银期转账：PIN密钥正在同步"/>
-  <error id="SECAGENT_OPEN_ACCOUNT_BY_CCB" value="1039" prompt="CTP:银期转账：建行发起的二级代理商开户前查询"/>
+  <error id="SECAGENT_QUERY_BY_CCB" value="1039" prompt="CTP:银期转账：建行发起的二级代理商查询"/>
 <!-- add for transfer begin -->
 	<error id="NO_VALID_BANKOFFER_AVAILABLE" value="2000" prompt="CTP:该报盘未连接到银行"/>
 	<error id="PASSWORD_MISMATCH" value="2001" prompt="CTP:资金密码错误"/>

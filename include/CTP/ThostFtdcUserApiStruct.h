@@ -3298,6 +3298,8 @@ struct CThostFtdcInputQuoteField
 	TThostFtdcOrderRefType	AskOrderRef;
 	///衍生买报单引用
 	TThostFtdcOrderRefType	BidOrderRef;
+	///应价编号
+	TThostFtdcOrderSysIDType	ForQuoteSysID;
 };
 
 ///输入报价操作
@@ -3418,6 +3420,8 @@ struct CThostFtdcQuoteField
 	TThostFtdcOrderRefType	AskOrderRef;
 	///衍生买报单引用
 	TThostFtdcOrderRefType	BidOrderRef;
+	///应价编号
+	TThostFtdcOrderSysIDType	ForQuoteSysID;
 };
 
 ///报价操作
@@ -3553,6 +3557,8 @@ struct CThostFtdcExchangeQuoteField
 	TThostFtdcOrderSysIDType	AskOrderSysID;
 	///买方报单编号
 	TThostFtdcOrderSysIDType	BidOrderSysID;
+	///应价编号
+	TThostFtdcOrderSysIDType	ForQuoteSysID;
 };
 
 ///交易所报价查询
@@ -3683,6 +3689,187 @@ struct CThostFtdcQryStrikeOffsetField
 	TThostFtdcInvestorIDType	InvestorID;
 	///合约代码
 	TThostFtdcInstrumentIDType	InstrumentID;
+};
+
+///组合合约安全系数
+struct CThostFtdcCombInstrumentGuardField
+{
+	///经纪公司代码
+	TThostFtdcBrokerIDType	BrokerID;
+	///合约代码
+	TThostFtdcInstrumentIDType	InstrumentID;
+	///
+	TThostFtdcRatioType	GuarantRatio;
+};
+
+///组合合约安全系数查询
+struct CThostFtdcQryCombInstrumentGuardField
+{
+	///经纪公司代码
+	TThostFtdcBrokerIDType	BrokerID;
+	///合约代码
+	TThostFtdcInstrumentIDType	InstrumentID;
+};
+
+///输入的申请组合
+struct CThostFtdcInputCombActionField
+{
+	///经纪公司代码
+	TThostFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TThostFtdcInvestorIDType	InvestorID;
+	///合约代码
+	TThostFtdcInstrumentIDType	InstrumentID;
+	///组合引用
+	TThostFtdcOrderRefType	CombActionRef;
+	///用户代码
+	TThostFtdcUserIDType	UserID;
+	///买卖方向
+	TThostFtdcDirectionType	Direction;
+	///数量
+	TThostFtdcVolumeType	Volume;
+	///组合指令方向
+	TThostFtdcCombDirectionType	CombDirection;
+	///投机套保标志
+	TThostFtdcHedgeFlagType	HedgeFlag;
+};
+
+///申请组合
+struct CThostFtdcCombActionField
+{
+	///经纪公司代码
+	TThostFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TThostFtdcInvestorIDType	InvestorID;
+	///合约代码
+	TThostFtdcInstrumentIDType	InstrumentID;
+	///组合引用
+	TThostFtdcOrderRefType	CombActionRef;
+	///用户代码
+	TThostFtdcUserIDType	UserID;
+	///买卖方向
+	TThostFtdcDirectionType	Direction;
+	///数量
+	TThostFtdcVolumeType	Volume;
+	///组合指令方向
+	TThostFtdcCombDirectionType	CombDirection;
+	///投机套保标志
+	TThostFtdcHedgeFlagType	HedgeFlag;
+	///本地申请组合编号
+	TThostFtdcOrderLocalIDType	ActionLocalID;
+	///交易所代码
+	TThostFtdcExchangeIDType	ExchangeID;
+	///会员代码
+	TThostFtdcParticipantIDType	ParticipantID;
+	///客户代码
+	TThostFtdcClientIDType	ClientID;
+	///合约在交易所的代码
+	TThostFtdcExchangeInstIDType	ExchangeInstID;
+	///交易所交易员代码
+	TThostFtdcTraderIDType	TraderID;
+	///安装编号
+	TThostFtdcInstallIDType	InstallID;
+	///组合状态
+	TThostFtdcOrderActionStatusType	ActionStatus;
+	///报单提示序号
+	TThostFtdcSequenceNoType	NotifySequence;
+	///交易日
+	TThostFtdcDateType	TradingDay;
+	///结算编号
+	TThostFtdcSettlementIDType	SettlementID;
+	///序号
+	TThostFtdcSequenceNoType	SequenceNo;
+	///前置编号
+	TThostFtdcFrontIDType	FrontID;
+	///会话编号
+	TThostFtdcSessionIDType	SessionID;
+	///用户端产品信息
+	TThostFtdcProductInfoType	UserProductInfo;
+	///状态信息
+	TThostFtdcErrorMsgType	StatusMsg;
+};
+
+///申请组合查询
+struct CThostFtdcQryCombActionField
+{
+	///经纪公司代码
+	TThostFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TThostFtdcInvestorIDType	InvestorID;
+	///合约代码
+	TThostFtdcInstrumentIDType	InstrumentID;
+	///交易所代码
+	TThostFtdcExchangeIDType	ExchangeID;
+};
+
+///交易所申请组合信息
+struct CThostFtdcExchangeCombActionField
+{
+	///买卖方向
+	TThostFtdcDirectionType	Direction;
+	///数量
+	TThostFtdcVolumeType	Volume;
+	///组合指令方向
+	TThostFtdcCombDirectionType	CombDirection;
+	///投机套保标志
+	TThostFtdcHedgeFlagType	HedgeFlag;
+	///本地申请组合编号
+	TThostFtdcOrderLocalIDType	ActionLocalID;
+	///交易所代码
+	TThostFtdcExchangeIDType	ExchangeID;
+	///会员代码
+	TThostFtdcParticipantIDType	ParticipantID;
+	///客户代码
+	TThostFtdcClientIDType	ClientID;
+	///合约在交易所的代码
+	TThostFtdcExchangeInstIDType	ExchangeInstID;
+	///交易所交易员代码
+	TThostFtdcTraderIDType	TraderID;
+	///安装编号
+	TThostFtdcInstallIDType	InstallID;
+	///组合状态
+	TThostFtdcOrderActionStatusType	ActionStatus;
+	///报单提示序号
+	TThostFtdcSequenceNoType	NotifySequence;
+	///交易日
+	TThostFtdcDateType	TradingDay;
+	///结算编号
+	TThostFtdcSettlementIDType	SettlementID;
+	///序号
+	TThostFtdcSequenceNoType	SequenceNo;
+};
+
+///交易所申请组合查询
+struct CThostFtdcQryExchangeCombActionField
+{
+	///会员代码
+	TThostFtdcParticipantIDType	ParticipantID;
+	///客户代码
+	TThostFtdcClientIDType	ClientID;
+	///合约在交易所的代码
+	TThostFtdcExchangeInstIDType	ExchangeInstID;
+	///交易所代码
+	TThostFtdcExchangeIDType	ExchangeID;
+	///交易所交易员代码
+	TThostFtdcTraderIDType	TraderID;
+};
+
+///产品报价汇率
+struct CThostFtdcProductExchRateField
+{
+	///产品代码
+	TThostFtdcInstrumentIDType	ProductID;
+	///报价币种类型
+	TThostFtdcCurrencyIDType	QuoteCurrencyID;
+	///汇率
+	TThostFtdcExchangeRateType	ExchangeRate;
+};
+
+///产品报价汇率查询
+struct CThostFtdcQryProductExchRateField
+{
+	///产品代码
+	TThostFtdcInstrumentIDType	ProductID;
 };
 
 ///市场行情

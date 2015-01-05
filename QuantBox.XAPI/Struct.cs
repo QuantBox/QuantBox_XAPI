@@ -552,6 +552,12 @@ namespace QuantBox.XAPI
         public OpenCloseType BidOpenClose;
         public HedgeFlagType BidHedgeFlag;
 
+        /// <summary>
+        /// 询价编号
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string QuoteReqID;
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
         public string ID;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
