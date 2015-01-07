@@ -538,7 +538,7 @@ void CMdUserApi::OnMarketData(struct DFITCDepthMarketDataField *pMarketDataField
 
 	strcpy(marketData.Symbol, pMarketDataField->instrumentID);
 	GetExchangeTime(pMarketDataField->tradingDay, nullptr, pMarketDataField->UpdateTime
-		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime);
+		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime, &marketData.UpdateMillisec);
 	marketData.UpdateMillisec = pMarketDataField->UpdateMillisec;
 
 	marketData.LastPrice = pMarketDataField->lastPrice;

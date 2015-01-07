@@ -324,8 +324,7 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 	sprintf(marketData.Symbol, "%s.%s", marketData.InstrumentID, marketData.ExchangeID);
 
 	GetExchangeTime(pL2MarketData->TradingDay, pL2MarketData->TradingDay, pL2MarketData->TimeStamp
-		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime);
-	marketData.UpdateMillisec = 0;
+		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime, &marketData.UpdateMillisec);
 
 	marketData.LastPrice = pL2MarketData->LastPrice;
 	marketData.Volume = pL2MarketData->TotalTradeVolume;
@@ -541,8 +540,7 @@ void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 
 	sprintf(marketData.Symbol, "%s.%s", marketData.InstrumentID, marketData.ExchangeID);
 	GetExchangeTime(pL2Index->TradingDay, pL2Index->TradingDay, pL2Index->TimeStamp
-		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime);
-	marketData.UpdateMillisec = 0;
+		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime, &marketData.UpdateMillisec);
 
 	marketData.LastPrice = pL2Index->LastIndex;
 	marketData.Volume = pL2Index->TotalVolume;

@@ -1574,8 +1574,7 @@ void CTraderApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	strcpy(marketData.Symbol, pDepthMarketData->InstID);
 	// 这个日期在晚上12点时会怎么样？
 	GetExchangeTime(pDepthMarketData->QuoteDate, nullptr, pDepthMarketData->QuoteTime
-		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime);
-	marketData.UpdateMillisec = 0;// pDepthMarketData->UpdateMillisec;
+		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime, &marketData.UpdateMillisec);
 
 	marketData.LastPrice = pDepthMarketData->Last;
 	marketData.Volume = pDepthMarketData->Volume;

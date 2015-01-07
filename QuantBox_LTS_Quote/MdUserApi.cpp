@@ -401,7 +401,7 @@ void CMdUserApi::OnRtnDepthMarketData(CSecurityFtdcDepthMarketDataField *pDepthM
 
 	sprintf(marketData.Symbol, "%s.%s", marketData.InstrumentID, marketData.ExchangeID);
 	GetExchangeTime(pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
-		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime);
+		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime, &marketData.UpdateMillisec);
 	marketData.UpdateMillisec = pDepthMarketData->UpdateMillisec;
 
 	marketData.LastPrice = pDepthMarketData->LastPrice;
