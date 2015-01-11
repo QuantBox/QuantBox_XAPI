@@ -266,7 +266,7 @@ void CHistoricalDataApi::RunInThread()
 										HistoricalDataRequestField* pHDR = (HistoricalDataRequestField*)pRequest->pBuf;
 										// 请求太快了，后面会没有回应
 										if (pHDR->CurrentDate != pHDR->Date1)
-											this_thread::sleep_for(chrono::milliseconds(1000 * 3));
+											this_thread::sleep_for(chrono::milliseconds(1000 * 6));
 										iRet = ReqQryHistoricalTicks_(pHDR, lRequest);
 		}
 			break;
@@ -274,7 +274,7 @@ void CHistoricalDataApi::RunInThread()
 		{
 										HistoricalDataRequestField* pHDR = (HistoricalDataRequestField*)pRequest->pBuf;
 										// 请求太快了，后面会没有回应
-										this_thread::sleep_for(chrono::milliseconds(1000 * 3));
+										this_thread::sleep_for(chrono::milliseconds(1000 * 6));
 										iRet = ReqQryHistoricalBars_(pHDR, lRequest);
 		}
 			break;
