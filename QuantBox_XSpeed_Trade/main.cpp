@@ -17,7 +17,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return (void*)(ApiType::Trade | ApiType::QuoteRequest | ApiType::Instrument);
 	case GetApiVersion:
-		return "0.1";
+		return "0.1.0.20150112";
 	case GetApiName:
 		return "XSpeed";
 	case Create:

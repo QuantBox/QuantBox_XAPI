@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "../include/ApiHeader.h"
+//#include "../include/ApiStruct.h"
 #include "../include/QueueEnum.h"
 #include "TraderApi.h"
 
@@ -14,11 +15,11 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	switch (rt)
 	{
 	case GetApiType:
-		return (void*)(ApiType::Trade | ApiType::Instrument);
+		return (void*)(ApiType::Trade | ApiType::QuoteRequest | ApiType::Instrument);
 	case GetApiVersion:
-		return "0.2.0.20150112";
+		return "0.1.0.20150112";
 	case GetApiName:
-		return "LTS";
+		return "XSpeedStock";
 	case Create:
 		return new CTraderApi();
 	default:
@@ -47,25 +48,29 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		pApi->Disconnect();
 		break;
 	case ReqQryInstrument:
-		pApi->ReqQryInstrument((const char*)ptr1, (const char*)ptr2);
+		//pApi->ReqQryInstrument((const char*)ptr1, (const char*)ptr2);
 		break;
 	case ReqQryTradingAccount:
-		pApi->ReqQryTradingAccount();
+		//pApi->ReqQryCustomerCapital();
 		break;
-	case ReqQryInvestorPosition:
-		pApi->ReqQryInvestorPosition((const char*)ptr1, (const char*)ptr2);
-		break;
-		//case ReqQrySettlementInfo:
-		//	pApi->ReqQrySettlementInfo((const char*)ptr1);
-		//	break;
+	//case ReqQrySettlementInfo:
+	//	pApi->ReqQrySettlementInfo((const char*)ptr1);
+	//	break;
 	case ReqOrderInsert:
 		return pApi->ReqOrderInsert((int)double1, (OrderField*)ptr1, (OrderField*)ptr2);
-		//case ReqQuoteInsert:
-		//	return (void*)pApi->ReqQuoteInsert((int)double1, (OrderField*)ptr1, (OrderField*)ptr2);
-	case ReqOrderAction:
-		return (void*)pApi->ReqOrderAction((const char*)ptr1);
+	//case ReqQuoteInsert:
+	//	return (void*)pApi->ReqQuoteInsert((int)double1, (OrderField*)ptr1, (OrderField*)ptr2);
+	//case ReqOrderAction:
+	//	return (void*)pApi->ReqCancelOrder((const char*)ptr1);
+	//	break;
+	case SubscribeQuote:
+		//pApi->ReqQuoteSubscribe((const char*)ptr2, DFITC_OPT_TYPE);
+		break;
+	case UnsubscribeQuote:
+		//pApi->ReqQuoteUnSubscribe((const char*)ptr2, DFITC_OPT_TYPE);
 		break;
 	default:
+		// 通知
 		break;
 	}
 

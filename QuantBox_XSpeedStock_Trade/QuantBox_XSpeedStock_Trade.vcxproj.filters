@@ -24,7 +24,10 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MdUserApi.h">
+    <ClInclude Include="TraderApi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeConvert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\toolkit.h">
@@ -41,7 +44,10 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MdUserApi.cpp">
+    <ClCompile Include="TraderApi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeConvert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\include\toolkit.cpp">

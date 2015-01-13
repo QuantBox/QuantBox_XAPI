@@ -619,13 +619,21 @@ char* CTraderApi::ReqOrderInsert(
 void CTraderApi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	OrderIDType orderId = { 0 };
-	sprintf(orderId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputOrder->OrderRef);
+	
+	if (pInputOrder)
+	{
+		sprintf(orderId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputOrder->OrderRef);
+	}
+	else
+	{
+		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+	}
 
 	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
 	if (it == m_id_platform_order.end())
 	{
 		// 没找到？不应当，这表示出错了
-		assert(false);
+		//assert(false);
 	}
 	else
 	{
@@ -643,13 +651,21 @@ void CTraderApi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThost
 void CTraderApi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo)
 {
 	OrderIDType orderId = { 0 };
-	sprintf(orderId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputOrder->OrderRef);
+
+	if (pInputOrder)
+	{
+		sprintf(orderId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputOrder->OrderRef);
+	}
+	else
+	{
+		IsErrorRspInfo(pRspInfo, 0, true);
+	}
 
 	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
 	if (it == m_id_platform_order.end())
 	{
 		// 没找到？不应当，这表示出错了
-		assert(false);
+		//assert(false);
 	}
 	else
 	{
@@ -868,13 +884,21 @@ int CTraderApi::ReqOrderAction(CThostFtdcOrderField *pOrder)
 void CTraderApi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	OrderIDType orderId = { 0 };
-	sprintf(orderId, "%d:%d:%s", pInputOrderAction->FrontID, pInputOrderAction->SessionID, pInputOrderAction->OrderRef);
+	
+	if (pInputOrderAction)
+	{
+		sprintf(orderId, "%d:%d:%s", pInputOrderAction->FrontID, pInputOrderAction->SessionID, pInputOrderAction->OrderRef);
+	}
+	else
+	{
+		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+	}
 
 	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
 	if (it == m_id_platform_order.end())
 	{
 		// 没找到？不应当，这表示出错了
-		assert(false);
+		//assert(false);
 	}
 	else
 	{
@@ -892,13 +916,21 @@ void CTraderApi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAc
 void CTraderApi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThostFtdcRspInfoField *pRspInfo)
 {
 	OrderIDType orderId = { 0 };
-	sprintf(orderId, "%d:%d:%s", pOrderAction->FrontID, pOrderAction->SessionID, pOrderAction->OrderRef);
+	
+	if (pOrderAction)
+	{
+		sprintf(orderId, "%d:%d:%s", pOrderAction->FrontID, pOrderAction->SessionID, pOrderAction->OrderRef);
+	}
+	else
+	{
+		IsErrorRspInfo(pRspInfo, 0, true);
+	}
 
 	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
 	if (it == m_id_platform_order.end())
 	{
 		// 没找到？不应当，这表示出错了
-		assert(false);
+		//assert(false);
 	}
 	else
 	{
@@ -1004,13 +1036,21 @@ char* CTraderApi::ReqQuoteInsert(
 void CTraderApi::OnRspQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	OrderIDType quoteId = { 0 };
-	sprintf(quoteId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputQuote->QuoteRef);
+	
+	if (pInputQuote)
+	{
+		sprintf(quoteId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputQuote->QuoteRef);
+	}
+	else
+	{
+		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+	}
 
 	unordered_map<string, QuoteField*>::iterator it = m_id_platform_quote.find(quoteId);
 	if (it == m_id_platform_quote.end())
 	{
 		// 没找到？不应当，这表示出错了
-		assert(false);
+		//assert(false);
 	}
 	else
 	{
@@ -1028,13 +1068,21 @@ void CTraderApi::OnRspQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThost
 void CTraderApi::OnErrRtnQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo)
 {
 	OrderIDType quoteId = { 0 };
-	sprintf(quoteId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputQuote->QuoteRef);
+	
+	if (pInputQuote)
+	{
+		sprintf(quoteId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputQuote->QuoteRef);
+	}
+	else
+	{
+		IsErrorRspInfo(pRspInfo, 0, true);
+	}
 
 	unordered_map<string, QuoteField*>::iterator it = m_id_platform_quote.find(quoteId);
 	if (it == m_id_platform_quote.end())
 	{
 		// 没找到？不应当，这表示出错了
-		assert(false);
+		//assert(false);
 	}
 	else
 	{
@@ -1108,13 +1156,21 @@ int CTraderApi::ReqQuoteAction(CThostFtdcQuoteField *pQuote)
 void CTraderApi::OnRspQuoteAction(CThostFtdcInputQuoteActionField *pInputQuoteAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	OrderIDType quoteId = { 0 };
-	sprintf(quoteId, "%d:%d:%s", pInputQuoteAction->FrontID, pInputQuoteAction->SessionID, pInputQuoteAction->QuoteRef);
+	
+	if (pInputQuoteAction)
+	{
+		sprintf(quoteId, "%d:%d:%s", pInputQuoteAction->FrontID, pInputQuoteAction->SessionID, pInputQuoteAction->QuoteRef);
+	}
+	else
+	{
+		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+	}
 
 	unordered_map<string, QuoteField*>::iterator it = m_id_platform_quote.find(quoteId);
 	if (it == m_id_platform_quote.end())
 	{
 		// 没找到？不应当，这表示出错了
-		assert(false);
+		//assert(false);
 	}
 	else
 	{
@@ -1134,13 +1190,21 @@ void CTraderApi::OnRspQuoteAction(CThostFtdcInputQuoteActionField *pInputQuoteAc
 void CTraderApi::OnErrRtnQuoteAction(CThostFtdcQuoteActionField *pQuoteAction, CThostFtdcRspInfoField *pRspInfo)
 {
 	OrderIDType quoteId = { 0 };
-	sprintf(quoteId, "%d:%d:%s", pQuoteAction->FrontID, pQuoteAction->SessionID, pQuoteAction->QuoteRef);
+	
+	if (pQuoteAction)
+	{
+		sprintf(quoteId, "%d:%d:%s", pQuoteAction->FrontID, pQuoteAction->SessionID, pQuoteAction->QuoteRef);
+	}
+	else
+	{
+		IsErrorRspInfo(pRspInfo, 0, true);
+	}
 
 	unordered_map<string, QuoteField*>::iterator it = m_id_platform_quote.find(quoteId);
 	if (it == m_id_platform_quote.end())
 	{
 		// 没找到？不应当，这表示出错了
-		assert(false);
+		//assert(false);
 	}
 	else
 	{

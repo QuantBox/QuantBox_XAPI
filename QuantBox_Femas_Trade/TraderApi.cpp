@@ -1191,6 +1191,7 @@ void CTraderApi::OnRspQryInstrument(CUstpFtdcRspInstrumentField *pRspInstrument,
 			field.PriceTick = pRspInstrument->PriceTick;
 			strcpy(field.ExpireDate, pRspInstrument->ExpireDate);
 			field.OptionsType = TUstpFtdcOptionsTypeType_2_PutCall(pRspInstrument->OptionsType);
+			field.StrikePrice = pRspInstrument->StrikePrice == DBL_MAX ? 0 : pRspInstrument->StrikePrice;
 
 			XRespone(ResponeType::OnRspQryInstrument, m_msgQueue, this, bIsLast, 0, &field, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
 		}

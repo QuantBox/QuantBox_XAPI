@@ -37,6 +37,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuantBox_Kingstar_Quote", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuantBox_Kingstar_Trade", "QuantBox_Kingstar_Trade\QuantBox_Kingstar_Trade.vcxproj", "{70015722-8252-4944-AE20-16A88B583CEE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuantBox_XSpeedStock_Trade", "QuantBox_XSpeedStock_Trade\QuantBox_XSpeedStock_Trade.vcxproj", "{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -354,6 +356,24 @@ Global
 		{70015722-8252-4944-AE20-16A88B583CEE}.Release|Win32.ActiveCfg = Release|Win32
 		{70015722-8252-4944-AE20-16A88B583CEE}.Release|Win32.Build.0 = Release|Win32
 		{70015722-8252-4944-AE20-16A88B583CEE}.Release|x64.ActiveCfg = Release|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Debug|Win32.Build.0 = Debug|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Debug|x64.ActiveCfg = Debug|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Debug64|Any CPU.ActiveCfg = Debug|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Debug64|Mixed Platforms.ActiveCfg = Debug|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Debug64|Mixed Platforms.Build.0 = Debug|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Debug64|Win32.ActiveCfg = Debug|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Debug64|Win32.Build.0 = Debug|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Debug64|x64.ActiveCfg = Debug|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Release|Any CPU.ActiveCfg = Release|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Release|Win32.ActiveCfg = Release|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Release|Win32.Build.0 = Release|Win32
+		{643E1AC7-594D-4A9C-936D-CC7C7B5D2AE0}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

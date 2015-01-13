@@ -681,6 +681,36 @@ struct CUstpFtdcInvestorMarginField
 	///空头保证金按手数
 	TUstpFtdcRatioType	ShortMarginAmt;
 };
+///行情用户
+struct CUstpFtdcMDUserField
+{
+	///经纪公司编号
+	TUstpFtdcBrokerIDType	BrokerID;
+	///用户代码
+	TUstpFtdcUserIDType	UserID;
+	///用户登录密码
+	TUstpFtdcPasswordType	Password;
+	///是否活跃
+	TUstpFtdcIsActiveType	IsActive;
+	///用户名称
+	TUstpFtdcUserNameType	UserName;
+	///用户类型
+	TUstpFtdcUserTypeType	UserType;
+	///允许登录的IP
+	TUstpFtdcIPAddressType	AllowedIP;
+	///允许登录的Mac
+	TUstpFtdcMacAddressType	AllowedMac;
+	///用户的有效期开始时间
+	TUstpFtdcDateType	ValidityBegin;
+	///用户的有效期终止时间
+	TUstpFtdcDateType	ValidityEnd;
+	///修改用户编号
+	TUstpFtdcUserIDType	SetUserID;
+	///操作日期
+	TUstpFtdcDateType	CommandDate;
+	///操作时间
+	TUstpFtdcTimeType	CommandTime;
+};
 ///成交
 struct CUstpFtdcTradeField
 {

@@ -30,3 +30,4 @@ rd QuantBox_Queue\Debug /S /Q
 rd QuantBox_XSpeed_Quote\Debug /S /Q
 rd QuantBox_XSpeed_Trade\Debug /S /Q
 rd QuantBox_XSpeedStock_Quote\Debug /S /Q
+rd QuantBox_XSpeedStock_Trade\Debug /S /Q

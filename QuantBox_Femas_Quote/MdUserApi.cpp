@@ -115,7 +115,7 @@ void CMdUserApi::ReqUserLogin()
 	strncpy(request.Password, m_UserInfo.Password, sizeof(TUstpFtdcPasswordType));
 
 	//只有这一处用到了m_nRequestID，没有必要每次重连m_nRequestID都从0开始
-	m_pApi->ReqUserLogin(&request,++m_nRequestID);
+	int nRet = m_pApi->ReqUserLogin(&request,++m_nRequestID);
 
 	XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 }
