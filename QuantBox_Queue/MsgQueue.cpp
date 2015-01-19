@@ -99,7 +99,7 @@ void CMsgQueue::RunInThread()
 		}
 	}
 
-	lock_guard<mutex> cl(m_mtx);
+	//lock_guard<mutex> cl(m_mtx);
 
 	// 清理线程
 	m_hThread = nullptr;
