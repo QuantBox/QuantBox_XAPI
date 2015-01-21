@@ -111,13 +111,13 @@ namespace QuantBox
         Quick,
     };
 
-    public enum PutCall_ : byte
+    public enum PutCall : byte
     {
         Put,
         Call,
     };
 
-    public enum OrderStatus_ : byte
+    public enum OrderStatus : byte
     {
         NotSent,
         PendingNew,
@@ -132,13 +132,13 @@ namespace QuantBox
         Replaced,
     };
 
-    public enum OrderSide_ : byte
+    public enum OrderSide : byte
     {
         Buy,
         Sell,
     };
 
-    public enum OrderType_ : byte
+    public enum OrderType : byte
     {
         Market,
         Stop,
@@ -149,7 +149,7 @@ namespace QuantBox
         TrailingStopLimit,
     };
 
-    public enum TimeInForce_ : byte
+    public enum TimeInForce : byte
     {
         ATC,
         Day,
@@ -163,13 +163,13 @@ namespace QuantBox
         GFS,
     };
 
-    public enum PositionSide_ : byte
+    public enum PositionSide : byte
     {
         Long,
         Short,
     };
 
-    public enum ExecType_ : byte
+    public enum ExecType : byte
     {
         ExecNew,
         ExecRejected,
@@ -197,7 +197,7 @@ namespace QuantBox
         MarketMaker,
     };
 
-    public enum InstrumentType_ : byte
+    public enum InstrumentType : byte
     {
 	    Stock,
 	    Future,
@@ -211,7 +211,7 @@ namespace QuantBox
 	    Synthetic,
     };
 
-    public enum BarType_:byte
+    public enum BarType:byte
     {
         Time,
         Tick,
@@ -219,7 +219,7 @@ namespace QuantBox
         Range,
     };
 
-    public enum DataObjetType_ : byte
+    public enum DataObjetType : byte
     {
         Tick,
         Bid,

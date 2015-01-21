@@ -48,7 +48,7 @@ char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vc
 		return nullptr;
 
 	//这里不知道要添加的字符有多长，很悲剧
-	size_t len = strlen(szString)*1.5+1;
+	size_t len = (size_t)(strlen(szString)*1.5+1);
 	char* buf = new char[len];
 	strncpy(buf,szString,len);
 

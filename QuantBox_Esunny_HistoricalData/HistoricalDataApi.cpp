@@ -378,8 +378,8 @@ int __cdecl CHistoricalDataApi::OnRspHistoryQuot(struct STKHISDATA *pHisData)
 		BarField* pF = &pFields[i];
 		memset(pF, 0, sizeof(BarField));
 		DateTimeChat2Int(item.time, pF->Date, pF->Time);
-		pF->Open = item.fOpen;
-		pF->High = item.fHigh;
+		pF->Open = round(item.fOpen);
+		pF->High = round(item.fHigh);
 		pF->Low = item.fLow;
 		pF->Close = item.fClose;
 		pF->Volume = item.fVolume;
@@ -485,6 +485,12 @@ int CHistoricalDataApi::RtnEmptyRspQryHistoricalTicks()
 	return 0;
 }
 
+double my_round(float val,int x = 0)
+{
+	double i = ((int)(val * 10000 + 0.5)) / 10000.0;
+	return i;
+}
+
 int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 {
 	m_timer_1 = 0;
@@ -498,11 +504,11 @@ int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 		TickField* pF = &pFields[i];
 		memset(pF, 0, sizeof(TickField));
 		DateTimeChat2Int(item.time, pF->Date, pF->Time);
-		pF->LastPrice = item.m_NewPrice;
+		pF->LastPrice = my_round(item.m_NewPrice);
 		pF->Volume = item.m_Volume;
 		pF->OpenInterest = item.m_Amount;
-		pF->BidPrice1 = item.m_BuyPrice;
-		pF->AskPrice1 = item.m_SellPrice;
+		pF->BidPrice1 = my_round(item.m_BuyPrice);
+		pF->AskPrice1 = my_round(item.m_SellPrice);
 		pF->BidSize1 = (VolumeType)item.m_BuyVol;
 		pF->AskSize1 = (VolumeType)item.m_SellVol;
 	}
