@@ -74,7 +74,8 @@ public:
 		}
 
 		m_queue.enqueue(pItem);
-		//m_mtx.unlock();
+		// 将Sleep改成用条件变量
+		m_cv.notify_all();
 	}
 
 private:
@@ -99,7 +100,8 @@ private:
 
 private:
 	volatile bool						m_bRunning;
-	mutex							m_mtx;
+	mutex								m_mtx;
+	condition_variable					m_cv;
 	thread*								m_hThread;
 	ReaderWriterQueue<ResponeItem*>		m_queue;
 	fnOnRespone							m_fnOnRespone;

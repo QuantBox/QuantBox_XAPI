@@ -567,7 +567,7 @@ void CTraderApi::OnRspInsertOrder(struct DFITCOrderRspDataRtnField * pOrderRtn, 
 	OrderIDType orderId = { 0 };
 	sprintf(orderId, "%d:%d", m_RspUserLogin.sessionID, pOrderRtn->localOrderID);
 
-	hash_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
+	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
 	if (it == m_id_platform_order.end())
 	{
 		// 没找到？不应当，这表示出错了
@@ -1381,7 +1381,7 @@ void CTraderApi::OnOrder(DFITCOrderRtnField *pOrder)
 	{
 		// 保存原始订单信息，用于撤单
 
-		hash_map<string, DFITCOrderRtnField*>::iterator it = m_id_api_order.find(orderId);
+		unordered_map<string, DFITCOrderRtnField*>::iterator it = m_id_api_order.find(orderId);
 		if (it == m_id_api_order.end())
 		{
 			// 找不到此订单，表示是新单
@@ -1406,7 +1406,7 @@ void CTraderApi::OnOrder(DFITCOrderRtnField *pOrder)
 		// 从API的订单转换成自己的结构体
 
 		OrderField* pField = nullptr;
-		hash_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
+		unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
 		if (it == m_id_platform_order.end())
 		{
 			// 开盘时发单信息还没有，所以找不到对应的单子，需要进行Order的恢复

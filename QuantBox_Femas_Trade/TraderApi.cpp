@@ -11,6 +11,7 @@
 
 #include "TypeConvert.h"
 
+#include <cfloat>
 #include <cstring>
 #include <assert.h>
 
@@ -83,7 +84,7 @@ void CTraderApi::Connect(const string& szPath,
 	m_szPath = szPath;
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
-	
+
 	char *pszPath = new char[szPath.length() + 1024];
 	srand((unsigned int)time(nullptr));
 	sprintf(pszPath, "%s/%s/%s/Td/%d/", szPath.c_str(), m_ServerInfo.BrokerID, m_UserInfo.UserID, rand());
@@ -367,7 +368,7 @@ void CTraderApi::OnRspUserLogin(CUstpFtdcRspUserLoginField *pRspUserLogin, CUstp
 			long long b = (m_RspUserLogin.MaxOrderLocalID[i] - '0');
 			x = x * 10L + b;
 		}
-		
+
 		m_nMaxOrderRef = x + 1;
 		ReqQryUserInvestor();
 	}
@@ -408,7 +409,7 @@ void CTraderApi::OnRspQryUserInvestor(CUstpFtdcRspUserInvestorField *pRspUserInv
 
 	if (!IsErrorRspInfo(pRspInfo)
 		&& pRspUserInvestor)
-	{		
+	{
 		memcpy(&m_RspUserInvestor, pRspUserInvestor, sizeof(CUstpFtdcRspUserInvestorField));
 
 		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
@@ -546,7 +547,7 @@ void CTraderApi::OnRspOrderInsert(CUstpFtdcInputOrderField *pInputOrder, CUstpFt
 {
 	// 只要下单会就第一步到这，并不代表柜台拒绝
 	OrderIDType orderId = { 0 };
-	
+
 	if (pInputOrder)
 	{
 		sprintf(orderId, "%s:%s", m_RspUserLogin__.SessionID, pInputOrder->UserOrderLocalID);
@@ -590,7 +591,7 @@ void CTraderApi::OnRspOrderInsert(CUstpFtdcInputOrderField *pInputOrder, CUstpFt
 void CTraderApi::OnErrRtnOrderInsert(CUstpFtdcInputOrderField *pInputOrder, CUstpFtdcRspInfoField *pRspInfo)
 {
 	OrderIDType orderId = { 0 };
-	
+
 	if (pInputOrder)
 	{
 		sprintf(orderId, "%s:%s", m_RspUserLogin__.SessionID, pInputOrder->UserOrderLocalID);
@@ -657,7 +658,7 @@ int CTraderApi::ReqOrderAction(CUstpFtdcOrderField *pOrder)
 
 	///报单引用
 	strcpy(body.UserOrderLocalID, pOrder->UserOrderLocalID);
-	
+
 	///交易所代码
 	strcpy(body.ExchangeID,pOrder->ExchangeID);
 	///报单编号
@@ -680,7 +681,7 @@ int CTraderApi::ReqOrderAction(CUstpFtdcOrderField *pOrder)
 void CTraderApi::OnRspOrderAction(CUstpFtdcOrderActionField *pOrderAction, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	OrderIDType orderId = { 0 };
-	
+
 	if (pOrderAction)
 	{
 		sprintf(orderId, "%s:%s", m_RspUserLogin__.SessionID, pOrderAction->UserOrderLocalID);
@@ -727,7 +728,7 @@ void CTraderApi::OnRspOrderAction(CUstpFtdcOrderActionField *pOrderAction, CUstp
 void CTraderApi::OnErrRtnOrderAction(CUstpFtdcOrderActionField *pOrderAction, CUstpFtdcRspInfoField *pRspInfo)
 {
 	OrderIDType orderId = { 0 };
-	
+
 	if (pOrderAction)
 	{
 		sprintf(orderId, "%s:%s", m_RspUserLogin__.SessionID, pOrderAction->UserOrderLocalID);
@@ -990,7 +991,7 @@ void CTraderApi::OnRspQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CUstp
 	{
 		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
 	}
-	
+
 	unordered_map<string, QuoteField*>::iterator it = m_id_platform_quote.find(quoteId);
 	if (it == m_id_platform_quote.end())
 	{
@@ -1166,7 +1167,7 @@ void CTraderApi::ReqQryInstrument(const string& szInstrumentId, const string& sz
 
 	strncpy(body.ExchangeID, szExchange.c_str(), sizeof(TUstpFtdcExchangeIDType));
 	strncpy(body.InstrumentID,szInstrumentId.c_str(),sizeof(TUstpFtdcInstrumentIDType));
-	
+
 
 	AddToSendQueue(pRequest);
 }
@@ -1219,7 +1220,7 @@ void CTraderApi::ReqQryInvestorFee(const string& szInstrumentId)
 	strcpy(body.BrokerID, m_RspUserInvestor.BrokerID);
 	strcpy(body.UserID, m_RspUserInvestor.UserID);
 	strcpy(body.InvestorID, m_RspUserInvestor.InvestorID);
-	
+
 	strncpy(body.InstrumentID,szInstrumentId.c_str(),sizeof(TUstpFtdcInstrumentIDType));
 
 	AddToSendQueue(pRequest);
@@ -1425,7 +1426,7 @@ void CTraderApi::OnTrade(CUstpFtdcTradeField *pTrade)
 		//strcpy(pField->ID, it->second.c_str());
 		//strcpy(pField->ID, pTrade->UserOrderLocalID);
 		sprintf(pField->ID, "%s:%s", m_RspUserLogin__.SessionID, pTrade->UserOrderLocalID);
-		
+
 
 		XRespone(ResponeType::OnRtnTrade, m_msgQueue, this, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
 

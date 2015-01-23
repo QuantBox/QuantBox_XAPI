@@ -18,7 +18,7 @@
 #include <mutex>
 #include <atomic>
 #include <thread>
-#include <hash_map>
+#include <unordered_map>
 
 using namespace std;
 using namespace DFITCXSPEEDAPI;
@@ -219,12 +219,12 @@ private:
 	mutex						m_csMap;
 	map<int,SRequest*>			m_reqMap;				//“—∑¢ÀÕ«Î«Û≥ÿ
 
-	hash_map<string, OrderField*>				m_id_platform_order;
-	hash_map<string, DFITCOrderRtnField*>		m_id_api_order;
-	hash_map<string, string>					m_sysId_orderId;
+	unordered_map<string, OrderField*>				m_id_platform_order;
+	unordered_map<string, DFITCOrderRtnField*>		m_id_api_order;
+	unordered_map<string, string>					m_sysId_orderId;
 
-	//hash_map<string, QuoteField*>				m_id_platform_quote;
-	hash_map<string, DFITCQuoteRtnField*>		m_id_api_quote;
-	hash_map<string, string>					m_sysId_quoteId;
+	//unordered_map<string, QuoteField*>				m_id_platform_quote;
+	unordered_map<string, DFITCQuoteRtnField*>		m_id_api_quote;
+	unordered_map<string, string>					m_sysId_quoteId;
 };
 

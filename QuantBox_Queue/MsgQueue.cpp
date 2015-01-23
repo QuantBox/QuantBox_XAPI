@@ -70,9 +70,6 @@ void CMsgQueue::StartThread()
 
 void CMsgQueue::StopThread()
 {
-	//m_mtx.lock();
-	
-
     m_bRunning = false;
 	lock_guard<mutex> cl(m_mtx);
     if(m_hThread)
@@ -81,7 +78,6 @@ void CMsgQueue::StopThread()
         delete m_hThread;
         m_hThread = nullptr;
     }
-	//m_mtx.unlock();
 }
 
 void CMsgQueue::RunInThread()
@@ -93,13 +89,15 @@ void CMsgQueue::RunInThread()
 		}
 		else
 		{
-			//挂起，等事件到来
-			//m_mtx.lock();
-			this_thread::sleep_for(chrono::milliseconds(1));
+			// 空闲时等1ms,如果立即有事件过来就晚了1ms
+			// this_thread::sleep_for(chrono::milliseconds(1));
+
+			// 空闲时过来等1ms,没等到就回去再试
+			// 如过正好等到了，就立即去试，应当会快一点吧?
+			unique_lock<mutex> lck(m_mtx);
+			m_cv.wait_for(lck, std::chrono::milliseconds(1));
 		}
 	}
-
-	//lock_guard<mutex> cl(m_mtx);
 
 	// 清理线程
 	m_hThread = nullptr;
