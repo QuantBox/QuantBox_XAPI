@@ -499,8 +499,10 @@ void CTraderApi::OnRspStockUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECR
 	if (!IsErrorRspInfo(pRspInfo)
 		&& pData)
 	{
-		sprintf(field.TradingDay,"%d",pData->tradingDay);
-		strncpy(field.LoginTime, pData->loginTime, sizeof(TimeType));
+		GetExchangeTime(nullptr, nullptr, pData->loginTime,
+			nullptr, nullptr, &field.LoginTime, nullptr);
+		field.TradingDay = pData->tradingDay;
+
 		sprintf(field.SessionID, "%d", pData->sessionID);
 
 		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
@@ -532,8 +534,10 @@ void CTraderApi::OnRspSOPUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECRsp
 	if (!IsErrorRspInfo(pRspInfo)
 		&& pData)
 	{
-		sprintf(field.TradingDay, "%d", pData->tradingDay);
-		strncpy(field.LoginTime, pData->loginTime, sizeof(TimeType));
+		GetExchangeTime(nullptr, nullptr, pData->loginTime,
+			nullptr, nullptr, &field.LoginTime, nullptr);
+		field.TradingDay = pData->tradingDay;
+
 		sprintf(field.SessionID, "%d", pData->sessionID);
 
 		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
@@ -565,8 +569,10 @@ void CTraderApi::OnRspFASLUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECRs
 	if (!IsErrorRspInfo(pRspInfo)
 		&& pData)
 	{
-		sprintf(field.TradingDay, "%d", pData->tradingDay);
-		strncpy(field.LoginTime, pData->loginTime, sizeof(TimeType));
+		GetExchangeTime(nullptr, nullptr, pData->loginTime,
+			nullptr, nullptr, &field.LoginTime, nullptr);
+		field.TradingDay = pData->tradingDay;
+
 		sprintf(field.SessionID, "%d", pData->sessionID);
 
 		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);

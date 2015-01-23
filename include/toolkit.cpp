@@ -95,23 +95,29 @@ int GetUpdateTime(char* UpdateTime, int* _UpdateTime, int* UpdateMillisec)
 	int mm = atoi(&UpdateTime[3]);
 	int ss = atoi(&UpdateTime[6]);
 
-	if (strlen(UpdateTime)>9)
+	if (UpdateMillisec)
 	{
-		*UpdateMillisec = atoi(&UpdateTime[9]);
-	}
-	else
-	{
-		*UpdateMillisec = 0;
+		if (strlen(UpdateTime)>9)
+		{
+			*UpdateMillisec = atoi(&UpdateTime[9]);
+		}
+		else
+		{
+			*UpdateMillisec = 0;
+		}
 	}
 
-	*_UpdateTime = HH * 10000 + mm * 100 + ss;
-	if (*_UpdateTime == 0)
+	if (_UpdateTime)
 	{
-		time_t now = time(0);
-		struct tm *ptmNow = localtime(&now);
-		int datetime = ptmNow->tm_hour * 10000 + ptmNow->tm_min * 100 + ptmNow->tm_sec;
-		if (datetime > 1500 && datetime < 234500)
-			*_UpdateTime = datetime;
+		*_UpdateTime = HH * 10000 + mm * 100 + ss;
+		if (*_UpdateTime == 0)
+		{
+			time_t now = time(0);
+			struct tm *ptmNow = localtime(&now);
+			int datetime = ptmNow->tm_hour * 10000 + ptmNow->tm_min * 100 + ptmNow->tm_sec;
+			if (datetime > 1500 && datetime < 234500)
+				*_UpdateTime = datetime;
+		}
 	}
 	
 	return HH;
@@ -120,10 +126,16 @@ int GetUpdateTime(char* UpdateTime, int* _UpdateTime, int* UpdateMillisec)
 void GetExchangeTime(char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime, int* UpdateMillisec)
 {
 	// TradingDay处理
-	*_TradingDay = atoi(TradingDay);
+	if (_TradingDay)
+	{
+		*_TradingDay = atoi(TradingDay);
+	}
 
 	// UpdateTime处理
 	int HH = GetUpdateTime(UpdateTime, _UpdateTime, UpdateMillisec);
+
+	if (_ActionDay == nullptr)
+		return;
 
 	// ActionDay处理
 	if ((ActionDay != nullptr) && (strlen(ActionDay) == 8))

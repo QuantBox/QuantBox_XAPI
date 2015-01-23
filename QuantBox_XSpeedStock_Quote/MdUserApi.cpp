@@ -510,8 +510,10 @@ void CMdUserApi::OnRspStockUserLogin(struct DFITCSECRspUserLoginField * pRspUser
 	if (!IsErrorRspInfo(pRspInfo)
 		&&pRspUserLogin)
 	{
-		sprintf(field.TradingDay, "%d", pRspUserLogin->tradingDay);
-		strncpy(field.LoginTime, pRspUserLogin->loginTime, sizeof(TimeType));
+		GetExchangeTime(nullptr, nullptr, pRspUserLogin->loginTime,
+			nullptr, nullptr, &field.LoginTime, nullptr);
+		field.TradingDay = pRspUserLogin->tradingDay;
+
 		sprintf(field.SessionID, "%d", pRspUserLogin->sessionID);
 
 		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);

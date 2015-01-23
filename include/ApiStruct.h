@@ -149,9 +149,9 @@ struct ErrorField
 struct RspUserLoginField
 {
 	///交易日
-	DateType	TradingDay;
+	DateIntType	TradingDay;
 	// 时间
-	TimeType	LoginTime;
+	TimeIntType	LoginTime;
 	// 会话ID
 	SessionIDType	SessionID;
 	// 错误代码

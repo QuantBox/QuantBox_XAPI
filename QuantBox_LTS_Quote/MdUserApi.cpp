@@ -317,8 +317,9 @@ void CMdUserApi::OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, C
 	if (!IsErrorRspInfo(pRspInfo)
 		&&pRspUserLogin)
 	{
-		strncpy(field.TradingDay, pRspUserLogin->TradingDay, sizeof(DateType));
-		strncpy(field.LoginTime, pRspUserLogin->LoginTime, sizeof(TimeType));
+		GetExchangeTime(pRspUserLogin->TradingDay, nullptr, pRspUserLogin->LoginTime,
+			&field.TradingDay, nullptr, &field.LoginTime, nullptr);
+
 		sprintf(field.SessionID, "%d:%d", pRspUserLogin->FrontID, pRspUserLogin->SessionID);
 
 		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);

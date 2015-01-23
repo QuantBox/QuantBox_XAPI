@@ -348,8 +348,8 @@ void CTraderApi::OnRspUserLogin(CUstpFtdcRspUserLoginField *pRspUserLogin, CUstp
 	if (!IsErrorRspInfo(pRspInfo)
 		&&pRspUserLogin)
 	{
-		strncpy(field.TradingDay, pRspUserLogin->TradingDay, sizeof(DateType));
-		strncpy(field.LoginTime, pRspUserLogin->LoginTime, sizeof(TimeType));
+		GetExchangeTime(pRspUserLogin->TradingDay, nullptr, pRspUserLogin->LoginTime,
+			&field.TradingDay, nullptr, &field.LoginTime, nullptr);
 		//sprintf(field.SessionID, "%d:%d", pRspUserLogin->FrontID, pRspUserLogin->SessionID);
 
 		memcpy(&m_RspUserLogin__, &field, sizeof(RspUserLoginField));

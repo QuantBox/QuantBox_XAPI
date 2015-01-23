@@ -104,13 +104,11 @@ namespace QuantBox.XAPI
         /// <summary>
         /// 交易日
         /// </summary>
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
-        public string TradingDay;
+        public int TradingDay;
         /// <summary>
         /// 时间
         /// </summary>
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
-        public string LoginTime;
+        public int LoginTime;
         /// <summary>
         /// 错误信息
         /// </summary>
