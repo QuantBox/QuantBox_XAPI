@@ -372,6 +372,8 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	GetExchangeTime(pDepthMarketData->TradingDay,pDepthMarketData->ActionDay,pDepthMarketData->UpdateTime
 		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime, &marketData.UpdateMillisec);
 
+	marketData.UpdateMillisec = pDepthMarketData->UpdateMillisec;
+
 	marketData.LastPrice = pDepthMarketData->LastPrice;
 	marketData.Volume = pDepthMarketData->Volume;
 	marketData.Turnover = pDepthMarketData->Turnover;
@@ -381,7 +383,7 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	marketData.OpenPrice = pDepthMarketData->OpenPrice;
 	marketData.HighestPrice = pDepthMarketData->HighestPrice;
 	marketData.LowestPrice = pDepthMarketData->LowestPrice;
-	marketData.ClosePrice = pDepthMarketData->ClosePrice;
+	marketData.ClosePrice = pDepthMarketData->ClosePrice != DBL_MAX ? pDepthMarketData->ClosePrice : 0;
 	marketData.SettlementPrice = pDepthMarketData->SettlementPrice;
 
 	marketData.UpperLimitPrice = pDepthMarketData->UpperLimitPrice;

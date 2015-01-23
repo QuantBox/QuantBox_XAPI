@@ -288,6 +288,7 @@ void CMdUserApi::OnRtnDepthMarketData(CUstpFtdcDepthMarketDataField *pDepthMarke
 	DepthMarketDataField marketData = {0};
 	strcpy(marketData.InstrumentID, pDepthMarketData->InstrumentID);
 	//strcpy(marketData.ExchangeID, pDepthMarketData->ExchangeID);
+	strcpy(marketData.ExchangeID, "CFFEX");
 
 	strcpy(marketData.Symbol, pDepthMarketData->InstrumentID);
 
