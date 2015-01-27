@@ -1127,6 +1127,7 @@ void CTraderApi::OnRspQryInstrument(CSecurityFtdcInstrumentField *pInstrument, C
 			strncpy(field.ExpireDate, pInstrument->ExpireDate, sizeof(TSecurityFtdcDateType));
 			field.OptionsType = CSecurityFtdcInstrumentField_2_PutCall(pInstrument);
 			field.StrikePrice = pInstrument->ExecPrice;
+			
 
 			// 期权的标的物
 			if (strlen(pInstrument->InstrumentID) == 8)

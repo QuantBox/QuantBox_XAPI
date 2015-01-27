@@ -99,6 +99,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI</OutDir>
+    <TargetName>QuantBox_Queue_x64</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug64|Win32'">
     <LinkIncremental>true</LinkIncremental>

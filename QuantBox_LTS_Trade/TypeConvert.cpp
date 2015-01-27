@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "TypeConvert.h"
 
+#include <stdlib.h>
+
 #include <string.h>
 /// 类似于OpenQuant FIX一样的效果，插件层简单，基本不要做怎么计算或处理
 /// 对于一个单子的某个状态可能是这样的，新单，部分成交，完全成交
@@ -206,6 +208,112 @@ ExecType CSecurityFtdcOrderField_2_ExecType(CSecurityFtdcOrderField* pIn)
 	}
 }
 
+PutCall CSecurityFtdcInstrumentField_2_PutCall(CSecurityFtdcInstrumentField* pIn)
+{
+	if (strlen(pIn->InstrumentID) == 8)
+	{
+		if (pIn->ExchangeInstID[6] == 'C')
+		{
+			return PutCall::Call;
+		}
+	}
+	return PutCall::Put;
+}
+
+// 上海证券交易所证券代码分配规则
+// http://wenku.baidu.com/link?url=fhnAW62VTXqHTn8p9xlyXKa_oDIfR2xIxBF3y_fryeoFnz7MFbeWJbMLx4n1H61ERFnhr6PtaxF_j01x8iIT0wArZzrBtABRysi-KEpBa9S
+InstrumentType CSecurityFtdcInstrumentField_2_InstrumentType_SSE(CSecurityFtdcInstrumentField* pIn)
+{
+	// 只有6位，8位的期权已经提前过滤
+	int prefix1 = atoi(pIn->InstrumentID) / 100000;
+	int prefix3 = atoi(pIn->InstrumentID) / 1000;
+	switch (prefix1)
+	{
+	case 0:
+		switch (prefix3)
+		{
+		case 0:
+			return InstrumentType::Index;
+		case 9:
+		case 10:
+		case 90:
+		case 99:
+			return InstrumentType::Bond;
+		default:
+			return InstrumentType::Index;
+		}
+	case 1:
+		return InstrumentType::Bond;
+	case 2:
+		return InstrumentType::Bond;
+	case 3:
+		return InstrumentType::Future;
+	case 5:
+		switch (prefix3)
+		{
+		case 500:
+		case 510:
+		case 519:
+		case 521:
+		case 522:
+		case 523:
+		case 524:
+			return InstrumentType::ETF;
+		case 580:
+		case 582:
+			return InstrumentType::Option;
+		default:
+			return InstrumentType::ETF;
+		}
+	case 6:
+		return InstrumentType::Stock;
+	case 9:
+		return InstrumentType::Stock;
+	default:
+		return InstrumentType::Synthetic;
+	}
+}
+
+// 深圳证券交易所证券代码编码方案
+// http://wenku.baidu.com/view/e41fba85ec3a87c24028c416.html
+InstrumentType CSecurityFtdcInstrumentField_2_InstrumentType_SZE(CSecurityFtdcInstrumentField* pIn)
+{
+	// 只有6位，取前2
+	int prefix1 = atoi(pIn->InstrumentID) / 100000;
+	int prefix2 = atoi(pIn->InstrumentID) / 10000;
+	switch (prefix2)
+	{
+	case 0:
+	case 7:
+	case 9:
+		return InstrumentType::Stock;
+	case 3:
+	case 8:
+		return InstrumentType::Option;
+	case 10:
+	case 11:
+	case 12:
+	case 13:
+		return InstrumentType::Bond;
+	case 17:
+	case 18:
+		return InstrumentType::ETF;
+	case 20:
+	case 30:
+		return InstrumentType::Stock;
+	case 27:
+	case 37:
+		return InstrumentType::Stock;
+	case 28:
+	case 38:
+		return InstrumentType::Option;
+	case 39:
+		return InstrumentType::Index;
+	default:
+		return InstrumentType::Synthetic;
+	}
+}
+
 InstrumentType CSecurityFtdcInstrumentField_2_InstrumentType(CSecurityFtdcInstrumentField* pIn)
 {
 	switch (pIn->ProductClass)
@@ -218,27 +326,90 @@ InstrumentType CSecurityFtdcInstrumentField_2_InstrumentType(CSecurityFtdcInstru
 		return InstrumentType::MultiLeg;
 	case SECURITY_FTDC_PC_EFP:
 		return InstrumentType::Future;
-	//case SECURITY_FTDC_PC_SpotOption:
-	//	return InstrumentType::Option;
+	case SECURITY_FTDC_PC_ETF:
+		return InstrumentType::ETF;
+	case SECURITY_FTDC_PC_ETFPurRed:
+		return InstrumentType::ETF;
 	default:
 		if (strlen(pIn->InstrumentID) == 8)
 		{
 			return InstrumentType::Option;
 		}
-		return InstrumentType::Stock;
+		if (pIn->ExchangeID[1] == 'Z')
+		{
+			return CSecurityFtdcInstrumentField_2_InstrumentType_SZE(pIn);
+		}
+		else
+		{
+			return CSecurityFtdcInstrumentField_2_InstrumentType_SSE(pIn);
+		}
 	}
 }
 
-PutCall CSecurityFtdcInstrumentField_2_PutCall(CSecurityFtdcInstrumentField* pIn)
+PriceType CSecurityFtdcInstrumentField_2_PriceTick_SSE(CSecurityFtdcInstrumentField* pIn)
 {
-	if (strlen(pIn->InstrumentID) == 8)
+	// 只有6位，8位的期权已经提前过滤
+	int prefix1 = atoi(pIn->InstrumentID) / 100000;
+	int prefix3 = atoi(pIn->InstrumentID) / 1000;
+	switch (prefix1)
 	{
-		if (pIn->ExchangeInstID[6] == 'C')
-		{
-			return PutCall::Call;
-		}
+	case 0:
+		return 0.01;
+	case 1:
+		return 0.01;
+	case 2:
+		return 0.001;
+	case 3:
+		return 0.01;
+	case 5:
+		return 0.001;
+	case 6:
+		return 0.01;
+	case 9:
+		return 0.001;
+	default:
+		return 0.01;
 	}
-	return PutCall::Put;
+
+	return 0.01;
+}
+
+PriceType CSecurityFtdcInstrumentField_2_PriceTick_SZE(CSecurityFtdcInstrumentField* pIn)
+{
+	// 只有6位，取前2
+	int prefix1 = atoi(pIn->InstrumentID) / 100000;
+	int prefix2 = atoi(pIn->InstrumentID) / 10000;
+	switch (prefix2)
+	{
+	case 0:
+	case 7:
+	case 9:
+		return 0.01;
+	case 3:
+	case 8:
+		return 0.001;
+	case 10:
+	case 11:
+	case 12:
+	case 13:
+		return 0.001;
+	case 17:
+	case 18:
+		return 0.001;
+	case 20:
+	case 30:
+		return 0.01;
+	case 27:
+	case 37:
+		return 0.01;
+	case 28:
+	case 38:
+		return 0.001;
+	case 39:
+		return 0.01;
+	default:
+		return 0.01;
+	}
 }
 
 PriceType CSecurityFtdcInstrumentField_2_PriceTick(CSecurityFtdcInstrumentField* pIn)
@@ -252,5 +423,12 @@ PriceType CSecurityFtdcInstrumentField_2_PriceTick(CSecurityFtdcInstrumentField*
 		return 0.001;
 	}
 
-	return 0.01;
+	if (pIn->ExchangeID[1] == 'Z')
+	{
+		return CSecurityFtdcInstrumentField_2_PriceTick_SZE(pIn);
+	}
+	else
+	{
+		return CSecurityFtdcInstrumentField_2_PriceTick_SSE(pIn);
+	}
 }
