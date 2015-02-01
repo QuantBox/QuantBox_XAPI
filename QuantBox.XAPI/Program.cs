@@ -63,7 +63,7 @@ namespace QuantBox.XAPI
         {
             //for (int i = 0; i < 10000; ++i)
             {
-				test_Linux_Main(args);
+                test_KingstarStock_Main(args);
             }
             Console.ReadKey();
         }
@@ -77,9 +77,9 @@ namespace QuantBox.XAPI
 			//XApi api = ApiManager.CreateApi(@"/home/hetao/works/QuantBox_XAPI/bin/Debug/libQuantBox_CTP_Quote.so");
 			//XApi api2 = ApiManager.CreateApi(@"/home/hetao/works/QuantBox_XAPI/bin/Debug/libQuantBox_CTP_Trade.so");
 
-			ApiManager.QueuePath = @"libQuantBox_Queue.so";
-			XApi api = ApiManager.CreateApi(@"libQuantBox_CTP_Quote.so");
-			XApi api2 = ApiManager.CreateApi(@"libQuantBox_CTP_Trade.so");
+			//ApiManager.QueuePath = @"libQuantBox_Queue.so";
+			XApi api = new XApi(@"libQuantBox_CTP_Quote.so");
+            XApi api2 = new XApi(@"libQuantBox_CTP_Trade.so");
 
             api.Server.BrokerID = "1017";
             api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51213";
@@ -115,17 +115,15 @@ namespace QuantBox.XAPI
 
 			Thread.Sleep (10000);
 			Console.WriteLine (123);
-            ApiManager.ReleaseApi(api);
-            ApiManager.ReleaseApi(api2);
+            api.Dispose();
+            api2.Dispose();
         }
 
 		#region LTS
         static void test_LTS_Main(string[] args)
         {
-            Queue queue = new Queue(@"QuantBox_Queue.dll");
-            Queue queue2 = new Queue(@"QuantBox_Queue.dll");
-            XApi api = new XApi("QuantBox_LTS_Quote.dll", queue);
-            XApi api2 = new XApi("QuantBox_C2LTS_Trade.dll", queue2);
+            XApi api = new XApi("QuantBox_LTS_Quote.dll");
+            XApi api2 = new XApi("QuantBox_C2LTS_Trade.dll");
 
             api.Server.BrokerID = "2010";
             api.Server.Address = "tcp://211.144.195.163:44513";
@@ -169,8 +167,8 @@ namespace QuantBox.XAPI
 
         static void test_CTP_Main(string[] args)
         {
-            ApiManager.QueuePath = @"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\QuantBox_Queue.dll";
-            api = ApiManager.CreateApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\QuantBox_CTP_Trade.dll");
+            //ApiManager.QueuePath = @"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\QuantBox_Queue.dll";
+            api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\QuantBox_CTP_Trade.dll");
 
             api.Server.BrokerID = "1017";
             api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51205";
@@ -185,14 +183,37 @@ namespace QuantBox.XAPI
 
             Thread.Sleep(5*1000);
 
-            ApiManager.ReleaseApi(api);
+            api.Dispose();
+
+        }
+
+        static void test_KingstarStock_Main(string[] args)
+        {
+            //ApiManager.QueuePath = @"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\QuantBox_CTP_Trade.dll";
+            api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\KingstarStock\x86\QuantBox_KingstarStock_Trade.dll");
+
+            api.Server.BrokerID = "1017";
+            api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51205";
+
+            api.User.UserID = "00000015";
+            api.User.Password = "1234561";
+
+            api.OnConnectionStatus = OnConnectionStatus;
+            api.OnRtnDepthMarketData = OnRtnDepthMarketData;
+            api.OnRtnError = OnRtnError;
+
+            api.Connect();
+
+            Thread.Sleep(5 * 1000);
+
+            api.Dispose();
 
         }
 
         static void test_KingstarGold_Main(string[] args)
         {
-            ApiManager.QueuePath = @"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\QuantBox_Queue.dll";
-            api = ApiManager.CreateApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\KingstarGold\QuantBox_KingstarGold.dll");
+            //ApiManager.QueuePath = @"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\QuantBox_Queue.dll";
+            api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\KingstarGold\QuantBox_KingstarGold.dll");
 
             api.Server.BrokerID = "";
             api.Server.Address = "tcp://124.74.239.38:18961";
@@ -210,7 +231,7 @@ namespace QuantBox.XAPI
 
             Console.ReadKey();
 
-            ApiManager.ReleaseApi(api);
+            api.Dispose();
 
             Console.ReadKey();
 

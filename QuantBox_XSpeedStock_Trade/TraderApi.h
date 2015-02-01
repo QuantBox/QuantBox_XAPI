@@ -22,6 +22,8 @@
 
 using namespace std;
 
+class CMsgQueue;
+
 class CTraderApi :
 	public DFITCSECTraderSpi
 {
@@ -51,18 +53,11 @@ class CTraderApi :
 		E_QuoteCancelField,
 	};
 
-	//请求数据包结构体
-	struct SRequest
-	{
-		RequestType type;
-		void* pBuf;
-	};
-
 public:
 	CTraderApi(void);
 	virtual ~CTraderApi(void);
 
-	void Register(void* pMsgQueue);
+	void Register(void* pCallback);
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
@@ -74,9 +69,9 @@ public:
 		OrderField* pOrder1,
 		OrderField* pOrder2);
 
-	int ReqParkedOrderInsert(int OrderRef,
-		OrderField* pOrder1,
-		OrderField* pOrder2);
+	//int ReqParkedOrderInsert(int OrderRef,
+	//	OrderField* pOrder1,
+	//	OrderField* pOrder2);
 
 	/*int ReqOrderAction(const string& szId);
 	void ReqCancelOrder(
@@ -108,40 +103,20 @@ public:
 	//void ReqQuoteUnSubscribe(const string& szExchangeId, DFITCInstrumentTypeType instrumentType);
 
 private:
-	//void OnOrder(DFITCOrderRtnField *pOrder);
-	//void OnTrade(DFITCMatchRtnField *pTrade);
+	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
-	//数据包发送线程
-	static void ProcessThread(CTraderApi* lpParam)
-	{
-		if (lpParam)
-			lpParam->RunInThread();
-	}
-	void RunInThread();
-	void StartThread();
-	void StopThread();
-
-	//指定数据包类型，生成对应数据包
-	SRequest * MakeRequestBuf(RequestType type);
-	//清除将发送请求包队列
-	void ReleaseRequestListBuf();
-	//清除已发送请求包池
-	void ReleaseRequestMapBuf();
-	//清除指定请求包池中指定包
-	void ReleaseRequestMapBuf(int nRequestID);
-	//添加到已经请求包池
-	void AddRequestMapBuf(int nRequestID,SRequest* pRequest);
-	//添加到将发送包队列
-	void AddToSendQueue(SRequest * pRequest);
-
-	int ReqInit();
+	int _Init();
 
 	void ReqStockUserLogin();
+	int _ReqStockUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	void ReqSOPUserLogin();
+	int _ReqSOPUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	void ReqFASLUserLogin();
+	int _ReqFASLUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
-	void ReqAuthenticate();
-	void ReqSettlementInfoConfirm();
+
+	int ReqInit();
 
 	//检查是否出错
 	bool IsErrorRspInfo_Output(struct DFITCSECRspInfoField *pRspInfo);//将出错消息送到消息队列
@@ -215,21 +190,13 @@ private:
 	int							m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增
 
 	DFITCSECTraderApi*			m_pApi;					//交易API
-	void*						m_msgQueue;				//消息队列指针
-
+	
 	string						m_szPath;				//生成配置文件的路径
 	ServerInfoField				m_ServerInfo;
 	UserInfoField				m_UserInfo;
 
 	int							m_nSleep;
-	volatile bool				m_bRunning;
-	thread*						m_hThread;
-
-	mutex						m_csList;
-	list<SRequest*>				m_reqList;				//将发送请求队列
-
-	mutex						m_csMap;
-	map<int,SRequest*>			m_reqMap;				//已发送请求池
+	
 
 	hash_map<string, OrderField*>				m_id_platform_order;
 	//hash_map<string, DFITCOrderRtnField*>		m_id_api_order;
@@ -238,5 +205,8 @@ private:
 	//hash_map<string, QuoteField*>				m_id_platform_quote;
 	//hash_map<string, DFITCQuoteRtnField*>		m_id_api_quote;
 	hash_map<string, string>					m_sysId_quoteId;
+
+	CMsgQueue*					m_msgQueue;				//消息队列指针
+	CMsgQueue*					m_msgQueue_Query;
 };
 

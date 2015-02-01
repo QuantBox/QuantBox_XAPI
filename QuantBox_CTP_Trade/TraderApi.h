@@ -23,6 +23,7 @@
 
 using namespace std;
 
+class CMsgQueue;
 
 class CTraderApi :
 	public CThostFtdcTraderSpi
@@ -30,10 +31,16 @@ class CTraderApi :
 	//请求数据包类型
 	enum RequestType
 	{
+		E_Init,
 		E_ReqAuthenticateField,
 		E_ReqUserLoginField,
 		E_SettlementInfoConfirmField,
+
+
+
 		E_QryInstrumentField,
+
+
 		E_InputOrderField,
 		E_InputOrderActionField,
 		E_InputQuoteField,
@@ -51,38 +58,11 @@ class CTraderApi :
 		E_QryQuoteField,
 	};
 
-	//请求数据包结构体
-	struct SRequest
-	{
-		RequestType type;
-		union{
-			CThostFtdcReqAuthenticateField				ReqAuthenticateField;
-			CThostFtdcReqUserLoginField					ReqUserLoginField;
-			CThostFtdcSettlementInfoConfirmField		SettlementInfoConfirmField;
-			CThostFtdcQryDepthMarketDataField			QryDepthMarketDataField;
-			CThostFtdcQryInstrumentField				QryInstrumentField;
-			CThostFtdcQryInstrumentCommissionRateField	QryInstrumentCommissionRateField;
-			CThostFtdcQryInstrumentMarginRateField		QryInstrumentMarginRateField;
-			CThostFtdcQryInvestorPositionField			QryInvestorPositionField;
-			CThostFtdcQryInvestorPositionDetailField    QryInvestorPositionDetailField;
-			CThostFtdcQryTradingAccountField			QryTradingAccountField;
-			CThostFtdcInputOrderField					InputOrderField;
-			CThostFtdcInputOrderActionField				InputOrderActionField;
-			CThostFtdcInputQuoteField					InputQuoteField;
-			CThostFtdcInputQuoteActionField				InputQuoteActionField;
-			CThostFtdcParkedOrderField					ParkedOrderField;
-			CThostFtdcQrySettlementInfoField			QrySettlementInfoField;
-			CThostFtdcQryOrderField						QryOrderField;
-			CThostFtdcQryTradeField						QryTradeField;
-			CThostFtdcQryQuoteField						QryQuoteField;
-		};
-	};
-
 public:
 	CTraderApi(void);
 	virtual ~CTraderApi(void);
 
-	void Register(void* pMsgQueue);
+	void Register(void* pCallback);
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
@@ -110,50 +90,42 @@ public:
 
 	void ReqQryTradingAccount();
 	void ReqQryInvestorPosition(const string& szInstrumentId, const string& szExchange);
-	void ReqQryInvestorPositionDetail(const string& szInstrumentId);
+	//void ReqQryInvestorPositionDetail(const string& szInstrumentId);
 	void ReqQryInstrument(const string& szInstrumentId, const string& szExchange);
-	void ReqQryInstrumentCommissionRate(const string& szInstrumentId);
-	void ReqQryInstrumentMarginRate(const string& szInstrumentId,TThostFtdcHedgeFlagType HedgeFlag = THOST_FTDC_HF_Speculation);
-	void ReqQryDepthMarketData(const string& szInstrumentId);
-	void ReqQrySettlementInfo(const string& szTradingDay);
+	//void ReqQryInstrumentCommissionRate(const string& szInstrumentId);
+	//void ReqQryInstrumentMarginRate(const string& szInstrumentId,TThostFtdcHedgeFlagType HedgeFlag = THOST_FTDC_HF_Speculation);
+	//void ReqQryDepthMarketData(const string& szInstrumentId);
+	//void ReqQrySettlementInfo(const string& szTradingDay);
 
 	void ReqQryOrder();
 	void ReqQryTrade();
 	void ReqQryQuote();
 
 private:
+	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	int _Init();
+
+	void ReqAuthenticate();
+	int _ReqAuthenticate(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	void ReqUserLogin();
+	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	void ReqSettlementInfoConfirm();
+	int _ReqSettlementInfoConfirm(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	int _ReqQryInstrument(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	int _ReqQryTradingAccount(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	int _ReqQryInvestorPosition(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	
+
 	void OnOrder(CThostFtdcOrderField *pOrder);
 	void OnTrade(CThostFtdcTradeField *pTrade);
 	void OnQuote(CThostFtdcQuoteField *pQuote);
 
 	void OnTrade(TradeField *pTrade);
-
-	//数据包发送线程
-	static void ProcessThread(CTraderApi* lpParam)
-	{
-		if (lpParam)
-			lpParam->RunInThread();
-	}
-	void RunInThread();
-	void StartThread();
-	void StopThread();
-
-	//指定数据包类型，生成对应数据包
-	SRequest * MakeRequestBuf(RequestType type);
-	//清除将发送请求包队列
-	void ReleaseRequestListBuf();
-	//清除已发送请求包池
-	void ReleaseRequestMapBuf();
-	//清除指定请求包池中指定包
-	void ReleaseRequestMapBuf(int nRequestID);
-	//添加到已经请求包池
-	void AddRequestMapBuf(int nRequestID,SRequest* pRequest);
-	//添加到将发送包队列
-	void AddToSendQueue(SRequest * pRequest);
-
-	void ReqAuthenticate();
-	void ReqUserLogin();
-	void ReqSettlementInfoConfirm();
 
 	//检查是否出错
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
@@ -196,22 +168,20 @@ private:
 
 	//仓位
 	virtual void OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	virtual void OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	virtual void OnRspQryInvestorPositionCombineDetail(CThostFtdcInvestorPositionCombineDetailField *pInvestorPositionCombineDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
 	//资金
 	virtual void OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//合约、手续费
 	virtual void OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	virtual void OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	virtual void OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//virtual void OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//virtual void OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//查询行情响应
-	virtual void OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//virtual void OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//请求查询投资者结算结果响应
-	virtual void OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInfo, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//virtual void OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInfo, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//其它
 	virtual void OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -228,22 +198,12 @@ private:
 	int							m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增
 
 	CThostFtdcTraderApi*		m_pApi;					//交易API
-	void*						m_msgQueue;				//消息队列指针
-
+	
 	string						m_szPath;				//生成配置文件的路径
 	ServerInfoField				m_ServerInfo;
 	UserInfoField				m_UserInfo;
-
 	int							m_nSleep;
-	volatile bool				m_bRunning;
-	thread*						m_hThread;
-
-	mutex						m_csList;
-	list<SRequest*>				m_reqList;				//将发送请求队列
-
-	mutex						m_csMap;
-	map<int,SRequest*>			m_reqMap;				//已发送请求池
-
+	
 	unordered_map<string, OrderField*>				m_id_platform_order;
 	unordered_map<string, CThostFtdcOrderField*>		m_id_api_order;
 	unordered_map<string, string>					m_sysId_orderId;
@@ -253,5 +213,8 @@ private:
 	unordered_map<string, string>					m_sysId_quoteId;
 
 	unordered_map<string, PositionField*>			m_id_platform_position;
+
+	CMsgQueue*					m_msgQueue;				//消息队列指针
+	CMsgQueue*					m_msgQueue_Query;
 };
 

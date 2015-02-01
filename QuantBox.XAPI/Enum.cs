@@ -109,6 +109,7 @@ namespace QuantBox
         Restart,
         Resume,
         Quick,
+        Undefined,
     };
 
     public enum PutCall : byte

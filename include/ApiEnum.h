@@ -45,6 +45,7 @@ enum ResumeType :char
 	Restart,
 	Resume,
 	Quick,
+	Undefined,
 };
 
 enum PutCall :char

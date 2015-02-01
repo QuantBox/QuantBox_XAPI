@@ -20,13 +20,21 @@
 using namespace std;
 _USING_LTS_NS_
 
+class CMsgQueue;
+
 class CLevel2UserApi :public CSecurityFtdcL2MDUserSpi
 {
+	enum RequestType
+	{
+		E_Init,
+		E_ReqUserLoginField,
+	};
+
 public:
 	CLevel2UserApi(void);
 	virtual ~CLevel2UserApi(void);
 
-	void Register(void* pMsgQueue);
+	void Register(void* pCallback);
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
@@ -42,12 +50,17 @@ public:
 	void UnSubscribeL2OrderAndTrade();
 
 private:
+	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	int _Init();
+	//登录请求
+	void ReqUserLogin();
+	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
 	//订阅行情
 	void SubscribeL2MarketData(const set<string>& instrumentIDs, const string& szExchageID);
 	void SubscribeL2Index(const set<string>& instrumentIDs, const string& szExchageID);
-
-	//登录请求
-	void ReqUserLogin();
 
 	virtual void OnFrontConnected();
 	virtual void OnFrontDisconnected(int nReason);
@@ -71,16 +84,19 @@ private:
 	mutex						m_csMapSecurityIDs;
 	mutex						m_csMapIndexIDs;
 
-	int							m_nRequestID;			//请求ID，每次请求前自增
+	int							m_lRequestID;			//请求ID，每次请求前自增
 
 	map<string,set<string> >	m_mapSecurityIDs;		//正在订阅的合约
 	map<string,set<string> >	m_mapIndexIDs;			//正在订阅的合约
 
 	CSecurityFtdcL2MDUserApi*	m_pApi;					//行情API
-	void*						m_msgQueue;				//消息队列指针
-
+	
 	string						m_szPath;				//生成配置文件的路径
 	ServerInfoField				m_ServerInfo;
 	UserInfoField				m_UserInfo;
+	int							m_nSleep;
+
+	CMsgQueue*					m_msgQueue;				//消息队列指针
+	CMsgQueue*					m_msgQueue_Query;
 };
 

@@ -5,6 +5,8 @@
 #include <cstring>
 #include <condition_variable>
 
+#include "../include/CrossPlatform.h"
+
 #include "../include/QueueHeader.h"
 #include "../include/QueueStruct.h"
 #include "readerwriterqueue.h"
@@ -12,7 +14,10 @@
 using namespace std;
 using namespace moodycamel;
 
-class CMsgQueue
+#pragma warning(push)
+#pragma warning(disable:4251)
+
+class DLL_PUBLIC CMsgQueue
 {
 public:
 	CMsgQueue();
@@ -32,6 +37,7 @@ public:
 	//由内部启动线程，内部主动调用Process触发回调
 	void StartThread();
 	void StopThread();
+	//void AbortThread();
 
 	//将外部的函数地址注册到队列
 	void Register(void* pCallback)
@@ -106,3 +112,5 @@ private:
 	ReaderWriterQueue<ResponeItem*>		m_queue;
 	fnOnRespone							m_fnOnRespone;
 };
+
+#pragma warning(pop)

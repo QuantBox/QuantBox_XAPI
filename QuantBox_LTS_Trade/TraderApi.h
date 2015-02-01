@@ -22,6 +22,7 @@
 
 using namespace std;
 
+class CMsgQueue;
 
 class CTraderApi :
 	public CSecurityFtdcTraderSpi
@@ -29,6 +30,8 @@ class CTraderApi :
 	//请求数据包类型
 	enum RequestType
 	{
+		E_Init,
+
 		E_ReqAuthenticateField,
 		E_ReqUserLoginField,
 		E_SettlementInfoConfirmField,
@@ -46,31 +49,6 @@ class CTraderApi :
 		E_QrySettlementInfoField,
 		E_QryOrderField,
 		E_QryTradeField,
-	};
-
-	//请求数据包结构体
-	struct SRequest
-	{
-		RequestType type;
-		union{
-			//CSecurityFtdcReqAuthenticateField				ReqAuthenticateField;
-			CSecurityFtdcReqUserLoginField					ReqUserLoginField;
-			//CSecurityFtdcSettlementInfoConfirmField		SettlementInfoConfirmField;
-			CSecurityFtdcQryDepthMarketDataField			QryDepthMarketDataField;
-			CSecurityFtdcQryInstrumentField				QryInstrumentField;
-			CSecurityFtdcQryInstrumentCommissionRateField	QryInstrumentCommissionRateField;
-			//CSecurityFtdcQryInstrumentMarginRateField		QryInstrumentMarginRateField;
-			CSecurityFtdcQryInvestorPositionField			QryInvestorPositionField;
-			CSecurityFtdcQryInvestorPositionDetailField    QryInvestorPositionDetailField;
-			CSecurityFtdcQryTradingAccountField			QryTradingAccountField;
-			CSecurityFtdcInputOrderField					InputOrderField;
-			CSecurityFtdcInputOrderActionField				InputOrderActionField;
-			//CSecurityFtdcInputQuoteField					InputQuoteField;
-			//CSecurityFtdcInputQuoteActionField				InputQuoteActionField;
-			//CSecurityFtdcQrySettlementInfoField			QrySettlementInfoField;
-			CSecurityFtdcQryOrderField						QryOrderField;
-			CSecurityFtdcQryTradeField						QryTradeField;
-		};
 	};
 
 public:
@@ -113,37 +91,23 @@ public:
 	void ReqQryTrade();
 
 private:
+	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	int _Init();
+
+	void ReqUserLogin();
+	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	int _ReqQryInstrument(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	int _ReqQryTradingAccount(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	int _ReqQryInvestorPosition(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+
+
 	void OnOrder(CSecurityFtdcOrderField *pOrder, bool bFromQry);
 	void OnTrade(CSecurityFtdcTradeField *pTrade, bool bFromQry);
-
 	void OnTrade(TradeField *pTrade, bool bFromQry);
-
-	//数据包发送线程
-	static void ProcessThread(CTraderApi* lpParam)
-	{
-		if (lpParam)
-			lpParam->RunInThread();
-	}
-	void RunInThread();
-	void StartThread();
-	void StopThread();
-
-	//指定数据包类型，生成对应数据包
-	SRequest * MakeRequestBuf(RequestType type);
-	//清除将发送请求包队列
-	void ReleaseRequestListBuf();
-	//清除已发送请求包池
-	void ReleaseRequestMapBuf();
-	//清除指定请求包池中指定包
-	void ReleaseRequestMapBuf(int nRequestID);
-	//添加到已经请求包池
-	void AddRequestMapBuf(int nRequestID,SRequest* pRequest);
-	//添加到将发送包队列
-	void AddToSendQueue(SRequest * pRequest);
-
-	//void ReqAuthenticate();
-	void ReqUserLogin();
-	//void ReqSettlementInfoConfirm();
 
 	//检查是否出错
 	bool IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
@@ -194,10 +158,10 @@ private:
 	//合约、手续费
 	virtual void OnRspQryInstrument(CSecurityFtdcInstrumentField *pInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspQryInstrumentMarginRate(CSecurityFtdcInstrumentMarginRateField *pInstrumentMarginRate, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	virtual void OnRspQryInstrumentCommissionRate(CSecurityFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//virtual void OnRspQryInstrumentCommissionRate(CSecurityFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//查询行情响应
-	virtual void OnRspQryDepthMarketData(CSecurityFtdcDepthMarketDataField *pDepthMarketData, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//virtual void OnRspQryDepthMarketData(CSecurityFtdcDepthMarketDataField *pDepthMarketData, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//请求查询投资者结算结果响应
 	//virtual void OnRspQrySettlementInfo(CSecurityFtdcSettlementInfoField *pSettlementInfo, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -216,30 +180,19 @@ private:
 	int							m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增
 
 	CSecurityFtdcTraderApi*		m_pApi;					//交易API
-	void*						m_msgQueue;				//消息队列指针
-
+	
 	string						m_szPath;				//生成配置文件的路径
 	ServerInfoField				m_ServerInfo;
 	UserInfoField				m_UserInfo;
-
 	int							m_nSleep;
-	volatile bool				m_bRunning;
-	thread*						m_hThread;
-
-	mutex						m_csList;
-	list<SRequest*>				m_reqList;				//将发送请求队列
-
-	mutex						m_csMap;
-	map<int,SRequest*>			m_reqMap;				//已发送请求池
 
 	unordered_map<string, OrderField*>				m_id_platform_order;
 	unordered_map<string, CSecurityFtdcOrderField*>		m_id_api_order;
 	unordered_map<string, string>					m_sysId_orderId;
 
-	//hash_map<string, QuoteField*>				m_id_platform_quote;
-	//hash_map<string, CSecurityFtdcQuoteField*>		m_id_api_quote;
-	//hash_map<string, string>					m_sysId_quoteId;
-
 	unordered_map<string, PositionField*>			m_id_platform_position;
+
+	CMsgQueue*					m_msgQueue;				//消息队列指针
+	CMsgQueue*					m_msgQueue_Query;
 };
 

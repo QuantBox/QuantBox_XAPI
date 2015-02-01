@@ -14,9 +14,7 @@ namespace QuantBox.XAPI.Callback
         public Logger log;
         protected Proxy proxy;
         protected IntPtr Handle = IntPtr.Zero;
-        protected Queue _Queue;
         private string _Path1;
-        //private string _Path2;
 
         protected XCall _XRespone;
 
@@ -54,13 +52,12 @@ namespace QuantBox.XAPI.Callback
 
         private System.Timers.Timer _Timer = new System.Timers.Timer();
 
-        internal BaseApi(string path1,Queue queue)
+        internal BaseApi(string path1)
         {
             _Path1 = path1;
             
             // 这里是因为回调函数可能被GC回收
             _XRespone = _OnRespone;
-            _Queue = queue;
 
             ReconnectInterval = 0;
         }
@@ -127,11 +124,9 @@ namespace QuantBox.XAPI.Callback
 
                 Handle = proxy.XRequest((byte)RequestType.Create, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
-                Register(_Queue.Handle);
+                RegisterAndStart(Marshal.GetFunctionPointerForDelegate(_XRespone));
 
-                _Queue.Register(Marshal.GetFunctionPointerForDelegate(_XRespone));
-                // 启动队列循环
-                _Queue.Connect();
+
 
                 IntPtr ServerIntPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(ServerInfoField)));
                 Marshal.StructureToPtr(Server, ServerIntPtr, false);
@@ -158,10 +153,7 @@ namespace QuantBox.XAPI.Callback
                 IsConnected = false;
 
                 if (proxy != null)
-                {
-                    // 将API与队列解绑定，这句提前操作了就收不到Disconnected事件了
-                    //proxy.XRequest((byte)RequestType.Register, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
-
+                {                    
                     proxy.XRequest((byte)RequestType.Disconnect, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
                     proxy.XRequest((byte)RequestType.Release, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
@@ -174,7 +166,7 @@ namespace QuantBox.XAPI.Callback
 
         }
 
-        public void Register(IntPtr ptr1)
+        public void RegisterAndStart(IntPtr ptr1)
         {
             lock (this)
             {

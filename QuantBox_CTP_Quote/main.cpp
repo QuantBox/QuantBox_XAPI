@@ -17,7 +17,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return (void*)(ApiType::MarketData | ApiType::QuoteRequest);
 	case GetApiVersion:
-		return (void*)"0.1.0.20150112";
+		return (void*)"0.1.0.20150130";
 	case GetApiName:
 		return (void*)"CTP";
 	case Create:

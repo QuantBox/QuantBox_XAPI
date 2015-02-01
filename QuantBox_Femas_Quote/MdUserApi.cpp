@@ -8,6 +8,8 @@
 
 #include "../include/toolkit.h"
 
+#include "../QuantBox_Queue/MsgQueue.h"
+
 #include <string.h>
 #include <cfloat>
 
@@ -15,11 +17,56 @@
 #include <vector>
 using namespace std;
 
+void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	// 由内部调用，不用检查是否为空
+	CMdUserApi* pApi = (CMdUserApi*)pApi1;
+	pApi->QueryInThread(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+	return nullptr;
+}
+
+void CMdUserApi::QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	int iRet = 0;
+	switch (type)
+	{
+	case E_Init:
+		iRet = _Init();
+		break;
+	case E_ReqUserLoginField:
+		iRet = _ReqUserLogin(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		break;
+	default:
+		break;
+	}
+
+	if (0 == iRet)
+	{
+		//返回成功，填加到已发送池
+		m_nSleep = 1;
+	}
+	else
+	{
+		m_msgQueue_Query->Input(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		//失败，按4的幂进行延时，但不超过1s
+		m_nSleep *= 4;
+		m_nSleep %= 1023;
+	}
+	this_thread::sleep_for(chrono::milliseconds(m_nSleep));
+}
+
 CMdUserApi::CMdUserApi(void)
 {
-	m_pApi = NULL;
-	m_msgQueue = NULL;
-	m_nRequestID = 0;
+	m_pApi = nullptr;
+	m_lRequestID = 0;
+	m_nSleep = 1;
+
+	// 自己维护两个消息队列
+	m_msgQueue = new CMsgQueue();
+	m_msgQueue_Query = new CMsgQueue();
+
+	m_msgQueue_Query->Register(Query);
+	m_msgQueue_Query->StartThread();
 }
 
 CMdUserApi::~CMdUserApi(void)
@@ -27,9 +74,23 @@ CMdUserApi::~CMdUserApi(void)
 	Disconnect();
 }
 
-void CMdUserApi::Register(void* pMsgQueue)
+void CMdUserApi::Register(void* pCallback)
 {
-	m_msgQueue = pMsgQueue;
+	if (m_msgQueue == nullptr)
+		return;
+
+	m_msgQueue_Query->Register(Query);
+	m_msgQueue->Register(pCallback);
+	if (pCallback)
+	{
+		m_msgQueue_Query->StartThread();
+		m_msgQueue->StartThread();
+	}
+	else
+	{
+		m_msgQueue_Query->StopThread();
+		m_msgQueue->StopThread();
+	}
 }
 
 ConfigInfoField* CMdUserApi::Config(ConfigInfoField* pConfigInfo)
@@ -46,7 +107,7 @@ bool CMdUserApi::IsErrorRspInfo(CUstpFtdcRspInfoField *pRspInfo, int nRequestID,
 		field.ErrorID = pRspInfo->ErrorID;
 		strcpy(field.ErrorMsg, pRspInfo->ErrorMsg);
 
-		XRespone(ResponeType::OnRtnError, m_msgQueue, this, bIsLast, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input(ResponeType::OnRtnError, m_msgQueue, this, bIsLast, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
 	return bRet;
 }
@@ -66,15 +127,21 @@ void CMdUserApi::Connect(const string& szPath,
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
-	char *pszPath = new char[szPath.length()+1024];
+	m_msgQueue_Query->Input(RequestType::E_Init, this, nullptr, 0, 0,
+		nullptr, 0, nullptr, 0, nullptr, 0);
+}
+
+int CMdUserApi::_Init()
+{
+	char *pszPath = new char[m_szPath.length() + 1024];
 	srand((unsigned int)time(NULL));
-	sprintf(pszPath, "%s/%s/%s/Md/%d/", szPath.c_str(), m_ServerInfo.BrokerID, m_UserInfo.UserID, rand());
+	sprintf(pszPath, "%s/%s/%s/Md/%d/", m_szPath.c_str(), m_ServerInfo.BrokerID, m_UserInfo.UserID, rand());
 	makedirs(pszPath);
 
 	m_pApi = CUstpFtdcMduserApi::CreateFtdcMduserApi(pszPath);
 	delete[] pszPath;
 
-	XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	if (m_pApi)
 	{
@@ -86,49 +153,77 @@ void CMdUserApi::Connect(const string& szPath,
 		strncpy(buf, m_ServerInfo.Address, len);
 
 		char* token = strtok(buf, _QUANTBOX_SEPS_);
-		while(token)
+		while (token)
 		{
 			if (strlen(token)>0)
 			{
 				m_pApi->RegisterFront(token);
 			}
-			token = strtok( NULL, _QUANTBOX_SEPS_);
+			token = strtok(NULL, _QUANTBOX_SEPS_);
 		}
 		delete[] buf;
 
-		m_pApi->SubscribeMarketDataTopic(m_ServerInfo.TopicId, (USTP_TE_RESUME_TYPE)m_ServerInfo.MarketDataTopicResumeType);
+		if (m_ServerInfo.MarketDataTopicResumeType<ResumeType::Undefined)
+			m_pApi->SubscribeMarketDataTopic(m_ServerInfo.TopicId, (USTP_TE_RESUME_TYPE)m_ServerInfo.MarketDataTopicResumeType);
 		//初始化连接
 		m_pApi->Init();
-		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	}
+
+	return 0;
 }
 
 void CMdUserApi::ReqUserLogin()
 {
-	if (NULL == m_pApi)
-		return;
+	CUstpFtdcReqUserLoginField body = { 0 };
 
-	CUstpFtdcReqUserLoginField request = {0};
+	strncpy(body.UserID, m_UserInfo.UserID, sizeof(TUstpFtdcUserIDType));
+	strncpy(body.BrokerID, m_ServerInfo.BrokerID, sizeof(TUstpFtdcBrokerIDType));
+	strncpy(body.Password, m_UserInfo.Password, sizeof(TUstpFtdcPasswordType));
 
-	strncpy(request.UserID, m_UserInfo.UserID, sizeof(TUstpFtdcUserIDType));
-	strncpy(request.BrokerID, m_ServerInfo.BrokerID, sizeof(TUstpFtdcBrokerIDType));
-	strncpy(request.Password, m_UserInfo.Password, sizeof(TUstpFtdcPasswordType));
+	m_msgQueue_Query->Input(RequestType::E_ReqUserLoginField, this, nullptr, 0, 0,
+		&body, sizeof(CUstpFtdcReqUserLoginField), nullptr, 0, nullptr, 0);
+}
 
-	//只有这一处用到了m_nRequestID，没有必要每次重连m_nRequestID都从0开始
-	int nRet = m_pApi->ReqUserLogin(&request,++m_nRequestID);
-
-	XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+int CMdUserApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	return m_pApi->ReqUserLogin((CUstpFtdcReqUserLoginField*)ptr1, ++m_lRequestID);
 }
 
 void CMdUserApi::Disconnect()
 {
-	if(m_pApi)
+	// 清理查询队列
+	if (m_msgQueue_Query)
+	{
+		m_msgQueue_Query->StopThread();
+		m_msgQueue_Query->Register(nullptr);
+		m_msgQueue_Query->Clear();
+		delete m_msgQueue_Query;
+		m_msgQueue_Query = nullptr;
+	}
+
+	if (m_pApi)
 	{
 		m_pApi->RegisterSpi(NULL);
 		m_pApi->Release();
 		m_pApi = NULL;
 
-		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		// 全清理，只留最后一个
+		m_msgQueue->Clear();
+		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		// 主动触发
+		m_msgQueue->Process();
+	}
+
+	// 清理响应队列
+	if (m_msgQueue)
+	{
+		m_msgQueue->StopThread();
+		m_msgQueue->Register(nullptr);
+		m_msgQueue->Clear();
+		delete m_msgQueue;
+		m_msgQueue = nullptr;
 	}
 }
 
@@ -209,7 +304,7 @@ void CMdUserApi::Unsubscribe(const string& szInstrumentIDs, const string& szExch
 
 void CMdUserApi::OnFrontConnected()
 {
-	XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	//连接成功后自动请求登录
 	ReqUserLogin();
@@ -222,7 +317,7 @@ void CMdUserApi::OnFrontDisconnected(int nReason)
 	field.ErrorID = nReason;
 	GetOnFrontDisconnectedMsg(nReason, field.ErrorMsg);
 
-	XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 }
 
 void CMdUserApi::OnRspUserLogin(CUstpFtdcRspUserLoginField *pRspUserLogin, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -236,8 +331,8 @@ void CMdUserApi::OnRspUserLogin(CUstpFtdcRspUserLoginField *pRspUserLogin, CUstp
 			&field.TradingDay, nullptr, &field.LoginTime, nullptr);
 		//sprintf(field.SessionID, "%d:%d", pRspUserLogin->, pRspUserLogin->SessionID);
 
-		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 		//有可能断线了，本处是断线重连后重新订阅
 		set<string> mapOld = m_setInstrumentIDs;//记下上次订阅的合约
@@ -249,7 +344,7 @@ void CMdUserApi::OnRspUserLogin(CUstpFtdcRspUserLoginField *pRspUserLogin, CUstp
 		field.ErrorID = pRspInfo->ErrorID;
 		strcpy(field.ErrorMsg, pRspInfo->ErrorMsg);
 
-		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
 }
 
@@ -342,5 +437,5 @@ void CMdUserApi::OnRtnDepthMarketData(CUstpFtdcDepthMarketDataField *pDepthMarke
 		marketData.AskVolume5 = pDepthMarketData->AskVolume5;
 	}
 
-	XRespone(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }

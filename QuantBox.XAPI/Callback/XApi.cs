@@ -10,8 +10,8 @@ namespace QuantBox.XAPI.Callback
 {
     public partial class XApi : BaseApi, IDisposable, IXApi
     {
-        internal XApi(string path1, Queue queue)
-            : base(path1, queue)
+        public XApi(string path1)
+            : base(path1)
         {
         }
 

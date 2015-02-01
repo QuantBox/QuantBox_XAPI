@@ -9,7 +9,7 @@ enum RequestType :char
 
 	Create, // 创建
 	Release, // 销毁
-	Register, // 注册回调
+	Register, // 注册接收队列回调
 	Config,		// 配置参数
 
 	Connect, // 开始/连接

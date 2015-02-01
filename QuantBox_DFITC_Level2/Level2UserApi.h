@@ -22,6 +22,8 @@
 using namespace std;
 using namespace DFITC_L2;
 
+class CMsgQueue;
+
 class CLevel2UserApi :public DFITCL2Spi
 {
 	//请求数据包类型
@@ -31,18 +33,11 @@ class CLevel2UserApi :public DFITCL2Spi
 		E_UserLoginField,
 	};
 
-	//请求数据包结构体
-	struct SRequest
-	{
-		RequestType type;
-		void* pBuf;
-	};
-
 public:
 	CLevel2UserApi(void);
 	virtual ~CLevel2UserApi(void);
 
-	void Register(void* pMsgQueue);
+	void Register(void* pCallback);
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
@@ -56,37 +51,18 @@ public:
 	void UnsubscribeAll();
 
 private:
-	//数据包发送线程
-	//数据包发送线程
-	static void ProcessThread(CLevel2UserApi* lpParam)
-	{
-		if (lpParam)
-			lpParam->RunInThread();
-	}
-	void RunInThread();
-	void StartThread();
-	void StopThread();
+	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
-	//指定数据包类型，生成对应数据包
-	SRequest * MakeRequestBuf(RequestType type);
-	//清除将发送请求包队列
-	void ReleaseRequestListBuf();
-	//清除已发送请求包池
-	void ReleaseRequestMapBuf();
-	//清除指定请求包池中指定包
-	void ReleaseRequestMapBuf(int nRequestID);
-	//添加到已经请求包池
-	void AddRequestMapBuf(int nRequestID, SRequest* pRequest);
-	//添加到将发送包队列
-	void AddToSendQueue(SRequest * pRequest);
+	int _Init();
+	//登录请求
+	void ReqUserLogin();
+	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
 
 	//订阅行情
 	void Subscribe(const set<string>& instrumentIDs, const string& szExchageID);
 	void Unsubscribe(const set<string>& instrumentIDs, const string& szExchageID);
-
-	//登录请求
-	void ReqUserLogin();
-	int ReqInit();
 
 	virtual void OnConnected();
 	virtual void OnDisconnected(int nReason);
@@ -117,20 +93,14 @@ private:
 	set<string>					m_setInstrumentIDs;
 
 	DFITCL2Api*					m_pApi;					//行情API
-	void*						m_msgQueue;				//消息队列指针
-
+	
 	string						m_szPath;				//生成配置文件的路径
 	ServerInfoField				m_ServerInfo;
 	UserInfoField				m_UserInfo;
 
 	int							m_nSleep;
-	volatile bool				m_bRunning;
-	thread*						m_hThread;
-
-	mutex						m_csList;
-	list<SRequest*>				m_reqList;				//将发送请求队列
-
-	mutex						m_csMap;
-	map<int, SRequest*>			m_reqMap;				//已发送请求池
+	
+	CMsgQueue*					m_msgQueue;				//消息队列指针
+	CMsgQueue*					m_msgQueue_Query;
 };
 

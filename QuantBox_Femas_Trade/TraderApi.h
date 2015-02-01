@@ -22,6 +22,7 @@
 
 using namespace std;
 
+class CMsgQueue;
 
 class CTraderApi :
 	public CUstpFtdcTraderSpi
@@ -29,6 +30,8 @@ class CTraderApi :
 	//请求数据包类型
 	enum RequestType
 	{
+		E_Init,
+
 		E_ReqUserLoginField,
 		E_QryUserInvestorField,
 		E_QryInstrumentField,
@@ -50,32 +53,11 @@ class CTraderApi :
 		E_QuoteActionField,
 	};
 
-	//请求数据包结构体
-	struct SRequest
-	{
-		RequestType type;
-		union{
-			CUstpFtdcReqUserLoginField					ReqUserLoginField;
-			CUstpFtdcQryUserInvestorField				QryUserInvestorField;
-			CUstpFtdcQryInstrumentField					QryInstrumentField;
-			CUstpFtdcQryInvestorPositionField			QryInvestorPositionField;
-			CUstpFtdcInputOrderField					InputOrderField;
-			CUstpFtdcInputQuoteField					InputQuoteField;
-			CUstpFtdcQryOrderField						QryOrderField;
-			CUstpFtdcQryTradeField						QryTradeField;
-			CUstpFtdcQryInvestorAccountField			QryInvestorAccountField;
-			CUstpFtdcQryInvestorFeeField				QryInvestorFeeField;
-			CUstpFtdcQryInvestorMarginField				QryInvestorMarginField;
-			CUstpFtdcOrderActionField					OrderActionField;
-			CUstpFtdcQuoteActionField					QuoteActionField;
-		};
-	};
-
 public:
 	CTraderApi(void);
 	virtual ~CTraderApi(void);
 
-	void Register(void* pMsgQueue);
+	void Register(void* pCallback);
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
@@ -85,10 +67,6 @@ public:
 	char* ReqOrderInsert(
 		int OrderRef,
 		OrderField* pOrder1);
-
-	//int ReqParkedOrderInsert(int OrderRef,
-	//	OrderField* pOrder1,
-	//	OrderField* pOrder2);
 
 	int ReqOrderAction(const string& szId);
 	int ReqOrderAction(CUstpFtdcOrderField *pOrder);
@@ -111,35 +89,25 @@ public:
 	void ReqQryQuote();
 
 private:
+	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	int _Init();
+
+	void ReqUserLogin();
+	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	void ReqQryUserInvestor();
+	int _ReqQryUserInvestor(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	int _ReqQryInstrument(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	int _ReqQryInvestorAccount(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	int _ReqQryInvestorPosition(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+
 	void OnOrder(CUstpFtdcOrderField *pOrder);
 	void OnTrade(CUstpFtdcTradeField *pTrade);
 	void OnQuote(CUstpFtdcRtnQuoteField *pQuote);
-
-	//数据包发送线程
-	static void ProcessThread(CTraderApi* lpParam)
-	{
-		if (lpParam)
-			lpParam->RunInThread();
-	}
-	void RunInThread();
-	void StartThread();
-	void StopThread();
-
-	//指定数据包类型，生成对应数据包
-	SRequest * MakeRequestBuf(RequestType type);
-	//清除将发送请求包队列
-	void ReleaseRequestListBuf();
-	//清除已发送请求包池
-	void ReleaseRequestMapBuf();
-	//清除指定请求包池中指定包
-	void ReleaseRequestMapBuf(int nRequestID);
-	//添加到已经请求包池
-	void AddRequestMapBuf(int nRequestID,SRequest* pRequest);
-	//添加到将发送包队列
-	void AddToSendQueue(SRequest * pRequest);
-
-	void ReqUserLogin();
-	void ReqQryUserInvestor();
 
 	//检查是否出错
 	bool IsErrorRspInfo(CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
@@ -209,21 +177,13 @@ private:
 	long long					m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增
 
 	CUstpFtdcTraderApi*			m_pApi;					//交易API
-	void*						m_msgQueue;				//消息队列指针
 
 	string						m_szPath;				//生成配置文件的路径
 	ServerInfoField				m_ServerInfo;
 	UserInfoField				m_UserInfo;
 
 	int							m_nSleep;
-	volatile bool				m_bRunning;
-	thread*						m_hThread;
 
-	mutex						m_csList;
-	list<SRequest*>				m_reqList;				//将发送请求队列
-
-	mutex						m_csMap;
-	map<int,SRequest*>			m_reqMap;				//已发送请求池
 
 	unordered_map<string, OrderField*>				m_id_platform_order;
 	unordered_map<string, CUstpFtdcOrderField*>		m_id_api_order;
@@ -232,5 +192,8 @@ private:
 	unordered_map<string, QuoteField*>				m_id_platform_quote;
 	unordered_map<string, CUstpFtdcRtnQuoteField*>		m_id_api_quote;
 	//unordered_map<string, string>					m_sysId_quoteId;
+
+	CMsgQueue*					m_msgQueue;				//消息队列指针
+	CMsgQueue*					m_msgQueue_Query;
 };
 

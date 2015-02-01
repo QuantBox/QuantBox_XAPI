@@ -18,14 +18,22 @@
 
 using namespace std;
 
+class CMsgQueue;
+
 class CMdUserApi :
 	public CUstpFtdcMduserSpi
 {
+	enum RequestType
+	{
+		E_Init,
+		E_ReqUserLoginField,
+	};
+
 public:
 	CMdUserApi(void);
 	virtual ~CMdUserApi(void);
 
-	void Register(void* pMsgQueue);
+	void Register(void* pCallback);
 	ConfigInfoField* Config(ConfigInfoField* pConfigInfo);
 
 	void Connect(const string& szPath,
@@ -40,11 +48,19 @@ public:
 	void UnsubscribeQuote(const string& szInstrumentIDs, const string& szExchageID);
 
 private:
+	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	int _Init();
+	//登录请求
+	void ReqUserLogin();
+	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+
+
 	//订阅行情
 	void Subscribe(const set<string>& instrumentIDs, const string& szExchageID);
 	void SubscribeQuote(const set<string>& instrumentIDs, const string& szExchageID);
-	//登录请求
-	void ReqUserLogin();
 
 	virtual void OnFrontConnected();
 	virtual void OnFrontDisconnected(int nReason);
@@ -63,15 +79,18 @@ private:
 	mutex						m_csMapInstrumentIDs;
 	mutex						m_csMapQuoteInstrumentIDs;
 
-	atomic<int>					m_nRequestID;			//请求ID，每次请求前自增
+	atomic<int>					m_lRequestID;			//请求ID，每次请求前自增
 
 	set<string>					m_setInstrumentIDs;		//正在订阅的合约
 	set<string>					m_setQuoteInstrumentIDs;		//正在订阅的合约
 	CUstpFtdcMduserApi*			m_pApi;					//行情API
-	void*						m_msgQueue;				//消息队列指针
 
 	string						m_szPath;				//生成配置文件的路径
 	ServerInfoField				m_ServerInfo;
 	UserInfoField				m_UserInfo;
+	int							m_nSleep;
+
+	CMsgQueue*					m_msgQueue;				//消息队列指针
+	CMsgQueue*					m_msgQueue_Query;
 };
 

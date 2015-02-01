@@ -4,7 +4,7 @@
  * 文件说明：定义接口所需的数据类型的头文件
  * 当前版本：1.0.13
  * 作者：XSpeed项目组
- * 发布日期：2014年5月27日
+ * 发布日期：2015年1月28日
  */
  
 #ifndef DFITCAPIDATATYPE_H
@@ -192,6 +192,14 @@ typedef int DFITCOrderTypeType;
 #define DFITC_ARBITRAGE                 4
 ///展期互换委托
 #define DFITC_EXTENSION                 8
+///限价止盈委托
+#define DFITC_PROFIT_LIMITORDER         32
+///市价止盈委托
+#define DFITC_PROFIT_MKORDER            34
+///限价止损委托
+#define DFITC_LOSS_LIMITORDER           48            
+///市价止损委托
+#define DFITC_LOSS_MKORDER              50
 
 
 ////////////////////////////////////////////////////////////
@@ -446,11 +454,23 @@ typedef char DFITCAbiPolicyCodeType[8];
 ////////////////////////////////////////////////////////////
 typedef char DFITCOrderPropertyType;
 ///无订单属性
-#define DFITC_SP_NON                    '0'
+#define DFITC_SP_NON                          '0'
 ///FAK设置
-#define DFITC_SP_FAK                    '1'
+#define DFITC_SP_FAK                          '1'
 ///FOK设置
-#define DFITC_SP_FOK                    '2'
+#define DFITC_SP_FOK                          '2'
+///市价任意价
+#define DFITC_SP_ANYPRICE                     '3' 
+///市价任意价转限价
+#define DFITC_SP_ANYPRICE_TO_MKORDER          '4'
+///五档市价
+#define DFITC_SP_FIVELEVELPRICE               '5'
+///五档市价转限价
+#define DFITC_SP_FIVELEVELPRICE_TO_LIMIT      '6'
+///最优价
+#define DFITC_SP_BESTPRICE                    '7'
+///最优价转限价
+#define DFITC_SP_BESTPRICE_TO_LIMIT           '8'
 
 
 ////////////////////////////////////////////////////////////

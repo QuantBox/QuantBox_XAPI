@@ -4,7 +4,7 @@
 * 文件说明：定义接口所需的数据接口
 * 当前版本：1.0.13
 * 作者：XSpeed项目组
-* 发布日期：2014年5月27日
+* 发布日期：2015年1月28日
 */
 
 #ifndef DFITCAPISTRUCT_H_
@@ -45,10 +45,11 @@ struct APISTRUCT DFITCInsertOrderField
     DFITCOrderTypeType                  orderType;                    //报单类型, 支持限价 、市价；上期所合约不支持市价，均按限价进行处理
     DFITCOrderPropertyType              orderProperty;                //报单附加属性, 支持None、FAK、FOK，目前只有大商所合约支持该报单附加属性 FAK/FOK
     DFITCInstrumentTypeType             instrumentType;               //合约类型, 可选值：期货、期权
-    DFITCReservedType                   reservedType1;                //预留字段1
+    DFITCAmountType                     minMatchAmount;               //上期FAK,FOK单的最小成交量
     DFITCReservedType                   reservedType2;                //预留字段2
     DFITCRequestIDType                  lRequestID;                   //请求ID
     DFITCCustomCategoryType             customCategory;               //自定义类别
+	DFITCPriceType                      profitLossPrice;              //止盈止损价格  
 
     DFITCInsertOrderField();
 };
@@ -155,6 +156,7 @@ struct APISTRUCT DFITCOrderRtnField
     DFITCInstrumentTypeType             instrumentType;               //合约类型
     DFITCSpeculatorType                 speculator;                   //投资类别
     DFITCPriceType                      insertPrice;                  //委托价
+	DFITCPriceType                      profitLossPrice;              //止盈止损价格 
     DFITCAccountIDType                  accountID;                    //资金账号
     DFITCAmountType                     cancelAmount;                 //撤单数量
     DFITCAmountType                     orderAmount;                  //委托数量
@@ -447,13 +449,14 @@ struct APISTRUCT DFITCOrderCommRtnField
     DFITCFrontAddrType                  operStation;                  //委托地址
     DFITCAccountIDType                  accountID;                    //客户号
     DFITCInstrumentTypeType             instrumentType;               //合约类型
-    DFITCReservedType                   reservedType1;                //预留字段1
+    DFITCSessionIDType                  sessionId;                    //会话ID
     DFITCReservedType                   reservedType2;                //预留字段2
     DFITCOrderSysIDType                 OrderSysID;                   //报单编号
     DFITCCustomCategoryType             customCategory;               //自定义类别
     DFITCPriceType                      margin;                       //保证金
     DFITCPriceType                      fee;                          //手续费
     DFITCLocalOrderIDType               localOrderID;                 //本地委托号
+	DFITCPriceType                      profitLossPrice;              //止盈止损价
 
     DFITCOrderCommRtnField();
 };

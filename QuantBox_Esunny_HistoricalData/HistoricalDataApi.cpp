@@ -9,6 +9,8 @@
 
 #include "../include/toolkit.h"
 
+#include "../QuantBox_Queue/MsgQueue.h"
+
 #include <cstring>
 #include <assert.h>
 
@@ -51,15 +53,74 @@ int GetNextTradingDate(int date)
 	}
 }
 
+void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	// 由内部调用，不用检查是否为空
+	CHistoricalDataApi* pApi = (CHistoricalDataApi*)pApi1;
+	pApi->QueryInThread(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+	return nullptr;
+}
+
+void CHistoricalDataApi::QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	int iRet = 0;
+	switch (type)
+	{
+	case E_Init:
+		iRet = _Init();
+		if (iRet != 0)
+			this_thread::sleep_for(chrono::milliseconds(1000 * 20));
+		break;
+	case E_ReqQryHistoricalTicks:
+	{
+									HistoricalDataRequestField* pHDR = (HistoricalDataRequestField*)ptr1;
+									if (pHDR->CurrentDate != pHDR->Date1)
+										this_thread::sleep_for(chrono::milliseconds(1000 * 6));
+									iRet = ReqQryHistoricalTicks_(pHDR);
+	}
+		break;
+	case E_ReqQryHistoricalBars:
+	{
+								   HistoricalDataRequestField* pHDR = (HistoricalDataRequestField*)ptr1;
+								   if (pHDR->CurrentDate != pHDR->Date1)
+									   this_thread::sleep_for(chrono::milliseconds(1000 * 6));
+								   iRet = ReqQryHistoricalBars_(pHDR);
+	}
+		break;
+	case E_ReqQryHistoricalTicks_Check:
+		iRet = ReqQryHistoricalTicks_Check();
+		break;
+	default:
+		break;
+	}
+
+	if (0 == iRet)
+	{
+		//返回成功，填加到已发送池
+		m_nSleep = 1;
+	}
+	else
+	{
+		m_msgQueue_Query->Input(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		//失败，按4的幂进行延时，但不超过1s
+		m_nSleep *= 4;
+		m_nSleep %= 1023;
+	}
+	this_thread::sleep_for(chrono::milliseconds(m_nSleep));
+}
 
 CHistoricalDataApi::CHistoricalDataApi(void)
 {
 	m_pApi = nullptr;
-	m_msgQueue = nullptr;
 	m_lRequestID = 0;
+	m_nSleep = 1;
 
-	m_hThread = nullptr;
-	m_bRunning = false;
+	// 自己维护两个消息队列
+	m_msgQueue = new CMsgQueue();
+	m_msgQueue_Query = new CMsgQueue();
+
+	m_msgQueue_Query->Register(Query);
+	m_msgQueue_Query->StartThread();
 
 	m_nHdRequestId = 0;
 }
@@ -70,29 +131,23 @@ CHistoricalDataApi::~CHistoricalDataApi(void)
 	Disconnect();
 }
 
-void CHistoricalDataApi::StartThread()
+void CHistoricalDataApi::Register(void* pCallback)
 {
-	if (nullptr == m_hThread)
-	{
-		m_bRunning = true;
-		m_hThread = new thread(ProcessThread, this);
-	}
-}
+	if (m_msgQueue == nullptr)
+		return;
 
-void CHistoricalDataApi::StopThread()
-{
-	m_bRunning = false;
-	if (m_hThread)
+	m_msgQueue_Query->Register(Query);
+	m_msgQueue->Register(pCallback);
+	if (pCallback)
 	{
-		m_hThread->join();
-		delete m_hThread;
-		m_hThread = nullptr;
+		m_msgQueue_Query->StartThread();
+		m_msgQueue->StartThread();
 	}
-}
-
-void CHistoricalDataApi::Register(void* pMsgQueue)
-{
-	m_msgQueue = pMsgQueue;
+	else
+	{
+		m_msgQueue_Query->StopThread();
+		m_msgQueue->StopThread();
+	}
 }
 
 void CHistoricalDataApi::Connect(const string& szPath,
@@ -103,222 +158,23 @@ void CHistoricalDataApi::Connect(const string& szPath,
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
+	m_msgQueue_Query->Input(RequestType::E_Init, this, nullptr, 0, 0,
+		nullptr, 0, nullptr, 0, nullptr, 0);
+}
+
+int CHistoricalDataApi::_Init()
+{
 	m_pApi = CreateEsunnyQuotClient(this);
-	XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
-	if (m_pApi)
-	{
-		// 停止已有线程，并清理
-		StopThread();
-		ReleaseRequestListBuf();
-		ReleaseRequestMapBuf();
-
-		SRequest* pRequest = MakeRequestBuf(E_Init);
-		if (pRequest)
-		{
-			AddToSendQueue(pRequest);
-		}
-	}
-}
-
-void CHistoricalDataApi::Disconnect()
-{
-	// 如果队列中有请求包，在后面又进行了Release,又回过头来发送，可能导致当了
-	StopThread();
-
-	if (m_pApi)
-	{
-		m_pApi->DisConnect();
-		DelEsunnyQuotClient(m_pApi);
-		m_pApi = nullptr;
-
-		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-	}
-
-	m_lRequestID = 0;//由于线程已经停止，没有必要用原子操作了
-
-	ReleaseRequestListBuf();
-	ReleaseRequestMapBuf();
-}
-
-CHistoricalDataApi::SRequest* CHistoricalDataApi::MakeRequestBuf(RequestType type)
-{
-	SRequest *pRequest = new SRequest;
-	if (nullptr == pRequest)
-		return nullptr;
-
-	memset(pRequest, 0, sizeof(SRequest));
-	pRequest->type = type;
-	switch (type)
-	{
-	case E_Init:
-		pRequest->pBuf = nullptr;
-		break;
-	case E_ReqQryHistoricalTicks:
-	case E_ReqQryHistoricalBars:
-		pRequest->pBuf = new HistoricalDataRequestField;
-		break;
-	case E_ReqQryHistoricalTicks_Check:
-		pRequest->pBuf = nullptr;
-		break;
-	default:
-		assert(false);
-		break;
-	}
-	return pRequest;
-}
-
-void CHistoricalDataApi::ReleaseRequestListBuf()
-{
-	lock_guard<mutex> cl(m_csList);
-	while (!m_reqList.empty())
-	{
-		SRequest * pRequest = m_reqList.front();
-		delete pRequest;
-		m_reqList.pop_front();
-	}
-}
-
-void CHistoricalDataApi::ReleaseRequestMapBuf()
-{
-	lock_guard<mutex> cl(m_csMap);
-	for (map<int, SRequest*>::iterator it = m_reqMap.begin(); it != m_reqMap.end(); ++it)
-	{
-		delete (*it).second;
-	}
-	m_reqMap.clear();
-}
-
-void CHistoricalDataApi::ReleaseRequestMapBuf(int nRequestID)
-{
-	lock_guard<mutex> cl(m_csMap);
-	map<int, SRequest*>::iterator it = m_reqMap.find(nRequestID);
-	if (it != m_reqMap.end())
-	{
-		delete it->second;
-		m_reqMap.erase(nRequestID);
-	}
-}
-
-void CHistoricalDataApi::AddRequestMapBuf(int nRequestID, SRequest* pRequest)
-{
-	if (nullptr == pRequest)
-		return;
-
-	lock_guard<mutex> cl(m_csMap);
-	map<int, SRequest*>::iterator it = m_reqMap.find(nRequestID);
-	if (it != m_reqMap.end())
-	{
-		SRequest* p = it->second;
-		if (pRequest != p)//如果实际上指的是同一内存，不再插入
-		{
-			delete p;
-			m_reqMap[nRequestID] = pRequest;
-		}
-	}
-}
-
-void CHistoricalDataApi::AddToSendQueue(SRequest * pRequest)
-{
-	if (nullptr == pRequest)
-		return;
-
-	lock_guard<mutex> cl(m_csList);
-	bool bFind = false;
-	//目前不去除相同类型的请求，即没有对大量同类型请求进行优化
-	//for (list<SRequest*>::iterator it = m_reqList.begin();it!= m_reqList.end();++it)
-	//{
-	//	if (pRequest->type == (*it)->type)
-	//	{
-	//		bFind = true;
-	//		break;
-	//	}
-	//}
-
-	if (!bFind)
-		m_reqList.push_back(pRequest);
-
-	if (!m_reqList.empty())
-	{
-		StartThread();
-	}
-}
-
-
-
-void CHistoricalDataApi::RunInThread()
-{
-	int iRet = 0;
-
-	while (!m_reqList.empty() && m_bRunning)
-	{
-		SRequest * pRequest = m_reqList.front();
-		int lRequest = ++m_lRequestID;// 这个地方是否会出现原子操作的问题呢？
-		switch (pRequest->type)
-		{
-		case E_Init:
-			iRet = ReqInit();
-			if (iRet != 0 && m_bRunning)
-                this_thread::sleep_for(chrono::milliseconds(1000 * 20));
-			break;
-		case E_ReqQryHistoricalTicks:
-		{
-										HistoricalDataRequestField* pHDR = (HistoricalDataRequestField*)pRequest->pBuf;
-										// 请求太快了，后面会没有回应
-										if (pHDR->CurrentDate != pHDR->Date1)
-											this_thread::sleep_for(chrono::milliseconds(1000 * 6));
-										iRet = ReqQryHistoricalTicks_(pHDR, lRequest);
-		}
-			break;
-		case E_ReqQryHistoricalBars:
-		{
-										HistoricalDataRequestField* pHDR = (HistoricalDataRequestField*)pRequest->pBuf;
-										// 请求太快了，后面会没有回应
-										this_thread::sleep_for(chrono::milliseconds(1000 * 6));
-										iRet = ReqQryHistoricalBars_(pHDR, lRequest);
-		}
-			break;
-		case E_ReqQryHistoricalTicks_Check:
-			iRet = ReqQryHistoricalTicks_Check();
-			break;
-		default:
-			assert(false);
-			break;
-		}
-
-		if (0 == iRet)
-		{
-			//返回成功，填加到已发送池
-			m_nSleep = 1;
-			AddRequestMapBuf(lRequest, pRequest);
-
-			lock_guard<mutex> cl(m_csList);
-			m_reqList.pop_front();
-		}
-		else
-		{
-			//失败，按4的幂进行延时，但不超过1s
-			m_nSleep *= 4;
-			m_nSleep %= 1023;
-		}
-		this_thread::sleep_for(chrono::milliseconds(m_nSleep));
-	}
-
-	// 清理线程
-	m_hThread = nullptr;
-	m_bRunning = false;
-}
-
-int CHistoricalDataApi::ReqInit()
-{
-	XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	//初始化连接
 	int iRet = m_pApi->Connect(m_ServerInfo.Address, m_ServerInfo.Port);
 	if (0 == iRet)
 	{
-		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 		iRet = m_pApi->Login(m_UserInfo.UserID, m_UserInfo.Password);
-		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	}
 	else
 	{
@@ -326,12 +182,141 @@ int CHistoricalDataApi::ReqInit()
 		field.ErrorID = iRet;
 		strcpy(field.ErrorMsg, "连接超时");
 
-		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 
 		return iRet;
 	}
 	return iRet;
 }
+
+void CHistoricalDataApi::Disconnect()
+{
+	// 清理查询队列
+	if (m_msgQueue_Query)
+	{
+		m_msgQueue_Query->StopThread();
+		m_msgQueue_Query->Register(nullptr);
+		m_msgQueue_Query->Clear();
+		delete m_msgQueue_Query;
+		m_msgQueue_Query = nullptr;
+	}
+
+	if (m_pApi)
+	{
+		m_pApi->DisConnect();
+		DelEsunnyQuotClient(m_pApi);
+		m_pApi = nullptr;
+
+		// 全清理，只留最后一个
+		m_msgQueue->Clear();
+		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		// 主动触发
+		m_msgQueue->Process();
+	}
+
+	// 清理响应队列
+	if (m_msgQueue)
+	{
+		m_msgQueue->StopThread();
+		m_msgQueue->Register(nullptr);
+		m_msgQueue->Clear();
+		delete m_msgQueue;
+		m_msgQueue = nullptr;
+	}
+
+	m_lRequestID = 0;
+}
+//
+//CHistoricalDataApi::SRequest* CHistoricalDataApi::MakeRequestBuf(RequestType type)
+//{
+//	SRequest *pRequest = new SRequest;
+//	if (nullptr == pRequest)
+//		return nullptr;
+//
+//	memset(pRequest, 0, sizeof(SRequest));
+//	pRequest->type = type;
+//	switch (type)
+//	{
+//	case E_Init:
+//		pRequest->pBuf = nullptr;
+//		break;
+//	case E_ReqQryHistoricalTicks:
+//	case E_ReqQryHistoricalBars:
+//		pRequest->pBuf = new HistoricalDataRequestField;
+//		break;
+//	case E_ReqQryHistoricalTicks_Check:
+//		pRequest->pBuf = nullptr;
+//		break;
+//	default:
+//		assert(false);
+//		break;
+//	}
+//	return pRequest;
+//}
+//
+//void CHistoricalDataApi::RunInThread()
+//{
+//	int iRet = 0;
+//
+//	while (!m_reqList.empty() && m_bRunning)
+//	{
+//		SRequest * pRequest = m_reqList.front();
+//		int lRequest = ++m_lRequestID;// 这个地方是否会出现原子操作的问题呢？
+//		switch (pRequest->type)
+//		{
+//		case E_Init:
+//			iRet = ReqInit();
+//			if (iRet != 0 && m_bRunning)
+//                this_thread::sleep_for(chrono::milliseconds(1000 * 20));
+//			break;
+//		case E_ReqQryHistoricalTicks:
+//		{
+//										HistoricalDataRequestField* pHDR = (HistoricalDataRequestField*)pRequest->pBuf;
+//										// 请求太快了，后面会没有回应
+//										if (pHDR->CurrentDate != pHDR->Date1)
+//											this_thread::sleep_for(chrono::milliseconds(1000 * 6));
+//										iRet = ReqQryHistoricalTicks_(pHDR, lRequest);
+//		}
+//			break;
+//		case E_ReqQryHistoricalBars:
+//		{
+//										HistoricalDataRequestField* pHDR = (HistoricalDataRequestField*)pRequest->pBuf;
+//										// 请求太快了，后面会没有回应
+//										this_thread::sleep_for(chrono::milliseconds(1000 * 6));
+//										iRet = ReqQryHistoricalBars_(pHDR, lRequest);
+//		}
+//			break;
+//		case E_ReqQryHistoricalTicks_Check:
+//			iRet = ReqQryHistoricalTicks_Check();
+//			break;
+//		default:
+//			assert(false);
+//			break;
+//		}
+//
+//		if (0 == iRet)
+//		{
+//			//返回成功，填加到已发送池
+//			m_nSleep = 1;
+//			AddRequestMapBuf(lRequest, pRequest);
+//
+//			lock_guard<mutex> cl(m_csList);
+//			m_reqList.pop_front();
+//		}
+//		else
+//		{
+//			//失败，按4的幂进行延时，但不超过1s
+//			m_nSleep *= 4;
+//			m_nSleep %= 1023;
+//		}
+//		this_thread::sleep_for(chrono::milliseconds(m_nSleep));
+//	}
+//
+//	// 清理线程
+//	m_hThread = nullptr;
+//	m_bRunning = false;
+//}
+
 
 int __cdecl CHistoricalDataApi::OnRspLogin(int err, const char *errtext)
 {
@@ -341,12 +326,12 @@ int __cdecl CHistoricalDataApi::OnRspLogin(int err, const char *errtext)
 
 	if (err == 0)
 	{
-		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	}
 	else
 	{
-		XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
 
 	return 0;
@@ -358,7 +343,7 @@ int __cdecl CHistoricalDataApi::OnChannelLost(int err, const char *errtext)
 	field.ErrorID = err;
 	strncpy(field.ErrorMsg, errtext, sizeof(ErrorMsgType));
 
-	XRespone(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 
 	return 0;
 }
@@ -386,17 +371,13 @@ int __cdecl CHistoricalDataApi::OnRspHistoryQuot(struct STKHISDATA *pHisData)
 		pF->OpenInterest = item.fAmount;
 	}
 
-	XRespone(ResponeType::OnRspQryHistoricalBars, m_msgQueue, this, true, 0, pFields, sizeof(BarField)*pHisData->nCount, &m_RequestBar, sizeof(HistoricalDataRequestField), nullptr, 0);
-
-	ReleaseRequestMapBuf(m_RequestBar.lRequest);
+	m_msgQueue->Input(ResponeType::OnRspQryHistoricalBars, m_msgQueue, this, true, 0, pFields, sizeof(BarField)*pHisData->nCount, &m_RequestBar, sizeof(HistoricalDataRequestField), nullptr, 0);
 
 	if (pFields)
 		delete[] pFields;
 
 	return 0;
 }
-
-
 
 int CHistoricalDataApi::ReqQryHistoricalTicks(HistoricalDataRequestField* request)
 {
@@ -405,27 +386,24 @@ int CHistoricalDataApi::ReqQryHistoricalTicks(HistoricalDataRequestField* reques
 		return 0;
 	}
 
-	SRequest* pRequest = MakeRequestBuf(E_ReqQryHistoricalTicks);
-	if (nullptr == pRequest)
-		return 0;
-
 	++m_nHdRequestId;
 	request->RequestId = m_nHdRequestId;
 	request->CurrentDate = request->Date1;
-	memcpy(pRequest->pBuf, request, sizeof(HistoricalDataRequestField));
-	AddToSendQueue(pRequest);
+
+	m_msgQueue_Query->Input(RequestType::E_ReqQryHistoricalTicks, this, nullptr, 0, 0,
+		request, sizeof(HistoricalDataRequestField), nullptr, 0, nullptr, 0);
 
 	return m_nHdRequestId;
 }
 
-int CHistoricalDataApi::ReqQryHistoricalTicks_(HistoricalDataRequestField* request,int lRequest)
+int CHistoricalDataApi::ReqQryHistoricalTicks_(HistoricalDataRequestField* request)
 {
-	request->lRequest = lRequest;
+	request->lRequest = ++m_lRequestID;
 	if (request->CurrentDate > request->Date2)
 	{
 		return 0;
 	}
-	
+
 	memcpy(&m_RequestTick, request, sizeof(HistoricalDataRequestField));
 
 	char buf1[20] = { 0 };
@@ -434,12 +412,9 @@ int CHistoricalDataApi::ReqQryHistoricalTicks_(HistoricalDataRequestField* reque
 	if (iRet == 0)
 	{
 		// 每天早上如9点前，前是查了没有返回的，所以要延时检查,没有就发回一个结束的标识
-		SRequest* pRequest = MakeRequestBuf(E_ReqQryHistoricalTicks_Check);
-		if (nullptr == pRequest)
-			return 0;
-
 		m_timer_1 = time(NULL);
-		AddToSendQueue(pRequest);
+		m_msgQueue_Query->Input(RequestType::E_ReqQryHistoricalTicks_Check, this, nullptr, 0, 0,
+			nullptr, 0, nullptr, 0, nullptr, 0);
 	}
 	else
 	{
@@ -469,23 +444,20 @@ int CHistoricalDataApi::RtnEmptyRspQryHistoricalTicks()
 {
 	bool bIsLast = m_RequestTick.CurrentDate >= m_RequestTick.Date2;
 
-	XRespone(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, bIsLast, 0, 0, 0, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
+	m_msgQueue->Input(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, bIsLast, 0, 0, 0, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
 
 	if (!bIsLast)
 	{
-		SRequest* pRequest = MakeRequestBuf(E_ReqQryHistoricalTicks);
-		if (nullptr == pRequest)
-			return 0;
-
 		m_RequestTick.CurrentDate = GetNextTradingDate(m_RequestTick.CurrentDate);
-		memcpy(pRequest->pBuf, &m_RequestTick, sizeof(HistoricalDataRequestField));
-		AddToSendQueue(pRequest);
+
+		m_msgQueue_Query->Input(RequestType::E_ReqQryHistoricalTicks, this, nullptr, 0, 0,
+			&m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0, nullptr, 0);
 	}
 
 	return 0;
 }
 
-double my_round(float val,int x = 0)
+double my_round(float val, int x = 0)
 {
 	double i = ((int)(val * 10000 + 0.5)) / 10000.0;
 	return i;
@@ -515,22 +487,16 @@ int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 
 	bool bIsLast = m_RequestTick.CurrentDate >= m_RequestTick.Date2;
 
-	XRespone(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, bIsLast, 0, pFields, sizeof(TickField)*pTraceData->nCount, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
-
-	ReleaseRequestMapBuf(m_RequestTick.lRequest);
+	m_msgQueue->Input(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, bIsLast, 0, pFields, sizeof(TickField)*pTraceData->nCount, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
 
 	if (pFields)
 		delete[] pFields;
 
 	if (!bIsLast)
 	{
-		SRequest* pRequest = MakeRequestBuf(E_ReqQryHistoricalTicks);
-		if (nullptr == pRequest)
-			return 0;
-
 		m_RequestTick.CurrentDate = GetNextTradingDate(m_RequestTick.CurrentDate);
-		memcpy(pRequest->pBuf, &m_RequestTick, sizeof(HistoricalDataRequestField));
-		AddToSendQueue(pRequest);
+		m_msgQueue_Query->Input(RequestType::E_ReqQryHistoricalTicks, this, nullptr, 0, 0,
+			&m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0, nullptr, 0);
 	}
 
 	return 0;
@@ -551,8 +517,8 @@ int __cdecl CHistoricalDataApi::OnRspMarketInfo(struct MarketInfo *pMarketInfo, 
 
 		strcpy(field.InstrumentName, item.szName);
 		field.Type = InstrumentType::Future;
-		
-		XRespone(ResponeType::OnRspQryInstrument, m_msgQueue, this, i >= pMarketInfo->stocknum -1, 0, &field, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
+
+		m_msgQueue->Input(ResponeType::OnRspQryInstrument, m_msgQueue, this, i >= pMarketInfo->stocknum - 1, 0, &field, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
 	}
 
 	return 0;
@@ -607,21 +573,18 @@ int BarSize2Period(int barSize)
 
 int CHistoricalDataApi::ReqQryHistoricalBars(HistoricalDataRequestField* request)
 {
-	SRequest* pRequest = MakeRequestBuf(E_ReqQryHistoricalBars);
-	if (nullptr == pRequest)
-		return 0;
-
 	++m_nHdRequestId;
 	request->RequestId = m_nHdRequestId;
-	memcpy(pRequest->pBuf, request, sizeof(HistoricalDataRequestField));
-	AddToSendQueue(pRequest);
+
+	m_msgQueue_Query->Input(RequestType::E_ReqQryHistoricalBars, this, nullptr, 0, 0,
+		request, sizeof(HistoricalDataRequestField), nullptr, 0, nullptr, 0);
 
 	return m_nHdRequestId;
 }
 
-int CHistoricalDataApi::ReqQryHistoricalBars_(HistoricalDataRequestField* request, int lRequest)
+int CHistoricalDataApi::ReqQryHistoricalBars_(HistoricalDataRequestField* request)
 {
-	request->lRequest = lRequest;
+	request->lRequest = ++m_lRequestID;
 	memcpy(&m_RequestBar, request, sizeof(HistoricalDataRequestField));
 
 	int period = BarSize2Period(request->BarSize);

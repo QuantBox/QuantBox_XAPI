@@ -22,6 +22,8 @@
 
 using namespace std;
 
+class CMsgQueue;
+
 class CMdUserApi :
 	public DFITCSECMdSpi
 {
@@ -29,25 +31,20 @@ class CMdUserApi :
 	enum RequestType
 	{
 		E_Init,
-		E_ReqStockUserLoginField,
-		E_ReqSOPUserLoginField,
-		E_ReqFASLUserLoginField,
+
+		E_StockUserLoginField,
+		E_SOPUserLoginField,
+		E_FASLUserLoginField,
+
 		E_ReqStockQuotQryField,
 		E_ReqSOPQuotQryField,
-	};
-
-	//请求数据包结构体
-	struct SRequest
-	{
-		RequestType type;
-		void* pBuf;
 	};
 
 public:
 	CMdUserApi(void);
 	virtual ~CMdUserApi(void);
 
-	void Register(void* pMsgQueue);
+	void Register(void* pCallback);
 	ConfigInfoField* Config(ConfigInfoField* pConfigInfo);
 
 	void Connect(const string& szPath,
@@ -64,31 +61,16 @@ public:
 	void ReqQryInstrument(const string& szInstrumentId, const string& szExchange);
 
 private:
-	//数据包发送线程
-	//数据包发送线程
-	static void ProcessThread(CMdUserApi* lpParam)
-	{
-		if (lpParam)
-			lpParam->RunInThread();
-	}
-	void RunInThread();
-	void StartThread();
-	void StopThread();
+	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
-	//指定数据包类型，生成对应数据包
-	SRequest * MakeRequestBuf(RequestType type);
-	//清除将发送请求包队列
-	void ReleaseRequestListBuf();
-	//清除已发送请求包池
-	void ReleaseRequestMapBuf();
-	//清除指定请求包池中指定包
-	void ReleaseRequestMapBuf(int nRequestID);
-	//添加到已经请求包池
-	void AddRequestMapBuf(int nRequestID, SRequest* pRequest);
-	//添加到将发送包队列
-	void AddToSendQueue(SRequest * pRequest);
+	int _Init();
 
-	int ReqInit();
+	void ReqStockUserLogin();
+	int _ReqStockUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	void ReqStockAvailableQuotQry(const string& szInstrumentId, const string& szExchange);
+	int _ReqStockAvailableQuotQry(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
 
 	//订阅行情
@@ -97,11 +79,8 @@ private:
 
 
 	//登录请求
-	void ReqStockUserLogin();
-	void ReqSOPUserLogin();
-	void ReqFASLUserLogin();
-
-	void ReqStockAvailableQuotQry(const string& szInstrumentId, const string& szExchange);
+	//void ReqSOPUserLogin();
+	//void ReqFASLUserLogin();
 
 	virtual void OnFrontConnected();
 	virtual void OnFrontDisconnected(int nReason);
@@ -143,20 +122,13 @@ private:
 	map<string, set<string> >	m_mapInstrumentIDs;		//正在订阅的合约
 
 	DFITCSECMdApi*				m_pApi;					//行情API
-	void*						m_msgQueue;				//消息队列指针
-
+	
 	string						m_szPath;				//生成配置文件的路径
 	ServerInfoField				m_ServerInfo;
 	UserInfoField				m_UserInfo;
-
 	int							m_nSleep;
-	volatile bool				m_bRunning;
-	thread*						m_hThread;
-
-	mutex						m_csList;
-	list<SRequest*>				m_reqList;				//将发送请求队列
-
-	mutex						m_csMap;
-	map<int, SRequest*>			m_reqMap;
+	
+	CMsgQueue*					m_msgQueue;				//消息队列指针
+	CMsgQueue*					m_msgQueue_Query;
 };
 

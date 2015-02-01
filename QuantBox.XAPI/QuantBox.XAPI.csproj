@@ -30,7 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject />
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug64|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -80,13 +81,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Callback\ApiManager.cs" />
     <Compile Include="Callback\BaseApi.cs" />
     <Compile Include="Callback\XApi.cs" />
     <Compile Include="Callback\XApi.HistoricalData.cs" />
     <Compile Include="Callback\XApi.QuoteRequest.cs" />
     <Compile Include="Callback\XApi.MarketData.cs" />
-    <Compile Include="Callback\Queue.cs" />
     <Compile Include="Callback\XApi.Instrument.cs" />
     <Compile Include="Callback\XApi.Trade.cs" />
     <Compile Include="Delegate.cs" />

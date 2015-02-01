@@ -55,18 +55,18 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case ReqQryTradingAccount:
 		pApi->ReqQryTradingAccount();
 		break;
-	case ReqQrySettlementInfo:
-		pApi->ReqQrySettlementInfo((const char*)ptr1);
-		break;
+	//case ReqQrySettlementInfo:
+	//	pApi->ReqQrySettlementInfo((const char*)ptr1);
+	//	break;
 	case ReqOrderInsert:
 		if (double2 == 0)
 		{
 			return pApi->ReqOrderInsert((int)double1, (OrderField*)ptr1, (OrderField*)ptr2);
 		}
-		else
-		{
-			return pApi->ReqParkedOrderInsert((int)double1, (OrderField*)ptr1, (OrderField*)ptr2);
-		}
+		//else
+		//{
+		//	return pApi->ReqParkedOrderInsert((int)double1, (OrderField*)ptr1, (OrderField*)ptr2);
+		//}
 	case ReqQuoteInsert:
 		return pApi->ReqQuoteInsert((int)double1, (QuoteField*)ptr1);
 	case ReqOrderAction:
