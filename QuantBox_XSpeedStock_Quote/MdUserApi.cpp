@@ -123,7 +123,7 @@ bool CMdUserApi::IsErrorRspInfo_Output(struct DFITCSECRspInfoField *pRspInfo)
 	{
 		ErrorField field = { 0 };
 		field.ErrorID = pRspInfo->errorID;
-		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(pRspInfo->errorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnRtnError, m_msgQueue, this, true, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -421,7 +421,7 @@ void CMdUserApi::OnRspStockUserLogin(struct DFITCSECRspUserLoginField * pRspUser
 	else
 	{
 		field.ErrorID = pRspInfo->errorID;
-		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(pRspInfo->errorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}

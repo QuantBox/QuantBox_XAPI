@@ -99,7 +99,7 @@ bool CTraderApi::IsErrorRspInfo_Output(struct DFITCErrorRtnField *pRspInfo)
 	{
 		ErrorField field = { 0 };
 		field.ErrorID = pRspInfo->nErrorID;
-		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(pRspInfo->errorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnRtnError, m_msgQueue, this, true, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -248,7 +248,7 @@ void CTraderApi::OnRspUserLogin(struct DFITCUserLoginInfoRtnField * pRspUserLogi
 	else
 	{
 		field.ErrorID = pRspInfo->nErrorID;
-		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(pRspInfo->errorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
@@ -353,7 +353,7 @@ void CTraderApi::OnRspInsertOrder(struct DFITCOrderRspDataRtnField * pOrderRtn, 
 		pField->ExecType = ExecType::ExecRejected;
 		pField->Status = OrderStatus::Rejected;
 		pField->ErrorID = pErrorInfo->nErrorID;
-		strncpy(pField->Text, pErrorInfo->errorMsg, sizeof(DFITCErrorMsgInfoType));
+		strncpy(pField->Text, pErrorInfo->errorMsg, sizeof(ErrorMsgType));
 		m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 	}
 }
@@ -903,16 +903,16 @@ void CTraderApi::OnRspQryExchangeInstrument(struct DFITCExchangeInstrumentRtnFie
 		{
 			InstrumentField field = { 0 };
 
-			strncpy(field.InstrumentID, pInstrumentData->instrumentID, sizeof(DFITCInstrumentIDType));
-			strncpy(field.ExchangeID, pInstrumentData->exchangeID, sizeof(DFITCExchangeIDType));
+			strncpy(field.InstrumentID, pInstrumentData->instrumentID, sizeof(InstrumentIDType));
+			strncpy(field.ExchangeID, pInstrumentData->exchangeID, sizeof(ExchangeIDType));
 
-			strncpy(field.Symbol, pInstrumentData->instrumentID, sizeof(DFITCInstrumentIDType));
+			strncpy(field.Symbol, pInstrumentData->instrumentID, sizeof(SymbolType));
 
-			strncpy(field.InstrumentName, pInstrumentData->VarietyName, sizeof(DFITCVarietyNameType));
+			strncpy(field.InstrumentName, pInstrumentData->VarietyName, sizeof(InstrumentNameType));
 			field.Type = DFITCInstrumentTypeType_2_InstrumentType(pInstrumentData->instrumentType);
 			field.VolumeMultiple = (VolumeMultipleType)pInstrumentData->contractMultiplier;
 			field.PriceTick = pInstrumentData->minPriceFluctuation;
-			strncpy(field.ExpireDate, pInstrumentData->instrumentMaturity, sizeof(DFITCInstrumentMaturityType));
+			strncpy(field.ExpireDate, pInstrumentData->instrumentMaturity, sizeof(DateType));
 			//field.OptionsType = TThostFtdcOptionsTypeType_2_PutCall(pInstrument->OptionsType);
 
 			m_msgQueue->Input(ResponeType::OnRspQryInstrument, m_msgQueue, this, bIsLast, 0, &field, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
@@ -941,12 +941,12 @@ void CTraderApi::OnRspArbitrageInstrument(struct DFITCAbiInstrumentRtnField * pA
 		{
 			InstrumentField field = { 0 };
 
-			strncpy(field.InstrumentID, pAbiInstrumentData->InstrumentID, sizeof(DFITCInstrumentIDType));
-			strncpy(field.ExchangeID, pAbiInstrumentData->exchangeID, sizeof(DFITCExchangeIDType));
+			strncpy(field.InstrumentID, pAbiInstrumentData->InstrumentID, sizeof(InstrumentIDType));
+			strncpy(field.ExchangeID, pAbiInstrumentData->exchangeID, sizeof(ExchangeIDType));
 
-			strncpy(field.Symbol, pAbiInstrumentData->InstrumentID, sizeof(DFITCInstrumentIDType));
+			strncpy(field.Symbol, pAbiInstrumentData->InstrumentID, sizeof(SymbolType));
 
-			strncpy(field.InstrumentName, pAbiInstrumentData->instrumentName, sizeof(DFITCVarietyNameType));
+			strncpy(field.InstrumentName, pAbiInstrumentData->instrumentName, sizeof(InstrumentNameType));
 			/*field.Type = DFITCInstrumentTypeType_2_InstrumentType(pInstrumentData->instrumentType);
 			field.VolumeMultiple = pInstrumentData->contractMultiplier;
 			field.PriceTick = pInstrumentData->minPriceFluctuation;

@@ -280,7 +280,7 @@ void CTraderApi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CTho
 	else
 	{
 		field.ErrorID = pRspInfo->ErrorID;
-		strncpy(field.ErrorMsg, pRspInfo->ErrorMsg, sizeof(pRspInfo->ErrorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}

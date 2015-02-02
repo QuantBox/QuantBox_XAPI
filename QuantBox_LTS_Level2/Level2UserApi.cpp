@@ -413,8 +413,8 @@ void CLevel2UserApi::OnRspUnSubL2MarketData(CSecurityFtdcSpecificInstrumentField
 void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2MarketData)
 {
 	DepthMarketDataField marketData = { 0 };
-	strncpy(marketData.InstrumentID, pL2MarketData->InstrumentID, sizeof(TSecurityFtdcInstrumentIDType));
-	strncpy(marketData.ExchangeID, pL2MarketData->ExchangeID, sizeof(TSecurityFtdcExchangeIDType));
+	strncpy(marketData.InstrumentID, pL2MarketData->InstrumentID, sizeof(InstrumentIDType));
+	strncpy(marketData.ExchangeID, pL2MarketData->ExchangeID, sizeof(ExchangeIDType));
 
 	sprintf(marketData.Symbol, "%s.%s", marketData.InstrumentID, marketData.ExchangeID);
 
@@ -630,8 +630,8 @@ void CLevel2UserApi::OnRspUnSubL2Index(CSecurityFtdcSpecificInstrumentField *pSp
 void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 {
 	DepthMarketDataField marketData = { 0 };
-	strncpy(marketData.InstrumentID, pL2Index->InstrumentID, sizeof(TSecurityFtdcInstrumentIDType));
-	strncpy(marketData.ExchangeID, pL2Index->ExchangeID, sizeof(TSecurityFtdcExchangeIDType));
+	strncpy(marketData.InstrumentID, pL2Index->InstrumentID, sizeof(InstrumentIDType));
+	strncpy(marketData.ExchangeID, pL2Index->ExchangeID, sizeof(ExchangeIDType));
 
 	sprintf(marketData.Symbol, "%s.%s", marketData.InstrumentID, marketData.ExchangeID);
 	GetExchangeTime(pL2Index->TradingDay, pL2Index->TradingDay, pL2Index->TimeStamp

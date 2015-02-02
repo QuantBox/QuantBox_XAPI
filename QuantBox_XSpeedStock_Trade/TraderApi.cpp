@@ -99,7 +99,7 @@ bool CTraderApi::IsErrorRspInfo_Output(struct DFITCSECRspInfoField *pRspInfo)
 	{
 		ErrorField field = { 0 };
 		field.ErrorID = pRspInfo->errorID;
-		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(pRspInfo->errorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnRtnError, m_msgQueue, this, true, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -299,7 +299,7 @@ void CTraderApi::OnRspStockUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECR
 	else
 	{
 		field.ErrorID = pRspInfo->errorID;
-		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(pRspInfo->errorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
@@ -331,7 +331,7 @@ void CTraderApi::OnRspSOPUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECRsp
 	else
 	{
 		field.ErrorID = pRspInfo->errorID;
-		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(pRspInfo->errorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
@@ -363,7 +363,7 @@ void CTraderApi::OnRspFASLUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECRs
 	else
 	{
 		field.ErrorID = pRspInfo->errorID;
-		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(pRspInfo->errorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}

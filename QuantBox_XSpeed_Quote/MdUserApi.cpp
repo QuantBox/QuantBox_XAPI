@@ -106,7 +106,7 @@ bool CMdUserApi::IsErrorRspInfo_Output(struct DFITCErrorRtnField *pRspInfo)
 	{
 		ErrorField field = { 0 };
 		field.ErrorID = pRspInfo->nErrorID;
-		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(pRspInfo->errorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnRtnError, m_msgQueue, this, true, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -547,7 +547,7 @@ void CMdUserApi::OnRspUserLogin(struct DFITCUserLoginInfoRtnField * pRspUserLogi
 	else
 	{
 		field.ErrorID = pRspInfo->nErrorID;
-		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(pRspInfo->errorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}

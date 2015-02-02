@@ -333,7 +333,7 @@ void CTraderApi::OnRspQryUserInvestor(CUstpFtdcRspUserInvestorField *pRspUserInv
 	else
 	{
 		field.ErrorID = pRspInfo->ErrorID;
-		strncpy(field.ErrorMsg, pRspInfo->ErrorMsg, sizeof(pRspInfo->ErrorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
@@ -478,7 +478,7 @@ void CTraderApi::OnRspOrderInsert(CUstpFtdcInputOrderField *pInputOrder, CUstpFt
 			pField->ExecType = ExecType::ExecNew;
 			pField->Status = OrderStatus::New;
 			pField->ErrorID = pRspInfo->ErrorID;
-			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TUstpFtdcErrorMsgType));
+			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 			strcat(pField->Text, "OnRspOrderInsert");
 			m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 		}
@@ -488,7 +488,7 @@ void CTraderApi::OnRspOrderInsert(CUstpFtdcInputOrderField *pInputOrder, CUstpFt
 			pField->ExecType = ExecType::ExecRejected;
 			pField->Status = OrderStatus::Rejected;
 			pField->ErrorID = pRspInfo->ErrorID;
-			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TUstpFtdcErrorMsgType));
+			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 			strcat(pField->Text, "OnRspOrderInsert");
 			m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 		}
@@ -522,7 +522,7 @@ void CTraderApi::OnErrRtnOrderInsert(CUstpFtdcInputOrderField *pInputOrder, CUst
 		pField->ExecType = ExecType::ExecRejected;
 		pField->Status = OrderStatus::Rejected;
 		pField->ErrorID = pRspInfo->ErrorID;
-		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TUstpFtdcErrorMsgType));
+		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 		strcat(pField->Text, "OnErrRtnOrderInsert");
 		m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 	}
@@ -607,7 +607,7 @@ void CTraderApi::OnRspOrderAction(CUstpFtdcOrderActionField *pOrderAction, CUstp
 			pField->ExecType = ExecType::ExecCancelled;
 			pField->Status = OrderStatus::Cancelled;
 			pField->ErrorID = pRspInfo->ErrorID;
-			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TUstpFtdcErrorMsgType));
+			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 			strcat(pField->Text, "OnRspOrderAction");
 			m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 		}
@@ -619,7 +619,7 @@ void CTraderApi::OnRspOrderAction(CUstpFtdcOrderActionField *pOrderAction, CUstp
 			strcpy(pField->ID, orderId);
 			pField->ExecType = ExecType::ExecCancelReject;
 			pField->ErrorID = pRspInfo->ErrorID;
-			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TUstpFtdcErrorMsgType));
+			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 			strcat(pField->Text, "OnRspOrderAction");
 			m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 		}
@@ -653,7 +653,7 @@ void CTraderApi::OnErrRtnOrderAction(CUstpFtdcOrderActionField *pOrderAction, CU
 		strcpy(pField->ID, orderId);
 		pField->ExecType = ExecType::ExecCancelReject;
 		pField->ErrorID = pRspInfo->ErrorID;
-		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TUstpFtdcErrorMsgType));
+		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 		strcat(pField->Text, "OnErrRtnOrderAction");
 		m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 	}
@@ -768,7 +768,7 @@ void CTraderApi::OnRspQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUstpFt
 			pField->ExecType = ExecType::ExecNew;
 			pField->Status = OrderStatus::New;
 			pField->ErrorID = pRspInfo->ErrorID;
-			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TUstpFtdcErrorMsgType));
+			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 			strcat(pField->Text, "OnRspQuoteInsert");
 			m_msgQueue->Input(ResponeType::OnRtnQuote, m_msgQueue, this, 0, 0, pField, sizeof(QuoteField), nullptr, 0, nullptr, 0);
 		}
@@ -779,7 +779,7 @@ void CTraderApi::OnRspQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUstpFt
 			pField->ExecType = ExecType::ExecRejected;
 			pField->Status = OrderStatus::Rejected;
 			pField->ErrorID = pRspInfo->ErrorID;
-			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TUstpFtdcErrorMsgType));
+			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 			strcat(pField->Text, "OnRspQuoteInsert");
 			m_msgQueue->Input(ResponeType::OnRtnQuote, m_msgQueue, this, 0, 0, pField, sizeof(QuoteField), nullptr, 0, nullptr, 0);
 		}
@@ -811,7 +811,7 @@ void CTraderApi::OnErrRtnQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUst
 		pField->ExecType = ExecType::ExecRejected;
 		pField->Status = OrderStatus::Rejected;
 		pField->ErrorID = pRspInfo->ErrorID;
-		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TUstpFtdcErrorMsgType));
+		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 		strcat(pField->Text, "OnErrRtnQuoteInsert");
 		m_msgQueue->Input(ResponeType::OnRtnQuote, m_msgQueue, this, 0, 0, pField, sizeof(QuoteField), nullptr, 0, nullptr, 0);
 	}
@@ -897,7 +897,7 @@ void CTraderApi::OnRspQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CUstp
 			pField->ExecType = ExecType::ExecCancelled;
 			pField->Status = OrderStatus::Cancelled;
 			pField->ErrorID = pRspInfo->ErrorID;
-			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TUstpFtdcErrorMsgType));
+			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 			strcat(pField->Text, "OnRspQuoteAction");
 			m_msgQueue->Input(ResponeType::OnRtnQuote, m_msgQueue, this, 0, 0, pField, sizeof(QuoteField), nullptr, 0, nullptr, 0);
 		}
@@ -909,7 +909,7 @@ void CTraderApi::OnRspQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CUstp
 			strcpy(pField->ID, quoteId);
 			pField->ExecType = ExecType::ExecCancelReject;
 			pField->ErrorID = pRspInfo->ErrorID;
-			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TUstpFtdcErrorMsgType));
+			strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 			strcat(pField->Text, "OnRspQuoteAction");
 			m_msgQueue->Input(ResponeType::OnRtnQuote, m_msgQueue, this, 0, 0, pField, sizeof(QuoteField), nullptr, 0, nullptr, 0);
 		}
@@ -942,7 +942,7 @@ void CTraderApi::OnErrRtnQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CU
 		strcpy(pField->ID, quoteId);
 		pField->ExecType = ExecType::ExecCancelReject;
 		pField->ErrorID = pRspInfo->ErrorID;
-		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TUstpFtdcErrorMsgType));
+		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 		strcat(pField->Text, "OnErrRtnQuoteAction");
 		m_msgQueue->Input(ResponeType::OnRtnQuote, m_msgQueue, this, 0, 0, pField, sizeof(QuoteField), nullptr, 0, nullptr, 0);
 	}
@@ -1374,7 +1374,7 @@ void CTraderApi::OnQuote(CUstpFtdcRtnQuoteField *pQuote)
 			strcpy(pField->AskOrderID, pQuote->AskOrderSysID);
 			strcpy(pField->BidOrderID, pQuote->BidOrderSysID);
 
-			//strncpy(pField->Text, pQuote->, sizeof(TThostFtdcErrorMsgType));
+			//strncpy(pField->Text, pQuote->, sizeof(ErrorMsgType));
 
 			//pField->ExecType = ExecType::ExecNew;
 			pField->Status = CUstpFtdcRtnQuoteField_2_OrderStatus(pQuote);

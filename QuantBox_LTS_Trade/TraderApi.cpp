@@ -443,7 +443,7 @@ void CTraderApi::OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, C
 	else
 	{
 		field.ErrorID = pRspInfo->ErrorID;
-		strncpy(field.ErrorMsg, pRspInfo->ErrorMsg, sizeof(pRspInfo->ErrorMsg));
+		strncpy(field.ErrorMsg, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 
 		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
@@ -612,7 +612,7 @@ void CTraderApi::OnRspOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, CSe
 		pField->ExecType = ExecType::ExecRejected;
 		pField->Status = OrderStatus::Rejected;
 		pField->ErrorID = pRspInfo->ErrorID;
-		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TSecurityFtdcErrorMsgType));
+		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 		m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 	}
 }
@@ -645,7 +645,7 @@ void CTraderApi::OnErrRtnOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, 
 		pField->ExecType = ExecType::ExecRejected;
 		pField->Status = OrderStatus::Rejected;
 		pField->ErrorID = pRspInfo->ErrorID;
-		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TSecurityFtdcErrorMsgType));
+		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 		m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 	}
 }
@@ -732,7 +732,7 @@ void CTraderApi::OnRspOrderAction(CSecurityFtdcInputOrderActionField *pInputOrde
 		OrderField* pField = it->second;
 		pField->ExecType = ExecType::ExecCancelReject;
 		pField->ErrorID = pRspInfo->ErrorID;
-		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TSecurityFtdcErrorMsgType));
+		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 		m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 	}
 }
@@ -762,7 +762,7 @@ void CTraderApi::OnErrRtnOrderAction(CSecurityFtdcOrderActionField *pOrderAction
 		OrderField* pField = it->second;
 		pField->ExecType = ExecType::ExecCancelReject;
 		pField->ErrorID = pRspInfo->ErrorID;
-		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TSecurityFtdcErrorMsgType));
+		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 		m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 	}
 }
@@ -914,16 +914,16 @@ void CTraderApi::OnRspQryInstrument(CSecurityFtdcInstrumentField *pInstrument, C
 		{
 			InstrumentField field = { 0 };
 
-			strncpy(field.InstrumentID, pInstrument->InstrumentID, sizeof(TSecurityFtdcInstrumentIDType));
-			strncpy(field.ExchangeID, pInstrument->ExchangeID, sizeof(TSecurityFtdcExchangeIDType));
+			strncpy(field.InstrumentID, pInstrument->InstrumentID, sizeof(InstrumentIDType));
+			strncpy(field.ExchangeID, pInstrument->ExchangeID, sizeof(ExchangeIDType));
 
 			sprintf(field.Symbol,"%s.%s",pInstrument->InstrumentID,pInstrument->ExchangeID);
 
-			strncpy(field.InstrumentName, pInstrument->InstrumentName, sizeof(TSecurityFtdcInstrumentNameType));
+			strncpy(field.InstrumentName, pInstrument->InstrumentName, sizeof(InstrumentNameType));
 			field.Type = CSecurityFtdcInstrumentField_2_InstrumentType(pInstrument);
 			field.VolumeMultiple = pInstrument->VolumeMultiple;
 			field.PriceTick = CSecurityFtdcInstrumentField_2_PriceTick(pInstrument);
-			strncpy(field.ExpireDate, pInstrument->ExpireDate, sizeof(TSecurityFtdcDateType));
+			strncpy(field.ExpireDate, pInstrument->ExpireDate, sizeof(DateType));
 			field.OptionsType = CSecurityFtdcInstrumentField_2_PutCall(pInstrument);
 			field.StrikePrice = pInstrument->ExecPrice;
 			
@@ -1029,13 +1029,13 @@ void CTraderApi::OnOrder(CSecurityFtdcOrderField *pOrder, bool bFromQry)
 			pField = new OrderField();
 			memset(pField, 0, sizeof(OrderField));
 			strcpy(pField->ID, orderId);
-			strncpy(pField->InstrumentID, pOrder->InstrumentID, sizeof(TSecurityFtdcInstrumentIDType));
-			strncpy(pField->ExchangeID, pOrder->ExchangeID, sizeof(TSecurityFtdcExchangeIDType));
+			strcpy(pField->InstrumentID, pOrder->InstrumentID);
+			strcpy(pField->ExchangeID, pOrder->ExchangeID);
 			pField->HedgeFlag = TSecurityFtdcHedgeFlagType_2_HedgeFlagType(pOrder->CombHedgeFlag[0]);
 			pField->Side = TSecurityFtdcDirectionType_2_OrderSide(pOrder->Direction);
 			pField->Price = atof(pOrder->LimitPrice);
 			pField->StopPx = pOrder->StopPrice;
-			strncpy(pField->Text, pOrder->StatusMsg, sizeof(TSecurityFtdcErrorMsgType));
+			strncpy(pField->Text, pOrder->StatusMsg, sizeof(ErrorMsgType));
 			pField->OpenClose = TSecurityFtdcOffsetFlagType_2_OpenCloseType(pOrder->CombOffsetFlag[0]);
 			pField->Status = CSecurityFtdcOrderField_2_OrderStatus(pOrder);
 			pField->Qty = pOrder->VolumeTotalOriginal;
@@ -1057,7 +1057,7 @@ void CTraderApi::OnOrder(CSecurityFtdcOrderField *pOrder, bool bFromQry)
 			pField->Status = CSecurityFtdcOrderField_2_OrderStatus(pOrder);
 			pField->ExecType = CSecurityFtdcOrderField_2_ExecType(pOrder);
 			strcpy(pField->OrderID, pOrder->OrderSysID);
-			strncpy(pField->Text, pOrder->StatusMsg, sizeof(TSecurityFtdcErrorMsgType));
+			strncpy(pField->Text, pOrder->StatusMsg, sizeof(ErrorMsgType));
 		}
 
 		m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
@@ -1086,15 +1086,15 @@ void CTraderApi::OnTrade(CSecurityFtdcTradeField *pTrade, bool bFromQry)
 		return;
 
 	TradeField* pField = new TradeField();
-	strncpy(pField->InstrumentID, pTrade->InstrumentID, sizeof(TSecurityFtdcInstrumentIDType));
-	strncpy(pField->ExchangeID, pTrade->ExchangeID, sizeof(TSecurityFtdcExchangeIDType));
+	strcpy(pField->InstrumentID, pTrade->InstrumentID);
+	strcpy(pField->ExchangeID, pTrade->ExchangeID);
 	pField->Side = TSecurityFtdcDirectionType_2_OrderSide(pTrade->Direction);
 	pField->Qty = pTrade->Volume;
 	pField->Price = atof(pTrade->Price);
 	pField->OpenClose = TSecurityFtdcOffsetFlagType_2_OpenCloseType(pTrade->OffsetFlag);
 	pField->HedgeFlag = TSecurityFtdcHedgeFlagType_2_HedgeFlagType(pTrade->HedgeFlag);
 	pField->Commission = 0;//TODO收续费以后要计算出来
-	strncpy(pField->Time, pTrade->TradeTime, sizeof(TSecurityFtdcTimeType));
+	strncpy(pField->Time, pTrade->TradeTime, sizeof(TimeType));
 	strcpy(pField->TradeID, pTrade->TradeID);
 
 	OrderIDType orderSysId = { 0 };
