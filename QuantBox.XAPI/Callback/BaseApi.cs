@@ -11,10 +11,10 @@ namespace QuantBox.XAPI.Callback
 {
     public class BaseApi : IDisposable
     {
-        public Logger log;
+        public Logger Log;
         protected Proxy proxy;
         protected IntPtr Handle = IntPtr.Zero;
-        private string _Path1;
+        public string LibPath;
 
         protected XCall _XRespone;
 
@@ -52,14 +52,18 @@ namespace QuantBox.XAPI.Callback
 
         private System.Timers.Timer _Timer = new System.Timers.Timer();
 
-        internal BaseApi(string path1)
+        public BaseApi()
         {
-            _Path1 = path1;
-            
             // 这里是因为回调函数可能被GC回收
             _XRespone = _OnRespone;
 
             ReconnectInterval = 0;
+        }
+
+        public BaseApi(string path)
+            : this()
+        {
+            LibPath = path;
         }
 
         void _Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
@@ -119,7 +123,7 @@ namespace QuantBox.XAPI.Callback
                 // XSpeed多次连接出问题，发现会生成多次
                 if (proxy == null)
                 {
-                    proxy = new Proxy(_Path1);
+                    proxy = new Proxy(LibPath);
                 }
 
                 Handle = proxy.XRequest((byte)RequestType.Create, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
@@ -182,7 +186,7 @@ namespace QuantBox.XAPI.Callback
             get{
                 if (proxy == null)
                 {
-                    proxy = new Proxy(_Path1);
+                    proxy = new Proxy(LibPath);
                 }
                 return (ApiType)proxy.XRequest((byte)RequestType.GetApiType, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
             }
@@ -194,7 +198,7 @@ namespace QuantBox.XAPI.Callback
             {
                 if (proxy == null)
                 {
-                    proxy = new Proxy(_Path1);
+                    proxy = new Proxy(LibPath);
                 }
                 IntPtr ptr = proxy.XRequest((byte)RequestType.GetApiVersion, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
                 return Marshal.PtrToStringAnsi(ptr);
@@ -207,7 +211,7 @@ namespace QuantBox.XAPI.Callback
             {
                 if (proxy == null)
                 {
-                    proxy = new Proxy(_Path1);
+                    proxy = new Proxy(LibPath);
                 }
                 IntPtr ptr = proxy.XRequest((byte)RequestType.GetApiName, IntPtr.Zero, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
                 return Marshal.PtrToStringAnsi(ptr);

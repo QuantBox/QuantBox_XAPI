@@ -2,11 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace QuantBox.XAPI.Event
 {
+    [ProgId("QuantBox.XAPI.Event.XApiWrapper"), ComVisible(true)]
     public class XApiWrapper:XApi
     {
         public new event EventHandler OnConnectionStatus;
@@ -27,7 +30,12 @@ namespace QuantBox.XAPI.Event
         public new event EventHandler OnRspQryHistoricalBars;
 
 
-        public XApiWrapper(string path):base(path)
+        public XApiWrapper(string path):this()
+        {
+            LibPath = path;
+        }
+
+        public XApiWrapper():base()
         {
             base.OnConnectionStatus = OnConnectionStatus_callback;
             base.OnRtnError = OnRtnError_callback;
@@ -45,6 +53,11 @@ namespace QuantBox.XAPI.Event
 
             base.OnRspQryHistoricalTicks = OnRspQryHistoricalTicks_callback;
             base.OnRspQryHistoricalBars = OnRspQryHistoricalBars_callback;
+        }
+
+        public void Show()
+        {
+            MessageBox.Show("123456789");
         }
 
         private void OnConnectionStatus_callback(object sender, ConnectionStatus status, ref RspUserLoginField userLogin, int size1)
