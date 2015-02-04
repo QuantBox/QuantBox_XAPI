@@ -74,7 +74,7 @@ void CTraderApi::Register(void* pCallback)
 	if (m_msgQueue == nullptr)
 		return;
 
-	m_msgQueue_Query->Register(Query);
+	m_msgQueue_Query->Register((void*)Query);
 	m_msgQueue->Register(pCallback);
 	if (pCallback)
 	{
@@ -98,7 +98,7 @@ CTraderApi::CTraderApi(void)
 	m_msgQueue = new CMsgQueue();
 	m_msgQueue_Query = new CMsgQueue();
 
-	m_msgQueue_Query->Register(Query);
+	m_msgQueue_Query->Register((void*)Query);
 	m_msgQueue_Query->StartThread();
 }
 
@@ -136,7 +136,7 @@ void CTraderApi::Connect(const string& szPath,
 	m_szPath = szPath;
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
-	
+
 	m_msgQueue_Query->Input(RequestType::E_Init, this, nullptr, 0, 0,
 		nullptr, 0, nullptr, 0, nullptr, 0);
 }
@@ -412,7 +412,7 @@ char* CTraderApi::ReqOrderInsert(
 		// 交易所的移仓换月功能，没有实测过
 		body.IsSwapOrder = (body.CombOffsetFlag[0] != body.CombOffsetFlag[1]);
 	}
-	
+
 	// 市价与限价
 	switch (pOrder1->Type)
 	{
@@ -510,7 +510,7 @@ char* CTraderApi::ReqOrderInsert(
 void CTraderApi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	OrderIDType orderId = { 0 };
-	
+
 	if (pInputOrder)
 	{
 		sprintf(orderId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputOrder->OrderRef);
@@ -542,7 +542,7 @@ void CTraderApi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThost
 void CTraderApi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo)
 {
 	OrderIDType orderId = { 0 };
-	
+
 	if (pInputOrder)
 	{
 		sprintf(orderId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputOrder->OrderRef);
@@ -764,7 +764,7 @@ char* CTraderApi::ReqQuoteInsert(
 			strcpy(pField->ID, m_orderInsert_Id);
 			strcpy(pField->AskID, m_orderInsert_Id);
 			sprintf(pField->BidID, "%d:%d:%d", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, nRet + 1);
-			
+
 			m_id_platform_quote.insert(pair<string, QuoteField*>(m_orderInsert_Id, pField));
 		}
 	}
@@ -775,7 +775,7 @@ char* CTraderApi::ReqQuoteInsert(
 void CTraderApi::OnRspQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	OrderIDType quoteId = { 0 };
-	
+
 	if (pInputQuote)
 	{
 		sprintf(quoteId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputQuote->QuoteRef);
@@ -807,7 +807,7 @@ void CTraderApi::OnRspQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThost
 void CTraderApi::OnErrRtnQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo)
 {
 	OrderIDType quoteId = { 0 };
-	
+
 	if (pInputQuote)
 	{
 		sprintf(quoteId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputQuote->QuoteRef);
@@ -923,7 +923,7 @@ void CTraderApi::OnRspQuoteAction(CThostFtdcInputQuoteActionField *pInputQuoteAc
 void CTraderApi::OnErrRtnQuoteAction(CThostFtdcQuoteActionField *pQuoteAction, CThostFtdcRspInfoField *pRspInfo)
 {
 	OrderIDType quoteId = { 0 };
-	
+
 	if (pQuoteAction)
 	{
 		sprintf(quoteId, "%d:%d:%s", pQuoteAction->FrontID, pQuoteAction->SessionID, pQuoteAction->QuoteRef);
@@ -1029,7 +1029,7 @@ void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInve
 			{
 				pField = new PositionField();
 				memset(pField, 0, sizeof(PositionField));
-				
+
 				strcpy(pField->Symbol, pInvestorPosition->InstrumentID);
 				strcpy(pField->InstrumentID, pInvestorPosition->InstrumentID);
 				//strcpy(pField->ExchangeID, );
@@ -1042,7 +1042,7 @@ void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInve
 			{
 				pField = it->second;
 			}
-						
+
 			pField->Position = pInvestorPosition->Position;
 			pField->TdPosition = pInvestorPosition->TodayPosition;
 			pField->YdPosition = pInvestorPosition->Position - pInvestorPosition->TodayPosition;
@@ -1378,7 +1378,7 @@ void CTraderApi::OnTrade(TradeField *pTrade)
 				pField->YdPosition = 0;
 			}
 		}
-		
+
 		// 计算错误，直接重新查询
 		if (pField->Position < 0 || pField->TdPosition < 0 || pField->YdPosition < 0)
 		{
@@ -1469,7 +1469,7 @@ void CTraderApi::OnQuote(CThostFtdcQuoteField *pQuote)
 			strcpy(pField->BidOrderID, pQuote->BidOrderSysID);
 
 			strncpy(pField->Text, pQuote->StatusMsg, sizeof(ErrorMsgType));
-			
+
 			//pField->ExecType = ExecType::ExecNew;
 			pField->Status = CThostFtdcQuoteField_2_OrderStatus(pQuote);
 			pField->ExecType = ExecType::ExecNew;
@@ -1488,7 +1488,7 @@ void CTraderApi::OnQuote(CThostFtdcQuoteField *pQuote)
 
 			pField->Status = CThostFtdcQuoteField_2_OrderStatus(pQuote);
 			pField->ExecType = CThostFtdcQuoteField_2_ExecType(pQuote);
-			
+
 			strncpy(pField->Text, pQuote->StatusMsg, sizeof(ErrorMsgType));
 		}
 
