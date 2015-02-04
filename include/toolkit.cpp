@@ -21,7 +21,9 @@ void WriteLog(const char *fmt, ...)
 	va_end(vl);
 	//char temp[2048] = "XSpeed:";
 	//OutputDebugStringA(strcat(temp, buff));
+#if defined _WIN32 || WIN32 || _WINDOWS
 	OutputDebugStringA(buff);
+#endif
 }
 
 void makedirs(const char* dir)
