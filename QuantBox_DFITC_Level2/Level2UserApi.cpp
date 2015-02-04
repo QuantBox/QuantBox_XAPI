@@ -65,7 +65,7 @@ CLevel2UserApi::CLevel2UserApi(void)
 	m_msgQueue = new CMsgQueue();
 	m_msgQueue_Query = new CMsgQueue();
 
-	m_msgQueue_Query->Register(Query);
+	m_msgQueue_Query->Register((void*)Query);
 	m_msgQueue_Query->StartThread();
 }
 
@@ -79,7 +79,7 @@ void CLevel2UserApi::Register(void* pCallback)
 	if (m_msgQueue == nullptr)
 		return;
 
-	m_msgQueue_Query->Register(Query);
+	m_msgQueue_Query->Register((void*)Query);
 	m_msgQueue->Register(pCallback);
 	if (pCallback)
 	{
@@ -163,7 +163,7 @@ void CLevel2UserApi::ReqUserLogin()
 int CLevel2UserApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-	
+
 	DFITCUserLoginField* pBody = (DFITCUserLoginField*)ptr1;
 	pBody->lRequestID = ++m_lRequestID;
 	return m_pApi->ReqUserLogin(pBody);

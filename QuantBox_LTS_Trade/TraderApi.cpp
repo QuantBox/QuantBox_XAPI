@@ -68,7 +68,7 @@ void CTraderApi::Register(void* pCallback)
 	if (m_msgQueue == nullptr)
 		return;
 
-	m_msgQueue_Query->Register(Query);
+	m_msgQueue_Query->Register((void*)Query);
 	m_msgQueue->Register(pCallback);
 	if (pCallback)
 	{
@@ -92,7 +92,7 @@ CTraderApi::CTraderApi(void)
 	m_msgQueue = new CMsgQueue();
 	m_msgQueue_Query = new CMsgQueue();
 
-	m_msgQueue_Query->Register(Query);
+	m_msgQueue_Query->Register((void*)Query);
 	m_msgQueue_Query->StartThread();
 }
 
@@ -926,7 +926,7 @@ void CTraderApi::OnRspQryInstrument(CSecurityFtdcInstrumentField *pInstrument, C
 			strncpy(field.ExpireDate, pInstrument->ExpireDate, sizeof(DateType));
 			field.OptionsType = CSecurityFtdcInstrumentField_2_PutCall(pInstrument);
 			field.StrikePrice = pInstrument->ExecPrice;
-			
+
 
 			// 期权的标的物
 			if (strlen(pInstrument->InstrumentID) == 8)
@@ -934,7 +934,7 @@ void CTraderApi::OnRspQryInstrument(CSecurityFtdcInstrumentField *pInstrument, C
 				strncpy(field.UnderlyingInstrID, pInstrument->ExchangeInstID, 6);
 				sprintf(&field.UnderlyingInstrID[6], ".%s", pInstrument->ExchangeID);
 			}
-			
+
 
 			m_msgQueue->Input(ResponeType::OnRspQryInstrument, m_msgQueue, this, bIsLast, 0, &field, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
 		}

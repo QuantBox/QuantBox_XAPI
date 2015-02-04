@@ -63,7 +63,7 @@ CLevel2UserApi::CLevel2UserApi(void)
 	m_msgQueue = new CMsgQueue();
 	m_msgQueue_Query = new CMsgQueue();
 
-	m_msgQueue_Query->Register(Query);
+	m_msgQueue_Query->Register((void*)Query);
 	m_msgQueue_Query->StartThread();
 }
 
@@ -77,7 +77,7 @@ void CLevel2UserApi::Register(void* pCallback)
 	if (m_msgQueue == nullptr)
 		return;
 
-	m_msgQueue_Query->Register(Query);
+	m_msgQueue_Query->Register((void*)Query);
 	m_msgQueue->Register(pCallback);
 	if (pCallback)
 	{
@@ -165,7 +165,7 @@ void CLevel2UserApi::ReqUserLogin()
 	strncpy(body.BrokerID, m_ServerInfo.BrokerID, sizeof(TSecurityFtdcBrokerIDType));
 	strncpy(body.UserID, m_UserInfo.UserID, sizeof(TSecurityFtdcUserIDType));
 	strncpy(body.Password, m_UserInfo.Password, sizeof(TSecurityFtdcPasswordType));
-	
+
 	m_msgQueue_Query->Input(RequestType::E_ReqUserLoginField, this, nullptr, 0, 0,
 		&body, sizeof(CSecurityFtdcUserLoginField), nullptr, 0, nullptr, 0);
 }
