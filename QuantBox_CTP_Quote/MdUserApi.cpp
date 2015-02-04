@@ -457,6 +457,9 @@ void CMdUserApi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecif
 //行情回调，得保证此函数尽快返回
 void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
+	// 测试平台穿越速度，用完后需要注释掉
+	//WriteLog("CTP:OnRtnDepthMarketData:%s %f %s.%03d", pDepthMarketData->InstrumentID, pDepthMarketData->LastPrice, pDepthMarketData->UpdateTime, pDepthMarketData->UpdateMillisec);
+
 	DepthMarketDataField marketData = {0};
 	strcpy(marketData.InstrumentID, pDepthMarketData->InstrumentID);
 	strcpy(marketData.ExchangeID, pDepthMarketData->ExchangeID);
@@ -514,7 +517,7 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 		marketData.AskPrice5 = pDepthMarketData->AskPrice5;
 		marketData.AskVolume5 = pDepthMarketData->AskVolume5;
 	}
-
+	
 	m_msgQueue->Input(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }
 

@@ -10,7 +10,15 @@ namespace QuantBox.XAPI.Callback
 {
     public partial class XApi : IXMarketData
     {
-        public DelegateOnRtnDepthMarketData OnRtnDepthMarketData;
+        
+        public DelegateOnRtnDepthMarketData OnRtnDepthMarketData
+        {
+            get { return OnRtnDepthMarketData_; }
+            set { OnRtnDepthMarketData_ = value; }
+        }
+        // 这种写法的主要目的是求快
+        private DelegateOnRtnDepthMarketData OnRtnDepthMarketData_;
+        
 
         #region 已经订阅的行情
         private Dictionary<string, SortedSet<string>> _SubscribedInstruments = new Dictionary<string, SortedSet<string>>();
@@ -84,9 +92,13 @@ namespace QuantBox.XAPI.Callback
 
         private void _OnRtnDepthMarketData(IntPtr ptr1)
         {
+            // 求快，这个地方不判断
+            //if (OnRtnDepthMarketData_ == null)
+            //    return;
+
             DepthMarketDataField obj = (DepthMarketDataField)Marshal.PtrToStructure(ptr1, typeof(DepthMarketDataField));
 
-            OnRtnDepthMarketData(this, ref obj);
+            OnRtnDepthMarketData_(this, ref obj);
         }
     }
 }

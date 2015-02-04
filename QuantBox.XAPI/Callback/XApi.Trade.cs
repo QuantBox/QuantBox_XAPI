@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuantBox.XAPI.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -7,14 +8,45 @@ using System.Threading.Tasks;
 
 namespace QuantBox.XAPI.Callback
 {
-    public partial class XApi
+    public partial class XApi : IXTrade
     {
-        public DelegateOnRspQryTradingAccount OnRspQryTradingAccount;
-        public DelegateOnRspQryInvestorPosition OnRspQryInvestorPosition;
-        public DelegateOnRspQrySettlementInfo OnRspQrySettlementInfo;
-        public DelegateOnRtnOrder OnRtnOrder;
-        public DelegateOnRtnTrade OnRtnTrade;
-        public DelegateOnRtnQuote OnRtnQuote;
+        public DelegateOnRspQryTradingAccount OnRspQryTradingAccount
+        {
+            get { return OnRspQryTradingAccount_; }
+            set { OnRspQryTradingAccount_ = value; }
+        }
+        public DelegateOnRspQryInvestorPosition OnRspQryInvestorPosition
+        {
+            get { return OnRspQryInvestorPosition_; }
+            set { OnRspQryInvestorPosition_ = value; }
+        }
+        public DelegateOnRspQrySettlementInfo OnRspQrySettlementInfo
+        {
+            get { return OnRspQrySettlementInfo_; }
+            set { OnRspQrySettlementInfo_ = value; }
+        }
+        public DelegateOnRtnOrder OnRtnOrder
+        {
+            get { return OnRtnOrder_; }
+            set { OnRtnOrder_ = value; }
+        }
+        public DelegateOnRtnTrade OnRtnTrade
+        {
+            get { return OnRtnTrade_; }
+            set { OnRtnTrade_ = value; }
+        }
+        public DelegateOnRtnQuote OnRtnQuote
+        {
+            get { return OnRtnQuote_; }
+            set { OnRtnQuote_ = value; }
+        }
+
+        private DelegateOnRtnOrder OnRtnOrder_;
+        private DelegateOnRtnTrade OnRtnTrade_;
+        private DelegateOnRtnQuote OnRtnQuote_;
+        private DelegateOnRspQryTradingAccount OnRspQryTradingAccount_;
+        private DelegateOnRspQryInvestorPosition OnRspQryInvestorPosition_;
+        private DelegateOnRspQrySettlementInfo OnRspQrySettlementInfo_;
 
         private Dictionary<string, StringBuilder> dict = new Dictionary<string, StringBuilder>();
 
@@ -137,62 +169,64 @@ namespace QuantBox.XAPI.Callback
 
         private void _OnRspQryTradingAccount(IntPtr ptr1, int size1, double double1)
         {
-            if (OnRspQryTradingAccount == null)
+            if (OnRspQryTradingAccount_ == null)
                 return;
 
             AccountField obj = PInvokeUtility.GetObjectFromIntPtr<AccountField>(ptr1);
 
-            OnRspQryTradingAccount(this, ref obj, size1, double1 != 0);
+            OnRspQryTradingAccount_(this, ref obj, size1, double1 != 0);
         }
 
         private void _OnRspQryInvestorPosition(IntPtr ptr1, int size1, double double1)
         {
-            if (OnRspQryInvestorPosition == null)
+            if (OnRspQryInvestorPosition_ == null)
                 return;
 
             PositionField obj = PInvokeUtility.GetObjectFromIntPtr<PositionField>(ptr1);
 
-            OnRspQryInvestorPosition(this, ref obj, size1, double1 != 0);
+            OnRspQryInvestorPosition_(this, ref obj, size1, double1 != 0);
         }
 
         private void _OnRspQrySettlementInfo(IntPtr ptr1, int size1, double double1)
         {
-            if (OnRspQrySettlementInfo == null)
+            if (OnRspQrySettlementInfo_ == null)
                 return;
 
             SettlementInfoField obj = PInvokeUtility.GetObjectFromIntPtr<SettlementInfoField>(ptr1);
 
-            OnRspQrySettlementInfo(this, ref obj, size1, double1 != 0);
+            OnRspQrySettlementInfo_(this, ref obj, size1, double1 != 0);
         }
 
         private void _OnRtnOrder(IntPtr ptr1, int size1)
         {
-            if (OnRtnOrder == null)
-                return;
+            // 求快，不加
+            //if (OnRtnOrder_ == null)
+            //    return;
 
             OrderField obj = PInvokeUtility.GetObjectFromIntPtr<OrderField>(ptr1);
 
-            OnRtnOrder(this, ref obj);
+            OnRtnOrder_(this, ref obj);
         }
 
         private void _OnRtnTrade(IntPtr ptr1, int size1)
         {
-            if (OnRtnTrade == null)
-                return;
+            // 求快，不加
+            //if (OnRtnTrade_ == null)
+            //    return;
 
             TradeField obj = PInvokeUtility.GetObjectFromIntPtr<TradeField>(ptr1);
 
-            OnRtnTrade(this, ref obj);
+            OnRtnTrade_(this, ref obj);
         }
 
         private void _OnRtnQuote(IntPtr ptr1, int size1)
         {
-            if (OnRtnQuote == null)
+            if (OnRtnQuote_ == null)
                 return;
 
             QuoteField obj = PInvokeUtility.GetObjectFromIntPtr<QuoteField>(ptr1);
 
-            OnRtnQuote(this, ref obj);
+            OnRtnQuote_(this, ref obj);
         }
     }
 }

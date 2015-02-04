@@ -7,6 +7,8 @@
 
 using namespace std;
 
+void WriteLog(const char *fmt, ...);
+
 //输入路径，生成多级目录
 void makedirs(const char* dir);
 

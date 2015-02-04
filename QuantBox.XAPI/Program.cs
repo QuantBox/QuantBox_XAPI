@@ -70,14 +70,6 @@ namespace QuantBox.XAPI
 
         static void test_Linux_Main(string[] args)
         {
-            //Queue queue = new Queue(@"libQuantBox_Queue.so");
-            //Queue queue2 = new Queue(@"libQuantBox_Queue.so");
-
-			//ApiManager.QueuePath = @"/home/hetao/works/QuantBox_XAPI/bin/Debug/libQuantBox_Queue.so";
-			//XApi api = ApiManager.CreateApi(@"/home/hetao/works/QuantBox_XAPI/bin/Debug/libQuantBox_CTP_Quote.so");
-			//XApi api2 = ApiManager.CreateApi(@"/home/hetao/works/QuantBox_XAPI/bin/Debug/libQuantBox_CTP_Trade.so");
-
-			//ApiManager.QueuePath = @"libQuantBox_Queue.so";
 			XApi api = new XApi(@"libQuantBox_CTP_Quote.so");
             XApi api2 = new XApi(@"libQuantBox_CTP_Trade.so");
 
@@ -109,7 +101,7 @@ namespace QuantBox.XAPI
             api.Connect();
            	api2.Connect();
 
-            api.Subscribe("IF1412", "");
+            api.Subscribe("IF1502;IF1503", "");
 
             Console.ReadKey();
 
@@ -167,14 +159,13 @@ namespace QuantBox.XAPI
 
         static void test_CTP_Main(string[] args)
         {
-            //ApiManager.QueuePath = @"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\QuantBox_Queue.dll";
-            api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\QuantBox_CTP_Trade.dll");
+            api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\x86\QuantBox_CTP_Quote.dll");
 
             api.Server.BrokerID = "1017";
-            api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51205";
+            api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51213";
 
             api.User.UserID = "00000015";
-            api.User.Password = "1234561";
+            api.User.Password = "123456";
 
             api.OnConnectionStatus = OnConnectionStatus;
             api.OnRtnDepthMarketData = OnRtnDepthMarketData;
@@ -185,6 +176,7 @@ namespace QuantBox.XAPI
 
             api.Dispose();
 
+            Thread.Sleep(5 * 1000);
         }
 
         static void test_KingstarStock_Main(string[] args)
@@ -212,7 +204,6 @@ namespace QuantBox.XAPI
 
         static void test_KingstarGold_Main(string[] args)
         {
-            //ApiManager.QueuePath = @"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\QuantBox_Queue.dll";
             api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\KingstarGold\QuantBox_KingstarGold.dll");
 
             api.Server.BrokerID = "";

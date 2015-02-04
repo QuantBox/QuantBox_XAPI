@@ -11,6 +11,18 @@
     #define MKDIR(X) mkdir((X),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 #endif // defined
 
+void WriteLog(const char *fmt, ...)
+{
+	char buff[1024];
+	va_list vl;
+	va_start(vl, fmt);
+	_vsnprintf(buff, 1024, fmt, vl);
+	//fflush(stdout);
+	va_end(vl);
+	//char temp[2048] = "XSpeed:";
+	//OutputDebugStringA(strcat(temp, buff));
+	OutputDebugStringA(buff);
+}
 
 void makedirs(const char* dir)
 {

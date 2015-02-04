@@ -18,6 +18,25 @@ namespace QuantBox.XAPI.Callback
 
         protected XCall _XRespone;
 
+        public ServerInfoField Server;
+        public UserInfoField User;
+
+        public DelegateOnConnectionStatus OnConnectionStatus
+        {
+            get { return OnConnectionStatus_; }
+            set { OnConnectionStatus_ = value; }
+        }
+        public DelegateOnRtnError OnRtnError
+        {
+            get { return OnRtnError_; }
+            set { OnRtnError_ = value; }
+        }
+        private DelegateOnConnectionStatus OnConnectionStatus_;
+        private DelegateOnRtnError OnRtnError_;
+
+        public RspUserLoginField UserLoginField;
+
+
         protected object locker = new object();
 
         public bool IsConnected { get; protected set; }
@@ -40,15 +59,6 @@ namespace QuantBox.XAPI.Callback
                 _Timer.Enabled = _reconnectInterval >= 10;
             }
         }
-
-        public ServerInfoField Server;
-        public UserInfoField User;
-
-        public DelegateOnConnectionStatus OnConnectionStatus;
-        public DelegateOnRtnError OnRtnError;
-
-        public RspUserLoginField UserLoginField;
-
 
         private System.Timers.Timer _Timer = new System.Timers.Timer();
 
@@ -148,7 +158,7 @@ namespace QuantBox.XAPI.Callback
             
         }
 
-        internal virtual void Disconnect()
+        public virtual void Disconnect()
         {
             lock(locker)
             {
@@ -261,18 +271,18 @@ namespace QuantBox.XAPI.Callback
                     break;
             }
 
-            if (OnConnectionStatus != null)
-                OnConnectionStatus(this, status, ref obj, size1);
+            if (OnConnectionStatus_ != null)
+                OnConnectionStatus_(this, status, ref obj, size1);
         }
 
         private void _OnRtnError(IntPtr ptr1)
         {
-            if (OnRtnError == null)
+            if (OnRtnError_ == null)
                 return;
 
             ErrorField obj = PInvokeUtility.GetObjectFromIntPtr<ErrorField>(ptr1);
             
-            OnRtnError(this, ref obj);
+            OnRtnError_(this, ref obj);
         }
     }
 }

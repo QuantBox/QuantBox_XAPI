@@ -98,7 +98,6 @@
     <Compile Include="Event\XApiWrapper.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Interface\IXApi.cs" />
-    <Compile Include="Interface\IXMarketData.cs" />
     <Compile Include="InvokeBase.cs" />
     <Compile Include="PInvokeUtility.cs" />
     <Compile Include="PositionFieldEx.cs" />

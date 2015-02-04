@@ -9,6 +9,9 @@ namespace QuantBox.XAPI
 {
     public class PInvokeUtility
     {
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        public static extern void OutputDebugString(string message);
+
         static Encoding encodingGB2312 = Encoding.GetEncoding(936);
 
         public static string GetUnicodeString(byte[] str)

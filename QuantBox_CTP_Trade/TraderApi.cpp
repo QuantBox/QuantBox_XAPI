@@ -481,6 +481,10 @@ char* CTraderApi::ReqOrderInsert(
 		}
 		sprintf(body.OrderRef, "%d", nRet);
 
+		// 测试平台穿越速度，用完后需要注释掉
+		//WriteLog("CTP:ReqOrderInsert:%s %d", body.InstrumentID, nRet);
+
+
 		//不保存到队列，而是直接发送
 		int n = m_pApi->ReqOrderInsert(&body, ++m_lRequestID);
 		if (n < 0)

@@ -9,7 +9,7 @@ namespace QuantBox.XAPI.Callback
 {
     public partial class XApi
     {
-        public DelegateOnRtnQuoteRequest OnRtnQuoteRequest;
+        public DelegateOnRtnQuoteRequest OnRtnQuoteRequest { get; set; }
 
         #region 做市商询价订阅，主要是XSpeed这个功能是在交易API中
         private Dictionary<string, SortedSet<string>> _SubscribedQuotes = new Dictionary<string, SortedSet<string>>();

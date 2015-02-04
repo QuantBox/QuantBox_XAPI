@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QuantBox.XAPI.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -7,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace QuantBox.XAPI.Callback
 {
-    public partial class XApi
+    public partial class XApi : IXHistoricalData
     {
-        public DelegateOnRspQryHistoricalTicks OnRspQryHistoricalTicks;
-        public DelegateOnRspQryHistoricalBars OnRspQryHistoricalBars;
+        public DelegateOnRspQryHistoricalTicks OnRspQryHistoricalTicks { get; set; }
+        public DelegateOnRspQryHistoricalBars OnRspQryHistoricalBars { get; set; }
 
         public int ReqQryHistoricalTicks(ref HistoricalDataRequestField request)
         {
