@@ -28,3 +28,5 @@ ExecType CSecurityFtdcOrderField_2_ExecType(CSecurityFtdcOrderField* pIn);
 InstrumentType CSecurityFtdcInstrumentField_2_InstrumentType(CSecurityFtdcInstrumentField* pIn);
 PutCall CSecurityFtdcInstrumentField_2_PutCall(CSecurityFtdcInstrumentField* pIn);
 PriceType CSecurityFtdcInstrumentField_2_PriceTick(CSecurityFtdcInstrumentField* pIn);
+
+IdCardType TSecurityFtdcIdCardTypeType_2_IdCardType(TSecurityFtdcIdCardTypeType In);

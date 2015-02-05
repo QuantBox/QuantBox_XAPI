@@ -44,6 +44,9 @@ void CTraderApi::QueryInThread(char type, void* pApi1, void* pApi2, double doubl
 	case E_QryInstrumentField:
 		iRet = _ReqQryInstrument(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 		break;
+	case E_QryInvestorField:
+		iRet = _ReqQryInvestor(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		break;
 	default:
 		break;
 	}
@@ -438,6 +441,8 @@ void CTraderApi::OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, C
 		// 自己发单时ID从1开始，不能从0开始
 		m_nMaxOrderRef = m_nMaxOrderRef>1 ? m_nMaxOrderRef : 1;
 		//ReqSettlementInfoConfirm();
+		ReqQryInvestor();
+
 		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	}
 	else
@@ -1193,5 +1198,45 @@ void CTraderApi::OnRspQryTrade(CSecurityFtdcTradeField *pTrade, CSecurityFtdcRsp
 	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
 	{
 		OnTrade(pTrade,true);
+	}
+}
+
+void CTraderApi::ReqQryInvestor()
+{
+	CSecurityFtdcQryInvestorField body = { 0 };
+
+	strncpy(body.BrokerID, m_RspUserLogin.BrokerID, sizeof(TSecurityFtdcBrokerIDType));
+	strncpy(body.InvestorID, m_RspUserLogin.UserID, sizeof(TSecurityFtdcInvestorIDType));
+
+	m_msgQueue_Query->Input(RequestType::E_QryInvestorField, this, nullptr, 0, 0,
+		&body, sizeof(CSecurityFtdcQryInvestorField), nullptr, 0, nullptr, 0);
+}
+
+int CTraderApi::_ReqQryInvestor(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	return m_pApi->ReqQryInvestor((CSecurityFtdcQryInvestorField*)ptr1, ++m_lRequestID);
+}
+
+void CTraderApi::OnRspQryInvestor(CSecurityFtdcInvestorField *pInvestor, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	{
+		if (pInvestor)
+		{
+			memcpy(&m_Investor, pInvestor, sizeof(CSecurityFtdcInvestorField));
+
+			InvestorField field = { 0 };
+			strcpy(field.BrokerID, pInvestor->BrokerID);
+			strcpy(field.InvestorID, pInvestor->InvestorID);
+			strcpy(field.InvestorName, pInvestor->InvestorName);
+			strcpy(field.IdentifiedCardNo, pInvestor->IdentifiedCardNo);
+			field.IdentifiedCardType = TSecurityFtdcIdCardTypeType_2_IdCardType(pInvestor->IdentifiedCardType);
+
+			m_msgQueue->Input(ResponeType::OnRspQryInvestor, m_msgQueue, this, bIsLast, 0, &field, sizeof(InvestorField), nullptr, 0, nullptr, 0);
+		}
+		else
+		{
+			m_msgQueue->Input(ResponeType::OnRspQryInvestor, m_msgQueue, this, bIsLast, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		}
 	}
 }

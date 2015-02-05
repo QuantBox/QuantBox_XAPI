@@ -38,6 +38,11 @@ namespace QuantBox.XAPI
         {
             return PInvokeUtility.GetUnicodeString(field.ErrorMsg);
         }
+
+        public static string InvestorName(this InvestorField field)
+        {
+            return PInvokeUtility.GetUnicodeString(field.InvestorName);
+        }
     }
 
     public static class Extensions_Misc
@@ -196,6 +201,12 @@ namespace QuantBox.XAPI
             string date = string.Format("{0}-{1:D2}-{2:D2} {3:D2}:{4:D2}:{5:D2}.000", yyyy, MM, dd, hh, mm, ss);
             return string.Format("{0},{1},{2},{3},{4},{5},{6}",
                 date, field.Open, field.High, field.Low, field.Close, field.Volume, field.OpenInterest);
+        }
+
+        public static string ToFormattedString(this InvestorField field)
+        {
+            return string.Format("[BrokerID={0};InvestorID={1};IdentifiedCardType={2},IdentifiedCardNo={3};InvestorName={4}]",
+                field.BrokerID, field.InvestorID, field.IdentifiedCardType,field.IdentifiedCardNo, field.InvestorName());
         }
     }
 }

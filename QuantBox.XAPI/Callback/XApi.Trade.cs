@@ -25,6 +25,11 @@ namespace QuantBox.XAPI.Callback
             get { return OnRspQrySettlementInfo_; }
             set { OnRspQrySettlementInfo_ = value; }
         }
+        public DelegateOnRspQryInvestor OnRspQryInvestor
+        {
+            get { return OnRspQryInvestor_; }
+            set { OnRspQryInvestor_ = value; }
+        }
         public DelegateOnRtnOrder OnRtnOrder
         {
             get { return OnRtnOrder_; }
@@ -47,6 +52,7 @@ namespace QuantBox.XAPI.Callback
         private DelegateOnRspQryTradingAccount OnRspQryTradingAccount_;
         private DelegateOnRspQryInvestorPosition OnRspQryInvestorPosition_;
         private DelegateOnRspQrySettlementInfo OnRspQrySettlementInfo_;
+        private DelegateOnRspQryInvestor OnRspQryInvestor_;
 
         private Dictionary<string, StringBuilder> dict = new Dictionary<string, StringBuilder>();
 
@@ -195,6 +201,16 @@ namespace QuantBox.XAPI.Callback
             SettlementInfoField obj = PInvokeUtility.GetObjectFromIntPtr<SettlementInfoField>(ptr1);
 
             OnRspQrySettlementInfo_(this, ref obj, size1, double1 != 0);
+        }
+
+        private void _OnRspQryInvestor(IntPtr ptr1, int size1, double double1)
+        {
+            if (OnRspQryInvestor_ == null)
+                return;
+
+            InvestorField obj = PInvokeUtility.GetObjectFromIntPtr<InvestorField>(ptr1);
+
+            OnRspQryInvestor_(this, ref obj, size1, double1 != 0);
         }
 
         private void _OnRtnOrder(IntPtr ptr1, int size1)

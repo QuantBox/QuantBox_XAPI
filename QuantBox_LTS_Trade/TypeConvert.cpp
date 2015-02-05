@@ -432,3 +432,35 @@ PriceType CSecurityFtdcInstrumentField_2_PriceTick(CSecurityFtdcInstrumentField*
 		return CSecurityFtdcInstrumentField_2_PriceTick_SSE(pIn);
 	}
 }
+
+IdCardType TSecurityFtdcIdCardTypeType_2_IdCardType(TSecurityFtdcIdCardTypeType In)
+{
+	switch (In)
+	{
+	case SECURITY_FTDC_ICT_EID:
+		return IdCardType::EID;
+	case SECURITY_FTDC_ICT_IDCard:
+		return IdCardType::IDCard;
+	case SECURITY_FTDC_ICT_OfficerIDCard:
+		return IdCardType::OfficerIDCard;
+	case SECURITY_FTDC_ICT_PoliceIDCard:
+		return IdCardType::PoliceIDCard;
+	case SECURITY_FTDC_ICT_SoldierIDCard:
+		return IdCardType::SoldierIDCard;
+	case SECURITY_FTDC_ICT_HouseholdRegister:
+		return IdCardType::HouseholdRegister;
+	case SECURITY_FTDC_ICT_Passport:
+		return IdCardType::Passport;
+	case SECURITY_FTDC_ICT_TaiwanCompatriotIDCard:
+		return IdCardType::TaiwanCompatriotIDCard;
+	case SECURITY_FTDC_ICT_HomeComingCard:
+		return IdCardType::HomeComingCard;
+	case SECURITY_FTDC_ICT_LicenseNo:
+		return IdCardType::LicenseNo;
+	case SECURITY_FTDC_ICT_TaxNo:
+		return IdCardType::TaxNo;
+	case SECURITY_FTDC_ICT_OtherCard:
+	default:
+		return IdCardType::OtherCard;
+	}
+}

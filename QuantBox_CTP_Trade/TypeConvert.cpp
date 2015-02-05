@@ -264,9 +264,6 @@ TimeInForce CThostFtdcOrderField_2_TimeInForce(CThostFtdcOrderField* pIn)
 }
 
 
-
-
-
 InstrumentType CThostFtdcInstrumentField_2_InstrumentType(CThostFtdcInstrumentField* pIn)
 {
 	switch (pIn->ProductClass)
@@ -283,5 +280,53 @@ InstrumentType CThostFtdcInstrumentField_2_InstrumentType(CThostFtdcInstrumentFi
 		return InstrumentType::Option;
 	default:
 		return InstrumentType::Stock;
+	}
+}
+
+IdCardType TThostFtdcIdCardTypeType_2_IdCardType(TThostFtdcIdCardTypeType In)
+{
+	switch (In)
+	{
+	case THOST_FTDC_ICT_EID:
+		return IdCardType::EID;
+	case THOST_FTDC_ICT_IDCard:
+		return IdCardType::IDCard;
+	case THOST_FTDC_ICT_OfficerIDCard:
+		return IdCardType::OfficerIDCard;
+	case THOST_FTDC_ICT_PoliceIDCard:
+		return IdCardType::PoliceIDCard;
+	case THOST_FTDC_ICT_SoldierIDCard:
+		return IdCardType::SoldierIDCard;
+	case THOST_FTDC_ICT_HouseholdRegister:
+		return IdCardType::HouseholdRegister;
+	case THOST_FTDC_ICT_Passport:
+		return IdCardType::Passport;
+	case THOST_FTDC_ICT_TaiwanCompatriotIDCard:
+		return IdCardType::TaiwanCompatriotIDCard;
+	case THOST_FTDC_ICT_HomeComingCard:
+		return IdCardType::HomeComingCard;
+	case THOST_FTDC_ICT_LicenseNo:
+		return IdCardType::LicenseNo;
+	case THOST_FTDC_ICT_TaxNo:
+		return IdCardType::TaxNo;
+	case THOST_FTDC_ICT_HMMainlandTravelPermit:
+		return IdCardType::HMMainlandTravelPermit;
+	case THOST_FTDC_ICT_TwMainlandTravelPermit:
+		return IdCardType::TwMainlandTravelPermit;
+	case THOST_FTDC_ICT_DrivingLicense:
+		return IdCardType::DrivingLicense;
+	case THOST_FTDC_ICT_SocialID:
+		return IdCardType::SocialID;
+	case THOST_FTDC_ICT_LocalID:
+		return IdCardType::LocalID;
+	case THOST_FTDC_ICT_BusinessRegistration:
+		return IdCardType::BusinessRegistration;
+	case THOST_FTDC_ICT_HKMCIDCard:
+		return IdCardType::HKMCIDCard;
+	case THOST_FTDC_ICT_AccountsPermits:
+		return IdCardType::AccountsPermits;
+	case THOST_FTDC_ICT_OtherCard:
+	default:
+		return IdCardType::OtherCard;
 	}
 }

@@ -393,6 +393,21 @@ struct SettlementInfoField
 	ContentType	Content;
 };
 
+///投资者
+struct InvestorField
+{
+	///用户代码
+	UserIDType	InvestorID;
+
+	BrokerIDType	BrokerID;
+	IdCardType		IdentifiedCardType;
+	///证件号码
+	IdentifiedCardNoType	IdentifiedCardNo;
+	///投资者名称
+	PartyNameType	InvestorName;
+
+};
+
 struct HistoricalDataRequestField
 {
 	///唯一符号

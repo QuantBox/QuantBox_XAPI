@@ -22,5 +22,6 @@ namespace QuantBox.XAPI
 
         OnRspQryHistoricalTicks,
         OnRspQryHistoricalBars,
+        OnRspQryInvestor,
     }
 }

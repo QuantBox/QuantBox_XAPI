@@ -232,4 +232,28 @@ namespace QuantBox
         Level2Snapshot,
         Level2Update,
     };
+
+    public enum IdCardType : byte
+    {
+        EID,
+        IDCard,
+        OfficerIDCard,
+        PoliceIDCard,
+        SoldierIDCard,
+        HouseholdRegister,
+        Passport,
+        TaiwanCompatriotIDCard,
+        HomeComingCard,
+        LicenseNo,
+        TaxNo,
+        HMMainlandTravelPermit,
+        TwMainlandTravelPermit,
+        DrivingLicense,
+        SocialID,
+        LocalID,
+        BusinessRegistration,
+        HKMCIDCard,
+        AccountsPermits,
+        OtherCard,
+    };
 }

@@ -171,4 +171,18 @@ namespace QuantBox.XAPI.Event
             this.bIsLast = bIsLast;
         }
     }
+
+    public class OnRspQryInvestorEventArgs : EventArgs
+    {
+        public readonly InvestorField investor;
+        public readonly int size1;
+        public readonly bool bIsLast;
+
+        public OnRspQryInvestorEventArgs(ref InvestorField investor, int size1, bool bIsLast)
+        {
+            this.investor = investor;
+            this.size1 = size1;
+            this.bIsLast = bIsLast;
+        }
+    }
 }

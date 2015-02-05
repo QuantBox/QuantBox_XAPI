@@ -694,6 +694,23 @@ namespace QuantBox.XAPI
     }
 
     /// <summary>
+    /// 投资者
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct InvestorField
+    {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+        public string InvestorID;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 11)]
+        public string BrokerID;
+        public IdCardType IdentifiedCardType;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 51)]
+        public string IdentifiedCardNo;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 81)]
+        public byte[] InvestorName;
+    }
+
+    /// <summary>
     /// 合约信息
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]

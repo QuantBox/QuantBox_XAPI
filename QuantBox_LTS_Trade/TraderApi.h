@@ -35,6 +35,9 @@ class CTraderApi :
 		E_ReqAuthenticateField,
 		E_ReqUserLoginField,
 		E_SettlementInfoConfirmField,
+		
+		E_QryInvestorField,
+
 		E_QryInstrumentField,
 		E_InputOrderField,
 		E_InputOrderActionField,
@@ -90,6 +93,8 @@ public:
 	void ReqQryOrder();
 	void ReqQryTrade();
 
+	void ReqQryInvestor();
+
 private:
 	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
@@ -102,8 +107,7 @@ private:
 	int _ReqQryInstrument(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	int _ReqQryTradingAccount(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	int _ReqQryInvestorPosition(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
-
-
+	int _ReqQryInvestor(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
 	void OnOrder(CSecurityFtdcOrderField *pOrder, bool bFromQry);
 	void OnTrade(CSecurityFtdcTradeField *pTrade, bool bFromQry);
@@ -121,6 +125,7 @@ private:
 	//virtual void OnRspAuthenticate(CSecurityFtdcRspAuthenticateField *pRspAuthenticateField, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	virtual void OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspSettlementInfoConfirm(CSecurityFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	virtual void OnRspQryInvestor(CSecurityFtdcInvestorField *pInvestor, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	//下单
 	virtual void OnRspOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -174,6 +179,8 @@ private:
 	atomic<int>					m_lRequestID;			//请求ID,得保持自增
 
 	CSecurityFtdcRspUserLoginField m_RspUserLogin;			//返回的登录成功响应，目前利用此内成员进行报单所属区分
+	CSecurityFtdcInvestorField	m_Investor;
+
 	OrderIDType					m_orderInsert_Id;
 
 	mutex						m_csOrderRef;

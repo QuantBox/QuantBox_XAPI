@@ -170,4 +170,29 @@ enum DataObjetType : char
 	Level2Snapshot,
 	Level2Update,
 };
+
+enum IdCardType:char
+{
+	EID,
+	IDCard,
+	OfficerIDCard,
+	PoliceIDCard,
+	SoldierIDCard,
+	HouseholdRegister,
+	Passport,
+	TaiwanCompatriotIDCard,
+	HomeComingCard,
+	LicenseNo,
+	TaxNo,
+	HMMainlandTravelPermit,
+	TwMainlandTravelPermit,
+	DrivingLicense,
+	SocialID,
+	LocalID,
+	BusinessRegistration,
+	HKMCIDCard,
+	AccountsPermits,
+	OtherCard,
+};
+
 #endif

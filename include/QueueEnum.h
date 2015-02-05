@@ -39,9 +39,11 @@ enum RequestType :char
 	ReqQryInstrumentCommissionRate,
 	ReqQryInstrumentMarginRate,
 	ReqQrySettlementInfo,
+	
 
 	ReqQryHistoricalTicks,
 	ReqQryHistoricalBars,
+	ReqQryInvestor,
 };
 
 enum ResponeType :char
@@ -61,6 +63,7 @@ enum ResponeType :char
 
 	OnRspQryHistoricalTicks,
 	OnRspQryHistoricalBars,
+	OnRspQryInvestor,
 };
 
 #endif

@@ -29,6 +29,8 @@ namespace QuantBox.XAPI.Event
         public new event EventHandler OnRspQryHistoricalTicks;
         public new event EventHandler OnRspQryHistoricalBars;
 
+        public new event EventHandler OnRspQryInvestor;
+
 
         public XApiWrapper(string path):this()
         {
@@ -159,6 +161,14 @@ namespace QuantBox.XAPI.Event
             if (null != OnRspQryHistoricalBars)
             {
                 OnRspQryHistoricalBars(this, new OnRspQryHistoricalBarsEventArgs(pTicks, size1, ref request, size2, bIsLast));
+            }
+        }
+
+        private void OnRspQryInvestor_callback(object sender, ref InvestorField investor, int size1, bool bIsLast)
+        {
+            if (null != OnRspQryInvestor)
+            {
+                OnRspQryInvestor(this, new OnRspQryInvestorEventArgs(ref investor, size1, bIsLast));
             }
         }
     }

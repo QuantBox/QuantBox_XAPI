@@ -62,6 +62,9 @@ namespace QuantBox.XAPI.Callback
                 case ResponeType.OnRspQrySettlementInfo:
                     _OnRspQrySettlementInfo(ptr1, size1, double1);
                     break;
+                case ResponeType.OnRspQryInvestor:
+                    _OnRspQryInvestor(ptr1, size1, double1);
+                    break;
                 case ResponeType.OnRtnOrder:
                     _OnRtnOrder(ptr1, size1);
                     break;
