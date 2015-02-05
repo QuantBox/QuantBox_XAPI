@@ -103,12 +103,35 @@ char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vc
 	return buf;
 }
 
+void GetUpdateTime_HH_mm_ss(char* UpdateTime,int* _HH,int* _mm,int* _ss)
+{
+	*_HH = atoi(&UpdateTime[0]);
+	*_mm = atoi(&UpdateTime[3]);
+	*_ss = atoi(&UpdateTime[6]);
+}
+
+void GetUpdateTime_HHmmss(char* UpdateTime, int* _HH, int* _mm, int* _ss)
+{
+	int HHmmss = atoi(UpdateTime);
+	*_HH = HHmmss / 10000;
+	*_mm = HHmmss % 10000 / 100;
+	*_ss = HHmmss % 100;
+}
+
 int GetUpdateTime(char* UpdateTime, int* _UpdateTime, int* UpdateMillisec)
 {
 	// UpdateTime¥¶¿Ì
-	int HH = atoi(&UpdateTime[0]);
-	int mm = atoi(&UpdateTime[3]);
-	int ss = atoi(&UpdateTime[6]);
+	int HH = 0;// atoi(&UpdateTime[0]);
+	int mm = 0;//atoi(&UpdateTime[3]);
+	int ss = 0;//atoi(&UpdateTime[6]);
+	if (strlen(UpdateTime) == 6)
+	{
+		GetUpdateTime_HHmmss(UpdateTime, &HH, &mm, &ss);
+	}
+	else
+	{
+		GetUpdateTime_HH_mm_ss(UpdateTime, &HH, &mm, &ss);
+	}
 
 	if (UpdateMillisec)
 	{

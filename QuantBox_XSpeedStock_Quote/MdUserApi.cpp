@@ -474,60 +474,60 @@ void CMdUserApi::OnRspStockUnSubMarketData(struct DFITCSECSpecificInstrumentFiel
 //行情回调，得保证此函数尽快返回
 void CMdUserApi::OnStockMarketData(struct DFITCStockDepthMarketDataField *pMarketDataField)
 {
-	DepthMarketDataField marketData = {0};
-	strcpy(marketData.InstrumentID, pMarketDataField->staticDataField.securityID);
-	strcpy(marketData.ExchangeID, pMarketDataField->staticDataField.exchangeID);
+	DepthMarketDataField field = { 0 };
+	strcpy(field.InstrumentID, pMarketDataField->staticDataField.securityID);
+	strcpy(field.ExchangeID, pMarketDataField->staticDataField.exchangeID);
 
-	sprintf(marketData.Symbol, "%s.%s", marketData.InstrumentID, ExchangeID_2to3(marketData.ExchangeID));
+	sprintf(field.Symbol, "%s.%s", field.InstrumentID, field.ExchangeID);
 
-	marketData.TradingDay = pMarketDataField->staticDataField.tradingDay;
-	marketData.ActionDay = pMarketDataField->staticDataField.tradingDay;
-	GetUpdateTime(pMarketDataField->sharedDataField.updateTime, &marketData.UpdateTime, &marketData.UpdateMillisec);
+	field.TradingDay = pMarketDataField->staticDataField.tradingDay;
+	field.ActionDay = pMarketDataField->staticDataField.tradingDay;
+	GetUpdateTime(pMarketDataField->sharedDataField.updateTime, &field.UpdateTime, &field.UpdateMillisec);
 
-	marketData.LastPrice = pMarketDataField->sharedDataField.latestPrice;
-	marketData.Volume = pMarketDataField->sharedDataField.tradeQty;
-	marketData.Turnover = pMarketDataField->sharedDataField.turnover;
+	field.LastPrice = pMarketDataField->sharedDataField.latestPrice;
+	field.Volume = pMarketDataField->sharedDataField.tradeQty;
+	field.Turnover = pMarketDataField->sharedDataField.turnover;
 	//marketData.OpenInterest = 0;
 	//marketData.AveragePrice = 0;
 
-	marketData.OpenPrice = pMarketDataField->staticDataField.openPrice;
+	field.OpenPrice = pMarketDataField->staticDataField.openPrice;
 	//marketData.HighestPrice = 0;
 	//marketData.LowestPrice = 0;
 	//marketData.ClosePrice = 0;
 	//marketData.SettlementPrice = 0;
 
-	marketData.UpperLimitPrice = pMarketDataField->staticDataField.upperLimitPrice;
-	marketData.LowerLimitPrice = pMarketDataField->staticDataField.lowerLimitPrice;
-	marketData.PreClosePrice = pMarketDataField->staticDataField.preClosePrice;
+	field.UpperLimitPrice = pMarketDataField->staticDataField.upperLimitPrice;
+	field.LowerLimitPrice = pMarketDataField->staticDataField.lowerLimitPrice;
+	field.PreClosePrice = pMarketDataField->staticDataField.preClosePrice;
 	//marketData.PreSettlementPrice = pMarketDataField->preSettlementPrice;
 	//marketData.PreOpenInterest = pMarketDataField->preOpenInterest;
 
-	marketData.BidPrice1 = pMarketDataField->sharedDataField.bidPrice1;
-	marketData.BidVolume1 = pMarketDataField->sharedDataField.bidQty1;
-	marketData.AskPrice1 = pMarketDataField->sharedDataField.askPrice1;
-	marketData.AskVolume1 = pMarketDataField->sharedDataField.askQty1;
+	field.BidPrice1 = pMarketDataField->sharedDataField.bidPrice1;
+	field.BidVolume1 = pMarketDataField->sharedDataField.bidQty1;
+	field.AskPrice1 = pMarketDataField->sharedDataField.askPrice1;
+	field.AskVolume1 = pMarketDataField->sharedDataField.askQty1;
 
-	marketData.BidPrice2 = pMarketDataField->sharedDataField.bidPrice2;
-	marketData.BidVolume2 = pMarketDataField->sharedDataField.bidQty2;
-	marketData.AskPrice2 = pMarketDataField->sharedDataField.askPrice2;
-	marketData.AskVolume2 = pMarketDataField->sharedDataField.askQty2;
+	field.BidPrice2 = pMarketDataField->sharedDataField.bidPrice2;
+	field.BidVolume2 = pMarketDataField->sharedDataField.bidQty2;
+	field.AskPrice2 = pMarketDataField->sharedDataField.askPrice2;
+	field.AskVolume2 = pMarketDataField->sharedDataField.askQty2;
 
-	marketData.BidPrice3 = pMarketDataField->sharedDataField.bidPrice3;
-	marketData.BidVolume3 = pMarketDataField->sharedDataField.bidQty3;
-	marketData.AskPrice3 = pMarketDataField->sharedDataField.askPrice3;
-	marketData.AskVolume3 = pMarketDataField->sharedDataField.askQty3;
+	field.BidPrice3 = pMarketDataField->sharedDataField.bidPrice3;
+	field.BidVolume3 = pMarketDataField->sharedDataField.bidQty3;
+	field.AskPrice3 = pMarketDataField->sharedDataField.askPrice3;
+	field.AskVolume3 = pMarketDataField->sharedDataField.askQty3;
 
-	marketData.BidPrice4 = pMarketDataField->sharedDataField.bidPrice4;
-	marketData.BidVolume4 = pMarketDataField->sharedDataField.bidQty4;
-	marketData.AskPrice4 = pMarketDataField->sharedDataField.askPrice4;
-	marketData.AskVolume4 = pMarketDataField->sharedDataField.askQty4;
+	field.BidPrice4 = pMarketDataField->sharedDataField.bidPrice4;
+	field.BidVolume4 = pMarketDataField->sharedDataField.bidQty4;
+	field.AskPrice4 = pMarketDataField->sharedDataField.askPrice4;
+	field.AskVolume4 = pMarketDataField->sharedDataField.askQty4;
 
-	marketData.BidPrice5 = pMarketDataField->sharedDataField.bidPrice5;
-	marketData.BidVolume5 = pMarketDataField->sharedDataField.bidQty5;
-	marketData.AskPrice5 = pMarketDataField->sharedDataField.askPrice5;
-	marketData.AskVolume5 = pMarketDataField->sharedDataField.askQty5;
+	field.BidPrice5 = pMarketDataField->sharedDataField.bidPrice5;
+	field.BidVolume5 = pMarketDataField->sharedDataField.bidQty5;
+	field.AskPrice5 = pMarketDataField->sharedDataField.askPrice5;
+	field.AskVolume5 = pMarketDataField->sharedDataField.askQty5;
 
-	m_msgQueue->Input(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, &field, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }
 
 //void CMdUserApi::OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

@@ -460,65 +460,65 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	// 测试平台穿越速度，用完后需要注释掉
 	//WriteLog("CTP:OnRtnDepthMarketData:%s %f %s.%03d", pDepthMarketData->InstrumentID, pDepthMarketData->LastPrice, pDepthMarketData->UpdateTime, pDepthMarketData->UpdateMillisec);
 
-	DepthMarketDataField marketData = {0};
-	strcpy(marketData.InstrumentID, pDepthMarketData->InstrumentID);
-	strcpy(marketData.ExchangeID, pDepthMarketData->ExchangeID);
+	DepthMarketDataField field = { 0 };
+	strcpy(field.InstrumentID, pDepthMarketData->InstrumentID);
+	strcpy(field.ExchangeID, pDepthMarketData->ExchangeID);
 
-	strcpy(marketData.Symbol, pDepthMarketData->InstrumentID);
+	sprintf(field.Symbol, "%s.%s", field.InstrumentID, field.ExchangeID);
 
 	//TODO:CTP大连没有ActionDay，所以API中是将TradingDay填到了这里，所以这里这种用法可能会出错，要测
-	GetExchangeTime(pDepthMarketData->TradingDay,pDepthMarketData->ActionDay,pDepthMarketData->UpdateTime
-		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime, &marketData.UpdateMillisec);
+	GetExchangeTime(pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
+		, &field.TradingDay, &field.ActionDay, &field.UpdateTime, &field.UpdateMillisec);
 
-	marketData.UpdateMillisec = pDepthMarketData->UpdateMillisec;
+	field.UpdateMillisec = pDepthMarketData->UpdateMillisec;
 
-	marketData.LastPrice = pDepthMarketData->LastPrice;
-	marketData.Volume = pDepthMarketData->Volume;
-	marketData.Turnover = pDepthMarketData->Turnover;
-	marketData.OpenInterest = pDepthMarketData->OpenInterest;
-	marketData.AveragePrice = pDepthMarketData->AveragePrice;
+	field.LastPrice = pDepthMarketData->LastPrice;
+	field.Volume = pDepthMarketData->Volume;
+	field.Turnover = pDepthMarketData->Turnover;
+	field.OpenInterest = pDepthMarketData->OpenInterest;
+	field.AveragePrice = pDepthMarketData->AveragePrice;
 
-	marketData.OpenPrice = pDepthMarketData->OpenPrice;
-	marketData.HighestPrice = pDepthMarketData->HighestPrice;
-	marketData.LowestPrice = pDepthMarketData->LowestPrice;
-	marketData.ClosePrice = pDepthMarketData->ClosePrice != DBL_MAX ? pDepthMarketData->ClosePrice : 0;
-	marketData.SettlementPrice = pDepthMarketData->SettlementPrice;
+	field.OpenPrice = pDepthMarketData->OpenPrice;
+	field.HighestPrice = pDepthMarketData->HighestPrice;
+	field.LowestPrice = pDepthMarketData->LowestPrice;
+	field.ClosePrice = pDepthMarketData->ClosePrice != DBL_MAX ? pDepthMarketData->ClosePrice : 0;
+	field.SettlementPrice = pDepthMarketData->SettlementPrice;
 
-	marketData.UpperLimitPrice = pDepthMarketData->UpperLimitPrice;
-	marketData.LowerLimitPrice = pDepthMarketData->LowerLimitPrice;
-	marketData.PreClosePrice = pDepthMarketData->PreClosePrice;
-	marketData.PreSettlementPrice = pDepthMarketData->PreSettlementPrice;
-	marketData.PreOpenInterest = pDepthMarketData->PreOpenInterest;
+	field.UpperLimitPrice = pDepthMarketData->UpperLimitPrice;
+	field.LowerLimitPrice = pDepthMarketData->LowerLimitPrice;
+	field.PreClosePrice = pDepthMarketData->PreClosePrice;
+	field.PreSettlementPrice = pDepthMarketData->PreSettlementPrice;
+	field.PreOpenInterest = pDepthMarketData->PreOpenInterest;
 
-	marketData.BidPrice1 = pDepthMarketData->BidPrice1;
-	marketData.BidVolume1 = pDepthMarketData->BidVolume1;
-	marketData.AskPrice1 = pDepthMarketData->AskPrice1;
-	marketData.AskVolume1 = pDepthMarketData->AskVolume1;
+	field.BidPrice1 = pDepthMarketData->BidPrice1;
+	field.BidVolume1 = pDepthMarketData->BidVolume1;
+	field.AskPrice1 = pDepthMarketData->AskPrice1;
+	field.AskVolume1 = pDepthMarketData->AskVolume1;
 
 	if (pDepthMarketData->BidPrice2 != DBL_MAX || pDepthMarketData->AskPrice2 != DBL_MAX)
 	{
-		marketData.BidPrice2 = pDepthMarketData->BidPrice2;
-		marketData.BidVolume2 = pDepthMarketData->BidVolume2;
-		marketData.AskPrice2 = pDepthMarketData->AskPrice2;
-		marketData.AskVolume2 = pDepthMarketData->AskVolume2;
+		field.BidPrice2 = pDepthMarketData->BidPrice2;
+		field.BidVolume2 = pDepthMarketData->BidVolume2;
+		field.AskPrice2 = pDepthMarketData->AskPrice2;
+		field.AskVolume2 = pDepthMarketData->AskVolume2;
 
-		marketData.BidPrice3 = pDepthMarketData->BidPrice3;
-		marketData.BidVolume3 = pDepthMarketData->BidVolume3;
-		marketData.AskPrice3 = pDepthMarketData->AskPrice3;
-		marketData.AskVolume3 = pDepthMarketData->AskVolume3;
+		field.BidPrice3 = pDepthMarketData->BidPrice3;
+		field.BidVolume3 = pDepthMarketData->BidVolume3;
+		field.AskPrice3 = pDepthMarketData->AskPrice3;
+		field.AskVolume3 = pDepthMarketData->AskVolume3;
 
-		marketData.BidPrice4 = pDepthMarketData->BidPrice4;
-		marketData.BidVolume4 = pDepthMarketData->BidVolume4;
-		marketData.AskPrice4 = pDepthMarketData->AskPrice4;
-		marketData.AskVolume4 = pDepthMarketData->AskVolume4;
+		field.BidPrice4 = pDepthMarketData->BidPrice4;
+		field.BidVolume4 = pDepthMarketData->BidVolume4;
+		field.AskPrice4 = pDepthMarketData->AskPrice4;
+		field.AskVolume4 = pDepthMarketData->AskVolume4;
 
-		marketData.BidPrice5 = pDepthMarketData->BidPrice5;
-		marketData.BidVolume5 = pDepthMarketData->BidVolume5;
-		marketData.AskPrice5 = pDepthMarketData->AskPrice5;
-		marketData.AskVolume5 = pDepthMarketData->AskVolume5;
+		field.BidPrice5 = pDepthMarketData->BidPrice5;
+		field.BidVolume5 = pDepthMarketData->BidVolume5;
+		field.AskPrice5 = pDepthMarketData->AskPrice5;
+		field.AskVolume5 = pDepthMarketData->AskVolume5;
 	}
 	
-	m_msgQueue->Input(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, &field, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }
 
 void CMdUserApi::OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -551,6 +551,7 @@ void CMdUserApi::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp)
 	strcpy(field.Symbol, pForQuoteRsp->InstrumentID);
 	strcpy(field.InstrumentID, pForQuoteRsp->InstrumentID);
 	strcpy(field.ExchangeID, pForQuoteRsp->ExchangeID);
+	sprintf(field.Symbol, "%s.%s", field.InstrumentID, field.ExchangeID);
 	strcpy(field.TradingDay, pForQuoteRsp->TradingDay);
 	strcpy(field.QuoteID, pForQuoteRsp->ForQuoteSysID);
 	strcpy(field.QuoteTime, pForQuoteRsp->ForQuoteTime);

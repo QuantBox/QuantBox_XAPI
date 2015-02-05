@@ -412,25 +412,25 @@ void CLevel2UserApi::OnRspUnSubL2MarketData(CSecurityFtdcSpecificInstrumentField
 
 void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2MarketData)
 {
-	DepthMarketDataField marketData = { 0 };
-	strncpy(marketData.InstrumentID, pL2MarketData->InstrumentID, sizeof(InstrumentIDType));
-	strncpy(marketData.ExchangeID, pL2MarketData->ExchangeID, sizeof(ExchangeIDType));
+	DepthMarketDataField field = { 0 };
+	strncpy(field.InstrumentID, pL2MarketData->InstrumentID, sizeof(InstrumentIDType));
+	strncpy(field.ExchangeID, pL2MarketData->ExchangeID, sizeof(ExchangeIDType));
 
-	sprintf(marketData.Symbol, "%s.%s", marketData.InstrumentID, marketData.ExchangeID);
+	sprintf(field.Symbol, "%s.%s", field.InstrumentID, field.ExchangeID);
 
 	GetExchangeTime(pL2MarketData->TradingDay, pL2MarketData->TradingDay, pL2MarketData->TimeStamp
-		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime, &marketData.UpdateMillisec);
+		, &field.TradingDay, &field.ActionDay, &field.UpdateTime, &field.UpdateMillisec);
 
-	marketData.LastPrice = pL2MarketData->LastPrice;
-	marketData.Volume = pL2MarketData->TotalTradeVolume;
-	marketData.Turnover = pL2MarketData->TotalTradeValue;
+	field.LastPrice = pL2MarketData->LastPrice;
+	field.Volume = pL2MarketData->TotalTradeVolume;
+	field.Turnover = pL2MarketData->TotalTradeValue;
 	//marketData.OpenInterest = pL2MarketData->OpenInterest;
 	//marketData.AveragePrice = pL2MarketData->AveragePrice;
 
-	marketData.OpenPrice = pL2MarketData->OpenPrice;
-	marketData.HighestPrice = pL2MarketData->HighPrice;
-	marketData.LowestPrice = pL2MarketData->LowPrice;
-	marketData.ClosePrice = pL2MarketData->ClosePrice;
+	field.OpenPrice = pL2MarketData->OpenPrice;
+	field.HighestPrice = pL2MarketData->HighPrice;
+	field.LowestPrice = pL2MarketData->LowPrice;
+	field.ClosePrice = pL2MarketData->ClosePrice;
 	//marketData.SettlementPrice = pL2MarketData->SettlementPrice;
 
 	//marketData.UpperLimitPrice = pL2MarketData->UpperLimitPrice;
@@ -439,37 +439,32 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 	//marketData.PreSettlementPrice = pL2MarketData->PreSettlementPrice;
 	//marketData.PreOpenInterest = pL2MarketData->PreOpenInterest;
 
-	marketData.BidPrice1 = pL2MarketData->BidPrice1;
-	marketData.BidVolume1 = pL2MarketData->BidVolume1;
-	marketData.AskPrice1 = pL2MarketData->OfferPrice1;
-	marketData.AskVolume1 = pL2MarketData->OfferVolume1;
+	field.BidPrice1 = pL2MarketData->BidPrice1;
+	field.BidVolume1 = pL2MarketData->BidVolume1;
+	field.AskPrice1 = pL2MarketData->OfferPrice1;
+	field.AskVolume1 = pL2MarketData->OfferVolume1;
 
 	//if (pDepthMarketData->BidPrice2 != DBL_MAX || pDepthMarketData->AskPrice2 != DBL_MAX)
 	{
-		marketData.BidPrice2 = pL2MarketData->BidPrice2;
-		marketData.BidVolume2 = pL2MarketData->BidVolume2;
-		marketData.AskPrice2 = pL2MarketData->OfferPrice2;
-		marketData.AskVolume2 = pL2MarketData->OfferVolume2;
+		field.BidPrice2 = pL2MarketData->BidPrice2;
+		field.BidVolume2 = pL2MarketData->BidVolume2;
+		field.AskPrice2 = pL2MarketData->OfferPrice2;
+		field.AskVolume2 = pL2MarketData->OfferVolume2;
 
-		marketData.BidPrice3 = pL2MarketData->BidPrice3;
-		marketData.BidVolume3 = pL2MarketData->BidVolume3;
-		marketData.AskPrice3 = pL2MarketData->OfferPrice3;
-		marketData.AskVolume3 = pL2MarketData->OfferVolume3;
+		field.BidPrice3 = pL2MarketData->BidPrice3;
+		field.BidVolume3 = pL2MarketData->BidVolume3;
+		field.AskPrice3 = pL2MarketData->OfferPrice3;
+		field.AskVolume3 = pL2MarketData->OfferVolume3;
 
-		marketData.BidPrice4 = pL2MarketData->BidPrice4;
-		marketData.BidVolume4 = pL2MarketData->BidVolume4;
-		marketData.AskPrice4 = pL2MarketData->OfferPrice2;
-		marketData.AskVolume4 = pL2MarketData->OfferVolume4;
+		field.BidPrice4 = pL2MarketData->BidPrice4;
+		field.BidVolume4 = pL2MarketData->BidVolume4;
+		field.AskPrice4 = pL2MarketData->OfferPrice2;
+		field.AskVolume4 = pL2MarketData->OfferVolume4;
 
-		marketData.BidPrice5 = pL2MarketData->BidPrice5;
-		marketData.BidVolume5 = pL2MarketData->BidVolume5;
-		marketData.AskPrice5 = pL2MarketData->OfferPrice5;
-		marketData.AskVolume5 = pL2MarketData->OfferVolume5;
-
-		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
-		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
-		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
-		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
+		field.BidPrice5 = pL2MarketData->BidPrice5;
+		field.BidVolume5 = pL2MarketData->BidVolume5;
+		field.AskPrice5 = pL2MarketData->OfferPrice5;
+		field.AskVolume5 = pL2MarketData->OfferVolume5;
 
 		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
 		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
@@ -491,9 +486,13 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
 		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
 
+		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
+		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
+		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
+		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
 	}
 
-	m_msgQueue->Input(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, &field, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }
 
 void CLevel2UserApi::SubscribeL2Index(const string& szInstrumentIDs, const string& szExchageID)
@@ -629,29 +628,29 @@ void CLevel2UserApi::OnRspUnSubL2Index(CSecurityFtdcSpecificInstrumentField *pSp
 
 void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 {
-	DepthMarketDataField marketData = { 0 };
-	strncpy(marketData.InstrumentID, pL2Index->InstrumentID, sizeof(InstrumentIDType));
-	strncpy(marketData.ExchangeID, pL2Index->ExchangeID, sizeof(ExchangeIDType));
+	DepthMarketDataField field = { 0 };
+	strncpy(field.InstrumentID, pL2Index->InstrumentID, sizeof(InstrumentIDType));
+	strncpy(field.ExchangeID, pL2Index->ExchangeID, sizeof(ExchangeIDType));
 
-	sprintf(marketData.Symbol, "%s.%s", marketData.InstrumentID, marketData.ExchangeID);
+	sprintf(field.Symbol, "%s.%s", field.InstrumentID, field.ExchangeID);
 	GetExchangeTime(pL2Index->TradingDay, pL2Index->TradingDay, pL2Index->TimeStamp
-		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime, &marketData.UpdateMillisec);
+		, &field.TradingDay, &field.ActionDay, &field.UpdateTime, &field.UpdateMillisec);
 
-	marketData.LastPrice = pL2Index->LastIndex;
-	marketData.Volume = pL2Index->TotalVolume;
-	marketData.Turnover = pL2Index->TurnOver;
+	field.LastPrice = pL2Index->LastIndex;
+	field.Volume = pL2Index->TotalVolume;
+	field.Turnover = pL2Index->TurnOver;
 	//marketData.OpenInterest = pL2Index->OpenInterest;
 	//marketData.AveragePrice = pL2Index->AveragePrice;
 
-	marketData.OpenPrice = pL2Index->OpenIndex;
-	marketData.HighestPrice = pL2Index->HighIndex;
-	marketData.LowestPrice = pL2Index->LowIndex;
-	marketData.ClosePrice = pL2Index->CloseIndex;
+	field.OpenPrice = pL2Index->OpenIndex;
+	field.HighestPrice = pL2Index->HighIndex;
+	field.LowestPrice = pL2Index->LowIndex;
+	field.ClosePrice = pL2Index->CloseIndex;
 	//marketData.SettlementPrice = pL2Index->SettlementPrice;
 
 	//marketData.UpperLimitPrice = pL2Index->UpperLimitPrice;
 	//marketData.LowerLimitPrice = pL2Index->LowerLimitPrice;
-	marketData.PreClosePrice = pL2Index->PreCloseIndex;
+	field.PreClosePrice = pL2Index->PreCloseIndex;
 	//marketData.PreSettlementPrice = pL2Index->PreSettlementPrice;
 	//marketData.PreOpenInterest = pL2Index->PreOpenInterest;
 
@@ -683,5 +682,5 @@ void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 	//	marketData.AskVolume5 = pL2MarketData->OfferVolume5;
 	//}
 
-	m_msgQueue->Input(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, DepthLevelType::L0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, DepthLevelType::L0, 0, &field, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }
