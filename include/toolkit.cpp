@@ -9,6 +9,7 @@
 #else
     #include <sys/stat.h>
     #define MKDIR(X) mkdir((X),S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    #define _vsnprintf vsnprintf
 #endif // defined
 
 void WriteLog(const char *fmt, ...)
@@ -21,7 +22,9 @@ void WriteLog(const char *fmt, ...)
 	va_end(vl);
 	//char temp[2048] = "XSpeed:";
 	//OutputDebugStringA(strcat(temp, buff));
+#if defined _WIN32 || WIN32 || _WINDOWS
 	OutputDebugStringA(buff);
+#endif
 }
 
 void makedirs(const char* dir)
@@ -131,7 +134,7 @@ int GetUpdateTime(char* UpdateTime, int* _UpdateTime, int* UpdateMillisec)
 				*_UpdateTime = datetime;
 		}
 	}
-	
+
 	return HH;
 }
 

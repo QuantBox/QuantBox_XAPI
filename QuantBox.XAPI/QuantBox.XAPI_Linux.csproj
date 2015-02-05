@@ -63,7 +63,6 @@
     <Compile Include="SoInvoke.cs" />
     <Compile Include="Struct.cs" />
     <Compile Include="Interface\IXApi.cs" />
-    <Compile Include="Interface\IXMarketData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
