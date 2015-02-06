@@ -10,15 +10,15 @@ namespace QuantBox.XAPI
     public class SoInvoke : InvokeBase
     {
         [DllImport("libdl.so")]
-        private extern static IntPtr dlopen(String path, int mode);
+        private extern static IntPtr dlopen(string path, int mode);
         [DllImport("libdl.so")]
-        private extern static IntPtr dlsym(IntPtr handle, String symbol);
+        private extern static IntPtr dlsym(IntPtr handle, string symbol);
         [DllImport("libdl.so")]
         private extern static IntPtr dlerror();
         [DllImport("libdl.so")]
         private extern static int dlclose(IntPtr handle);
 
-        public SoInvoke(String DLLPath)
+        public SoInvoke(string DLLPath)
         {
             hLib = dlopen(DLLPath, 1);
             if (hLib == IntPtr.Zero)

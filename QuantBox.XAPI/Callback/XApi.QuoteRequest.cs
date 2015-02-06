@@ -9,7 +9,12 @@ namespace QuantBox.XAPI.Callback
 {
     public partial class XApi
     {
-        public DelegateOnRtnQuoteRequest OnRtnQuoteRequest { get; set; }
+        public DelegateOnRtnQuoteRequest OnRtnQuoteRequest
+        {
+            get {return OnRtnQuoteRequest_;}
+            set { OnRtnQuoteRequest_ = value; }
+        }
+        private DelegateOnRtnQuoteRequest OnRtnQuoteRequest_;
 
         #region 做市商询价订阅，主要是XSpeed这个功能是在交易API中
         private Dictionary<string, SortedSet<string>> _SubscribedQuotes = new Dictionary<string, SortedSet<string>>();
@@ -82,12 +87,13 @@ namespace QuantBox.XAPI.Callback
 
         private void _OnRtnQuoteRequest(IntPtr ptr1, int size1)
         {
-            if (OnRtnQuoteRequest == null)
+            if (OnRtnQuoteRequest_ == null)
                 return;
 
-            QuoteRequestField obj = PInvokeUtility.GetObjectFromIntPtr<QuoteRequestField>(ptr1);
+            //QuoteRequestField obj = PInvokeUtility.GetObjectFromIntPtr<QuoteRequestField>(ptr1);
+            QuoteRequestField obj = (QuoteRequestField)Marshal.PtrToStructure(ptr1, typeof(QuoteRequestField));
 
-            OnRtnQuoteRequest(this, ref obj);
+            OnRtnQuoteRequest_(this, ref obj);
         }
     }
 }

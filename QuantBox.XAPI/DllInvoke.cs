@@ -21,9 +21,9 @@ namespace QuantBox.XAPI
         }
 
         [DllImport("kernel32.dll")]
-        private extern static IntPtr LoadLibrary(String lpFileName);
+        private extern static IntPtr LoadLibrary(string lpFileName);
         [DllImport("kernel32.dll")]
-        private extern static IntPtr GetProcAddress(IntPtr hModule, String lpProcName);
+        private extern static IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
         [DllImport("kernel32.dll")]
         private extern static bool FreeLibrary(IntPtr hModule);
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -33,7 +33,7 @@ namespace QuantBox.XAPI
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern IntPtr LoadLibraryEx(string lpFileName, IntPtr hReservedNull, LoadLibraryFlags dwFlags);
 
-        public DllInvoke(String DLLPath)
+        public DllInvoke(string DLLPath)
         {
             hLib = LoadLibraryEx(DLLPath,IntPtr.Zero,LoadLibraryFlags.LOAD_WITH_ALTERED_SEARCH_PATH);
             if (hLib == IntPtr.Zero)
@@ -46,7 +46,7 @@ namespace QuantBox.XAPI
             Dispose();
         }
         //将要执行的函数转换为委托
-        public override Delegate Invoke(String APIName, Type t)
+        public override Delegate Invoke(string APIName, Type t)
         {
             if (hLib == IntPtr.Zero)
                 return (Delegate)null;

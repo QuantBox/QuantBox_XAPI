@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ideafixxxer.Generics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -9,37 +10,37 @@ namespace QuantBox.XAPI
 {
     public static class Extensions_GBK
     {
-        public static string InstrumentName(this InstrumentField field)
+        public static string InstrumentName([In]this InstrumentField field)
         {
             return PInvokeUtility.GetUnicodeString(field.InstrumentName);
         }
 
-        public static string Content(this SettlementInfoField field)
+        public static string Content([In]this SettlementInfoField field)
         {
             return PInvokeUtility.GetUnicodeString(field.Content);
         }
 
-        public static string Text(this OrderField field)
+        public static string Text([In]this OrderField field)
         {
             return PInvokeUtility.GetUnicodeString(field.Text);
         }
 
-        public static string Text(this QuoteField field)
+        public static string Text([In]this QuoteField field)
         {
             return PInvokeUtility.GetUnicodeString(field.Text);
         }
 
-        public static string ErrorMsg(this RspUserLoginField field)
+        public static string ErrorMsg([In]this RspUserLoginField field)
         {
             return PInvokeUtility.GetUnicodeString(field.ErrorMsg);
         }
 
-        public static string ErrorMsg(this ErrorField field)
+        public static string ErrorMsg([In]this ErrorField field)
         {
             return PInvokeUtility.GetUnicodeString(field.ErrorMsg);
         }
 
-        public static string InvestorName(this InvestorField field)
+        public static string InvestorName([In]this InvestorField field)
         {
             return PInvokeUtility.GetUnicodeString(field.InvestorName);
         }
@@ -47,7 +48,7 @@ namespace QuantBox.XAPI
 
     public static class Extensions_Misc
     {
-        public static DateTime ExchangeDateTime(this DepthMarketDataField field)
+        public static DateTime ExchangeDateTime([In]this DepthMarketDataField field)
         {
             int yyyy = field.ActionDay / 10000;
             int MM = field.ActionDay % 10000 / 100;
@@ -60,7 +61,7 @@ namespace QuantBox.XAPI
             return new DateTime(yyyy, MM, dd, HH, mm, ss, field.UpdateMillisec);
         }
 
-        public static DateTime ExchangeDateTime_(this DepthMarketDataField field)
+        public static DateTime ExchangeDateTime_([In]this DepthMarketDataField field)
         {
             // 表示传回来的时间可能有问题，要检查一下
             if(field.UpdateTime == 0)
@@ -106,35 +107,35 @@ namespace QuantBox.XAPI
 
     public static class Extensions_Output
     {
-        public static string ToFormattedString(this ErrorField field)
+        public static string ToFormattedString([In]this ErrorField field)
         {
             return string.Format("[ErrorID={0},ErrorMsg={1}]",
                 field.ErrorID, field.ErrorMsg());
         }
 
-        public static string ToFormattedString(this OrderField field)
+        public static string ToFormattedString([In]this OrderField field)
         {
             return string.Format("[InstrumentID={0};ExchangeID={1};Side={2};Qty={3};Price={4};OpenClose={5};HedgeFlag={6};"
                 + "ID={7};OrderID={8};"
                 + "Type={9};TimeInForce={10};Status={11};ExecType={12};"
                 + "ErrorID={13};Text={14}]",
-                field.InstrumentID, field.ExchangeID, field.Side, field.Qty, field.Price, field.OpenClose, field.HedgeFlag,
+                field.InstrumentID, field.ExchangeID, Enum<OrderSide>.ToString(field.Side), field.Qty, field.Price, Enum<OpenCloseType>.ToString(field.OpenClose), Enum<HedgeFlagType>.ToString(field.HedgeFlag),
                 field.ID, field.OrderID,
-                field.Type, field.TimeInForce, field.Status, field.ExecType,
+                Enum<OrderType>.ToString(field.Type), Enum<TimeInForce>.ToString(field.TimeInForce), Enum<OrderStatus>.ToString(field.Status), Enum<ExecType>.ToString(field.ExecType),
                 field.ErrorID, field.Text());
         }
 
-        public static string ToFormattedString(this TradeField field)
+        public static string ToFormattedString([In]this TradeField field)
         {
             return string.Format("[InstrumentID={0};ExchangeID={1};Side={2};Qty={3};Price={4};OpenClose={5};HedgeFlag={6};"
                 + "ID={7};TradeID={8};"
                 + "Time={9};Commission={10}]",
-                field.InstrumentID, field.ExchangeID, field.Side, field.Qty, field.Price, field.OpenClose, field.HedgeFlag,
+                field.InstrumentID, field.ExchangeID, Enum<OrderSide>.ToString(field.Side), field.Qty, field.Price, Enum<OpenCloseType>.ToString(field.OpenClose), Enum<HedgeFlagType>.ToString(field.HedgeFlag),
                 field.ID, field.TradeID,
                 field.Time, field.Commission);
         }
 
-        public static string ToFormattedString(this QuoteField field)
+        public static string ToFormattedString([In]this QuoteField field)
         {
             return string.Format("[InstrumentID={0};ExchangeID={1};"
                 + "AskPrice={2};AskQty={3};BidPrice={4};BidQty={5};"
@@ -145,29 +146,29 @@ namespace QuantBox.XAPI
                 field.InstrumentID, field.ExchangeID,
                 field.AskPrice, field.AskQty, field.BidPrice, field.BidQty,
                 field.ID,field.AskOrderID,field.BidOrderID,
-                field.Status,field.ExecType,
-                field.ErrorID,field.Text(),
-                field.AskOpenClose,field.AskHedgeFlag,field.BidOpenClose,field.BidHedgeFlag);
+                Enum<OrderStatus>.ToString(field.Status), Enum<ExecType>.ToString(field.ExecType),
+                field.ErrorID, field.Text(),
+                Enum<OpenCloseType>.ToString(field.AskOpenClose), Enum<HedgeFlagType>.ToString(field.AskHedgeFlag), Enum<OpenCloseType>.ToString(field.BidOpenClose), Enum<HedgeFlagType>.ToString(field.BidHedgeFlag));
         }
 
-        public static string ToFormattedString(this RspUserLoginField field)
+        public static string ToFormattedString([In]this RspUserLoginField field)
         {
             return string.Format("[TradingDay={0};LoginTime={1};SessionID={2};ErrorID={3};ErrorMsg={4}]",
                 field.TradingDay,field.LoginTime,field.SessionID,field.ErrorID,field.ErrorMsg());
         }
 
-        public static string ToFormattedString(this QuoteRequestField field)
+        public static string ToFormattedString([In]this QuoteRequestField field)
         {
             return string.Format("[TradingDay={0};InstrumentID={1};ExchangeID={2};QuoteID={3};QuoteTime={4}]",
                 field.TradingDay, field.InstrumentID, field.ExchangeID, field.QuoteID, field.QuoteTime);
         }
 
-        public static string ToFormattedHeader(this TickField field)
+        public static string ToFormattedHeader([In]this TickField field)
         {
             return "DateTime,Price,Size,OpenInt,Bid,BidSize,Ask,AskSize";
         }
 
-        public static string ToFormattedString(this TickField field)
+        public static string ToFormattedString([In]this TickField field)
         {
             int yyyy = field.Date / 10000;
             int MM = field.Date % 10000 / 100;
@@ -183,12 +184,12 @@ namespace QuantBox.XAPI
                 field.BidPrice1,field.BidSize1,field.AskPrice1,field.AskSize1);
         }
 
-        public static string ToFormattedHeader(this BarField field)
+        public static string ToFormattedHeader([In]this BarField field)
         {
             return "DateTime,Open,High,Low,Close,Volume,OpenInt";
         }
 
-        public static string ToFormattedString(this BarField field)
+        public static string ToFormattedString([In]this BarField field)
         {
             int yyyy = field.Date / 10000;
             int MM = field.Date % 10000 / 100;
@@ -203,10 +204,10 @@ namespace QuantBox.XAPI
                 date, field.Open, field.High, field.Low, field.Close, field.Volume, field.OpenInterest);
         }
 
-        public static string ToFormattedString(this InvestorField field)
+        public static string ToFormattedString([In]this InvestorField field)
         {
             return string.Format("[BrokerID={0};InvestorID={1};IdentifiedCardType={2},IdentifiedCardNo={3};InvestorName={4}]",
-                field.BrokerID, field.InvestorID, field.IdentifiedCardType,field.IdentifiedCardNo, field.InvestorName());
+                field.BrokerID, field.InvestorID, Enum<IdCardType>.ToString(field.IdentifiedCardType),field.IdentifiedCardNo, field.InvestorName());
         }
     }
 }

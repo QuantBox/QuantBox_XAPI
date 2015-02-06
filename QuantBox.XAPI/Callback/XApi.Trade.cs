@@ -219,7 +219,8 @@ namespace QuantBox.XAPI.Callback
             //if (OnRtnOrder_ == null)
             //    return;
 
-            OrderField obj = PInvokeUtility.GetObjectFromIntPtr<OrderField>(ptr1);
+            //OrderField obj = PInvokeUtility.GetObjectFromIntPtr<OrderField>(ptr1);
+            OrderField obj = (OrderField)Marshal.PtrToStructure(ptr1, typeof(OrderField));
 
             OnRtnOrder_(this, ref obj);
         }
@@ -230,17 +231,19 @@ namespace QuantBox.XAPI.Callback
             //if (OnRtnTrade_ == null)
             //    return;
 
-            TradeField obj = PInvokeUtility.GetObjectFromIntPtr<TradeField>(ptr1);
+            //TradeField obj = PInvokeUtility.GetObjectFromIntPtr<TradeField>(ptr1);
+            TradeField obj = (TradeField)Marshal.PtrToStructure(ptr1, typeof(TradeField));
 
             OnRtnTrade_(this, ref obj);
         }
 
         private void _OnRtnQuote(IntPtr ptr1, int size1)
         {
-            if (OnRtnQuote_ == null)
-                return;
+            //if (OnRtnQuote_ == null)
+            //    return;
 
-            QuoteField obj = PInvokeUtility.GetObjectFromIntPtr<QuoteField>(ptr1);
+            //QuoteField obj = PInvokeUtility.GetObjectFromIntPtr<QuoteField>(ptr1);
+            QuoteField obj = (QuoteField)Marshal.PtrToStructure(ptr1, typeof(QuoteField));
 
             OnRtnQuote_(this, ref obj);
         }
