@@ -124,7 +124,7 @@ int GetUpdateTime(char* UpdateTime, int* _UpdateTime, int* UpdateMillisec)
 	int HH = 0;// atoi(&UpdateTime[0]);
 	int mm = 0;//atoi(&UpdateTime[3]);
 	int ss = 0;//atoi(&UpdateTime[6]);
-	if (strlen(UpdateTime) == 6)
+	if (strlen(UpdateTime) <= 6)
 	{
 		GetUpdateTime_HHmmss(UpdateTime, &HH, &mm, &ss);
 	}

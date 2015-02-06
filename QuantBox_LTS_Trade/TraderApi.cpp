@@ -47,6 +47,12 @@ void CTraderApi::QueryInThread(char type, void* pApi1, void* pApi2, double doubl
 	case E_QryInvestorField:
 		iRet = _ReqQryInvestor(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 		break;
+	case E_QryOrderField:
+		iRet = _ReqQryOrder(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		break;
+	case E_QryTradeField:
+		iRet = _ReqQryTrade(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		break;
 	default:
 		break;
 	}
@@ -444,6 +450,13 @@ void CTraderApi::OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, C
 		ReqQryInvestor();
 
 		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+
+		if (m_ServerInfo.PrivateTopicResumeType > ResumeType::Restart)
+		{
+			ReqQryOrder();
+			//ReqQryTrade();
+			//ReqQryQuote();
+		}
 	}
 	else
 	{
@@ -988,6 +1001,14 @@ void CTraderApi::ReqQryOrder()
 
 	strncpy(body.BrokerID, m_RspUserLogin.BrokerID, sizeof(TSecurityFtdcBrokerIDType));
 	strncpy(body.InvestorID, m_RspUserLogin.UserID, sizeof(TSecurityFtdcInvestorIDType));
+	
+	m_msgQueue_Query->Input(RequestType::E_QryOrderField, this, nullptr, 0, 0,
+		&body, sizeof(CSecurityFtdcQryOrderField), nullptr, 0, nullptr, 0);
+}
+
+int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	return m_pApi->ReqQryOrder((CSecurityFtdcQryOrderField*)ptr1, ++m_lRequestID);
 }
 
 void CTraderApi::OnOrder(CSecurityFtdcOrderField *pOrder, bool bFromQry)
@@ -1083,6 +1104,14 @@ void CTraderApi::ReqQryTrade()
 
 	strcpy(body.BrokerID, m_RspUserLogin.BrokerID);
 	strcpy(body.InvestorID, m_RspUserLogin.UserID);
+
+	m_msgQueue_Query->Input(RequestType::E_QryTradeField, this, nullptr, 0, 0,
+		&body, sizeof(CSecurityFtdcQryTradeField), nullptr, 0, nullptr, 0);
+}
+
+int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	return m_pApi->ReqQryTrade((CSecurityFtdcQryTradeField*)ptr1, ++m_lRequestID);
 }
 
 void CTraderApi::OnTrade(CSecurityFtdcTradeField *pTrade, bool bFromQry)
