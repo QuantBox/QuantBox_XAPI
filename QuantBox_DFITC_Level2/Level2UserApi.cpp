@@ -47,7 +47,7 @@ void CLevel2UserApi::QueryInThread(char type, void* pApi1, void* pApi2, double d
 	}
 	else
 	{
-		m_msgQueue_Query->Input(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		m_msgQueue_Query->Input_Copy(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 		//失败，按4的幂进行延时，但不超过1s
 		m_nSleep *= 4;
 		m_nSleep %= 1023;
@@ -98,11 +98,12 @@ bool CLevel2UserApi::IsErrorRspInfo_Output(struct ErrorRtnField * pErrorField)
 	bool bRet = ((pErrorField) && (pErrorField->ErrorID != 0));
 	if (bRet)
 	{
-		ErrorField field = { 0 };
-		field.ErrorID = pErrorField->ErrorID;
-		strcpy(field.ErrorMsg, pErrorField->ErrorMsg);
+		ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
 
-		m_msgQueue->Input(ResponeType::OnRtnError, m_msgQueue, this, true, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
+		pField->ErrorID = pErrorField->ErrorID;
+		strcpy(pField->ErrorMsg, pErrorField->ErrorMsg);
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, this, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
 	return bRet;
 }
@@ -122,7 +123,7 @@ void CLevel2UserApi::Connect(const string& szPath,
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
-	m_msgQueue_Query->Input(RequestType::E_Init, this, nullptr, 0, 0,
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, this, nullptr, 0, 0,
 		nullptr, 0, nullptr, 0, nullptr, 0);
 }
 
@@ -130,9 +131,9 @@ int CLevel2UserApi::_Init()
 {
 	m_pApi = NEW_CONNECTOR();
 
-	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
-	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	//初始化连接
 	int iRet = m_pApi->Connect(m_ServerInfo.Address, this, m_ServerInfo.IsUsingUdp);
 	if (0 == iRet)
@@ -140,29 +141,30 @@ int CLevel2UserApi::_Init()
 	}
 	else
 	{
-		RspUserLoginField field = { 0 };
-		field.ErrorID = iRet;
-		strcpy(field.ErrorMsg, "连接超时");
+		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
 
-		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		pField->ErrorID = iRet;
+		strcpy(pField->ErrorMsg, "连接超时");
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
 	return iRet;
 }
 
 void CLevel2UserApi::ReqUserLogin()
 {
-	DFITCUserLoginField body = { 0 };
+	DFITCUserLoginField* pBody = (DFITCUserLoginField*)m_msgQueue_Query->new_block(sizeof(DFITCUserLoginField));
 
-	strcpy(body.accountID, m_UserInfo.UserID);
-	strcpy(body.passwd, m_UserInfo.Password);
+	strcpy(pBody->accountID, m_UserInfo.UserID);
+	strcpy(pBody->passwd, m_UserInfo.Password);
 
-	m_msgQueue_Query->Input(RequestType::E_UserLoginField, this, nullptr, 0, 0,
-		&body, sizeof(DFITCUserLoginField), nullptr, 0, nullptr, 0);
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_UserLoginField, this, nullptr, 0, 0,
+		pBody, sizeof(DFITCUserLoginField), nullptr, 0, nullptr, 0);
 }
 
 int CLevel2UserApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	DFITCUserLoginField* pBody = (DFITCUserLoginField*)ptr1;
 	pBody->lRequestID = ++m_lRequestID;
@@ -188,7 +190,7 @@ void CLevel2UserApi::Disconnect()
 
 		// 全清理，只留最后一个
 		m_msgQueue->Clear();
-		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 		// 主动触发
 		m_msgQueue->Process();
 	}
@@ -208,7 +210,7 @@ void CLevel2UserApi::Disconnect()
 
 void CLevel2UserApi::OnConnected()
 {
-	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	//连接成功后自动请求登录
 	ReqUserLogin();
@@ -216,22 +218,23 @@ void CLevel2UserApi::OnConnected()
 
 void CLevel2UserApi::OnDisconnected(int nReason)
 {
-	RspUserLoginField field = { 0 };
-	//连接失败返回的信息是拼接而成，主要是为了统一输出
-	field.ErrorID = nReason;
-	GetOnFrontDisconnectedMsg(nReason, field.ErrorMsg);
+	RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
 
-	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+	//连接失败返回的信息是拼接而成，主要是为了统一输出
+	pField->ErrorID = nReason;
+	GetOnFrontDisconnectedMsg(nReason, pField->ErrorMsg);
+
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 }
 
 void CLevel2UserApi::OnRspUserLogin(struct ErrorRtnField * pErrorField)
 {
-	RspUserLoginField field = { 0 };
+	RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
 
 	if (!IsErrorRspInfo(pErrorField))
 	{
-		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 		//有可能断线了，本处是断线重连后重新订阅
 		set<string> mapOld = m_setInstrumentIDs;//记下上次订阅的合约
@@ -240,10 +243,10 @@ void CLevel2UserApi::OnRspUserLogin(struct ErrorRtnField * pErrorField)
 	}
 	else
 	{
-		field.ErrorID = pErrorField->ErrorID;
-		strcpy(field.ErrorMsg, pErrorField->ErrorMsg);
+		pField->ErrorID = pErrorField->ErrorID;
+		strcpy(pField->ErrorMsg, pErrorField->ErrorMsg);
 
-		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
 }
 

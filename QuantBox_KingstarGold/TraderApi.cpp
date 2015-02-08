@@ -56,7 +56,7 @@ void CTraderApi::QueryInThread(char type, void* pApi1, void* pApi2, double doubl
 	}
 	else
 	{
-		m_msgQueue_Query->Input(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		m_msgQueue_Query->Input_Copy(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 		//失败，按4的幂进行延时，但不超过1s
 		m_nSleep *= 4;
 		m_nSleep %= 1023;
@@ -108,11 +108,12 @@ bool CTraderApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, int nRequestID
 	bool bRet = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bRet)
 	{
-		ErrorField field = { 0 };
-		field.ErrorID = pRspInfo->ErrorID;
-		strcpy(field.ErrorMsg, pRspInfo->ErrorMsg);
+		ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
 
-		m_msgQueue->Input(ResponeType::OnRtnError, m_msgQueue, this, bIsLast, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
+		pField->ErrorID = pRspInfo->ErrorID;
+		strcpy(pField->ErrorMsg, pRspInfo->ErrorMsg);
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, this, bIsLast, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
 	return bRet;
 }
@@ -132,7 +133,7 @@ void CTraderApi::Connect(const string& szPath,
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
-	m_msgQueue_Query->Input(RequestType::E_Init, this, nullptr, 0, 0,
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, this, nullptr, 0, 0,
 		nullptr, 0, nullptr, 0, nullptr, 0);
 }
 
@@ -140,7 +141,7 @@ int CTraderApi::_Init()
 {
 	m_pApi = CGoldTradeApi::CreateGoldTradeApi();
 
-	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	if (m_pApi)
 	{
@@ -167,7 +168,7 @@ int CTraderApi::_Init()
 
 		//初始化连接
 		int ret = m_pApi->Init();
-		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 		// 这地方的写法怎么是这样的？好像是没有回报
 		ReqUserLogin();
 	}
@@ -194,7 +195,7 @@ void CTraderApi::Disconnect()
 
 		// 全清理，只留最后一个
 		m_msgQueue->Clear();
-		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 		// 主动触发
 		m_msgQueue->Process();
 	}
@@ -213,7 +214,7 @@ void CTraderApi::Disconnect()
 
 void CTraderApi::OnFrontConnected()
 {
-	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	////连接成功后自动请求认证或登录
 	//if (strlen(m_ServerInfo.AuthCode)>0
@@ -230,46 +231,46 @@ void CTraderApi::OnFrontConnected()
 
 void CTraderApi::OnFrontDisconnected(int nReason)
 {
-	RspUserLoginField field = { 0 };
+	RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+
 	//连接失败返回的信息是拼接而成，主要是为了统一输出
-	field.ErrorID = nReason;
-	GetOnFrontDisconnectedMsg(nReason,field.ErrorMsg);
+	pField->ErrorID = nReason;
+	GetOnFrontDisconnectedMsg(nReason, pField->ErrorMsg);
 
-	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 }
 
 void CTraderApi::ReqUserLogin()
 {
-	CThostFtdcReqUserLoginField body = {0};
+	CThostFtdcReqUserLoginField* pBody = (CThostFtdcReqUserLoginField*)m_msgQueue_Query->new_block(sizeof(CThostFtdcReqUserLoginField));
 
-	strncpy(body.accountID, m_UserInfo.UserID, sizeof(TThostFtdcTraderIDType));
-	strncpy(body.password, m_UserInfo.Password, sizeof(TThostFtdcPasswordType));
-	body.loginType = BANKACC_TYPE;
+	strncpy(pBody->accountID, m_UserInfo.UserID, sizeof(TThostFtdcTraderIDType));
+	strncpy(pBody->password, m_UserInfo.Password, sizeof(TThostFtdcPasswordType));
+	pBody->loginType = BANKACC_TYPE;
 
-	m_msgQueue_Query->Input(RequestType::E_ReqUserLoginField, this, nullptr, 0, 0,
-		&body, sizeof(CThostFtdcReqUserLoginField), nullptr, 0, nullptr, 0);
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_ReqUserLoginField, this, nullptr, 0, 0,
+		pBody, sizeof(CThostFtdcReqUserLoginField), nullptr, 0, nullptr, 0);
 }
 
 int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	return m_pApi->ReqUserLogin((CThostFtdcReqUserLoginField*)ptr1, ++m_lRequestID);
 }
 
 void CTraderApi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	RspUserLoginField field = { 0 };
+	RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
 
 	if (!IsErrorRspInfo(pRspInfo)
 		&&pRspUserLogin)
 	{
 		GetExchangeTime(pRspUserLogin->tradeDate, nullptr, pRspUserLogin->lastLoginTime,
-			&field.TradingDay, nullptr, &field.LoginTime, nullptr);
-		//sprintf(field.SessionID, "%d:%d", pRspUserLogin->FrontID, pRspUserLogin->SessionID);
+			&pField->TradingDay, nullptr, &pField->LoginTime, nullptr);
+		//sprintf(pField->SessionID, "%d:%d", pRspUserLogin->FrontID, pRspUserLogin->SessionID);
 
-		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 		// 记下登录信息，可能会用到
 		memcpy(&m_RspUserLogin,pRspUserLogin,sizeof(CThostFtdcRspUserLoginField));
@@ -279,10 +280,10 @@ void CTraderApi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CTho
 	}
 	else
 	{
-		field.ErrorID = pRspInfo->ErrorID;
-		strncpy(field.ErrorMsg, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
+		pField->ErrorID = pRspInfo->ErrorID;
+		strncpy(pField->ErrorMsg, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 
-		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
 }
 
@@ -1011,13 +1012,13 @@ void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInve
 
 void CTraderApi::ReqQryInstrument(const string& szInstrumentId, const string& szExchange)
 {
-	CThostFtdcQryInstrumentField body = {0};
+	CThostFtdcQryInstrumentField* pBody = (CThostFtdcQryInstrumentField*)m_msgQueue_Query->new_block(sizeof(CThostFtdcQryInstrumentField));
 
-	strncpy(body.ContractID, szInstrumentId.c_str(), sizeof(TThostFtdcInstrumentIDType));
+	strncpy(pBody->ContractID, szInstrumentId.c_str(), sizeof(TThostFtdcInstrumentIDType));
 	//strncpy(body.ProductID, szExchange.c_str(), sizeof(TThostFtdcProductIDType));
 
-	m_msgQueue_Query->Input(RequestType::E_QryInstrumentField, this, nullptr, 0, 0,
-		&body, sizeof(CThostFtdcQryInstrumentField), nullptr, 0, nullptr, 0);
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_QryInstrumentField, this, nullptr, 0, 0,
+		pBody, sizeof(CThostFtdcQryInstrumentField), nullptr, 0, nullptr, 0);
 }
 
 int CTraderApi::_ReqQryInstrument(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
@@ -1031,25 +1032,25 @@ void CTraderApi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CTho
 	{
 		if (pInstrument)
 		{
-			InstrumentField field = { 0 };
+			InstrumentField* pField = (InstrumentField*)m_msgQueue->new_block(sizeof(InstrumentField));
 
-			strcpy(field.InstrumentID, pInstrument->instID);
-			strcpy(field.ExchangeID, pInstrument->exchangeID);
+			strcpy(pField->InstrumentID, pInstrument->instID);
+			strcpy(pField->ExchangeID, pInstrument->exchangeID);
 
-			strcpy(field.Symbol, pInstrument->instID);
+			strcpy(pField->Symbol, pInstrument->instID);
 
-			strcpy(field.InstrumentName, pInstrument->name);
-			field.Type = CThostFtdcInstrumentField_2_InstrumentType(pInstrument);
-			//field.VolumeMultiple = pInstrument->VolumeMultiple;
-			field.PriceTick = pInstrument->tick;
-			//strncpy(field.ExpireDate, pInstrument->ExpireDate, sizeof(TThostFtdcDateType));
-			//field.OptionsType = TThostFtdcOptionsTypeType_2_PutCall(pInstrument->OptionsType);
+			strcpy(pField->InstrumentName, pInstrument->name);
+			pField->Type = CThostFtdcInstrumentField_2_InstrumentType(pInstrument);
+			//pField->VolumeMultiple = pInstrument->VolumeMultiple;
+			pField->PriceTick = pInstrument->tick;
+			//strncpy(pField->ExpireDate, pInstrument->ExpireDate, sizeof(TThostFtdcDateType));
+			//pField->OptionsType = TThostFtdcOptionsTypeType_2_PutCall(pInstrument->OptionsType);
 
-			m_msgQueue->Input(ResponeType::OnRspQryInstrument, m_msgQueue, this, bIsLast, 0, &field, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
+			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInstrument, m_msgQueue, this, bIsLast, 0, pField, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
 		}
 		else
 		{
-			m_msgQueue->Input(ResponeType::OnRspQryInstrument, m_msgQueue, this, bIsLast, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInstrument, m_msgQueue, this, bIsLast, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 		}
 	}
 }
@@ -1376,60 +1377,61 @@ void CTraderApi::Unsubscribe(const string& szInstrumentIDs, const string& szExch
 
 void CTraderApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-	DepthMarketDataField marketData = { 0 };
-	strcpy(marketData.InstrumentID, pDepthMarketData->InstID);
-	//strcpy(marketData.ExchangeID, pDepthMarketData->e);
+	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
 
-	strcpy(marketData.Symbol, pDepthMarketData->InstID);
+	strcpy(pField->InstrumentID, pDepthMarketData->InstID);
+	//strcpy(pField->ExchangeID, pDepthMarketData->e);
+
+	strcpy(pField->Symbol, pDepthMarketData->InstID);
 	// 这个日期在晚上12点时会怎么样？
 	GetExchangeTime(pDepthMarketData->QuoteDate, nullptr, pDepthMarketData->QuoteTime
-		, &marketData.TradingDay, &marketData.ActionDay, &marketData.UpdateTime, &marketData.UpdateMillisec);
+		, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
 
-	marketData.LastPrice = pDepthMarketData->Last;
-	marketData.Volume = pDepthMarketData->Volume;
-	marketData.Turnover = pDepthMarketData->Turnover;
-	marketData.OpenInterest = pDepthMarketData->OpenInt;
-	marketData.AveragePrice = pDepthMarketData->Average;
+	pField->LastPrice = pDepthMarketData->Last;
+	pField->Volume = pDepthMarketData->Volume;
+	pField->Turnover = pDepthMarketData->Turnover;
+	pField->OpenInterest = pDepthMarketData->OpenInt;
+	pField->AveragePrice = pDepthMarketData->Average;
 
-	marketData.OpenPrice = pDepthMarketData->Open;
-	marketData.HighestPrice = pDepthMarketData->High;
-	marketData.LowestPrice = pDepthMarketData->Low;
-	marketData.ClosePrice = pDepthMarketData->Close;
-	marketData.SettlementPrice = pDepthMarketData->Settle;
+	pField->OpenPrice = pDepthMarketData->Open;
+	pField->HighestPrice = pDepthMarketData->High;
+	pField->LowestPrice = pDepthMarketData->Low;
+	pField->ClosePrice = pDepthMarketData->Close;
+	pField->SettlementPrice = pDepthMarketData->Settle;
 
-	marketData.UpperLimitPrice = pDepthMarketData->UpDown;
-	marketData.LowerLimitPrice = pDepthMarketData->lowLimit;
-	marketData.PreClosePrice = pDepthMarketData->PreClose;
-	marketData.PreSettlementPrice = pDepthMarketData->PreSettle;
-	//marketData.PreOpenInterest = pDepthMarketData->PreOpenInterest;
+	pField->UpperLimitPrice = pDepthMarketData->UpDown;
+	pField->LowerLimitPrice = pDepthMarketData->lowLimit;
+	pField->PreClosePrice = pDepthMarketData->PreClose;
+	pField->PreSettlementPrice = pDepthMarketData->PreSettle;
+	//pField->PreOpenInterest = pDepthMarketData->PreOpenInterest;
 
-	marketData.BidPrice1 = pDepthMarketData->Bid1;
-	marketData.BidVolume1 = pDepthMarketData->BidLot1;
-	marketData.AskPrice1 = pDepthMarketData->Ask1;
-	marketData.AskVolume1 = pDepthMarketData->AskLot1;
+	pField->BidPrice1 = pDepthMarketData->Bid1;
+	pField->BidVolume1 = pDepthMarketData->BidLot1;
+	pField->AskPrice1 = pDepthMarketData->Ask1;
+	pField->AskVolume1 = pDepthMarketData->AskLot1;
 
 	//if (pDepthMarketData->Bid2 != DBL_MAX || pDepthMarketData->Ask2 != DBL_MAX)
 	{
-		marketData.BidPrice2 = pDepthMarketData->Bid2;
-		marketData.BidVolume2 = pDepthMarketData->BidLot2;
-		marketData.AskPrice2 = pDepthMarketData->Ask2;
-		marketData.AskVolume2 = pDepthMarketData->AskLot2;
+		pField->BidPrice2 = pDepthMarketData->Bid2;
+		pField->BidVolume2 = pDepthMarketData->BidLot2;
+		pField->AskPrice2 = pDepthMarketData->Ask2;
+		pField->AskVolume2 = pDepthMarketData->AskLot2;
 
-		marketData.BidPrice3 = pDepthMarketData->Bid3;
-		marketData.BidVolume3 = pDepthMarketData->BidLot3;
-		marketData.AskPrice3 = pDepthMarketData->Ask3;
-		marketData.AskVolume3 = pDepthMarketData->AskLot3;
+		pField->BidPrice3 = pDepthMarketData->Bid3;
+		pField->BidVolume3 = pDepthMarketData->BidLot3;
+		pField->AskPrice3 = pDepthMarketData->Ask3;
+		pField->AskVolume3 = pDepthMarketData->AskLot3;
 
-		marketData.BidPrice4 = pDepthMarketData->Bid4;
-		marketData.BidVolume4 = pDepthMarketData->BidLot4;
-		marketData.AskPrice4 = pDepthMarketData->Ask4;
-		marketData.AskVolume4 = pDepthMarketData->AskLot4;
+		pField->BidPrice4 = pDepthMarketData->Bid4;
+		pField->BidVolume4 = pDepthMarketData->BidLot4;
+		pField->AskPrice4 = pDepthMarketData->Ask4;
+		pField->AskVolume4 = pDepthMarketData->AskLot4;
 
-		marketData.BidPrice5 = pDepthMarketData->Bid5;
-		marketData.BidVolume5 = pDepthMarketData->BidLot5;
-		marketData.AskPrice5 = pDepthMarketData->Ask5;
-		marketData.AskVolume5 = pDepthMarketData->AskLot5;
+		pField->BidPrice5 = pDepthMarketData->Bid5;
+		pField->BidVolume5 = pDepthMarketData->BidLot5;
+		pField->AskPrice5 = pDepthMarketData->Ask5;
+		pField->AskVolume5 = pDepthMarketData->AskLot5;
 	}
 
-	m_msgQueue->Input(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, &marketData, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }

@@ -73,7 +73,7 @@ void CTraderApi::QueryInThread(char type, void* pApi1, void* pApi2, double doubl
 	}
 	else
 	{
-		m_msgQueue_Query->Input(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		m_msgQueue_Query->Input_Copy(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 		//失败，按4的幂进行延时，但不超过1s
 		m_nSleep *= 4;
 		m_nSleep %= 1023;
@@ -103,18 +103,19 @@ int CTraderApi::_Init()
 	init_para.emLogLevel = LL_INFO;
 	init_para.nTimeOut = 60000;
 
-	m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Uninitialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_Copy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Uninitialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	bool bRet = SPX_API_Initialize(&init_para, &m_err_msg);
 	//IsErrorRspInfo(&m_err_msg, 0, true);
 	if (!bRet)
 	{
-		RspUserLoginField field = { 0 };
-		//连接失败返回的信息是拼接而成，主要是为了统一输出
-		field.ErrorID = m_err_msg.error_no;
-		strcpy(field.ErrorMsg, m_err_msg.msg);
+		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
 
-		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, &field, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		//连接失败返回的信息是拼接而成，主要是为了统一输出
+		pField->ErrorID = m_err_msg.error_no;
+		strcpy(pField->ErrorMsg, m_err_msg.msg);
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 
 		return 0;
 	}
@@ -129,13 +130,13 @@ int CTraderApi::_Init()
 
 void CTraderApi::ReqUserLogin()
 {
-	STTraderLogin body = { 0 };
+	STTraderLogin* pBody = (STTraderLogin*)m_msgQueue_Query->new_block(sizeof(STTraderLogin));
 
-	strncpy(body.cust_no, m_UserInfo.UserID, sizeof(TCustNoType));
-	strncpy(body.cust_pwd, m_UserInfo.Password, sizeof(TCustPwdType));
+	strncpy(pBody->cust_no, m_UserInfo.UserID, sizeof(TCustNoType));
+	strncpy(pBody->cust_pwd, m_UserInfo.Password, sizeof(TCustPwdType));
 
-	m_msgQueue_Query->Input(RequestType::E_ReqUserLoginField, this, nullptr, 0, 0,
-		&body, sizeof(STTraderLogin), nullptr, 0, nullptr, 0);
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_ReqUserLoginField, this, nullptr, 0, 0,
+		pBody, sizeof(STTraderLogin), nullptr, 0, nullptr, 0);
 }
 
 int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
@@ -209,11 +210,12 @@ bool CTraderApi::IsErrorRspInfo(STRspMsg *pRspInfo, int nRequestID, bool bIsLast
 	bool bRet = ((pRspInfo) && (pRspInfo->error_no != 0));
 	if (bRet)
 	{
-		ErrorField field = { 0 };
-		field.ErrorID = pRspInfo->error_no;
-		strcpy(field.ErrorMsg, pRspInfo->msg);
+		ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
 
-		m_msgQueue->Input(ResponeType::OnRtnError, m_msgQueue, this, bIsLast, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
+		pField->ErrorID = pRspInfo->error_no;
+		strcpy(pField->ErrorMsg, pRspInfo->msg);
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, this, bIsLast, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
 	return bRet;
 }
@@ -233,7 +235,7 @@ void CTraderApi::Connect(const string& szPath,
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
-	m_msgQueue_Query->Input(E_Init, this, nullptr, 0, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue_Query->Input_NoCopy(E_Init, this, nullptr, 0, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 }
 
 void CTraderApi::Disconnect()
@@ -254,7 +256,7 @@ void CTraderApi::Disconnect()
 
 		// 全清理，只留最后一个
 		m_msgQueue->Clear();
-		m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 		// 主动触发
 		m_msgQueue->Process();
 	}

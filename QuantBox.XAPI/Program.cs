@@ -24,6 +24,7 @@ namespace QuantBox.XAPI
 
         static void OnRtnDepthMarketData(object sender, ref DepthMarketDataField marketData)
         {
+            Debugger.Log(0, null, "CTP:C#");
             Console.WriteLine(marketData.InstrumentID);
             Console.WriteLine(marketData.ExchangeID);
             Console.WriteLine(marketData.LastPrice);
@@ -63,7 +64,7 @@ namespace QuantBox.XAPI
         {
             //for (int i = 0; i < 10000; ++i)
             {
-                test_KingstarStock_Main(args);
+                test_CTP_Main(args);
             }
             Console.ReadKey();
         }
@@ -163,6 +164,11 @@ namespace QuantBox.XAPI
 
             api.Server.BrokerID = "1017";
             api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51213";
+            //api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\x86\QuantBox_CTP_Trade.dll");
+
+            //api.Server.BrokerID = "1017";
+            //api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51205";
+            //api.Server.PrivateTopicResumeType = ResumeType.Undefined;
 
             api.User.UserID = "00000015";
             api.User.Password = "123456";
@@ -171,8 +177,10 @@ namespace QuantBox.XAPI
             api.OnRtnDepthMarketData = OnRtnDepthMarketData;
 
             api.Connect();
+            Thread.Sleep(3 * 1000);
+            api.Subscribe("IF1502", "");
 
-            Thread.Sleep(5*1000);
+            Thread.Sleep(5 * 1000);
 
             api.Dispose();
 

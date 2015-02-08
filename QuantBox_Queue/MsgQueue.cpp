@@ -16,9 +16,12 @@ void CMsgQueue::Clear()
 	//清空队列
 	while (m_queue.try_dequeue(pItem))
 	{
-		delete pItem->ptr1;
-		delete pItem->ptr2;
-		delete pItem->ptr3;
+		if (pItem->bNeedDelete)
+		{
+			delete pItem->ptr1;
+			delete pItem->ptr2;
+			delete pItem->ptr3;
+		}
 		delete pItem;
 	}
 }
@@ -29,9 +32,12 @@ bool CMsgQueue::Process()
 	if (m_queue.try_dequeue(pItem))
 	{
 		Output(pItem);
-		delete pItem->ptr1;
-		delete pItem->ptr2;
-		delete pItem->ptr3;
+		if (pItem->bNeedDelete)
+		{
+			delete pItem->ptr1;
+			delete pItem->ptr2;
+			delete pItem->ptr3;
+		}
 		delete pItem;
 		return true;
 	}
@@ -60,18 +66,6 @@ void CMsgQueue::StopThread()
     }
 }
 
-//void CMsgQueue::AbortThread()
-//{
-//	m_bRunning = false;
-//	//lock_guard<mutex> cl(m_mtx);
-//	if (m_hThread)
-//	{
-//		//m_hThread->
-//		delete m_hThread;
-//		m_hThread = nullptr;
-//	}
-//}
-
 void CMsgQueue::RunInThread()
 {
 	while (m_bRunning)
@@ -82,7 +76,7 @@ void CMsgQueue::RunInThread()
 		else
 		{
 			// 空闲时等1ms,如果立即有事件过来就晚了1ms
-			// this_thread::sleep_for(chrono::milliseconds(1));
+			 //this_thread::sleep_for(chrono::milliseconds(1));
 
 			// 空闲时过来等1ms,没等到就回去再试
 			// 如过正好等到了，就立即去试，应当会快一点吧?

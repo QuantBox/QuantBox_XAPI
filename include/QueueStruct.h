@@ -17,6 +17,8 @@ struct ResponeItem
 	int			size2;
 	void*		ptr3;	// 需要delete
 	int			size3;
+
+	bool		bNeedDelete;
 };
 
 #endif//end of _QUEUE_HEADER_H_

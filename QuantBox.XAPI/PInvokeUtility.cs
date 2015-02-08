@@ -20,8 +20,17 @@ namespace QuantBox.XAPI
             {
                 return string.Empty;
             }
-            // 只移除了最后一个，中间出现的不会动，导致NLog输出的有可能截断
-            return encodingGB2312.GetString(str).TrimEnd('\0');
+            int bytecount = 0;
+            foreach(byte b in str)
+            {
+                if (0 == b)
+                    break;
+                ++bytecount;
+            }
+            if (0 == bytecount)
+                return string.Empty;
+            //比TrimEnd('\0');快,减少了内存的复制
+            return encodingGB2312.GetString(str, 0, bytecount);
         }
 
         public static T GetObjectFromIntPtr<T>(IntPtr handler)

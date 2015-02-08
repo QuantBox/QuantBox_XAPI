@@ -63,16 +63,16 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 
 	return pApi1;
 }
-
-void* __stdcall XRespone(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
-{
-	if (pApi1 == nullptr)
-	{
-		return nullptr;
-	}
-
-	CMsgQueue* pQueue = GetQueue(pApi1);
-	pQueue->Input(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
-
-	return pApi1;
-}
+//
+//void* __stdcall XRespone(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+//{
+//	if (pApi1 == nullptr)
+//	{
+//		return nullptr;
+//	}
+//
+//	CMsgQueue* pQueue = GetQueue(pApi1);
+//	pQueue->Input(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+//
+//	return pApi1;
+//}
