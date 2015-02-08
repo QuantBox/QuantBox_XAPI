@@ -44,6 +44,8 @@ public:
 		m_fnOnRespone = (fnOnRespone)pCallback;
 	}
 
+	// 对输入的数据做了一次复制，主要是为了解决转过来的指针可能失效的问题。
+	// 比如说STL中的指针跨线程指向的地址就无效了。所以从map中取的OrderField等都是做了次复制
 	void Input_Copy(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 	{
 		ResponeItem* pItem = new ResponeItem;
@@ -95,9 +97,11 @@ public:
 		return p;
 	}
 
+	// 对于过来的指针不做复制，直接使用
+	// 由于是跨DLL进行操作，由另一个DLL创建的内存块交给此队列进行处理时delete可能实现有变化导致出错
+	// 所以必须是由此DLL new出来的内存块交给另一DLL修改返回后，再由此DLL delete，所以提前用到new_block
 	void Input_NoCopy(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 	{
-		// 不进行拷贝这种，由于必须自己生成，自己释放，所以这地方要由new_block来生成
 		ResponeItem* pItem = new ResponeItem;
 		pItem->bNeedDelete = true;
 
@@ -121,9 +125,9 @@ public:
 		m_cv.notify_all();
 	}
 
+	// 不做拷贝也不做delete，这种必须由其它DLL进行delete
 	void Input_NoCopy_NoDelete(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 	{
-		// 不进行拷贝这种，由于必须自己生成，自己释放，所以这地方要由new_block来生成
 		ResponeItem* pItem = new ResponeItem;
 		pItem->bNeedDelete = false;
 

@@ -18,9 +18,9 @@ void CMsgQueue::Clear()
 	{
 		if (pItem->bNeedDelete)
 		{
-			delete pItem->ptr1;
-			delete pItem->ptr2;
-			delete pItem->ptr3;
+			delete[] pItem->ptr1;
+			delete[] pItem->ptr2;
+			delete[] pItem->ptr3;
 		}
 		delete pItem;
 	}
@@ -34,9 +34,10 @@ bool CMsgQueue::Process()
 		Output(pItem);
 		if (pItem->bNeedDelete)
 		{
-			delete pItem->ptr1;
-			delete pItem->ptr2;
-			delete pItem->ptr3;
+			// 删除的是数组，目前是自己模块创建的自己删
+			delete[] pItem->ptr1;
+			delete[] pItem->ptr2;
+			delete[] pItem->ptr3;
 		}
 		delete pItem;
 		return true;
