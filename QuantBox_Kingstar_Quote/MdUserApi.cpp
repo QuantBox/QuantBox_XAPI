@@ -556,13 +556,13 @@ void CMdUserApi::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp)
 	// 上期技术的人说，上海中金走的交易接口，大商，郑商走行情，所以这个地方后期可能要改
 	QuoteRequestField* pField = (QuoteRequestField*)m_msgQueue->new_block(sizeof(QuoteRequestField));
 
+	pField->TradingDay = GetDate(pForQuoteRsp->TradingDay);
+	pField->QuoteTime = GetDate(pForQuoteRsp->ForQuoteTime);
 	strcpy(pField->Symbol, pForQuoteRsp->InstrumentID);
 	strcpy(pField->InstrumentID, pForQuoteRsp->InstrumentID);
 	strcpy(pField->ExchangeID, pForQuoteRsp->ExchangeID);
 	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
-	strcpy(pField->TradingDay, pForQuoteRsp->TradingDay);
 	strcpy(pField->QuoteID, pForQuoteRsp->ForQuoteSysID);
-	strcpy(pField->QuoteTime, pForQuoteRsp->ForQuoteTime);
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnQuoteRequest, m_msgQueue, this, 0, 0, pField, sizeof(QuoteRequestField), nullptr, 0, nullptr, 0);
 }

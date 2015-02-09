@@ -777,7 +777,7 @@ void CTraderApi::OnRspQryInstrument(CSecurityFtdcInstrumentField *pInstrument, C
 			pField->Type = CSecurityFtdcInstrumentField_2_InstrumentType(pInstrument);
 			pField->VolumeMultiple = pInstrument->VolumeMultiple;
 			pField->PriceTick = CSecurityFtdcInstrumentField_2_PriceTick(pInstrument);
-			strncpy(pField->ExpireDate, pInstrument->ExpireDate, sizeof(DateType));
+			pField->ExpireDate = GetDate(pInstrument->ExpireDate);
 			pField->OptionsType = CSecurityFtdcInstrumentField_2_PutCall(pInstrument);
 			pField->StrikePrice = pInstrument->ExecPrice;
 
@@ -965,7 +965,7 @@ void CTraderApi::OnTrade(CSecurityFtdcTradeField *pTrade, bool bFromQry)
 	pField->OpenClose = TSecurityFtdcOffsetFlagType_2_OpenCloseType(pTrade->OffsetFlag);
 	pField->HedgeFlag = TSecurityFtdcHedgeFlagType_2_HedgeFlagType(pTrade->HedgeFlag);
 	pField->Commission = 0;//TODO收续费以后要计算出来
-	strncpy(pField->Time, pTrade->TradeTime, sizeof(TimeType));
+	pField->Time = GetTime(pTrade->TradeTime);
 	strcpy(pField->TradeID, pTrade->TradeID);
 
 	OrderIDType orderSysId = { 0 };

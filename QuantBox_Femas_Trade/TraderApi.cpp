@@ -1084,7 +1084,7 @@ void CTraderApi::OnRspQryInstrument(CUstpFtdcRspInstrumentField *pRspInstrument,
 			pField->Type = CUstpFtdcRspInstrumentField_2_InstrumentType(pRspInstrument);
 			pField->VolumeMultiple = pRspInstrument->VolumeMultiple;
 			pField->PriceTick = pRspInstrument->PriceTick;
-			strcpy(pField->ExpireDate, pRspInstrument->ExpireDate);
+			pField->ExpireDate = GetDate(pRspInstrument->ExpireDate);
 			pField->OptionsType = TUstpFtdcOptionsTypeType_2_PutCall(pRspInstrument->OptionsType);
 			pField->StrikePrice = pRspInstrument->StrikePrice == DBL_MAX ? 0 : pRspInstrument->StrikePrice;
 
@@ -1283,7 +1283,7 @@ void CTraderApi::OnTrade(CUstpFtdcTradeField *pTrade)
 	pField->OpenClose = TUstpFtdcOffsetFlagType_2_OpenCloseType(pTrade->OffsetFlag);
 	pField->HedgeFlag = TUstpFtdcHedgeFlagType_2_HedgeFlagType(pTrade->HedgeFlag);
 	pField->Commission = 0;//TODO收续费以后要计算出来
-	strcpy(pField->Time, pTrade->TradeTime);
+	pField->Time = GetTime(pTrade->TradeTime);
 	strcpy(pField->TradeID, pTrade->TradeID);
 
 	//OrderIDType orderSysId = { 0 };
@@ -1451,12 +1451,13 @@ void CTraderApi::OnRtnForQuote(CUstpFtdcReqForQuoteField *pReqForQuote)
 {
 	QuoteRequestField* pField = (QuoteRequestField*)m_msgQueue->new_block(sizeof(QuoteRequestField));
 
+	pField->TradingDay = GetDate(pReqForQuote->TradingDay);
+	pField->QuoteTime = GetDate(pReqForQuote->ReqForQuoteTime);
 	strcpy(pField->Symbol, pReqForQuote->InstrumentID);
 	strcpy(pField->InstrumentID, pReqForQuote->InstrumentID);
 	strcpy(pField->ExchangeID, pReqForQuote->ExchangeID);
-	strcpy(pField->TradingDay, pReqForQuote->TradingDay);
+	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
 	strcpy(pField->QuoteID, pReqForQuote->ReqForQuoteID);
-	strcpy(pField->QuoteTime, pReqForQuote->ReqForQuoteTime);
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnQuoteRequest, m_msgQueue, this, 0, 0,
 		pField, sizeof(QuoteRequestField), nullptr, 0, nullptr, 0);

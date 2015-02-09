@@ -19,6 +19,9 @@ char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vc
 int GetUpdateTime(char* UpdateTime, int* _UpdateTime, int* UpdateMillisec);
 void GetExchangeTime(char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime, int* UpdateMillisec);
 
+int GetDate(char* TradingDay);
+int GetTime(char* UpdateTime);
+
 //根据OnFrontDisconnected(int nReason)的值填上错误消息
 void GetOnFrontDisconnectedMsg(int ErrorId, char* ErrorMsg);
 

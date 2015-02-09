@@ -118,6 +118,28 @@ void GetUpdateTime_HHmmss(char* UpdateTime, int* _HH, int* _mm, int* _ss)
 	*_ss = HHmmss % 100;
 }
 
+int GetDate(char* TradingDay)
+{
+	int yyyyMMdd = atoi(TradingDay);
+	return yyyyMMdd;
+}
+
+int GetTime(char* UpdateTime)
+{
+	int HH = 0;// atoi(&UpdateTime[0]);
+	int mm = 0;//atoi(&UpdateTime[3]);
+	int ss = 0;//atoi(&UpdateTime[6]);
+	if (strlen(UpdateTime) <= 6)
+	{
+		GetUpdateTime_HHmmss(UpdateTime, &HH, &mm, &ss);
+	}
+	else
+	{
+		GetUpdateTime_HH_mm_ss(UpdateTime, &HH, &mm, &ss);
+	}
+	return HH * 10000 + mm * 100 + ss;
+}
+
 int GetUpdateTime(char* UpdateTime, int* _UpdateTime, int* UpdateMillisec)
 {
 	// UpdateTime´¦Àí

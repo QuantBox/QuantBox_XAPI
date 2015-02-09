@@ -7,12 +7,7 @@
 
 struct PositionField
 {
-	///唯一符号
-	SymbolType			Symbol;
-	///合约代码
-	InstrumentIDType	InstrumentID;
-	///交易所代码
-	ExchangeIDType	ExchangeID;
+
 
 	PositionSide	Side;
 	QtyType Position;
@@ -20,13 +15,16 @@ struct PositionField
 	QtyType YdPosition;
 	HedgeFlagType HedgeFlag;
 	//TThostFtdcPositionDateType 还没处理
+	///唯一符号
+	SymbolType			Symbol;
+	///合约代码
+	InstrumentIDType	InstrumentID;
+	///交易所代码
+	ExchangeIDType	ExchangeID;
 };
 
 struct QuoteField
 {
-	InstrumentIDType InstrumentID;
-	ExchangeIDType	ExchangeID;
-
 	QtyType AskQty;
 	PriceType AskPrice;
 	OpenCloseType AskOpenClose;
@@ -37,6 +35,14 @@ struct QuoteField
 	OpenCloseType BidOpenClose;
 	HedgeFlagType BidHedgeFlag;
 
+	OrderStatus Status;
+	ExecType ExecType;
+
+	ErrorIDType ErrorID;
+
+	InstrumentIDType InstrumentID;
+	ExchangeIDType	ExchangeID;
+
 	///询价编号
 	OrderIDType	QuoteReqID;
 
@@ -45,26 +51,13 @@ struct QuoteField
 	OrderIDType BidID;
 	OrderIDType AskOrderID;
 	OrderIDType BidOrderID;
-	OrderStatus Status;
-	ExecType ExecType;
-	ErrorIDType ErrorID;
+
 	ErrorMsgType Text;
-
-	/*
-	QtyType LeavesQty;
-	QtyType CumQty;
-	PriceType AvgPx;
-	
-
-	
-	
-	long DateTime;*/
 };
 
 struct OrderField
 {
-	InstrumentIDType InstrumentID;
-	ExchangeIDType	ExchangeID;
+
 	OrderType Type;
 	OrderSide Side;
 	QtyType Qty;
@@ -81,25 +74,28 @@ struct OrderField
 	QtyType CumQty;
 	PriceType AvgPx;
 	ErrorIDType ErrorID;
+	TimeIntType Time;
+	InstrumentIDType InstrumentID;
+	ExchangeIDType	ExchangeID;
 	ErrorMsgType Text;
 
 	OrderIDType ID;
 	OrderIDType OrderID;
-	long DateTime;
 };
 
 struct TradeField
 {
-	InstrumentIDType InstrumentID;
-	ExchangeIDType	ExchangeID;
-
 	OrderSide Side;
 	QtyType Qty;
 	PriceType Price;
 	OpenCloseType OpenClose;
 	HedgeFlagType HedgeFlag;
 	MoneyType Commission;
-	TimeType Time;
+	TimeIntType Time;
+	InstrumentIDType InstrumentID;
+	ExchangeIDType	ExchangeID;
+
+	
 	OrderIDType ID;
 	TradeIDType TradeID;
 };
@@ -152,10 +148,10 @@ struct RspUserLoginField
 	DateIntType	TradingDay;
 	// 时间
 	TimeIntType	LoginTime;
-	// 会话ID
-	SessionIDType	SessionID;
 	// 错误代码
 	ErrorIDType	ErrorID;
+	// 会话ID
+	SessionIDType	SessionID;
 	// 错误信息
 	ErrorMsgType	ErrorMsg;
 };
@@ -170,13 +166,6 @@ struct DepthMarketDataField
 	DateIntType			ActionDay;
 	TimeIntType			UpdateTime;
 	TimeIntType			UpdateMillisec;
-
-	///唯一符号
-	SymbolType			Symbol;
-	///合约代码
-	InstrumentIDType	InstrumentID;
-	///交易所代码
-	ExchangeIDType	ExchangeID;
 
 	///最新价
 	PriceType	LastPrice;
@@ -253,6 +242,13 @@ struct DepthMarketDataField
 	PriceType	AskPrice5;
 	///申卖量五
 	VolumeType	AskVolume5;
+
+	///唯一符号
+	SymbolType			Symbol;
+	///合约代码
+	InstrumentIDType	InstrumentID;
+	///交易所代码
+	ExchangeIDType	ExchangeID;
 };
 
 ///Tick行情
@@ -301,23 +297,37 @@ struct BarField
 ///发给做市商的询价请求
 struct QuoteRequestField
 {
+	///交易日
+	DateIntType	TradingDay;
+	///询价时间
+	TimeIntType	QuoteTime;
 	///唯一符号
 	SymbolType			Symbol;
 	///合约代码
 	InstrumentIDType	InstrumentID;
 	///交易所代码
 	ExchangeIDType	ExchangeID;
-	///交易日
-	DateType	TradingDay;
 	///询价编号
 	OrderIDType	QuoteID;
-	///询价时间
-	TimeType	QuoteTime;
 };
 
 ///合约
 struct InstrumentField
 {
+	///合约名称
+	InstrumentType		Type;
+	///合约数量乘数
+	VolumeMultipleType	VolumeMultiple;
+	///最小变动价位
+	PriceType	PriceTick;
+	///到期日
+	DateIntType	ExpireDate;
+
+	///执行价
+	PriceType	StrikePrice;
+	///期权类型
+	PutCall	OptionsType;
+
 	///唯一符号
 	SymbolType			Symbol;
 	///合约代码
@@ -326,21 +336,8 @@ struct InstrumentField
 	ExchangeIDType	ExchangeID;
 	///合约名称
 	InstrumentNameType InstrumentName;
-
-	///合约名称
-	InstrumentType		Type;
-	///合约数量乘数
-	VolumeMultipleType	VolumeMultiple;
-	///最小变动价位
-	PriceType	PriceTick;
-	///到期日
-	DateType	ExpireDate;
 	///基础商品代码
 	InstrumentIDType	UnderlyingInstrID;
-	///执行价
-	PriceType	StrikePrice;
-	///期权类型
-	PutCall	OptionsType;
 };
 
 ///账号
@@ -388,7 +385,7 @@ struct AccountField
 struct SettlementInfoField
 {
 	///交易日
-	DateType	TradingDay;
+	DateIntType	TradingDay;
 	///消息正文
 	ContentType	Content;
 };
@@ -396,11 +393,12 @@ struct SettlementInfoField
 ///投资者
 struct InvestorField
 {
+	IdCardType		IdentifiedCardType;
 	///用户代码
 	UserIDType	InvestorID;
 
 	BrokerIDType	BrokerID;
-	IdCardType		IdentifiedCardType;
+
 	///证件号码
 	IdentifiedCardNoType	IdentifiedCardNo;
 	///投资者名称
@@ -410,13 +408,6 @@ struct InvestorField
 
 struct HistoricalDataRequestField
 {
-	///唯一符号
-	SymbolType			Symbol;
-	///合约代码
-	InstrumentIDType	InstrumentID;
-	///交易所代码
-	ExchangeIDType	ExchangeID;
-
 	int Date1;
 	int Date2;
 	int Time1;
@@ -429,5 +420,12 @@ struct HistoricalDataRequestField
 	int RequestId;
 	int CurrentDate;
 	int lRequest;
+
+	///唯一符号
+	SymbolType			Symbol;
+	///合约代码
+	InstrumentIDType	InstrumentID;
+	///交易所代码
+	ExchangeIDType	ExchangeID;
 };
 #endif

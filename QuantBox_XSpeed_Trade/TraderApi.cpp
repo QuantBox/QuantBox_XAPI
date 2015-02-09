@@ -916,7 +916,7 @@ void CTraderApi::OnRspQryExchangeInstrument(struct DFITCExchangeInstrumentRtnFie
 			pField->Type = DFITCInstrumentTypeType_2_InstrumentType(pInstrumentData->instrumentType);
 			pField->VolumeMultiple = (VolumeMultipleType)pInstrumentData->contractMultiplier;
 			pField->PriceTick = pInstrumentData->minPriceFluctuation;
-			strncpy(pField->ExpireDate, pInstrumentData->instrumentMaturity, sizeof(DateType));
+			pField->ExpireDate = GetDate(pInstrumentData->instrumentMaturity);
 			//pField->OptionsType = TThostFtdcOptionsTypeType_2_PutCall(pInstrument->OptionsType);
 
 			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInstrument, m_msgQueue, this, bIsLast, 0, pField, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
@@ -1312,12 +1312,12 @@ void CTraderApi::OnRtnQuoteSubscribe(struct DFITCQuoteSubscribeRtnField * pRtnQu
 {
 	QuoteRequestField* pField = (QuoteRequestField*)m_msgQueue->new_block(sizeof(QuoteRequestField));
 
+	pField->TradingDay = GetDate(pRtnQuoteSubscribeData->tradingDate);
+	pField->QuoteTime = GetDate(pRtnQuoteSubscribeData->quoteTime);
 	strcpy(pField->Symbol, pRtnQuoteSubscribeData->instrumentID);
 	strcpy(pField->InstrumentID, pRtnQuoteSubscribeData->instrumentID);
 	strcpy(pField->ExchangeID, pRtnQuoteSubscribeData->exchangeID);
-	strcpy(pField->TradingDay, pRtnQuoteSubscribeData->tradingDate);
 	strcpy(pField->QuoteID, pRtnQuoteSubscribeData->quoteID);
-	strcpy(pField->QuoteTime, pRtnQuoteSubscribeData->quoteTime);
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnQuoteRequest, m_msgQueue, this, 0, 0, pField, sizeof(QuoteRequestField), nullptr, 0, nullptr, 0);
 }
