@@ -16,8 +16,16 @@
 #include <cstring>
 #include <assert.h>
 
+CTraderApi* CTraderApi::pThis = nullptr;
+
+void __stdcall CTraderApi::OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData)
+{
+	// 这个类在一个dll不能实例化多次了，因为使用了static变量
+	pThis->_OnReadPushData(FuncNO, pEtxPushData);
+}
+
 //客户端实现推送回调函数
-void __stdcall OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData)
+void CTraderApi::_OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData)
 {
 	char szmsg[2048] = { 0 };
 
@@ -41,6 +49,7 @@ void __stdcall OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData)
 		printf(szmsg);
 	}
 
+	//ProcessThread(nullptr);
 }
 
 void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
@@ -178,6 +187,8 @@ CTraderApi::CTraderApi(void)
 
 	m_msgQueue_Query->Register(Query);
 	m_msgQueue_Query->StartThread();
+
+	pThis = this;
 }
 
 

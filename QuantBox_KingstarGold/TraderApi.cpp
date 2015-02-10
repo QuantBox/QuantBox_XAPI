@@ -210,6 +210,31 @@ void CTraderApi::Disconnect()
 	}
 
 	m_lRequestID = 0;
+
+	Clear();
+}
+
+void CTraderApi::Clear()
+{
+	for (unordered_map<string, OrderField*>::iterator it = m_id_platform_order.begin(); it != m_id_platform_order.end(); ++it)
+		delete it->second;
+	m_id_platform_order.clear();
+
+	for (unordered_map<string, CThostFtdcOrderField*>::iterator it = m_id_api_order.begin(); it != m_id_api_order.end(); ++it)
+		delete it->second;
+	m_id_api_order.clear();
+
+	//for (unordered_map<string, QuoteField*>::iterator it = m_id_platform_quote.begin(); it != m_id_platform_quote.end(); ++it)
+	//	delete it->second;
+	//m_id_platform_quote.clear();
+
+	//for (unordered_map<string, CThostFtdcQuoteField*>::iterator it = m_id_api_quote.begin(); it != m_id_api_quote.end(); ++it)
+	//	delete it->second;
+	//m_id_api_quote.clear();
+
+	//for (unordered_map<string, PositionField*>::iterator it = m_id_platform_position.begin(); it != m_id_platform_position.end(); ++it)
+	//	delete it->second;
+	//m_id_platform_position.clear();
 }
 
 void CTraderApi::OnFrontConnected()
@@ -624,7 +649,7 @@ void CTraderApi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 
 int CTraderApi::ReqOrderAction(const string& szId)
 {
-	hash_map<string, CThostFtdcOrderField*>::iterator it = m_id_api_order.find(szId);
+	unordered_map<string, CThostFtdcOrderField*>::iterator it = m_id_api_order.find(szId);
 	if (it == m_id_api_order.end())
 	{
 		// <error id="ORDER_NOT_FOUND" value="25" prompt="CTP:撤单找不到相应报单"/>

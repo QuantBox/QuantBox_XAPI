@@ -216,8 +216,8 @@ namespace QuantBox.XAPI.Callback
         private void _OnRtnOrder(IntPtr ptr1, int size1)
         {
             // 求快，不加
-            //if (OnRtnOrder_ == null)
-            //    return;
+            if (OnRtnOrder_ == null)
+                return;
 
             //OrderField obj = PInvokeUtility.GetObjectFromIntPtr<OrderField>(ptr1);
             OrderField obj = (OrderField)Marshal.PtrToStructure(ptr1, typeof(OrderField));
@@ -228,8 +228,8 @@ namespace QuantBox.XAPI.Callback
         private void _OnRtnTrade(IntPtr ptr1, int size1)
         {
             // 求快，不加
-            //if (OnRtnTrade_ == null)
-            //    return;
+            if (OnRtnTrade_ == null)
+                return;
 
             //TradeField obj = PInvokeUtility.GetObjectFromIntPtr<TradeField>(ptr1);
             TradeField obj = (TradeField)Marshal.PtrToStructure(ptr1, typeof(TradeField));

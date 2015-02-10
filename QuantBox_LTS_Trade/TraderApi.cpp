@@ -224,6 +224,31 @@ void CTraderApi::Disconnect()
 	}
 
 	m_lRequestID = 0;//由于线程已经停止，没有必要用原子操作了
+	
+	Clear();
+}
+
+void CTraderApi::Clear()
+{
+	for (unordered_map<string, OrderField*>::iterator it = m_id_platform_order.begin(); it != m_id_platform_order.end(); ++it)
+		delete it->second;
+	m_id_platform_order.clear();
+
+	for (unordered_map<string, CSecurityFtdcOrderField*>::iterator it = m_id_api_order.begin(); it != m_id_api_order.end(); ++it)
+		delete it->second;
+	m_id_api_order.clear();
+
+	//for (unordered_map<string, QuoteField*>::iterator it = m_id_platform_quote.begin(); it != m_id_platform_quote.end(); ++it)
+	//	delete it->second;
+	//m_id_platform_quote.clear();
+
+	//for (unordered_map<string, CThostFtdcQuoteField*>::iterator it = m_id_api_quote.begin(); it != m_id_api_quote.end(); ++it)
+	//	delete it->second;
+	//m_id_api_quote.clear();
+
+	for (unordered_map<string, PositionField*>::iterator it = m_id_platform_position.begin(); it != m_id_platform_position.end(); ++it)
+		delete it->second;
+	m_id_platform_position.clear();
 }
 
 void CTraderApi::OnFrontConnected()
@@ -287,7 +312,8 @@ void CTraderApi::OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, C
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
-		if (m_ServerInfo.PrivateTopicResumeType > ResumeType::Restart)
+		if (m_ServerInfo.PrivateTopicResumeType > ResumeType::Restart
+			&& (m_ServerInfo.PrivateTopicResumeType<ResumeType::Undefined))
 		{
 			ReqQryOrder();
 			//ReqQryTrade();

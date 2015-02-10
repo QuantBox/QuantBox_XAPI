@@ -14,7 +14,7 @@ namespace QuantBox.XAPI
     {
         static void OnConnectionStatus(object sender, ConnectionStatus status, ref RspUserLoginField userLogin, int size1)
         {
-            Console.WriteLine("11111" + status);
+            Console.WriteLine("333333" + status + userLogin.ErrorMsg());
         }
 
         static void OnConnectionStatus2(object sender, ConnectionStatus status, ref RspUserLoginField userLogin, int size1)
@@ -32,7 +32,7 @@ namespace QuantBox.XAPI
 
         static void OnRspQryInstrument(object sender, ref InstrumentField instrument,int size1, bool bIsLast)
         {
-            Console.WriteLine(instrument.InstrumentName());
+            Console.WriteLine(instrument.InstrumentName);
         }
 
         static void OnRspQryTradingAccount(object sender, ref AccountField account, int size1, bool bIsLast)
@@ -160,27 +160,29 @@ namespace QuantBox.XAPI
 
         static void test_CTP_Main(string[] args)
         {
-            api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\x86\QuantBox_CTP_Quote.dll");
-
-            api.Server.BrokerID = "1017";
-            api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51213";
-            //api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\x86\QuantBox_CTP_Trade.dll");
+            //api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\x86\QuantBox_CTP_Quote.dll");
 
             //api.Server.BrokerID = "1017";
-            //api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51205";
-            //api.Server.PrivateTopicResumeType = ResumeType.Undefined;
+            //api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51213";
+            api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\x86\QuantBox_CTP_Trade.dll");
+
+            api.Server.BrokerID = "1017";
+            api.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51205";
+            api.Server.PrivateTopicResumeType = ResumeType.Undefined;
 
             api.User.UserID = "00000015";
             api.User.Password = "123456";
 
             api.OnConnectionStatus = OnConnectionStatus;
             api.OnRtnDepthMarketData = OnRtnDepthMarketData;
+            api.OnRspQryInstrument = OnRspQryInstrument;
 
             api.Connect();
-            Thread.Sleep(3 * 1000);
-            api.Subscribe("IF1502", "");
+            Thread.Sleep(10 * 1000);
+            //api.Subscribe("IF1502", "");
+            api.ReqQryInstrument("", "");
 
-            Thread.Sleep(5 * 1000);
+            Thread.Sleep(300 * 1000);
 
             api.Dispose();
 

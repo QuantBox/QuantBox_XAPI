@@ -53,34 +53,9 @@ class CTraderApi
 		E_QryQuoteField,
 	};
 
-	//请求数据包结构体
-	struct SRequest
-	{
-		RequestType type;
-		/*union{
-			CThostFtdcReqAuthenticateField				ReqAuthenticateField;
-			CThostFtdcReqUserLoginField					ReqUserLoginField;
-			CThostFtdcSettlementInfoConfirmField		SettlementInfoConfirmField;
-			CThostFtdcQryDepthMarketDataField			QryDepthMarketDataField;
-			CThostFtdcQryInstrumentField				QryInstrumentField;
-			CThostFtdcQryInstrumentCommissionRateField	QryInstrumentCommissionRateField;
-			CThostFtdcQryInstrumentMarginRateField		QryInstrumentMarginRateField;
-			CThostFtdcQryInvestorPositionField			QryInvestorPositionField;
-			CThostFtdcQryInvestorPositionDetailField    QryInvestorPositionDetailField;
-			CThostFtdcQryTradingAccountField			QryTradingAccountField;
-			CThostFtdcInputOrderField					InputOrderField;
-			CThostFtdcInputOrderActionField				InputOrderActionField;
-			CThostFtdcInputQuoteField					InputQuoteField;
-			CThostFtdcInputQuoteActionField				InputQuoteActionField;
-			CThostFtdcParkedOrderField					ParkedOrderField;
-			CThostFtdcQrySettlementInfoField			QrySettlementInfoField;
-			CThostFtdcQryOrderField						QryOrderField;
-			CThostFtdcQryTradeField						QryTradeField;
-			CThostFtdcQryQuoteField						QryQuoteField;
-		};*/
-	};
-
 public:
+	static CTraderApi * pThis;
+
 	CTraderApi(void);
 	virtual ~CTraderApi(void);
 
@@ -123,7 +98,12 @@ public:
 	//void ReqQryTrade();
 	//void ReqQryQuote();
 
+	
 private:
+	//friend void __stdcall OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData);
+	static void __stdcall OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData);
+	void _OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData);
+
 	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	virtual void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	
@@ -250,14 +230,6 @@ private:
 	UserInfoField				m_UserInfo;
 
 	int							m_nSleep;
-	volatile bool				m_bRunning;
-	thread*						m_hThread;
-
-	mutex						m_csList;
-	list<SRequest*>				m_reqList;				//将发送请求队列
-
-	mutex						m_csMap;
-	map<int,SRequest*>			m_reqMap;				//已发送请求池
 
 	//unordered_map<string, OrderField*>				m_id_platform_order;
 	//unordered_map<string, CThostFtdcOrderField*>		m_id_api_order;
@@ -271,5 +243,7 @@ private:
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;			//发送消息队列指针
+
+	
 };
 

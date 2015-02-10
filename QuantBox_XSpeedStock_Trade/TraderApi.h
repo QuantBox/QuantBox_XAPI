@@ -18,7 +18,7 @@
 #include <mutex>
 #include <atomic>
 #include <thread>
-#include <hash_map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -105,6 +105,8 @@ public:
 private:
 	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	void Clear();
 
 	int _Init();
 
@@ -198,13 +200,13 @@ private:
 	int							m_nSleep;
 	
 
-	hash_map<string, OrderField*>				m_id_platform_order;
-	//hash_map<string, DFITCOrderRtnField*>		m_id_api_order;
-	hash_map<string, string>					m_sysId_orderId;
+	unordered_map<string, OrderField*>				m_id_platform_order;
+	//unordered_map<string, DFITCOrderRtnField*>		m_id_api_order;
+	unordered_map<string, string>					m_sysId_orderId;
 
-	//hash_map<string, QuoteField*>				m_id_platform_quote;
-	//hash_map<string, DFITCQuoteRtnField*>		m_id_api_quote;
-	hash_map<string, string>					m_sysId_quoteId;
+	//unordered_map<string, QuoteField*>				m_id_platform_quote;
+	//unordered_map<string, DFITCQuoteRtnField*>		m_id_api_quote;
+	unordered_map<string, string>					m_sysId_quoteId;
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;
