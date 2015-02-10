@@ -66,10 +66,9 @@ public:
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	//char* ReqOrderInsert(
-	//	int OrderRef,
-	//	OrderField* pOrder1,
-	//	OrderField* pOrder2);
+	char* ReqOrderInsert(
+		int OrderRef,
+		OrderField* pOrder, int count);
 
 	//char* ReqParkedOrderInsert(int OrderRef,
 	//	OrderField* pOrder1,
@@ -113,6 +112,8 @@ private:
 	void ReqUserLogin();
 	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
+	void OnPST16203PushData(PST16203PushData pEtxPushData);
+	void OnPST16204PushData(PST16204PushData pEtxPushData);
 
 	//friend void* Send(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
@@ -231,9 +232,9 @@ private:
 
 	int							m_nSleep;
 
-	//unordered_map<string, OrderField*>				m_id_platform_order;
+	unordered_map<string, OrderField*>				m_id_platform_order;
 	//unordered_map<string, CThostFtdcOrderField*>		m_id_api_order;
-	//unordered_map<string, string>					m_sysId_orderId;
+	unordered_map<string, string>					m_sysId_orderId;
 
 	//unordered_map<string, QuoteField*>				m_id_platform_quote;
 	//unordered_map<string, CThostFtdcQuoteField*>		m_id_api_quote;

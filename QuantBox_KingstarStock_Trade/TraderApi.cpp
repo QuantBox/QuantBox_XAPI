@@ -27,29 +27,28 @@ void __stdcall CTraderApi::OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushD
 //客户端实现推送回调函数
 void CTraderApi::_OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData)
 {
-	char szmsg[2048] = { 0 };
-
-	PST16203PushData pCJData = NULL;
-	PST16204PushData pCDFDData = NULL;
-
-	if (ETX_16203 == FuncNO)
+	switch (FuncNO)
 	{
-		pCJData = (PST16203PushData)pEtxPushData;
-
-		//cout << pCJData->cust_no << " " << pCJData->order_no << endl;
-
-	}
-	else if (ETX_16204 == FuncNO)
+	case ETX_16203:
+		OnPST16203PushData((PST16203PushData)pEtxPushData);
+		break;
+	case ETX_16204:
+		OnPST16204PushData((PST16204PushData)pEtxPushData);
+		break;
+	default:
 	{
-		//cout << pCDFDData->cust_no << " " << pCDFDData->order_no << endl;
-	}
-	else
-	{
-		sprintf(szmsg, "无法识别的推送数据[%d]", FuncNO);
-		printf(szmsg);
-	}
+			   char szmsg[128] = { 0 };
+			   sprintf(szmsg, "无法识别的推送数据[%d]", FuncNO);
 
-	//ProcessThread(nullptr);
+			   ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
+
+			   pField->ErrorID = FuncNO;
+			   strcpy(pField->ErrorMsg, szmsg);
+
+			   m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, this, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
+	}
+		break;
+	}
 }
 
 void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
@@ -94,8 +93,12 @@ int CTraderApi::_Init()
 {
 	//网关地址与代理信息由客户自行配置（根据实际情况配置，无则不配置）
 	//配置网关信息
+
+	char szPost[20] = { 0 };
+	_itoa(m_ServerInfo.Port, szPost, 10);
+
 	SPX_API_SetParam(MAINSERVER_IP, m_ServerInfo.Address, &m_err_msg);
-	SPX_API_SetParam(MAINSERVER_PORT, "8085", &m_err_msg);
+	SPX_API_SetParam(MAINSERVER_PORT, szPost, &m_err_msg);
 	//SPX_API_SetParam(BACKSERVER_IP, "127.0.0.1", &m_err_msg);
 	//SPX_API_SetParam(BACKSERVER_PORT, "17990", &m_err_msg);
 	//配置代理信息
@@ -108,14 +111,14 @@ int CTraderApi::_Init()
 
 	STInitPara init_para;
 	init_para.pOnReadPushData = OnReadPushData;
-	init_para.bWriteLog = true;
+	init_para.bWriteLog = false;//这个有可能导致要用管理员权限才能读写目录
 	init_para.emLogLevel = LL_INFO;
 	init_para.nTimeOut = 60000;
 
-	m_msgQueue->Input_Copy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Uninitialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Uninitialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	bool bRet = SPX_API_Initialize(&init_para, &m_err_msg);
-	//IsErrorRspInfo(&m_err_msg, 0, true);
+
 	if (!bRet)
 	{
 		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
@@ -129,8 +132,31 @@ int CTraderApi::_Init()
 		return 0;
 	}
 
+	if (m_err_msg.error_no != 0)
+	{
+		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+
+		pField->ErrorID = m_err_msg.error_no;
+		strcpy(pField->ErrorMsg, m_err_msg.msg);
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+	}
+	else
+	{
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	}
+
 	m_pApi = SPX_API_CreateHandle(&m_err_msg);
-	IsErrorRspInfo(&m_err_msg, 0, true);
+	if (m_pApi == nullptr)
+	{
+		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+
+		pField->ErrorID = m_err_msg.error_no;
+		strcpy(pField->ErrorMsg, m_err_msg.msg);
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		return 0;
+	}
 	
 	ReqUserLogin();
 
@@ -152,6 +178,7 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 {
 	int row_num = 0;
 	STTraderLoginRsp *p_login_rsp = nullptr;
+
 	bool bRet = SPX_API_Login(m_pApi, (STTraderLogin*)ptr1, &p_login_rsp, &row_num, &m_err_msg);
 
 	if (bRet && m_err_msg.error_no == 0)
@@ -168,10 +195,17 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 			}
 		}
 	}
+	else
+	{
+		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
 
+		pField->ErrorID = m_err_msg.error_no;
+		strcpy(pField->ErrorMsg, m_err_msg.msg);
 
-	//m_msgQueue->Input(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-	//return m_pApi->ReqUserLogin((CThostFtdcReqUserLoginField*)ptr1, ++m_lRequestID);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		return 0;
+	}
+
 	return 0;
 }
 
@@ -281,4 +315,107 @@ void CTraderApi::Disconnect()
 		delete m_msgQueue;
 		m_msgQueue = nullptr;
 	}
+}
+
+char* CTraderApi::ReqOrderInsert(
+	int OrderRef,
+	OrderField* pOrder,int count)
+{
+	if (count < 1)
+		return nullptr;
+
+	STOrder order;
+	order.sec_code;
+	order.bs;
+	order.market_order_flag;
+	order.price;
+	order.order_vol;
+	order.order_prop;
+
+	return nullptr;
+}
+
+void BuildOrder(OrderField* pIn, PSTOrder pOut)
+{
+
+}
+
+void CTraderApi::OnPST16203PushData(PST16203PushData pEtxPushData)
+{
+	OrderIDType orderId = { 0 };
+	//sprintf(orderId, "%d:%d:%s", pEtxPushData->batch_no, pOrder->SessionID, pOrder->OrderRef);
+	//OrderIDType orderSydId = { 0 };
+
+	//{
+	//	// 保存原始订单信息，用于撤单
+
+	//	unordered_map<string, CThostFtdcOrderField*>::iterator it = m_id_api_order.find(orderId);
+	//	if (it == m_id_api_order.end())
+	//	{
+	//		// 找不到此订单，表示是新单
+	//		CThostFtdcOrderField* pField = new CThostFtdcOrderField();
+	//		memcpy(pField, pOrder, sizeof(CThostFtdcOrderField));
+	//		m_id_api_order.insert(pair<string, CThostFtdcOrderField*>(orderId, pField));
+	//	}
+	//	else
+	//	{
+	//		// 找到了订单
+	//		// 需要再复制保存最后一次的状态，还是只要第一次的用于撤单即可？记下，这样最后好比较
+	//		CThostFtdcOrderField* pField = it->second;
+	//		memcpy(pField, pOrder, sizeof(CThostFtdcOrderField));
+	//	}
+
+	//	// 保存SysID用于定义成交回报与订单
+	//	sprintf(orderSydId, "%s:%s", pOrder->ExchangeID, pOrder->OrderSysID);
+	//	m_sysId_orderId.insert(pair<string, string>(orderSydId, orderId));
+	//}
+
+	//{
+	//	// 从API的订单转换成自己的结构体
+
+	//	OrderField* pField = nullptr;
+	//	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
+	//	if (it == m_id_platform_order.end())
+	//	{
+	//		// 开盘时发单信息还没有，所以找不到对应的单子，需要进行Order的恢复
+	//		pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
+	//		strcpy(pField->ID, orderId);
+	//		strcpy(pField->InstrumentID, pOrder->InstrumentID);
+	//		strcpy(pField->ExchangeID, pOrder->ExchangeID);
+	//		pField->HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pOrder->CombHedgeFlag[0]);
+	//		pField->Side = TThostFtdcDirectionType_2_OrderSide(pOrder->Direction);
+	//		pField->Price = pOrder->LimitPrice;
+	//		pField->StopPx = pOrder->StopPrice;
+	//		strncpy(pField->Text, pOrder->StatusMsg, sizeof(ErrorMsgType));
+	//		pField->OpenClose = TThostFtdcOffsetFlagType_2_OpenCloseType(pOrder->CombOffsetFlag[0]);
+	//		pField->Status = CThostFtdcOrderField_2_OrderStatus(pOrder);
+	//		pField->Qty = pOrder->VolumeTotalOriginal;
+	//		pField->Type = CThostFtdcOrderField_2_OrderType(pOrder);
+	//		pField->TimeInForce = CThostFtdcOrderField_2_TimeInForce(pOrder);
+	//		pField->ExecType = ExecType::ExecNew;
+	//		strcpy(pField->OrderID, pOrder->OrderSysID);
+
+
+	//		// 添加到map中，用于其它工具的读取，撤单失败时的再通知等
+	//		m_id_platform_order.insert(pair<string, OrderField*>(orderId, pField));
+	//	}
+	//	else
+	//	{
+	//		pField = it->second;
+	//		strcpy(pField->ID, orderId);
+	//		pField->LeavesQty = pOrder->VolumeTotal;
+	//		pField->Price = pOrder->LimitPrice;
+	//		pField->Status = CThostFtdcOrderField_2_OrderStatus(pOrder);
+	//		pField->ExecType = CThostFtdcOrderField_2_ExecType(pOrder);
+	//		strcpy(pField->OrderID, pOrder->OrderSysID);
+	//		strncpy(pField->Text, pOrder->StatusMsg, sizeof(ErrorMsgType));
+	//	}
+
+	//	m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
+	//}
+}
+
+void CTraderApi::OnPST16204PushData(PST16204PushData pEtxPushData)
+{
+
 }

@@ -151,10 +151,16 @@ namespace QuantBox.XAPI
                 Enum<OpenCloseType>.ToString(field.AskOpenClose), Enum<HedgeFlagType>.ToString(field.AskHedgeFlag), Enum<OpenCloseType>.ToString(field.BidOpenClose), Enum<HedgeFlagType>.ToString(field.BidHedgeFlag));
         }
 
-        public static string ToFormattedString([In]this RspUserLoginField field)
+        public static string ToFormattedStringLong([In]this RspUserLoginField field)
         {
             return string.Format("[TradingDay={0};LoginTime={1};SessionID={2};ErrorID={3};ErrorMsg={4}]",
                 field.TradingDay,field.LoginTime,field.SessionID,field.ErrorID,field.ErrorMsg());
+        }
+
+        public static string ToFormattedStringShort([In]this RspUserLoginField field)
+        {
+            return string.Format("[ErrorID={0};ErrorMsg={1}]",
+                field.ErrorID, field.ErrorMsg());
         }
 
         public static string ToFormattedString([In]this QuoteRequestField field)

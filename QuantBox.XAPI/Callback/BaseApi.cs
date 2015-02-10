@@ -258,17 +258,10 @@ namespace QuantBox.XAPI.Callback
             IsConnected = (ConnectionStatus.Done == status);
 
             RspUserLoginField obj = default(RspUserLoginField);
-
-            switch(status)
+            if(size1>0)
             {
-                case ConnectionStatus.Logined:
-                case ConnectionStatus.Disconnected:
-                case ConnectionStatus.Doing:
-                    obj = PInvokeUtility.GetObjectFromIntPtr<RspUserLoginField>(ptr1);
-                    UserLoginField = obj;
-                    break;
-                default:
-                    break;
+                obj = PInvokeUtility.GetObjectFromIntPtr<RspUserLoginField>(ptr1);
+                UserLoginField = obj;   
             }
 
             if (OnConnectionStatus_ != null)
