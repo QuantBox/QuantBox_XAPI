@@ -215,5 +215,10 @@ namespace QuantBox.XAPI
             return string.Format("[BrokerID={0};InvestorID={1};IdentifiedCardType={2},IdentifiedCardNo={3};InvestorName={4}]",
                 field.BrokerID, field.InvestorID, Enum<IdCardType>.ToString(field.IdentifiedCardType),field.IdentifiedCardNo, field.InvestorName());
         }
+        public static string ToFormattedStringExchangeDateTime([In]this DepthMarketDataField field)
+        {
+            return string.Format("[TradingDay={0};ActionDay={1};UpdateTime={2},UpdateMillisec={3}]",
+                field.TradingDay, field.ActionDay, field.UpdateTime, field.UpdateMillisec);
+        }
     }
 }
