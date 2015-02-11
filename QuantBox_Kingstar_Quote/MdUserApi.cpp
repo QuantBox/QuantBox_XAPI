@@ -175,8 +175,6 @@ int CMdUserApi::_Init()
 
 void CMdUserApi::ReqUserLogin()
 {
-	//CThostFtdcReqUserLoginField* pBody = new CThostFtdcReqUserLoginField();
-	//memset(pBody, 0, sizeof(CThostFtdcReqUserLoginField));
 	CThostFtdcReqUserLoginField* pBody = (CThostFtdcReqUserLoginField*)m_msgQueue_Query->new_block(sizeof(CThostFtdcReqUserLoginField));
 
 	strncpy(pBody->BrokerID, m_ServerInfo.BrokerID, sizeof(TThostFtdcBrokerIDType));
@@ -403,8 +401,8 @@ void CMdUserApi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CTho
 	if (!IsErrorRspInfo(pRspInfo)
 		&& pRspUserLogin)
 	{
-		GetExchangeTime(pRspUserLogin->TradingDay, nullptr, pRspUserLogin->LoginTime,
-			&pField->TradingDay, nullptr, &pField->LoginTime, nullptr);
+		pField->TradingDay = GetDate(pRspUserLogin->TradingDay);
+		pField->LoginTime = GetTime(pRspUserLogin->LoginTime);
 
 		sprintf(pField->SessionID, "%d:%d", pRspUserLogin->FrontID, pRspUserLogin->SessionID);
 

@@ -308,9 +308,8 @@ void CTraderApi::OnRspStockUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECR
 	if (!IsErrorRspInfo(pRspInfo)
 		&& pData)
 	{
-		GetExchangeTime(nullptr, nullptr, pData->loginTime,
-			nullptr, nullptr, &pField->LoginTime, nullptr);
 		pField->TradingDay = pData->tradingDay;
+		pField->LoginTime = GetTime(pData->loginTime);
 
 		sprintf(pField->SessionID, "%d:%d", pData->frontID, pData->sessionID);
 

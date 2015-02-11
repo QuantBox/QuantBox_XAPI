@@ -338,8 +338,10 @@ void CMdUserApi::OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, C
 	if (!IsErrorRspInfo(pRspInfo)
 		&&pRspUserLogin)
 	{
-		GetExchangeTime(pRspUserLogin->TradingDay, nullptr, pRspUserLogin->LoginTime,
-			&pField->TradingDay, nullptr, &pField->LoginTime, nullptr);
+		//GetExchangeTime(pRspUserLogin->TradingDay, nullptr, pRspUserLogin->LoginTime,
+		//	&pField->TradingDay, nullptr, &pField->LoginTime, nullptr);
+		pField->TradingDay = GetDate(pRspUserLogin->TradingDay);
+		pField->LoginTime = GetTime(pRspUserLogin->LoginTime);
 
 		sprintf(pField->SessionID, "%d:%d", pRspUserLogin->FrontID, pRspUserLogin->SessionID);
 
@@ -423,7 +425,7 @@ void CMdUserApi::OnRtnDepthMarketData(CSecurityFtdcDepthMarketDataField *pDepthM
 	strcpy(pField->ExchangeID, pDepthMarketData->ExchangeID);
 
 	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
-	GetExchangeTime(pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
+	GetExchangeTime(pDepthMarketData->TradingDay, nullptr, pDepthMarketData->UpdateTime
 		, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
 	pField->UpdateMillisec = pDepthMarketData->UpdateMillisec;
 

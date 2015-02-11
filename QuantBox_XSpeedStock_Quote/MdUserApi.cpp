@@ -379,9 +379,8 @@ void CMdUserApi::OnRspStockUserLogin(struct DFITCSECRspUserLoginField * pRspUser
 	if (!IsErrorRspInfo(pRspInfo)
 		&&pRspUserLogin)
 	{
-		GetExchangeTime(nullptr, nullptr, pRspUserLogin->loginTime,
-			nullptr, nullptr, &pField->LoginTime, nullptr);
 		pField->TradingDay = pRspUserLogin->tradingDay;
+		pField->LoginTime = GetTime(pRspUserLogin->loginTime);
 
 		sprintf(pField->SessionID, "%d:%d", pRspUserLogin->frontID, pRspUserLogin->sessionID);
 

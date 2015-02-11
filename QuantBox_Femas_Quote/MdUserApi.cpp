@@ -328,8 +328,9 @@ void CMdUserApi::OnRspUserLogin(CUstpFtdcRspUserLoginField *pRspUserLogin, CUstp
 	if (!IsErrorRspInfo(pRspInfo)
 		&&pRspUserLogin)
 	{
-		GetExchangeTime(pRspUserLogin->TradingDay, nullptr, pRspUserLogin->LoginTime,
-			&pField->TradingDay, nullptr, &pField->LoginTime, nullptr);
+		pField->TradingDay = GetDate(pRspUserLogin->TradingDay);
+		pField->LoginTime = GetTime(pRspUserLogin->LoginTime);
+
 		//sprintf(pField->SessionID, "%d:%d", pRspUserLogin->, pRspUserLogin->SessionID);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);

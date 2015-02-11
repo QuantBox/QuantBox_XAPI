@@ -290,8 +290,8 @@ void CTraderApi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CTho
 	if (!IsErrorRspInfo(pRspInfo)
 		&&pRspUserLogin)
 	{
-		GetExchangeTime(pRspUserLogin->tradeDate, nullptr, pRspUserLogin->lastLoginTime,
-			&pField->TradingDay, nullptr, &pField->LoginTime, nullptr);
+		pField->TradingDay = GetDate(pRspUserLogin->tradeDate);
+		pField->LoginTime = GetTime(pRspUserLogin->lastLoginTime);
 		//sprintf(pField->SessionID, "%d:%d", pRspUserLogin->FrontID, pRspUserLogin->SessionID);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);

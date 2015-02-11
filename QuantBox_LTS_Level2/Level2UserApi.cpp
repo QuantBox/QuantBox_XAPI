@@ -238,8 +238,10 @@ void CLevel2UserApi::OnRspUserLogin(CSecurityFtdcUserLoginField *pUserLogin, CSe
 	if (!IsErrorRspInfo(pRspInfo)
 		&& pUserLogin)
 	{
-		GetExchangeTime(pUserLogin->TradingDay, nullptr, nullptr,
-			&pField->TradingDay, nullptr, &pField->LoginTime, nullptr);
+		//GetExchangeTime(pUserLogin->TradingDay, nullptr, nullptr,
+		//	&pField->TradingDay, nullptr, &pField->LoginTime, nullptr);
+		pField->TradingDay = GetDate(pUserLogin->TradingDay);
+		//pField->LoginTime = GetTime(pUserLogin->LoginTime);
 
 		//strncpy(pField->LoginTime, pUserLogin->, sizeof(TimeType));
 		//sprintf(pField->SessionID, "%d:%d", pUserLogin->FrontID, pRspUserLogin->SessionID);

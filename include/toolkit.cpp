@@ -188,7 +188,14 @@ void GetExchangeTime(char* TradingDay, char* ActionDay, char* UpdateTime, int* _
 	// TradingDay处理
 	if (_TradingDay)
 	{
-		*_TradingDay = atoi(TradingDay);
+		int tradingday = atoi(TradingDay);
+		if (tradingday == 0)
+		{
+			time_t now = time(0);
+			struct tm *ptmNow = localtime(&now);
+			tradingday = (ptmNow->tm_year + 1900) * 10000 + (ptmNow->tm_mon + 1) * 100 + ptmNow->tm_mday;
+		}
+		*_TradingDay = tradingday;
 	}
 
 	// UpdateTime处理
