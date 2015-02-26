@@ -380,9 +380,10 @@ void CTraderApi::OnRspQryUserInvestor(CUstpFtdcRspUserInvestorField *pRspUserInv
 	}
 }
 
-char* CTraderApi::ReqOrderInsert(
+OrderIDType* CTraderApi::ReqOrderInsert(
 	int OrderRef,
-	OrderField* pOrder1)
+	OrderField* pOrder,
+	int count)
 {
 	if (nullptr == m_pApi)
 		return nullptr;
@@ -402,23 +403,23 @@ char* CTraderApi::ReqOrderInsert(
 	//body.IsSwapOrder = 0;
 
 	//合约
-	strncpy(body.InstrumentID, pOrder1->InstrumentID, sizeof(TUstpFtdcInstrumentIDType));
+	strncpy(body.InstrumentID, pOrder->InstrumentID, sizeof(TUstpFtdcInstrumentIDType));
 	//买卖
-	body.Direction = OrderSide_2_TUstpFtdcDirectionType(pOrder1->Side);
+	body.Direction = OrderSide_2_TUstpFtdcDirectionType(pOrder->Side);
 	//开平
-	body.OffsetFlag = OpenCloseType_2_TUstpFtdcOffsetFlagType(pOrder1->OpenClose);
+	body.OffsetFlag = OpenCloseType_2_TUstpFtdcOffsetFlagType(pOrder->OpenClose);
 	//投保
-	body.HedgeFlag = HedgeFlagType_2_TUstpFtdcHedgeFlagType(pOrder1->HedgeFlag);
+	body.HedgeFlag = HedgeFlagType_2_TUstpFtdcHedgeFlagType(pOrder->HedgeFlag);
 	//数量
-	body.Volume = (int)pOrder1->Qty;
+	body.Volume = (int)pOrder->Qty;
 
 	// 对于套利单，是用第一个参数的价格，还是用两个参数的价格差呢？
-	body.LimitPrice = pOrder1->Price;
-	body.StopPrice = pOrder1->StopPx;
+	body.LimitPrice = pOrder->Price;
+	body.StopPrice = pOrder->StopPx;
 
 
 	// 市价与限价
-	switch (pOrder1->Type)
+	switch (pOrder->Type)
 	{
 	case Market:
 	case Stop:
@@ -437,7 +438,7 @@ char* CTraderApi::ReqOrderInsert(
 	}
 
 	// IOC与FOK
-	switch (pOrder1->TimeInForce)
+	switch (pOrder->TimeInForce)
 	{
 	case IOC:
 		body.TimeCondition = USTP_FTDC_TC_IOC;
@@ -482,13 +483,13 @@ char* CTraderApi::ReqOrderInsert(
 			sprintf(m_orderInsert_Id, "%s:%012lld", m_RspUserLogin__.SessionID, nRet);
 
 			OrderField* pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
-			memcpy(pField, pOrder1, sizeof(OrderField));
+			memcpy(pField, pOrder, sizeof(OrderField));
 			strcpy(pField->ID, m_orderInsert_Id);
 			m_id_platform_order.insert(pair<string, OrderField*>(m_orderInsert_Id, pField));
 		}
 	}
 
-	return m_orderInsert_Id;
+	return &m_orderInsert_Id;
 }
 
 void CTraderApi::OnRspOrderInsert(CUstpFtdcInputOrderField *pInputOrder, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

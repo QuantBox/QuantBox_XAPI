@@ -192,6 +192,7 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 			for (int i = 0; i<row_num; i++)
 			{
 				//cout << p_login_rsp[i].cust_name << " " << p_login_rsp[i].market_code << " " << p_login_rsp[i].holder_acc_no << endl;
+
 			}
 		}
 	}
@@ -317,28 +318,71 @@ void CTraderApi::Disconnect()
 	}
 }
 
-char* CTraderApi::ReqOrderInsert(
+void BuildOrder(OrderField* pIn, PSTOrder pOut)
+{
+	strncpy(pOut->sec_code, pIn->InstrumentID, sizeof(TSecCodeType));
+	OrderField_2_TBSType(pIn, pOut);
+	OrderField_2_TMarketOrderFlagType(pIn, pOut);
+	pOut->price = pIn->Price;
+	pOut->order_vol = pIn->Qty;
+	//pOut->order_prop;
+}
+
+OrderIDType* CTraderApi::ReqOrderInsert(
 	int OrderRef,
-	OrderField* pOrder,int count)
+	OrderField* pOrder,
+	int count)
 {
 	if (count < 1)
 		return nullptr;
 
-	STOrder order;
-	order.sec_code;
-	order.bs;
-	order.market_order_flag;
-	order.price;
-	order.order_vol;
-	order.order_prop;
+	// 如果是批量下单是不同市场，不同账号怎么办？是要自己分成两组吗？
+	// 这个下单是阻塞模式，是否得先生成编号，否则无法正常映射
+	
+	int req_no = 0;
+
+	int row_num = 0;
+	STOrder *orderreq = new STOrder[count];
+	STOrderRsp *p_order_rsp = NULL;
+
+	memset(orderreq, 0, sizeof(STOrder)*count);
+
+	for (int i = 0; i < count;++i)
+	{
+		BuildOrder(&pOrder[i], &orderreq[i]);
+	}
+
+	bool bRet = SPX_API_Order(m_pApi, "0050001236", "1", "A050001236", "0", orderreq, &p_order_rsp, count, &row_num, &m_err_msg);
+
+	if (bRet && m_err_msg.error_no == 0)
+	{
+		if (p_order_rsp != NULL)
+		{
+			for (int i = 0; i<row_num; i++)
+			{
+				if (p_order_rsp[i].error_no == 0)
+				{
+					//cout << p_order_rsp[i].batch_no << " " << p_order_rsp[i].order_no << endl;
+				}
+				else
+				{
+					//cout << "Order Error:" << p_order_rsp[i].error_no << " " << p_order_rsp[i].err_msg << endl;
+				}
+			}
+		}
+		else
+		{
+			//cout << "返回结果为空" << endl;
+		}
+	}
+
+
+	delete[] orderreq;
 
 	return nullptr;
 }
 
-void BuildOrder(OrderField* pIn, PSTOrder pOut)
-{
 
-}
 
 void CTraderApi::OnPST16203PushData(PST16203PushData pEtxPushData)
 {

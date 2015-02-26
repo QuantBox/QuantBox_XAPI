@@ -60,10 +60,10 @@ public:
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	char* ReqOrderInsert(
+	OrderIDType* ReqOrderInsert(
 		int OrderRef,
-		OrderField* pOrder1,
-		OrderField* pOrder2);
+		OrderField* pOrder,
+		int count);
 
 	int ReqOrderAction(const string& szId);
 	void ReqCancelOrder(

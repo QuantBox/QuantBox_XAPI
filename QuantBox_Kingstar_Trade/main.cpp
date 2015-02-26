@@ -16,7 +16,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return (void*)(ApiType::Trade | ApiType::Instrument);
 	case GetApiVersion:
-		return (void*)"0.1.0.20150112";
+		return (void*)"0.2.0.20150226";
 	case GetApiName:
 		return (void*)"Kingstar";
 	case Create:
@@ -61,7 +61,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case ReqOrderInsert:
 		if (double2 == 0)
 		{
-			return pApi->ReqOrderInsert((int)double1, (OrderField*)ptr1, (OrderField*)ptr2);
+			return pApi->ReqOrderInsert((int)double1, (OrderField*)ptr1, size1);
 		}
 		//else
 		//{

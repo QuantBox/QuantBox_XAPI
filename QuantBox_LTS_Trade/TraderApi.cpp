@@ -329,10 +329,10 @@ void CTraderApi::OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, C
 	}
 }
 
-char* CTraderApi::ReqOrderInsert(
+OrderIDType* CTraderApi::ReqOrderInsert(
 	int OrderRef,
-	OrderField* pOrder1,
-	OrderField* pOrder2)
+	OrderField* pOrder,
+	int count)
 {
 	if (nullptr == m_pApi)
 		return nullptr;
@@ -349,27 +349,27 @@ char* CTraderApi::ReqOrderInsert(
 	//body.IsSwapOrder = 0;
 
 	//合约
-	strncpy(body.InstrumentID, pOrder1->InstrumentID, sizeof(TSecurityFtdcInstrumentIDType));
-	strncpy(body.ExchangeID, pOrder1->ExchangeID, sizeof(TSecurityFtdcExchangeIDType));
+	strncpy(body.InstrumentID, pOrder->InstrumentID, sizeof(TSecurityFtdcInstrumentIDType));
+	strncpy(body.ExchangeID, pOrder->ExchangeID, sizeof(TSecurityFtdcExchangeIDType));
 	//买卖
-	body.Direction = OrderSide_2_TSecurityFtdcDirectionType(pOrder1->Side);
+	body.Direction = OrderSide_2_TSecurityFtdcDirectionType(pOrder->Side);
 	//开平
-	body.CombOffsetFlag[0] = OpenCloseType_2_TSecurityFtdcOffsetFlagType(pOrder1->OpenClose);
+	body.CombOffsetFlag[0] = OpenCloseType_2_TSecurityFtdcOffsetFlagType(pOrder->OpenClose);
 	//投保
-	body.CombHedgeFlag[0] = HedgeFlagType_2_TSecurityFtdcHedgeFlagType(pOrder1->HedgeFlag);
+	body.CombHedgeFlag[0] = HedgeFlagType_2_TSecurityFtdcHedgeFlagType(pOrder->HedgeFlag);
 	//数量
-	body.VolumeTotalOriginal = (int)pOrder1->Qty;
+	body.VolumeTotalOriginal = (int)pOrder->Qty;
 
 	// 对于套利单，是用第一个参数的价格，还是用两个参数的价格差呢？
 	//body.LimitPrice = pOrder1->Price;
-	sprintf(body.LimitPrice, "%f", pOrder1->Price);
-	body.StopPrice = pOrder1->StopPx;
+	sprintf(body.LimitPrice, "%f", pOrder->Price);
+	body.StopPrice = pOrder->StopPx;
 
 	// 针对第二个进行处理，如果有第二个参数，认为是交易所套利单
-	if (pOrder2)
+	if (count>1)
 	{
-		body.CombOffsetFlag[1] = OpenCloseType_2_TSecurityFtdcOffsetFlagType(pOrder1->OpenClose);
-		body.CombHedgeFlag[1] = HedgeFlagType_2_TSecurityFtdcHedgeFlagType(pOrder1->HedgeFlag);
+		body.CombOffsetFlag[1] = OpenCloseType_2_TSecurityFtdcOffsetFlagType(pOrder[1].OpenClose);
+		body.CombHedgeFlag[1] = HedgeFlagType_2_TSecurityFtdcHedgeFlagType(pOrder[1].HedgeFlag);
 		// 交易所的移仓换月功能，没有实测过
 		//body.IsSwapOrder = (body.CombOffsetFlag[0] != body.CombOffsetFlag[1]);
 	}
@@ -378,7 +378,7 @@ char* CTraderApi::ReqOrderInsert(
 	//body.OrderPriceType = OrderType_2_TSecurityFtdcOrderPriceTypeType(pOrder1->Type);
 
 	// 市价与限价
-	switch (pOrder1->Type)
+	switch (pOrder->Type)
 	{
 	case Market:
 	case Stop:
@@ -397,7 +397,7 @@ char* CTraderApi::ReqOrderInsert(
 	}
 
 	// IOC与FOK
-	switch (pOrder1->TimeInForce)
+	switch (pOrder->TimeInForce)
 	{
 	case IOC:
 		body.TimeCondition = SECURITY_FTDC_TC_IOC;
@@ -414,7 +414,7 @@ char* CTraderApi::ReqOrderInsert(
 	}
 
 	// 条件单
-	switch (pOrder1->Type)
+	switch (pOrder->Type)
 	{
 	case Stop:
 	case TrailingStop:
@@ -456,13 +456,13 @@ char* CTraderApi::ReqOrderInsert(
 			sprintf(m_orderInsert_Id, "%d:%d:%d", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, nRet);
 
 			OrderField* pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
-			memcpy(pField, pOrder1, sizeof(OrderField));
+			memcpy(pField, pOrder, sizeof(OrderField));
 			strcpy(pField->ID, m_orderInsert_Id);
 			m_id_platform_order.insert(pair<string, OrderField*>(m_orderInsert_Id, pField));
 		}
 	}
 
-	return m_orderInsert_Id;
+	return &m_orderInsert_Id;
 }
 
 void CTraderApi::OnRspOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

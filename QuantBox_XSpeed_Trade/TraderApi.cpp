@@ -281,10 +281,10 @@ void CTraderApi::OnRspUserLogin(struct DFITCUserLoginInfoRtnField * pRspUserLogi
 	}
 }
 
-char* CTraderApi::ReqOrderInsert(
+OrderIDType* CTraderApi::ReqOrderInsert(
 	int OrderRef,
-	OrderField* pOrder1,
-	OrderField* pOrder2)
+	OrderField* pOrder,
+	int count)
 {
 	if (nullptr == m_pApi)
 		return nullptr;
@@ -293,20 +293,20 @@ char* CTraderApi::ReqOrderInsert(
 
 	strcpy(body.accountID, m_RspUserLogin.accountID);
 	// 合约
-	strncpy(body.instrumentID, pOrder1->InstrumentID, sizeof(DFITCInstrumentIDType));
+	strncpy(body.instrumentID, pOrder->InstrumentID, sizeof(DFITCInstrumentIDType));
 	// 价格
-	body.insertPrice = pOrder1->Price;
+	body.insertPrice = pOrder->Price;
 	// 数量
-	body.orderAmount = (DFITCAmountType)pOrder1->Qty;
+	body.orderAmount = (DFITCAmountType)pOrder->Qty;
 	// 买卖
-	body.buySellType = OrderSide_2_DFITCBuySellTypeType(pOrder1->Side);
+	body.buySellType = OrderSide_2_DFITCBuySellTypeType(pOrder->Side);
 	// 开平
-	body.openCloseType = OpenCloseType_2_DFITCOpenCloseTypeType(pOrder1->OpenClose);
+	body.openCloseType = OpenCloseType_2_DFITCOpenCloseTypeType(pOrder->OpenClose);
 	// 投保
-	body.speculator = HedgeFlagType_2_DFITCSpeculatorType(pOrder1->HedgeFlag);
+	body.speculator = HedgeFlagType_2_DFITCSpeculatorType(pOrder->HedgeFlag);
 	body.insertType = DFITC_BASIC_ORDER;
-	body.orderType = OrderType_2_DFITCOrderTypeType(pOrder1->Type);
-	body.orderProperty = TimeInForce_2_DFITCOrderPropertyType(pOrder1->TimeInForce);
+	body.orderType = OrderType_2_DFITCOrderTypeType(pOrder->Type);
+	body.orderProperty = TimeInForce_2_DFITCOrderPropertyType(pOrder->TimeInForce);
 	body.instrumentType = DFITC_COMM_TYPE;
 
 	//// 针对第二个进行处理，如果有第二个参数，认为是交易所套利单
@@ -352,13 +352,13 @@ char* CTraderApi::ReqOrderInsert(
 			sprintf(m_orderInsert_Id, "%d:%d", m_RspUserLogin.sessionID, nRet);
 
 			OrderField* pField = new OrderField();
-			memcpy(pField, pOrder1, sizeof(OrderField));
+			memcpy(pField, pOrder, sizeof(OrderField));
 			strcpy(pField->ID, m_orderInsert_Id);
 			m_id_platform_order.insert(pair<string, OrderField*>(m_orderInsert_Id, pField));
 		}
 	}
 
-	return m_orderInsert_Id;
+	return &m_orderInsert_Id;
 }
 
 void CTraderApi::OnRspInsertOrder(struct DFITCOrderRspDataRtnField * pOrderRtn, struct DFITCErrorRtnField * pErrorInfo)

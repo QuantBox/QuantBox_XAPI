@@ -478,33 +478,61 @@ void CMdUserApi::OnMarketData(struct DFITCDepthMarketDataField *pMarketDataField
 	pField->PreSettlementPrice = pMarketDataField->preSettlementPrice;
 	pField->PreOpenInterest = pMarketDataField->preOpenInterest;
 
-	pField->BidPrice1 = pMarketDataField->BidPrice1;
-	pField->BidVolume1 = pMarketDataField->BidVolume1;
-	pField->AskPrice1 = pMarketDataField->AskPrice1;
-	pField->AskVolume1 = pMarketDataField->AskVolume1;
-
-	if (pMarketDataField->BidPrice2 != -1 || pMarketDataField->AskPrice2 != -1)
+	do
 	{
+		if (pMarketDataField->BidVolume1 == 0)
+			break;
+		pField->BidPrice1 = pMarketDataField->BidPrice1;
+		pField->BidVolume1 = pMarketDataField->BidVolume1;
+
+		if (pMarketDataField->BidVolume2 == 0)
+			break;
 		pField->BidPrice2 = pMarketDataField->BidPrice2;
 		pField->BidVolume2 = pMarketDataField->BidVolume2;
+
+		if (pMarketDataField->BidVolume3 == 0)
+			break;
+		pField->BidPrice3 = pMarketDataField->BidPrice3;
+		pField->BidVolume3 = pMarketDataField->BidVolume3;
+
+		if (pMarketDataField->BidVolume4 == 0)
+			break;
+		pField->BidPrice4 = pMarketDataField->BidPrice4;
+		pField->BidVolume4 = pMarketDataField->BidVolume4;
+
+		if (pMarketDataField->BidVolume5 == 0)
+			break;
+		pField->BidPrice5 = pMarketDataField->BidPrice5;
+		pField->BidVolume5 = pMarketDataField->BidVolume5;
+	} while (false);
+
+	do
+	{
+		if (pMarketDataField->AskVolume1 == 0)
+			break;
+		pField->AskPrice1 = pMarketDataField->AskPrice1;
+		pField->AskVolume1 = pMarketDataField->AskVolume1;
+
+		if (pMarketDataField->AskVolume2 == 0)
+			break;
 		pField->AskPrice2 = pMarketDataField->AskPrice2;
 		pField->AskVolume2 = pMarketDataField->AskVolume2;
 
-		pField->BidPrice3 = pMarketDataField->BidPrice3;
-		pField->BidVolume3 = pMarketDataField->BidVolume3;
+		if (pMarketDataField->AskVolume3 == 0)
+			break;
 		pField->AskPrice3 = pMarketDataField->AskPrice3;
 		pField->AskVolume3 = pMarketDataField->AskVolume3;
 
-		pField->BidPrice4 = pMarketDataField->BidPrice4;
-		pField->BidVolume4 = pMarketDataField->BidVolume4;
+		if (pMarketDataField->AskVolume4 == 0)
+			break;
 		pField->AskPrice4 = pMarketDataField->AskPrice4;
 		pField->AskVolume4 = pMarketDataField->AskVolume4;
 
-		pField->BidPrice5 = pMarketDataField->BidPrice5;
-		pField->BidVolume5 = pMarketDataField->BidVolume5;
+		if (pMarketDataField->AskVolume5 == 0)
+			break;
 		pField->AskPrice5 = pMarketDataField->AskPrice5;
 		pField->AskVolume5 = pMarketDataField->AskVolume5;
-	}
+	} while (false);
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }

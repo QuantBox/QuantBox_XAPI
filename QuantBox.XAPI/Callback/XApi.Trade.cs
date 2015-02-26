@@ -86,49 +86,85 @@ namespace QuantBox.XAPI.Callback
             Marshal.FreeHGlobal(szTradingDayPtr);
         }
 
-        public string SendOrder(int OrderRef, ref OrderField order1)
+        public void SendOrder(int OrderRef, ref OrderField[] orders,out string[] OrderRefs)
         {
             int size = Marshal.SizeOf(typeof(OrderField));
+            int sizeAll = size * orders.Length;
 
-            IntPtr order1Ptr = Marshal.AllocHGlobal(size);
-            //IntPtr order2Ptr = Marshal.AllocHGlobal(size);
-            Marshal.StructureToPtr(order1, order1Ptr, false);
-            //Marshal.StructureToPtr(order2, order2Ptr, false);
+            IntPtr ordersPtr = Marshal.AllocHGlobal(sizeAll);
+
+            // 将结构体写成内存块
+            for (int i = 0; i < orders.Length;++i)
+            {
+                Marshal.StructureToPtr(orders[i], ordersPtr + i * size, false);
+            }
 
             IntPtr ptr = proxy.XRequest((byte)RequestType.ReqOrderInsert, Handle, IntPtr.Zero,
                 OrderRef, 0,
-                order1Ptr, size, IntPtr.Zero, 0, IntPtr.Zero, 0);
+                ordersPtr, orders.Length, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
-            Marshal.FreeHGlobal(order1Ptr);
-            //Marshal.FreeHGlobal(order2Ptr);
+            Marshal.FreeHGlobal(ordersPtr);
 
+            OrderRefs = new string[orders.Length];
+
+            // 从内存块中读到数据再写回
             if (ptr.ToInt64() == 0)
-                return null;
+            {
+                //OrderRefs = new string[orders.Length];
+                //OrderRefs = null;
+                return;
+            }
 
-            return Marshal.PtrToStringAnsi(ptr);
+            for(int i = 0;i<orders.Length;++i)
+            {
+                OrderRefs[i] = Marshal.PtrToStringAnsi(ptr + i * 64);
+            }
         }
 
-        public string SendOrder(int OrderRef, ref OrderField order1, ref OrderField order2)
-        {
-            int size = Marshal.SizeOf(typeof(OrderField));
 
-            IntPtr order1Ptr = Marshal.AllocHGlobal(size);
-            IntPtr order2Ptr = Marshal.AllocHGlobal(size);
-            Marshal.StructureToPtr(order1, order1Ptr, false);
-            Marshal.StructureToPtr(order2, order2Ptr, false);
+        //public string SendOrder(int OrderRef, ref OrderField order1)
+        //{
+        //    int size = Marshal.SizeOf(typeof(OrderField));
 
-            IntPtr ptr = proxy.XRequest((byte)RequestType.ReqOrderInsert, Handle, IntPtr.Zero,
-                OrderRef, 0,
-                order1Ptr, size, order2Ptr, size, IntPtr.Zero, 0);
+        //    IntPtr order1Ptr = Marshal.AllocHGlobal(size);
+        //    //IntPtr order2Ptr = Marshal.AllocHGlobal(size);
+        //    Marshal.StructureToPtr(order1, order1Ptr, false);
+        //    //Marshal.StructureToPtr(order2, order2Ptr, false);
 
-            Marshal.FreeHGlobal(order1Ptr);
-            Marshal.FreeHGlobal(order2Ptr);
+        //    IntPtr ptr = proxy.XRequest((byte)RequestType.ReqOrderInsert, Handle, IntPtr.Zero,
+        //        OrderRef, 0,
+        //        order1Ptr, size, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
-            if (ptr.ToInt64() == 0)
-                return null;
+        //    Marshal.FreeHGlobal(order1Ptr);
+        //    //Marshal.FreeHGlobal(order2Ptr);
 
-            return Marshal.PtrToStringAnsi(ptr);
-        }
+        //    if (ptr.ToInt64() == 0)
+        //        return null;
+
+        //    return Marshal.PtrToStringAnsi(ptr);
+        //}
+
+        //public string SendOrder(int OrderRef, ref OrderField order1, ref OrderField order2)
+        //{
+        //    int size = Marshal.SizeOf(typeof(OrderField));
+
+        //    IntPtr order1Ptr = Marshal.AllocHGlobal(size);
+        //    IntPtr order2Ptr = Marshal.AllocHGlobal(size);
+        //    Marshal.StructureToPtr(order1, order1Ptr, false);
+        //    Marshal.StructureToPtr(order2, order2Ptr, false);
+
+        //    IntPtr ptr = proxy.XRequest((byte)RequestType.ReqOrderInsert, Handle, IntPtr.Zero,
+        //        OrderRef, 0,
+        //        order1Ptr, size, order2Ptr, size, IntPtr.Zero, 0);
+
+        //    Marshal.FreeHGlobal(order1Ptr);
+        //    Marshal.FreeHGlobal(order2Ptr);
+
+        //    if (ptr.ToInt64() == 0)
+        //        return null;
+
+        //    return Marshal.PtrToStringAnsi(ptr);
+        //}
 
         public int CancelOrder(string szId)
         {
@@ -219,7 +255,6 @@ namespace QuantBox.XAPI.Callback
             if (OnRtnOrder_ == null)
                 return;
 
-            //OrderField obj = PInvokeUtility.GetObjectFromIntPtr<OrderField>(ptr1);
             OrderField obj = (OrderField)Marshal.PtrToStructure(ptr1, typeof(OrderField));
 
             OnRtnOrder_(this, ref obj);
@@ -231,7 +266,6 @@ namespace QuantBox.XAPI.Callback
             if (OnRtnTrade_ == null)
                 return;
 
-            //TradeField obj = PInvokeUtility.GetObjectFromIntPtr<TradeField>(ptr1);
             TradeField obj = (TradeField)Marshal.PtrToStructure(ptr1, typeof(TradeField));
 
             OnRtnTrade_(this, ref obj);
@@ -239,10 +273,9 @@ namespace QuantBox.XAPI.Callback
 
         private void _OnRtnQuote(IntPtr ptr1, int size1)
         {
-            //if (OnRtnQuote_ == null)
-            //    return;
+            if (OnRtnQuote_ == null)
+                return;
 
-            //QuoteField obj = PInvokeUtility.GetObjectFromIntPtr<QuoteField>(ptr1);
             QuoteField obj = (QuoteField)Marshal.PtrToStructure(ptr1, typeof(QuoteField));
 
             OnRtnQuote_(this, ref obj);

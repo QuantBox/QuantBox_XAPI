@@ -396,10 +396,10 @@ void CTraderApi::OnRspFASLUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECRs
 	}
 }
 
-char* CTraderApi::ReqOrderInsert(
+OrderIDType* CTraderApi::ReqOrderInsert(
 	int OrderRef,
-	OrderField* pOrder1,
-	OrderField* pOrder2)
+	OrderField* pOrder,
+	int count)
 {
 	//if (nullptr == m_pApi)
 		return nullptr;

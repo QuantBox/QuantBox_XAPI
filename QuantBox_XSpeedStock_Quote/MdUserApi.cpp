@@ -487,30 +487,61 @@ void CMdUserApi::OnStockMarketData(struct DFITCStockDepthMarketDataField *pMarke
 	//marketData.PreSettlementPrice = pMarketDataField->preSettlementPrice;
 	//marketData.PreOpenInterest = pMarketDataField->preOpenInterest;
 
-	pField->BidPrice1 = pMarketDataField->sharedDataField.bidPrice1;
-	pField->BidVolume1 = pMarketDataField->sharedDataField.bidQty1;
-	pField->AskPrice1 = pMarketDataField->sharedDataField.askPrice1;
-	pField->AskVolume1 = pMarketDataField->sharedDataField.askQty1;
+	do
+	{
+		if (pMarketDataField->sharedDataField.bidQty1 == 0)
+			break;
+		pField->BidPrice1 = pMarketDataField->sharedDataField.bidPrice1;
+		pField->BidVolume1 = pMarketDataField->sharedDataField.bidQty1;
 
-	pField->BidPrice2 = pMarketDataField->sharedDataField.bidPrice2;
-	pField->BidVolume2 = pMarketDataField->sharedDataField.bidQty2;
-	pField->AskPrice2 = pMarketDataField->sharedDataField.askPrice2;
-	pField->AskVolume2 = pMarketDataField->sharedDataField.askQty2;
+		if (pMarketDataField->sharedDataField.bidQty2 == 0)
+			break;
+		pField->BidPrice2 = pMarketDataField->sharedDataField.bidPrice2;
+		pField->BidVolume2 = pMarketDataField->sharedDataField.bidQty2;
 
-	pField->BidPrice3 = pMarketDataField->sharedDataField.bidPrice3;
-	pField->BidVolume3 = pMarketDataField->sharedDataField.bidQty3;
-	pField->AskPrice3 = pMarketDataField->sharedDataField.askPrice3;
-	pField->AskVolume3 = pMarketDataField->sharedDataField.askQty3;
+		if (pMarketDataField->sharedDataField.bidQty3 == 0)
+			break;
+		pField->BidPrice3 = pMarketDataField->sharedDataField.bidPrice3;
+		pField->BidVolume3 = pMarketDataField->sharedDataField.bidQty3;
 
-	pField->BidPrice4 = pMarketDataField->sharedDataField.bidPrice4;
-	pField->BidVolume4 = pMarketDataField->sharedDataField.bidQty4;
-	pField->AskPrice4 = pMarketDataField->sharedDataField.askPrice4;
-	pField->AskVolume4 = pMarketDataField->sharedDataField.askQty4;
+		if (pMarketDataField->sharedDataField.bidQty4 == 0)
+			break;
+		pField->BidPrice4 = pMarketDataField->sharedDataField.bidPrice4;
+		pField->BidVolume4 = pMarketDataField->sharedDataField.bidQty4;
 
-	pField->BidPrice5 = pMarketDataField->sharedDataField.bidPrice5;
-	pField->BidVolume5 = pMarketDataField->sharedDataField.bidQty5;
-	pField->AskPrice5 = pMarketDataField->sharedDataField.askPrice5;
-	pField->AskVolume5 = pMarketDataField->sharedDataField.askQty5;
+		if (pMarketDataField->sharedDataField.bidQty5 == 0)
+			break;
+		pField->BidPrice5 = pMarketDataField->sharedDataField.bidPrice5;
+		pField->BidVolume5 = pMarketDataField->sharedDataField.bidQty5;
+	} while (false);
+
+	do
+	{
+		if (pMarketDataField->sharedDataField.askQty1 == 0)
+			break;
+		pField->AskPrice1 = pMarketDataField->sharedDataField.askPrice1;
+		pField->AskVolume1 = pMarketDataField->sharedDataField.askQty1;
+
+		if (pMarketDataField->sharedDataField.askQty2 == 0)
+			break;
+		pField->AskPrice2 = pMarketDataField->sharedDataField.askPrice2;
+		pField->AskVolume2 = pMarketDataField->sharedDataField.askQty2;
+
+		if (pMarketDataField->sharedDataField.askQty3 == 0)
+			break;
+		pField->AskPrice3 = pMarketDataField->sharedDataField.askPrice3;
+		pField->AskVolume3 = pMarketDataField->sharedDataField.askQty3;
+
+		if (pMarketDataField->sharedDataField.askQty4 == 0)
+			break;
+		pField->AskPrice4 = pMarketDataField->sharedDataField.askPrice4;
+		pField->AskVolume4 = pMarketDataField->sharedDataField.askQty4;
+
+		if (pMarketDataField->sharedDataField.askQty5 == 0)
+			break;
+		pField->AskPrice5 = pMarketDataField->sharedDataField.askPrice5;
+		pField->AskVolume5 = pMarketDataField->sharedDataField.askQty5;
+	} while (false);
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }

@@ -442,58 +442,61 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 	//marketData.PreSettlementPrice = pL2MarketData->PreSettlementPrice;
 	//marketData.PreOpenInterest = pL2MarketData->PreOpenInterest;
 
-	pField->BidPrice1 = pL2MarketData->BidPrice1;
-	pField->BidVolume1 = pL2MarketData->BidVolume1;
-	pField->AskPrice1 = pL2MarketData->OfferPrice1;
-	pField->AskVolume1 = pL2MarketData->OfferVolume1;
-
-	//if (pDepthMarketData->BidPrice2 != DBL_MAX || pDepthMarketData->AskPrice2 != DBL_MAX)
+	do
 	{
+		if (pL2MarketData->BidVolume1 == 0)
+			break;
+		pField->BidPrice1 = pL2MarketData->BidPrice1;
+		pField->BidVolume1 = pL2MarketData->BidVolume1;
+
+		if (pL2MarketData->BidVolume2 == 0)
+			break;
 		pField->BidPrice2 = pL2MarketData->BidPrice2;
 		pField->BidVolume2 = pL2MarketData->BidVolume2;
+
+		if (pL2MarketData->BidVolume3 == 0)
+			break;
+		pField->BidPrice3 = pL2MarketData->BidPrice3;
+		pField->BidVolume3 = pL2MarketData->BidVolume3;
+
+		if (pL2MarketData->BidVolume4 == 0)
+			break;
+		pField->BidPrice4 = pL2MarketData->BidPrice4;
+		pField->BidVolume4 = pL2MarketData->BidVolume4;
+
+		if (pL2MarketData->BidVolume5 == 0)
+			break;
+		pField->BidPrice5 = pL2MarketData->BidPrice5;
+		pField->BidVolume5 = pL2MarketData->BidVolume5;
+	} while (false);
+
+	do
+	{
+		if (pL2MarketData->OfferVolume1 == 0)
+			break;
+		pField->AskPrice1 = pL2MarketData->OfferPrice1;
+		pField->AskVolume1 = pL2MarketData->OfferVolume1;
+
+		if (pL2MarketData->OfferVolume2 == 0)
+			break;
 		pField->AskPrice2 = pL2MarketData->OfferPrice2;
 		pField->AskVolume2 = pL2MarketData->OfferVolume2;
 
-		pField->BidPrice3 = pL2MarketData->BidPrice3;
-		pField->BidVolume3 = pL2MarketData->BidVolume3;
+		if (pL2MarketData->OfferVolume3 == 0)
+			break;
 		pField->AskPrice3 = pL2MarketData->OfferPrice3;
 		pField->AskVolume3 = pL2MarketData->OfferVolume3;
 
-		pField->BidPrice4 = pL2MarketData->BidPrice4;
-		pField->BidVolume4 = pL2MarketData->BidVolume4;
-		pField->AskPrice4 = pL2MarketData->OfferPrice2;
+		if (pL2MarketData->OfferVolume4 == 0)
+			break;
+		pField->AskPrice4 = pL2MarketData->OfferPrice4;
 		pField->AskVolume4 = pL2MarketData->OfferVolume4;
 
-		pField->BidPrice5 = pL2MarketData->BidPrice5;
-		pField->BidVolume5 = pL2MarketData->BidVolume5;
+		if (pL2MarketData->OfferVolume5 == 0)
+			break;
 		pField->AskPrice5 = pL2MarketData->OfferPrice5;
 		pField->AskVolume5 = pL2MarketData->OfferVolume5;
-
-		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
-		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
-		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
-		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
-
-		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
-		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
-		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
-		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
-
-		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
-		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
-		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
-		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
-
-		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
-		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
-		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
-		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
-
-		//marketData.BidPrice5 = pL2MarketData->BidPrice5;
-		//marketData.BidVolume5 = pL2MarketData->BidVolume5;
-		//marketData.AskPrice5 = pL2MarketData->OfferPrice5;
-		//marketData.AskVolume5 = pL2MarketData->OfferVolume5;
-	}
+	} while (false);
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }

@@ -17,7 +17,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return (void*)(ApiType::Trade | ApiType::QuoteRequest | ApiType::Instrument);
 	case GetApiVersion:
-		return "0.1.0.20150112";
+		return "0.2.0.20150226";
 	case GetApiName:
 		return "XSpeed";
 	case Create:
@@ -57,7 +57,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	//	pApi->ReqQrySettlementInfo((const char*)ptr1);
 	//	break;
 	case ReqOrderInsert:
-		return pApi->ReqOrderInsert((int)double1, (OrderField*)ptr1, (OrderField*)ptr2);
+		return pApi->ReqOrderInsert((int)double1, (OrderField*)ptr1, size1);
 	//case ReqQuoteInsert:
 	//	return (void*)pApi->ReqQuoteInsert((int)double1, (OrderField*)ptr1, (OrderField*)ptr2);
 	//case ReqOrderAction:

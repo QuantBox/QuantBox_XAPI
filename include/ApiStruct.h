@@ -81,6 +81,7 @@ struct OrderField
 
 	OrderIDType ID;
 	OrderIDType OrderID;
+	AccountIDType Account;
 };
 
 struct TradeField
