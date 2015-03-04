@@ -155,6 +155,8 @@ struct RspUserLoginField
 	SessionIDType	SessionID;
 	// 错误信息
 	ErrorMsgType	ErrorMsg;
+	///投资者名称
+	PartyNameType	InvestorName;
 };
 
 

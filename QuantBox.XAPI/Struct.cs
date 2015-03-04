@@ -123,6 +123,11 @@ namespace QuantBox.XAPI
         /// </summary>
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
         public byte[] ErrorMsg;
+        /// <summary>
+        /// 投资者名称
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 81)]
+        public byte[] InvestorName;
     }
 
     /// <summary>

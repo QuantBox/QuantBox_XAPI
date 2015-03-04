@@ -63,7 +63,8 @@ public:
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
-		UserInfoField* pUserInfo);
+		UserInfoField* pUserInfo,
+		int count);
 	void Disconnect();
 
 	OrderIDType* ReqOrderInsert(
@@ -100,7 +101,6 @@ public:
 
 	
 private:
-	//friend void __stdcall OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData);
 	static void __stdcall OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData);
 	void _OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData);
 
@@ -116,40 +116,7 @@ private:
 	void OnPST16203PushData(PST16203PushData pEtxPushData);
 	void OnPST16204PushData(PST16204PushData pEtxPushData);
 
-	//friend void* Send(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
-
-	/*void OnOrder(CThostFtdcOrderField *pOrder);
-	void OnTrade(CThostFtdcTradeField *pTrade);
-	void OnQuote(CThostFtdcQuoteField *pQuote);*/
-
-	//void OnTrade(TradeField *pTrade);
-
-	////数据包发送线程
-	//static void ProcessThread(CTraderApi* lpParam)
-	//{
-	//	if (lpParam)
-	//		lpParam->RunInThread();
-	//}
-	//void RunInThread();
-	//void StartThread();
-	//void StopThread();
-
-	////指定数据包类型，生成对应数据包
-	//SRequest * MakeRequestBuf(RequestType type);
-	////清除将发送请求包队列
-	//void ReleaseRequestListBuf();
-	////清除已发送请求包池
-	//void ReleaseRequestMapBuf();
-	////清除指定请求包池中指定包
-	//void ReleaseRequestMapBuf(int nRequestID);
-	////添加到已经请求包池
-	//void AddRequestMapBuf(int nRequestID,SRequest* pRequest);
-	////添加到将发送包队列
-	//void AddToSendQueue(SRequest * pRequest);
-
-	//void ReqAuthenticate();
-	//void ReqUserLogin();
-	//void ReqSettlementInfoConfirm();
+	
 
 	//检查是否出错
 	bool IsErrorRspInfo(STRspMsg *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
@@ -246,6 +213,8 @@ private:
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;			//发送消息队列指针
 
-	
+	UserInfoField*				m_pUserInfos;
+	int							m_UserInfo_Pos;
+	int							m_UserInfo_Count;
 };
 

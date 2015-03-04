@@ -38,7 +38,8 @@ public:
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
-		UserInfoField* pUserInfo);
+		UserInfoField* pUserInfo,
+		int count);
 	void Disconnect();
 
 	void Subscribe(const string& szInstrumentIDs, const string& szExchageID);

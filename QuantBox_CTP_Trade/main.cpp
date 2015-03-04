@@ -41,7 +41,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		pApi->Register(ptr1);
 		break;
 	case Connect:
-		pApi->Connect((const char*)ptr3, (ServerInfoField*)ptr1, (UserInfoField*)ptr2);
+		pApi->Connect((const char*)ptr3, (ServerInfoField*)ptr1, (UserInfoField*)ptr2,size2);
 		break;
 	case Disconnect:
 		pApi->Disconnect();

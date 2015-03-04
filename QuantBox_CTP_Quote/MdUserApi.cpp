@@ -122,7 +122,8 @@ bool CMdUserApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 
 void CMdUserApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
-	UserInfoField* pUserInfo)
+	UserInfoField* pUserInfo,
+	int count)
 {
 	m_szPath = szPath;
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));

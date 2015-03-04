@@ -65,7 +65,8 @@ public:
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
-		UserInfoField* pUserInfo);
+		UserInfoField* pUserInfo,
+		int count);
 	void Disconnect();
 
 	OrderIDType* ReqOrderInsert(

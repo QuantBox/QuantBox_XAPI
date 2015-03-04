@@ -144,7 +144,8 @@ bool CTraderApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 
 void CTraderApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
-	UserInfoField* pUserInfo)
+	UserInfoField* pUserInfo,
+	int count)
 {
 	m_szPath = szPath;
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));

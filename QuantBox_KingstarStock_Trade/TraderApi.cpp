@@ -37,13 +37,10 @@ void CTraderApi::_OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData)
 		break;
 	default:
 	{
-			   char szmsg[128] = { 0 };
-			   sprintf(szmsg, "无法识别的推送数据[%d]", FuncNO);
-
 			   ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
 
 			   pField->ErrorID = FuncNO;
-			   strcpy(pField->ErrorMsg, szmsg);
+			   sprintf(pField->ErrorMsg, "无法识别的推送数据[%d]", FuncNO);
 
 			   m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, this, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -119,56 +116,53 @@ int CTraderApi::_Init()
 
 	bool bRet = SPX_API_Initialize(&init_para, &m_err_msg);
 
-	if (!bRet)
+	RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+
+	//连接失败返回的信息是拼接而成，主要是为了统一输出
+	pField->ErrorID = m_err_msg.error_no;
+	strcpy(pField->ErrorMsg, m_err_msg.msg);
+	ConnectionStatus status;
+
+	do
 	{
-		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+		if (!bRet)
+		{
+			status = ConnectionStatus::Disconnected;
+			break;
+		}
+		status = ConnectionStatus::Initialized;
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, status, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 
-		//连接失败返回的信息是拼接而成，主要是为了统一输出
-		pField->ErrorID = m_err_msg.error_no;
-		strcpy(pField->ErrorMsg, m_err_msg.msg);
+		m_pApi = SPX_API_CreateHandle(&m_err_msg);
+		if (m_pApi == nullptr)
+		{
+			pField->ErrorID = m_err_msg.error_no;
+			strcpy(pField->ErrorMsg, m_err_msg.msg);
+			status = ConnectionStatus::Disconnected;
+			break;
+		}
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+
+		ReqUserLogin();
 
 		return 0;
-	}
+	} while (false);
 
-	if (m_err_msg.error_no != 0)
-	{
-		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
-
-		pField->ErrorID = m_err_msg.error_no;
-		strcpy(pField->ErrorMsg, m_err_msg.msg);
-
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-	}
-	else
-	{
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-	}
-
-	m_pApi = SPX_API_CreateHandle(&m_err_msg);
-	if (m_pApi == nullptr)
-	{
-		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
-
-		pField->ErrorID = m_err_msg.error_no;
-		strcpy(pField->ErrorMsg, m_err_msg.msg);
-
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		return 0;
-	}
-	
-	ReqUserLogin();
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, status, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 
 	return 0;
 }
 
 void CTraderApi::ReqUserLogin()
 {
+	if (m_UserInfo_Pos >= m_UserInfo_Count)
+		return;
+
 	STTraderLogin* pBody = (STTraderLogin*)m_msgQueue_Query->new_block(sizeof(STTraderLogin));
 
-	strncpy(pBody->cust_no, m_UserInfo.UserID, sizeof(TCustNoType));
-	strncpy(pBody->cust_pwd, m_UserInfo.Password, sizeof(TCustPwdType));
+	strncpy(pBody->cust_no, m_pUserInfos[m_UserInfo_Pos].UserID, sizeof(TCustNoType));
+	strncpy(pBody->cust_pwd, m_pUserInfos[m_UserInfo_Pos].Password, sizeof(TCustPwdType));
 
 	m_msgQueue_Query->Input_NoCopy(RequestType::E_ReqUserLoginField, this, nullptr, 0, 0,
 		pBody, sizeof(STTraderLogin), nullptr, 0, nullptr, 0);
@@ -185,14 +179,25 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 	{
 		if (row_num <= 0)
 		{
-			printf("返回结果为空");
+			RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+
+			pField->ErrorID = m_err_msg.error_no;
+			strcpy(pField->ErrorMsg, "返回结果为空");
+
+			m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 		}
 		else if (p_login_rsp != nullptr)
 		{
 			for (int i = 0; i<row_num; i++)
 			{
-				//cout << p_login_rsp[i].cust_name << " " << p_login_rsp[i].market_code << " " << p_login_rsp[i].holder_acc_no << endl;
+				RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
 
+				pField->TradingDay = GetDate(p_login_rsp[i].tx_date);
+				strcpy(pField->InvestorName, p_login_rsp[i].cust_name);
+				pField->ErrorID = 0;
+				sprintf(pField->ErrorMsg, "%c %s", p_login_rsp[i].market_code, p_login_rsp[i].holder_acc_no);
+
+				m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 			}
 		}
 	}
@@ -204,8 +209,10 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 		strcpy(pField->ErrorMsg, m_err_msg.msg);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		return 0;
 	}
+
+	++m_UserInfo_Pos;
+	ReqUserLogin();
 
 	return 0;
 }
@@ -275,11 +282,18 @@ bool CTraderApi::IsErrorRspInfo(STRspMsg *pRspInfo)
 
 void CTraderApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
-	UserInfoField* pUserInfo)
+	UserInfoField* pUserInfo,
+	int count)
 {
 	m_szPath = szPath;
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
+
+	m_pUserInfos = (UserInfoField*)(new char[sizeof(UserInfoField)*count]);
+	memcpy(m_pUserInfos, pUserInfo, sizeof(UserInfoField)*count);
+
+	m_UserInfo_Pos = 0;
+	m_UserInfo_Count = count;
 
 	m_msgQueue_Query->Input_NoCopy(E_Init, this, nullptr, 0, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 }

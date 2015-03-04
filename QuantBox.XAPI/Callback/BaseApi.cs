@@ -20,6 +20,7 @@ namespace QuantBox.XAPI.Callback
 
         public ServerInfoField Server;
         public UserInfoField User;
+        public List<UserInfoField> UserList = new List<UserInfoField>();
 
         public DelegateOnConnectionStatus OnConnectionStatus
         {
@@ -140,19 +141,33 @@ namespace QuantBox.XAPI.Callback
 
                 RegisterAndStart(Marshal.GetFunctionPointerForDelegate(_XRespone));
 
-
-
                 IntPtr ServerIntPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(ServerInfoField)));
                 Marshal.StructureToPtr(Server, ServerIntPtr, false);
 
-                IntPtr UserIntPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(UserInfoField)));
-                Marshal.StructureToPtr(User, UserIntPtr, false);
+                IntPtr UserListIntPtr = IntPtr.Zero;
+                int count = UserList.Count;
+
+                if (UserList.Count > 0)
+                {
+                    UserListIntPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(UserInfoField)) * count);
+
+                    for (int i = 0; i < UserList.Count; ++i)
+                    {
+                        Marshal.StructureToPtr(UserList[i], UserListIntPtr + i * Marshal.SizeOf(typeof(UserInfoField)), false);
+                    }
+                }
+                else
+                {
+                    count = 1;
+                    UserListIntPtr = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(UserInfoField)));
+                    Marshal.StructureToPtr(User, UserListIntPtr, false);
+                }
 
                 // 进行连接
-                proxy.XRequest((byte)RequestType.Connect, Handle, IntPtr.Zero, 0, 0, ServerIntPtr, 0, UserIntPtr, 0, Marshal.StringToHGlobalAnsi(Path.GetTempPath()), 0);
+                proxy.XRequest((byte)RequestType.Connect, Handle, IntPtr.Zero, 0, 0, ServerIntPtr, 0, UserListIntPtr, count, Marshal.StringToHGlobalAnsi(Path.GetTempPath()), 0);
 
                 Marshal.FreeHGlobal(ServerIntPtr);
-                Marshal.FreeHGlobal(UserIntPtr);
+                Marshal.FreeHGlobal(UserListIntPtr);
             }
 
             
@@ -255,13 +270,22 @@ namespace QuantBox.XAPI.Callback
         {
             ConnectionStatus status = (ConnectionStatus)double1;
             // 连接状态更新
-            IsConnected = (ConnectionStatus.Done == status);
+            // 这种写法是为了解决多账号登录时，先进行Done然后再Logining或Doing的问题
+            if (ConnectionStatus.Disconnected == status
+                || ConnectionStatus.Uninitialized == status)
+            {
+                IsConnected = false;
+            }
+            else if (ConnectionStatus.Done == status)
+            {
+                IsConnected = true;
+            }
 
             RspUserLoginField obj = default(RspUserLoginField);
             if(size1>0)
             {
                 obj = PInvokeUtility.GetObjectFromIntPtr<RspUserLoginField>(ptr1);
-                UserLoginField = obj;   
+                UserLoginField = obj;
             }
 
             if (OnConnectionStatus_ != null)
