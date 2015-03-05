@@ -76,8 +76,8 @@ public:
 	//	OrderField* pOrder1,
 	//	OrderField* pOrder2);
 
-	//int ReqOrderAction(const string& szId);
-	////int ReqOrderAction(CThostFtdcOrderField *pOrder);
+	int ReqOrderAction(const string& szId);
+	int ReqOrderAction(STOrderCancel *pOrder, int count);
 
 	//char* ReqQuoteInsert(
 	//	int QuoteRef,
@@ -201,7 +201,7 @@ private:
 	int							m_nSleep;
 
 	unordered_map<string, OrderField*>				m_id_platform_order;
-	//unordered_map<string, CThostFtdcOrderField*>		m_id_api_order;
+	unordered_map<string, STOrderRsp*>				m_id_api_order;
 	unordered_map<string, string>					m_sysId_orderId;
 
 	//unordered_map<string, QuoteField*>				m_id_platform_quote;

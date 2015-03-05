@@ -127,6 +127,12 @@ TMarketCodeType OrderField_2_TMarketCodeType(OrderField* pIn)
 	return '2';
 }
 
+TMarketCodeType TSecCodeType_2_TMarketCodeType(TSecCodeType* pIn)
+{
+	//if (strcmp())
+	return '1';
+}
+
 //OrderSide TThostFtdcDirectionType_2_OrderSide(TThostFtdcDirectionType In)
 //{
 //	if (In == THOST_FTDC_D_Sell)
