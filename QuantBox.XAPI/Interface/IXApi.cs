@@ -46,7 +46,7 @@ namespace QuantBox.XAPI.Interface
         void ReqQryInvestorPosition(string szInstrument, string szExchange);
         void ReqQrySettlementInfo(string szTradingDay);
         void SendOrder(int OrderRef, ref OrderField[] orders, out string[] OrderRefs);
-        int CancelOrder(string szId);
+        void CancelOrder(string[] szId,out string[] errs);
         string SendQuote(int QuoteRef, ref QuoteField quote);
         int CancelQuote(string szId);
     }

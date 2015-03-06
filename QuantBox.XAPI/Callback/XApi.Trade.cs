@@ -110,72 +110,49 @@ namespace QuantBox.XAPI.Callback
             // 从内存块中读到数据再写回
             if (ptr.ToInt64() == 0)
             {
-                //OrderRefs = new string[orders.Length];
-                //OrderRefs = null;
                 return;
             }
 
+            int ret_size = Marshal.SizeOf(typeof(OrderIDType));
+
             for(int i = 0;i<orders.Length;++i)
             {
-                OrderRefs[i] = Marshal.PtrToStringAnsi(ptr + i * 64);
+                // 这里定义一个ID占64字节
+                OrderIDType output = (OrderIDType)Marshal.PtrToStructure(ptr + i * ret_size, typeof(OrderIDType));
+
+                OrderRefs[i] = output.ID;
             }
         }
 
-
-        //public string SendOrder(int OrderRef, ref OrderField order1)
-        //{
-        //    int size = Marshal.SizeOf(typeof(OrderField));
-
-        //    IntPtr order1Ptr = Marshal.AllocHGlobal(size);
-        //    //IntPtr order2Ptr = Marshal.AllocHGlobal(size);
-        //    Marshal.StructureToPtr(order1, order1Ptr, false);
-        //    //Marshal.StructureToPtr(order2, order2Ptr, false);
-
-        //    IntPtr ptr = proxy.XRequest((byte)RequestType.ReqOrderInsert, Handle, IntPtr.Zero,
-        //        OrderRef, 0,
-        //        order1Ptr, size, IntPtr.Zero, 0, IntPtr.Zero, 0);
-
-        //    Marshal.FreeHGlobal(order1Ptr);
-        //    //Marshal.FreeHGlobal(order2Ptr);
-
-        //    if (ptr.ToInt64() == 0)
-        //        return null;
-
-        //    return Marshal.PtrToStringAnsi(ptr);
-        //}
-
-        //public string SendOrder(int OrderRef, ref OrderField order1, ref OrderField order2)
-        //{
-        //    int size = Marshal.SizeOf(typeof(OrderField));
-
-        //    IntPtr order1Ptr = Marshal.AllocHGlobal(size);
-        //    IntPtr order2Ptr = Marshal.AllocHGlobal(size);
-        //    Marshal.StructureToPtr(order1, order1Ptr, false);
-        //    Marshal.StructureToPtr(order2, order2Ptr, false);
-
-        //    IntPtr ptr = proxy.XRequest((byte)RequestType.ReqOrderInsert, Handle, IntPtr.Zero,
-        //        OrderRef, 0,
-        //        order1Ptr, size, order2Ptr, size, IntPtr.Zero, 0);
-
-        //    Marshal.FreeHGlobal(order1Ptr);
-        //    Marshal.FreeHGlobal(order2Ptr);
-
-        //    if (ptr.ToInt64() == 0)
-        //        return null;
-
-        //    return Marshal.PtrToStringAnsi(ptr);
-        //}
-
-        public int CancelOrder(string szId)
+        public void CancelOrder(string[] szId,out string[] errs)
         {
-            IntPtr szIdPtr = Marshal.StringToHGlobalAnsi(szId);
+            int size = Marshal.SizeOf(typeof(OrderIDType));
+            int sizeAll = size * szId.Length;
+
+            
+
+            IntPtr ordersPtr = Marshal.AllocHGlobal(sizeAll);
+
+            // 将结构体写成内存块
+            for (int i = 0; i < szId.Length; ++i)
+            {
+                OrderIDType _szId = new OrderIDType();
+                _szId.ID = szId[i];
+                Marshal.StructureToPtr(_szId, ordersPtr + i * size, false);
+            }
 
             IntPtr ptr = proxy.XRequest((byte)RequestType.ReqOrderAction, Handle, IntPtr.Zero, 0, 0,
-                szIdPtr, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
+                ordersPtr, szId.Length, IntPtr.Zero, 0, IntPtr.Zero, 0);
 
-            Marshal.FreeHGlobal(szIdPtr);
+            errs = new string[szId.Length];
 
-            return ptr.ToInt32();
+            for (int i = 0; i < szId.Length; ++i)
+            {
+                // 这里定义一个ID占64字节
+                OrderIDType output = (OrderIDType)Marshal.PtrToStructure(ptr + i * size, typeof(OrderIDType));
+
+                errs[i] = output.ID;
+            }
         }
 
         public string SendQuote(int QuoteRef, ref QuoteField quote)

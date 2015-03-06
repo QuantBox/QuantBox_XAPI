@@ -23,6 +23,15 @@
 
 using namespace std;
 
+struct OrderFieldEx
+{
+	OrderField Field;
+	TCustNoType         cust_no;                    ///< 客户号
+	TMarketCodeType     market_code;                ///< 市场代码（按批撤必须填入）
+	TBatchNoType        batch_no;                   ///< 批号
+	TContractNoType     order_no;                   ///< 流水号
+};
+
 class CMsgQueue;
 
 class CTraderApi
@@ -76,8 +85,8 @@ public:
 	//	OrderField* pOrder1,
 	//	OrderField* pOrder2);
 
-	int ReqOrderAction(const string& szId);
-	int ReqOrderAction(STOrderCancel *pOrder, int count);
+	OrderIDType* ReqOrderAction(OrderIDType* szId, int count);
+	OrderIDType* ReqOrderAction(OrderFieldEx *pOrder, int count);
 
 	//char* ReqQuoteInsert(
 	//	int QuoteRef,
@@ -200,9 +209,9 @@ private:
 
 	int							m_nSleep;
 
-	unordered_map<string, OrderField*>				m_id_platform_order;
-	unordered_map<string, STOrderRsp*>				m_id_api_order;
-	unordered_map<string, string>					m_sysId_orderId;
+	unordered_map<string, OrderFieldEx*>				m_id_platform_order;
+	//unordered_map<string, STOrderInfo*>				m_id_api_order;
+	//unordered_map<string, string>					m_sysId_orderId;//成交回报时使用找到原订单
 
 	//unordered_map<string, QuoteField*>				m_id_platform_quote;
 	//unordered_map<string, CThostFtdcQuoteField*>		m_id_api_quote;
@@ -216,5 +225,8 @@ private:
 	UserInfoField*				m_pUserInfos;
 	int							m_UserInfo_Pos;
 	int							m_UserInfo_Count;
+
+	OrderIDType					m_orderInsert_Ids[10];
+	STOrderCancel				m_temp_ordercancel;
 };
 

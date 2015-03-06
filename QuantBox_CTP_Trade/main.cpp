@@ -70,7 +70,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case ReqQuoteInsert:
 		return pApi->ReqQuoteInsert((int)double1, (QuoteField*)ptr1);
 	case ReqOrderAction:
-		return (void*)pApi->ReqOrderAction((const char*)ptr1);
+		return pApi->ReqOrderAction((OrderIDType*)ptr1, size1);
 	case ReqQuoteAction:
 		return (void*)pApi->ReqQuoteAction((const char*)ptr1);
 	default:

@@ -355,9 +355,6 @@ OrderIDType* CTraderApi::ReqOrderInsert(
 
 	// 如果是批量下单是不同市场，不同账号怎么办？是要自己分成两组吗？
 	// 这个下单是阻塞模式，是否得先生成编号，否则无法正常映射
-	
-	int req_no = 0;
-
 	int row_num = 0;
 	STOrder *p_order_req = new STOrder[count];
 	STOrderRsp *p_order_rsp = NULL;
@@ -391,6 +388,18 @@ OrderIDType* CTraderApi::ReqOrderInsert(
 					pOrder[i].Status = OrderStatus::New;
 
 					sprintf(pOrder[i].ID, "%d", p_order_rsp[i].order_no);
+					strncpy(m_orderInsert_Ids[i], pOrder[i].ID, sizeof(OrderIDType));
+
+					{
+						OrderFieldEx* pField = (OrderFieldEx*)m_msgQueue->new_block(sizeof(OrderFieldEx));
+						memcpy(&pField->Field, &pOrder[i], sizeof(OrderField));
+
+						pField->batch_no = p_order_rsp[i].batch_no;
+						pField->order_no = p_order_rsp[i].order_no;
+						pField->market_code = smarket_code[0];
+
+						m_id_platform_order.insert(pair<string, OrderFieldEx*>(m_orderInsert_Ids[i], pField));
+					}
 				}
 				else
 				{
@@ -435,16 +444,86 @@ OrderIDType* CTraderApi::ReqOrderInsert(
 
 	delete[] p_order_req;
 
-	return nullptr;
+	return &m_orderInsert_Ids[0];
 }
 
-int CTraderApi::ReqOrderAction(const string& szId)
+OrderIDType* CTraderApi::ReqOrderAction(OrderIDType* szId, int count)
 {
+	OrderFieldEx *pOrder = new OrderFieldEx[count];
+
+	for (int i = 0; i < count; ++i)
+	{
+		unordered_map<string, OrderFieldEx*>::iterator it = m_id_platform_order.find(szId[0]);
+		if (it == m_id_platform_order.end())
+		{
+			// 没找到怎么办？第一个就没找到怎么办？
+			if (i>0)
+				memcpy(&pOrder[i], &pOrder[i-1], sizeof(OrderFieldEx));
+
+			pOrder[i].order_no = atoi(szId[i]);
+		}
+		else
+		{
+			memcpy(&pOrder[i], it->second, sizeof(OrderFieldEx));
+		}
+	}
+
+	ReqOrderAction(pOrder, count);
+	
 	return 0;
 }
 
-int CTraderApi::ReqOrderAction(STOrderCancel *pOrder, int count)
+void BuildCancelOrder(OrderFieldEx* pIn, STOrderCancel* pOut)
 {
+	strcpy(pOut->cust_no,pIn->cust_no);
+	pOut->market_code = pIn->market_code;
+	pOut->ordercancel_type = 1;
+	pOut->order_no = pIn->order_no;
+}
+
+OrderIDType* CTraderApi::ReqOrderAction(OrderFieldEx* pOrder, int count)
+{
+	int row_num = 0;
+
+	STOrderCancel *p_ordercancel_req = new STOrderCancel[count];
+	STOrderCancelRsp *p_ordercancel_rsp = NULL;
+
+	for (int i = 0; i < count; ++i)
+	{
+		BuildCancelOrder(&pOrder[i], &p_ordercancel_req[i]);
+	}
+
+	bool bRet = SPX_API_OrderCancel(m_pApi, p_ordercancel_req, &p_ordercancel_rsp, count, &row_num, &m_err_msg);
+
+	if (bRet && m_err_msg.error_no == 0)
+	{
+		if (p_ordercancel_rsp != NULL)
+		{
+			for (int i = 0; i<row_num; i++)
+			{
+				if (p_ordercancel_rsp[i].error_no == 0)
+				{
+					//cout << "Cancel Order NO: " << p_ordercancel_req[i].order_no << endl;
+				}
+				else
+				{
+					//cout << "OrderCancel Error: " << p_ordercancel_rsp[i].error_no << " " << p_ordercancel_rsp[i].err_msg << endl;
+				}
+			}
+		}
+		else
+		{
+			//cout << "返回结果为空" << endl;
+		}
+	}
+	else
+	{
+		//cout << "OrderCancel error:" << err_msg.error_no << err_msg.msg << endl;
+
+	}
+
+	delete[] p_ordercancel_req;
+
 	return 0;
 }
 

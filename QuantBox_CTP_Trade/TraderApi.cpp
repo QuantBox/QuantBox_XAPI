@@ -628,29 +628,22 @@ void CTraderApi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	OnTrade(pTrade);
 }
 
-int CTraderApi::ReqOrderAction(const string& szId)
+OrderIDType* CTraderApi::ReqOrderAction(OrderIDType* szIds, int count)
 {
-	unordered_map<string, CThostFtdcOrderField*>::iterator it = m_id_api_order.find(szId);
+	unordered_map<string, CThostFtdcOrderField*>::iterator it = m_id_api_order.find(szIds[0]);
 	if (it == m_id_api_order.end())
 	{
-		// <error id="ORDER_NOT_FOUND" value="25" prompt="CTP:撤单找不到相应报单"/>
-		//ErrorField field = { 0 };
-		//field.ErrorID = 25;
-		//sprintf(field.ErrorMsg, "ORDER_NOT_FOUND");
-
-		////TODO:应当通过报单回报通知订单找不到
-
-		//XRespone(ResponeType::OnRtnError, m_msgQueue, this, 0, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
-		return -100;
+		sprintf(m_orderAction_Id, "%d", -100);
+		return &m_orderAction_Id;
 	}
 	else
 	{
 		// 找到了订单
-		return ReqOrderAction(it->second);
+		return ReqOrderAction(it->second,count);
 	}
 }
 
-int CTraderApi::ReqOrderAction(CThostFtdcOrderField *pOrder)
+OrderIDType* CTraderApi::ReqOrderAction(CThostFtdcOrderField *pOrder, int count)
 {
 	if (nullptr == m_pApi)
 		return 0;
@@ -677,7 +670,16 @@ int CTraderApi::ReqOrderAction(CThostFtdcOrderField *pOrder)
 	strncpy(body.InstrumentID, pOrder->InstrumentID,sizeof(TThostFtdcInstrumentIDType));
 
 	int nRet = m_pApi->ReqOrderAction(&body, ++m_lRequestID);
-	return nRet;
+	if (nRet < 0)
+	{
+		sprintf(m_orderAction_Id, "%d", nRet);
+	}
+	else
+	{
+		memset(m_orderAction_Id, 0, sizeof(OrderIDType));
+	}
+	
+	return &m_orderAction_Id;
 }
 
 void CTraderApi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

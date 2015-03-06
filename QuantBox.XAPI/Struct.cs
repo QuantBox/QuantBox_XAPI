@@ -638,6 +638,13 @@ namespace QuantBox.XAPI
         public string Account;
     }
 
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct OrderIDType
+    {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string ID;
+    }
+
     /// <summary>
     /// 订单信息
     /// </summary>
