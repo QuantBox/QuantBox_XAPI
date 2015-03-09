@@ -25,8 +25,8 @@ TMarketCodeType OrderField_2_TMarketCodeType(OrderField* pIn);
 //OrderType CThostFtdcOrderField_2_OrderType(CThostFtdcOrderField* pIn);
 //TimeInForce CThostFtdcOrderField_2_TimeInForce(CThostFtdcOrderField* pIn);
 //
-//OrderStatus CThostFtdcOrderField_2_OrderStatus(CThostFtdcOrderField* pIn);
-//ExecType CThostFtdcOrderField_2_ExecType(CThostFtdcOrderField* pIn);
+OrderStatus TOrderStatusType_2_OrderStatus(TOrderStatusType In);
+ExecType TOrderStatusType_2_ExecType(TOrderStatusType In);
 //
 //OrderStatus CThostFtdcQuoteField_2_OrderStatus(CThostFtdcQuoteField* pIn);
 //ExecType CThostFtdcQuoteField_2_ExecType(CThostFtdcQuoteField* pIn);

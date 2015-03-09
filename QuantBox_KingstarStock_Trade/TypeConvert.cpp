@@ -133,6 +133,56 @@ TMarketCodeType TSecCodeType_2_TMarketCodeType(TSecCodeType* pIn)
 	return '1';
 }
 
+OrderStatus TOrderStatusType_2_OrderStatus(TOrderStatusType In)
+{
+	switch (In)
+	{
+	case 0:
+	case '0':
+	case '1':
+	case '2':
+	case '3':
+		return OrderStatus::New;
+	case '5':
+	case '6':
+		return OrderStatus::Cancelled;
+	case '7':
+		return OrderStatus::PartiallyFilled;
+	case '8':
+		return OrderStatus::Filled;
+	case '9':
+	case 'A':
+		return OrderStatus::Rejected;
+	default:
+		return OrderStatus::New;
+	}
+}
+
+ExecType TOrderStatusType_2_ExecType(TOrderStatusType In)
+{
+	switch (In)
+	{
+	case 0:
+	case '0':
+	case '1':
+	case '2':
+	case '3':
+		return ExecType::ExecNew;
+	case '5':
+	case '6':
+		return ExecType::ExecCancelled;
+	case '7':
+		return ExecType::ExecTrade;
+	case '8':
+		return ExecType::ExecTrade;
+	case '9':
+	case 'A':
+		return ExecType::ExecRejected;
+	default:
+		return ExecType::ExecNew;
+	}
+}
+
 //OrderSide TThostFtdcDirectionType_2_OrderSide(TThostFtdcDirectionType In)
 //{
 //	if (In == THOST_FTDC_D_Sell)

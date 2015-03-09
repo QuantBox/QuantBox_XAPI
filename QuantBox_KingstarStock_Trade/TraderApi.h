@@ -28,6 +28,7 @@ struct OrderFieldEx
 	OrderField Field;
 	TCustNoType         cust_no;                    ///< 客户号
 	TMarketCodeType     market_code;                ///< 市场代码（按批撤必须填入）
+	THolderNoType       holder_acc_no;              ///< 股东帐号
 	TBatchNoType        batch_no;                   ///< 批号
 	TContractNoType     order_no;                   ///< 流水号
 };
@@ -76,7 +77,8 @@ public:
 		int count);
 	void Disconnect();
 
-	OrderIDType* ReqOrderInsert(
+	int ReqOrderInsert(
+		OrderIDType* pOutput,
 		int OrderRef,
 		OrderField* pOrder,
 		int count);
@@ -85,8 +87,8 @@ public:
 	//	OrderField* pOrder1,
 	//	OrderField* pOrder2);
 
-	OrderIDType* ReqOrderAction(OrderIDType* szId, int count);
-	OrderIDType* ReqOrderAction(OrderFieldEx *pOrder, int count);
+	int ReqOrderAction(OrderIDType* pOutput, OrderIDType* szId, int count);
+	int ReqOrderAction(OrderIDType* pOutput, OrderFieldEx *pOrder, int count);
 
 	//char* ReqQuoteInsert(
 	//	int QuoteRef,
@@ -104,8 +106,8 @@ public:
 	//void ReqQryDepthMarketData(const string& szInstrumentId);
 	//void ReqQrySettlementInfo(const string& szTradingDay);
 
-	//void ReqQryOrder();
-	//void ReqQryTrade();
+	void ReqQryOrder(TCustNoType cust_no);
+	void ReqQryTrade(TCustNoType cust_no);
 	//void ReqQryQuote();
 
 	
@@ -121,6 +123,10 @@ private:
 	//登录请求
 	void ReqUserLogin();
 	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	int _ReqQryOrder(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	int _ReqQryTrade(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
 
 	void OnPST16203PushData(PST16203PushData pEtxPushData);
 	void OnPST16204PushData(PST16204PushData pEtxPushData);
@@ -226,7 +232,6 @@ private:
 	int							m_UserInfo_Pos;
 	int							m_UserInfo_Count;
 
-	OrderIDType					m_orderInsert_Ids[10];
 	STOrderCancel				m_temp_ordercancel;
 };
 

@@ -422,13 +422,14 @@ void CTraderApi::Clear()
 	m_id_platform_position.clear();
 }
 
-OrderIDType* CTraderApi::ReqOrderInsert(
+int CTraderApi::ReqOrderInsert(
+	OrderIDType* pOutput,
 	int OrderRef,
 	OrderField* pOrder,
 	int count)
 {
 	if (nullptr == m_pApi)
-		return nullptr;
+		return -1;
 
 	CThostFtdcInputOrderField body = {0};
 
@@ -542,7 +543,7 @@ OrderIDType* CTraderApi::ReqOrderInsert(
 		if (n < 0)
 		{
 			nRet = n;
-			return nullptr;
+			sprintf(m_orderInsert_Id, "%d", nRet);
 		}
 		else
 		{
@@ -553,10 +554,12 @@ OrderIDType* CTraderApi::ReqOrderInsert(
 			memcpy(pField, pOrder, sizeof(OrderField));
 			strcpy(pField->ID, m_orderInsert_Id);
 			m_id_platform_order.insert(pair<string, OrderField*>(m_orderInsert_Id, pField));
+
 		}
+		strncpy((char*)pOutput, m_orderInsert_Id, sizeof(OrderIDType));
 	}
 
-	return &m_orderInsert_Id;
+	return nRet;
 }
 
 void CTraderApi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -628,22 +631,22 @@ void CTraderApi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	OnTrade(pTrade);
 }
 
-OrderIDType* CTraderApi::ReqOrderAction(OrderIDType* szIds, int count)
+int CTraderApi::ReqOrderAction(OrderIDType* pOutput, OrderIDType* szIds, int count)
 {
 	unordered_map<string, CThostFtdcOrderField*>::iterator it = m_id_api_order.find(szIds[0]);
 	if (it == m_id_api_order.end())
 	{
-		sprintf(m_orderAction_Id, "%d", -100);
-		return &m_orderAction_Id;
+		sprintf((char*)pOutput, "%d", -100);
+		return -100;
 	}
 	else
 	{
 		// ÕÒµ½ÁË¶©µ¥
-		return ReqOrderAction(it->second,count);
+		return ReqOrderAction(pOutput,it->second, count);
 	}
 }
 
-OrderIDType* CTraderApi::ReqOrderAction(CThostFtdcOrderField *pOrder, int count)
+int CTraderApi::ReqOrderAction(OrderIDType* pOutput, CThostFtdcOrderField *pOrder, int count)
 {
 	if (nullptr == m_pApi)
 		return 0;
@@ -678,8 +681,10 @@ OrderIDType* CTraderApi::ReqOrderAction(CThostFtdcOrderField *pOrder, int count)
 	{
 		memset(m_orderAction_Id, 0, sizeof(OrderIDType));
 	}
+	strncpy((char*)pOutput, m_orderAction_Id, sizeof(OrderIDType));
+
 	
-	return &m_orderAction_Id;
+	return nRet;
 }
 
 void CTraderApi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

@@ -69,7 +69,8 @@ public:
 		int count);
 	void Disconnect();
 
-	OrderIDType* ReqOrderInsert(
+	int ReqOrderInsert(
+		OrderIDType* pOutput,
 		int OrderRef,
 		OrderField* pOrder,
 		int count);
@@ -78,8 +79,8 @@ public:
 		OrderField* pOrder1,
 		OrderField* pOrder2);
 
-	OrderIDType* ReqOrderAction(OrderIDType* szIds, int count);
-	OrderIDType* ReqOrderAction(CThostFtdcOrderField *pOrder, int count);
+	int ReqOrderAction(OrderIDType* pOutput, OrderIDType* szIds, int count);
+	int ReqOrderAction(OrderIDType* pOutput, CThostFtdcOrderField *pOrder, int count);
 
 	char* ReqQuoteInsert(
 		int QuoteRef,
