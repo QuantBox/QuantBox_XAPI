@@ -151,6 +151,7 @@ int CTraderApi::_Init()
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
+		// 登录第一个
 		ReqUserLogin();
 
 		return 0;
@@ -208,7 +209,9 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 
 				m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 
+				// 登录时查询此账号下的所有报单与成交
 				ReqQryOrder(p_login_req[0].cust_no);
+				ReqQryTrade(p_login_req[0].cust_no);
 			}
 		}
 	}
@@ -222,6 +225,7 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
 
+	// 登录下一个账号
 	++m_UserInfo_Pos;
 	ReqUserLogin();
 
@@ -376,12 +380,19 @@ int CTraderApi::ReqOrderInsert(
 		BuildOrder(&pOrder[i], &p_order_req[i]);
 	}
 
-	char scust_no[11] = "0000000013";
-	char smarket_code[2] = "1";
-	char sholder_acc_no[15] = "A780891297";
-	char sorder_type[2] = "0";
+	//char scust_no[11] = "0000000013";
+	char smarket_code[2] = "1";// 如何得到？
+	//char sholder_acc_no[15] = "A780891297";
+	char sorder_type[2] = "0";// 如何指定？
 
-	bool bRet = SPX_API_Order(m_pApi, pOrder[0].Account, smarket_code, sholder_acc_no, sorder_type, p_order_req, &p_order_rsp, count, &row_num, &m_err_msg);
+	// 先看是否指定了市场，没有就进行计算
+
+	if (strlen(pOrder[0].Account) == 0)
+	{
+		strncpy(pOrder[0].Account, m_UserInfo.UserID, sizeof(AccountIDType));
+	}
+
+	bool bRet = SPX_API_Order(m_pApi, pOrder[0].ClientID, smarket_code, pOrder[0].Account, sorder_type, p_order_req, &p_order_rsp, count, &row_num, &m_err_msg);
 
 	if (bRet && m_err_msg.error_no == 0)
 	{
@@ -404,8 +415,8 @@ int CTraderApi::ReqOrderInsert(
 						OrderFieldEx* pField = (OrderFieldEx*)m_msgQueue->new_block(sizeof(OrderFieldEx));
 						memcpy(&pField->Field, &pOrder[i], sizeof(OrderField));
 
-						strncpy(pField->cust_no, scust_no, sizeof(TCustNoType));
-						strncpy(pField->holder_acc_no, sholder_acc_no, sizeof(THolderNoType));
+						strncpy(pField->cust_no, pOrder[0].ClientID, sizeof(TCustNoType));
+						strncpy(pField->holder_acc_no, pOrder[0].Account, sizeof(THolderNoType));
 						pField->batch_no = p_order_rsp[i].batch_no;
 						pField->order_no = p_order_rsp[i].order_no;
 						pField->market_code = smarket_code[0];
@@ -416,10 +427,15 @@ int CTraderApi::ReqOrderInsert(
 				else
 				{
 					// 订单号没有生成，但需要返回订单号
+					sprintf(pOrder[i].ID, "XAPI:%d", time(nullptr)*100 + i);
+					strncpy(pOutput[i], pOrder[i].ID, sizeof(OrderIDType));
+
 					pOrder[i].ExecType = ExecType::ExecRejected;
 					pOrder[i].Status = OrderStatus::Rejected;
 				}
 
+				// 在下单时就立即返回了事件
+				// 如果这个事件比函数返回数据区更快呢？处理下来将产生不可预计的错误
 				m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, &pOrder[i], sizeof(OrderField), nullptr, 0, nullptr, 0);
 			}
 		}
@@ -428,6 +444,8 @@ int CTraderApi::ReqOrderInsert(
 			for (int i = 0; i < count; ++i)
 			{
 				// 订单号没有生成，但需要返回订单号
+				sprintf(pOrder[i].ID, "XAPI:%d", time(nullptr) * 100 + i);
+				strncpy(pOutput[i], pOrder[i].ID, sizeof(OrderIDType));
 
 				pOrder[i].ErrorID = m_err_msg.error_no;
 				strcpy(pOrder[i].Text, "返回结果为空");
@@ -444,6 +462,8 @@ int CTraderApi::ReqOrderInsert(
 		for (int i = 0; i < count; ++i)
 		{
 			// 订单号没有生成，但需要返回订单号
+			sprintf(pOrder[i].ID, "XAPI:%d", time(nullptr) * 100 + i);
+			strncpy(pOutput[i], pOrder[i].ID, sizeof(OrderIDType));
 
 			pOrder[i].ErrorID = m_err_msg.error_no;
 			strcpy(pOrder[i].Text, m_err_msg.msg);
@@ -457,7 +477,7 @@ int CTraderApi::ReqOrderInsert(
 	delete[] p_order_req;
 
 	// 应当启动线程，进行可撤单查询
-	ReqQryOrder(scust_no);
+	ReqQryOrder(pOrder[0].ClientID);
 	
 	return 0;
 }
@@ -530,7 +550,8 @@ int CTraderApi::ReqOrderAction(OrderIDType* pOutput, OrderFieldEx* pOrder, int c
 				}
 				else
 				{
-					sprintf(pOutput[i],"%d",p_ordercancel_rsp[i].error_no);
+					memset(pOutput[i], 0, sizeof(OrderIDType));
+					//sprintf(pOutput[i],"%d",p_ordercancel_rsp[i].error_no);
 
 					pOrder[i].Field.ErrorID = p_ordercancel_rsp[i].error_no;
 					strncpy(pOrder[i].Field.Text, p_ordercancel_rsp[i].err_msg, sizeof(ErrorMsgType));
@@ -546,7 +567,8 @@ int CTraderApi::ReqOrderAction(OrderIDType* pOutput, OrderFieldEx* pOrder, int c
 		{
 			for (int i = 0; i < count; ++i)
 			{
-				sprintf(pOutput[i], "%d", 0);
+				//sprintf(pOutput[i], "%d", 0);
+				memset(pOutput[i], 0, sizeof(OrderIDType));
 
 				pOrder[i].Field.ErrorID = 0;
 				strcpy(pOrder[i].Field.Text, "返回结果为空");
@@ -562,7 +584,8 @@ int CTraderApi::ReqOrderAction(OrderIDType* pOutput, OrderFieldEx* pOrder, int c
 		// 出错了，全输出
 		for (int i = 0; i < count; ++i)
 		{
-			sprintf(pOutput[i], "%d", m_err_msg.error_no);
+			//sprintf(pOutput[i], "%d", m_err_msg.error_no);
+			memset(pOutput[i], 0, sizeof(OrderIDType));
 
 			pOrder[i].Field.ErrorID = m_err_msg.error_no;
 			strcpy(pOrder[i].Field.Text, m_err_msg.msg);
@@ -605,8 +628,6 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 		{
 			for (int i = 0; i<row_num; i++)
 			{
-				//cout << p_qry_order_rsp[i].market_code << " " << p_qry_order_rsp[i].sec_code << " " << p_qry_order_rsp[i].batch_no << " " << p_qry_order_rsp[i].order_no << " " << p_qry_order_rsp[i].bs << " ";
-				//cout << p_qry_order_rsp[i].order_date << " " << p_qry_order_rsp[i].price << " " << p_qry_order_rsp[i].order_vol << " " << p_qry_order_rsp[i].order_status << " " << p_qry_order_rsp[i].done_price << endl;
 				OrderIDType ID = { 0 };
 				sprintf(ID,"%d",p_qry_order_rsp[i].order_no);
 
@@ -661,16 +682,22 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 		{
 			//cout << "返回结果为空" << endl;
 			// 反回为空，表示已经查过一次，没有新的生成，不用处理
+			// 但如果是多账号，会出现对每个查询都自动变成全量了，看来是游标被重置了,如何处理
 			//return 0;
 		}
 	}
 	else
 	{
 		//cout << "QueryOrder error:" << err_msg.error_no << err_msg.msg << endl;
+		ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
 
+		pField->ErrorID = m_err_msg.error_no;
+		strcpy(pField->ErrorMsg, m_err_msg.msg);
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, this, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
 
-	return -1;
+	return 0;
 }
 
 void CTraderApi::ReqQryTrade(TCustNoType cust_no)
@@ -702,7 +729,51 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 			{
 				//cout << p_qry_order_rsp[i].market_code << " " << p_qry_order_rsp[i].sec_code << " " << p_qry_order_rsp[i].batch_no << " " << p_qry_order_rsp[i].order_no << " " << p_qry_order_rsp[i].bs << " ";
 				//cout << p_qry_order_rsp[i].order_date << " " << p_qry_order_rsp[i].price << " " << p_qry_order_rsp[i].order_vol << " " << p_qry_order_rsp[i].order_status << " " << p_qry_order_rsp[i].done_price << endl;
+				TradeField* pField = (TradeField*)m_msgQueue->new_block(sizeof(TradeField));
+				strcpy(pField->InstrumentID, p_qry_done_rsp[i].sec_code);
+				sprintf(pField->ExchangeID, "%c", p_qry_done_rsp[i].market_code);
 
+				pField->Side = TBSFLAG_2_OrderSide(p_qry_done_rsp[i].bs);
+				pField->Qty = p_qry_done_rsp[i].done_vol;
+				pField->Price = p_qry_done_rsp[i].done_price;
+				//pField->OpenClose = TThostFtdcOffsetFlagType_2_OpenCloseType(pTrade->OffsetFlag);
+				//pField->HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pTrade->HedgeFlag);
+				pField->Commission = 0;//TODO收续费以后要计算出来
+				pField->Time = p_qry_done_rsp[i].done_time;
+				strcpy(pField->TradeID, p_qry_done_rsp[i].done_no);
+				sprintf(pField->ID, "%d", p_qry_done_rsp[i].order_no);
+
+				m_msgQueue->Input_Copy(ResponeType::OnRtnTrade, m_msgQueue, this, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+
+				//OrderIDType orderSysId = { 0 };
+				//sprintf(orderSysId, "%s:%s", pTrade->ExchangeID, pTrade->OrderSysID);
+				//unordered_map<string, string>::iterator it = m_sysId_orderId.find(pField->ID);
+				//if (it == m_sysId_orderId.end())
+				//{
+				//	// 此成交找不到对应的报单
+				//	//assert(false);
+				//}
+				//else
+				//{
+				//	// 找到对应的报单
+				//	strcpy(pField->ID, it->second.c_str());
+
+				//	
+
+				//	//unordered_map<string, OrderField*>::iterator it2 = m_id_platform_order.find(it->second);
+				//	//if (it2 == m_id_platform_order.end())
+				//	//{
+				//	//	// 此成交找不到对应的报单
+				//	//	//assert(false);
+				//	//}
+				//	//else
+				//	//{
+				//	//	// 更新订单的状态
+				//	//	// 是否要通知接口
+				//	//}
+
+				//	//OnTrade(pField);
+				//}
 			}
 		}
 		else
@@ -713,10 +784,19 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 	else
 	{
 		//cout << "QueryOrder error:" << err_msg.error_no << err_msg.msg << endl;
+		ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
 
+		pField->ErrorID = m_err_msg.error_no;
+		strcpy(pField->ErrorMsg, m_err_msg.msg);
 
+		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, this, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
 	return 0;
+}
+
+void CTraderApi::ReqQryInstrument(const string& szInstrumentId, const string& szExchange)
+{
+
 }
 
 void CTraderApi::OnPST16203PushData(PST16203PushData pEtxPushData)
@@ -727,83 +807,20 @@ void CTraderApi::OnPST16203PushData(PST16203PushData pEtxPushData)
 	ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
 
 	//pField->ErrorID = pRspInfo->error_no;
-	sprintf(pField->ErrorMsg,"%s",pEtxPushData->order_status_name);
+	sprintf(pField->ErrorMsg,"OnPST16203PushData %s",pEtxPushData->order_status_name);
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, this, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
-
-	//sprintf(orderId, "%d:%d:%s", pEtxPushData->batch_no, pOrder->SessionID, pOrder->OrderRef);
-	//OrderIDType orderSydId = { 0 };
-
-	//{
-	//	// 保存原始订单信息，用于撤单
-
-	//	unordered_map<string, CThostFtdcOrderField*>::iterator it = m_id_api_order.find(orderId);
-	//	if (it == m_id_api_order.end())
-	//	{
-	//		// 找不到此订单，表示是新单
-	//		CThostFtdcOrderField* pField = new CThostFtdcOrderField();
-	//		memcpy(pField, pOrder, sizeof(CThostFtdcOrderField));
-	//		m_id_api_order.insert(pair<string, CThostFtdcOrderField*>(orderId, pField));
-	//	}
-	//	else
-	//	{
-	//		// 找到了订单
-	//		// 需要再复制保存最后一次的状态，还是只要第一次的用于撤单即可？记下，这样最后好比较
-	//		CThostFtdcOrderField* pField = it->second;
-	//		memcpy(pField, pOrder, sizeof(CThostFtdcOrderField));
-	//	}
-
-	//	// 保存SysID用于定义成交回报与订单
-	//	sprintf(orderSydId, "%s:%s", pOrder->ExchangeID, pOrder->OrderSysID);
-	//	m_sysId_orderId.insert(pair<string, string>(orderSydId, orderId));
-	//}
-
-	//{
-	//	// 从API的订单转换成自己的结构体
-
-	//	OrderField* pField = nullptr;
-	//	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
-	//	if (it == m_id_platform_order.end())
-	//	{
-	//		// 开盘时发单信息还没有，所以找不到对应的单子，需要进行Order的恢复
-	//		pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
-	//		strcpy(pField->ID, orderId);
-	//		strcpy(pField->InstrumentID, pOrder->InstrumentID);
-	//		strcpy(pField->ExchangeID, pOrder->ExchangeID);
-	//		pField->HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pOrder->CombHedgeFlag[0]);
-	//		pField->Side = TThostFtdcDirectionType_2_OrderSide(pOrder->Direction);
-	//		pField->Price = pOrder->LimitPrice;
-	//		pField->StopPx = pOrder->StopPrice;
-	//		strncpy(pField->Text, pOrder->StatusMsg, sizeof(ErrorMsgType));
-	//		pField->OpenClose = TThostFtdcOffsetFlagType_2_OpenCloseType(pOrder->CombOffsetFlag[0]);
-	//		pField->Status = CThostFtdcOrderField_2_OrderStatus(pOrder);
-	//		pField->Qty = pOrder->VolumeTotalOriginal;
-	//		pField->Type = CThostFtdcOrderField_2_OrderType(pOrder);
-	//		pField->TimeInForce = CThostFtdcOrderField_2_TimeInForce(pOrder);
-	//		pField->ExecType = ExecType::ExecNew;
-	//		strcpy(pField->OrderID, pOrder->OrderSysID);
-
-
-	//		// 添加到map中，用于其它工具的读取，撤单失败时的再通知等
-	//		m_id_platform_order.insert(pair<string, OrderField*>(orderId, pField));
-	//	}
-	//	else
-	//	{
-	//		pField = it->second;
-	//		strcpy(pField->ID, orderId);
-	//		pField->LeavesQty = pOrder->VolumeTotal;
-	//		pField->Price = pOrder->LimitPrice;
-	//		pField->Status = CThostFtdcOrderField_2_OrderStatus(pOrder);
-	//		pField->ExecType = CThostFtdcOrderField_2_ExecType(pOrder);
-	//		strcpy(pField->OrderID, pOrder->OrderSysID);
-	//		strncpy(pField->Text, pOrder->StatusMsg, sizeof(ErrorMsgType));
-	//	}
-
-	//	m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
-	//}
 }
 
 void CTraderApi::OnPST16204PushData(PST16204PushData pEtxPushData)
 {
+	OrderIDType orderId = { 0 };
 
+	// 只是打印成交
+	ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
+
+	//pField->ErrorID = pRspInfo->error_no;
+	sprintf(pField->ErrorMsg, "OnPST16204PushData %s", pEtxPushData->order_status_name);
+
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, this, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 }

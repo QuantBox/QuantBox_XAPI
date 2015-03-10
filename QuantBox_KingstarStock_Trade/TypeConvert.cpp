@@ -81,8 +81,10 @@ void OrderField_2_TBSType(OrderField* pIn, PSTOrder pOut)
 	{
 	case OrderSide::Sell:
 		strcpy(pOut->bs, "1");
+		break;
 	case OrderSide::Buy:
 		strcpy(pOut->bs, "1");
+		break;
 	default:
 		break;
 	}
@@ -96,6 +98,19 @@ void OrderField_2_TBSType(OrderField* pIn, PSTOrder pOut)
 	//default:
 	//	break;
 	//}
+}
+
+OrderSide TBSFLAG_2_OrderSide(TBSFLAG In)
+{
+	switch (In)
+	{
+	case '1':
+		return OrderSide::Buy;
+	case '2':
+		return OrderSide::Sell;
+	default:
+		return OrderSide::Buy;
+	}
 }
 
 void OrderField_2_TMarketOrderFlagType(OrderField* pIn, PSTOrder pOut)
@@ -123,8 +138,24 @@ TMarketCodeType OrderField_2_TMarketCodeType(OrderField* pIn)
 {
 	// 1.合约导入时就导入了对应的市场代码
 	// 2.没有对应的市场代码，只能从合约名中取
-	return '1';
-	return '2';
+	if (pIn->ExchangeID[0] != 0)
+		return pIn->ExchangeID[0];
+
+	int code = atoi(pIn->InstrumentID);
+	if (code>500000)
+	{
+		// 600000
+		// 515050
+
+		// 上海A股
+		return '1';
+	}
+	else if (code>0)
+	{
+		// 000000
+		// 300000
+		return '2';
+	}
 }
 
 TMarketCodeType TSecCodeType_2_TMarketCodeType(TSecCodeType* pIn)

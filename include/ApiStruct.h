@@ -81,6 +81,7 @@ struct OrderField
 
 	OrderIDType ID;
 	OrderIDType OrderID;
+	UserIDType ClientID;
 	AccountIDType Account;
 };
 

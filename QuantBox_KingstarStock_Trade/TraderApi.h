@@ -100,7 +100,7 @@ public:
 	//void ReqQryTradingAccount();
 	//void ReqQryInvestorPosition(const string& szInstrumentId, const string& szExchange);
 	//void ReqQryInvestorPositionDetail(const string& szInstrumentId);
-	//void ReqQryInstrument(const string& szInstrumentId, const string& szExchange);
+	void ReqQryInstrument(const string& szInstrumentId, const string& szExchange);
 	//void ReqQryInstrumentCommissionRate(const string& szInstrumentId);
 	////void ReqQryInstrumentMarginRate(const string& szInstrumentId,TThostFtdcHedgeFlagType HedgeFlag = THOST_FTDC_HF_Speculation);
 	//void ReqQryDepthMarketData(const string& szInstrumentId);

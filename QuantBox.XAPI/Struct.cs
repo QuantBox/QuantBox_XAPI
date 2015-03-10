@@ -635,6 +635,8 @@ namespace QuantBox.XAPI
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
         public string OrderID;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+        public string ClientID;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         public string Account;
     }
 

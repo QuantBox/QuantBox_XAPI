@@ -2,7 +2,7 @@
 
 #include "../include/Kingstar_Stock/SPXAPI_struct.h"
 #include "../include/ApiStruct.h"
-
+#include <stdlib.h>
 
 //PutCall TThostFtdcOptionsTypeType_2_PutCall(TThostFtdcOptionsTypeType In);
 
@@ -13,6 +13,7 @@
 //OpenCloseType TThostFtdcOffsetFlagType_2_OpenCloseType(TThostFtdcOffsetFlagType In);
 
 void OrderField_2_TBSType(OrderField* pIn, PSTOrder pOut);
+OrderSide TBSFLAG_2_OrderSide(TBSFLAG In);
 void OrderField_2_TMarketOrderFlagType(OrderField* pIn, PSTOrder pOut);
 TMarketCodeType OrderField_2_TMarketCodeType(OrderField* pIn);
 
