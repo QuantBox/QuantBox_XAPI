@@ -58,7 +58,7 @@ void CMsgQueue::StopThread()
 {
     m_bRunning = false;
 	m_cv.notify_all();
-	//lock_guard<mutex> cl(m_mtx);
+	lock_guard<mutex> cl(m_mtx_del);
     if(m_hThread)
     {
         m_hThread->join();

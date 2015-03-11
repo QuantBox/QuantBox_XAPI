@@ -10,6 +10,7 @@
 #include "../include/QueueHeader.h"
 #include "../include/QueueStruct.h"
 #include "readerwriterqueue.h"
+#include "concurrentqueue.h"
 
 using namespace std;
 using namespace moodycamel;
@@ -174,9 +175,11 @@ private:
 private:
 	volatile bool						m_bRunning;
 	mutex								m_mtx;
+	mutex								m_mtx_del;
 	condition_variable					m_cv;
 	thread*								m_hThread;
-	ReaderWriterQueue<ResponeItem*>		m_queue;
+	//ReaderWriterQueue<ResponeItem*>		m_queue;
+	ConcurrentQueue<ResponeItem*>		m_queue;
 	fnOnRespone							m_fnOnRespone;
 };
 
