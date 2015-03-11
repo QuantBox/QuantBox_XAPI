@@ -67,10 +67,12 @@ public:
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
-		UserInfoField* pUserInfo);
+		UserInfoField* pUserInfo,
+		int count);
 	void Disconnect();
 
-	OrderIDType* ReqOrderInsert(
+	int ReqOrderInsert(
+		OrderIDType* pOutput,
 		int OrderRef,
 		OrderField* pOrder,
 		int count);
@@ -79,8 +81,8 @@ public:
 		OrderField* pOrder1,
 		OrderField* pOrder2);
 
-	int ReqOrderAction(const string& szId);
-	int ReqOrderAction(CThostFtdcOrderField *pOrder);
+	int ReqOrderAction(OrderIDType* pOutput, OrderIDType* szIds, int count);
+	int ReqOrderAction(OrderIDType* pOutput, CThostFtdcOrderField *pOrder, int count);
 
 	char* ReqQuoteInsert(
 		int QuoteRef,
@@ -204,6 +206,7 @@ private:
 	CThostFtdcInvestorField		m_Investor;
 
 	OrderIDType					m_orderInsert_Id;
+	OrderIDType					m_orderAction_Id;
 
 	mutex						m_csOrderRef;
 	int							m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增

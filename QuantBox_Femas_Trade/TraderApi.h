@@ -64,13 +64,14 @@ public:
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	OrderIDType* ReqOrderInsert(
+	int ReqOrderInsert(
+		OrderIDType* pOutput,
 		int OrderRef,
 		OrderField* pOrder,
 		int count);
 
-	int ReqOrderAction(const string& szId);
-	int ReqOrderAction(CUstpFtdcOrderField *pOrder);
+	int ReqOrderAction(OrderIDType* pOutput, OrderIDType* szIds, int count);
+	int ReqOrderAction(OrderIDType* pOutput, CUstpFtdcOrderField *pOrder, int count);
 
 	char* ReqQuoteInsert(
 		int QuoteRef,
@@ -178,6 +179,7 @@ private:
 	CUstpFtdcRspUserInvestorField m_RspUserInvestor;
 
 	OrderIDType					m_orderInsert_Id;
+	OrderIDType					m_orderAction_Id;
 
 	mutex						m_csOrderRef;
 	long long					m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增

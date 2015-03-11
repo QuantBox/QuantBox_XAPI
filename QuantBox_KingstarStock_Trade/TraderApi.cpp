@@ -207,6 +207,10 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 				sprintf(pField->SessionID, "%s:%c:%s", p_login_req->cust_no, p_login_rsp[i].market_code, p_login_rsp[i].holder_acc_no);
 				sprintf(pField->InvestorName, "%s", p_login_rsp[i].cust_name);
 
+				char buf[50] = { 0 };
+				sprintf(buf, "%s:%c", p_login_req->cust_no, p_login_rsp[i].market_code);
+				m_cust_acc_no.insert(pair<string, string>(buf, p_login_rsp[i].holder_acc_no));
+
 				m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 
 				// 登录时查询此账号下的所有报单与成交
@@ -381,15 +385,32 @@ int CTraderApi::ReqOrderInsert(
 	}
 
 	//char scust_no[11] = "0000000013";
-	char smarket_code[2] = "1";// 如何得到？
+	char smarket_code[2] = {0};// 如何得到？
 	//char sholder_acc_no[15] = "A780891297";
 	char sorder_type[2] = "0";// 如何指定？
 
-	// 先看是否指定了市场，没有就进行计算
+	// 先看是否指定了账号，如果没有指定就用默认第一条
+	if (strlen(pOrder[0].ClientID) == 0)
+	{
+		strncpy(pOrder[0].ClientID, m_UserInfo.UserID, sizeof(UserIDType));
+	}
 
+	// 估计得到市场代码，可能不准
+	smarket_code[0] = OrderField_2_TMarketCodeType(&pOrder[0]);
+
+	// 从登录后的列表中查到哪些账号可用
 	if (strlen(pOrder[0].Account) == 0)
 	{
-		strncpy(pOrder[0].Account, m_UserInfo.UserID, sizeof(AccountIDType));
+		char buf[50] = { 0 };
+		sprintf(buf, "%s:%s", pOrder[0].ClientID, smarket_code);
+		unordered_map<string, string>::iterator it = m_cust_acc_no.find(buf);
+		if (it == m_cust_acc_no.end())
+		{
+		}
+		else
+		{
+			strncpy(pOrder[0].Account, it->second.c_str(), sizeof(AccountIDType));
+		}
 	}
 
 	bool bRet = SPX_API_Order(m_pApi, pOrder[0].ClientID, smarket_code, pOrder[0].Account, sorder_type, p_order_req, &p_order_rsp, count, &row_num, &m_err_msg);

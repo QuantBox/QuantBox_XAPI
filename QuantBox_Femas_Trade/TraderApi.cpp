@@ -380,13 +380,14 @@ void CTraderApi::OnRspQryUserInvestor(CUstpFtdcRspUserInvestorField *pRspUserInv
 	}
 }
 
-OrderIDType* CTraderApi::ReqOrderInsert(
+int CTraderApi::ReqOrderInsert(
+	OrderIDType* pOutput,
 	int OrderRef,
 	OrderField* pOrder,
 	int count)
 {
 	if (nullptr == m_pApi)
-		return nullptr;
+		return 0;
 
 	CUstpFtdcInputOrderField body = {0};
 
@@ -475,7 +476,7 @@ OrderIDType* CTraderApi::ReqOrderInsert(
 		if (n < 0)
 		{
 			nRet = n;
-			return nullptr;
+			sprintf(m_orderInsert_Id, "%d", nRet);
 		}
 		else
 		{
@@ -487,9 +488,10 @@ OrderIDType* CTraderApi::ReqOrderInsert(
 			strcpy(pField->ID, m_orderInsert_Id);
 			m_id_platform_order.insert(pair<string, OrderField*>(m_orderInsert_Id, pField));
 		}
+		strncpy((char*)pOutput, m_orderInsert_Id, sizeof(OrderIDType));
 	}
 
-	return &m_orderInsert_Id;
+	return nRet;
 }
 
 void CTraderApi::OnRspOrderInsert(CUstpFtdcInputOrderField *pInputOrder, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -575,22 +577,22 @@ void CTraderApi::OnRtnTrade(CUstpFtdcTradeField *pTrade)
 	OnTrade(pTrade);
 }
 
-int CTraderApi::ReqOrderAction(const string& szId)
+int CTraderApi::ReqOrderAction(OrderIDType* pOutput, OrderIDType* szIds, int count)
 {
-	unordered_map<string, CUstpFtdcOrderField*>::iterator it = m_id_api_order.find(szId);
+	unordered_map<string, CUstpFtdcOrderField*>::iterator it = m_id_api_order.find(szIds[0]);
 	if (it == m_id_api_order.end())
 	{
-		// <error id="ORDER_NOT_FOUND" value="25" prompt="CTP:撤单找不到相应报单"/>
+		sprintf((char*)pOutput, "%d", -100);
 		return -100;
 	}
 	else
 	{
 		// 找到了订单
-		return ReqOrderAction(it->second);
+		return ReqOrderAction(pOutput, it->second, count);
 	}
 }
 
-int CTraderApi::ReqOrderAction(CUstpFtdcOrderField *pOrder)
+int CTraderApi::ReqOrderAction(OrderIDType* pOutput, CUstpFtdcOrderField *pOrder, int count)
 {
 	if (nullptr == m_pApi)
 		return 0;
@@ -617,7 +619,17 @@ int CTraderApi::ReqOrderAction(CUstpFtdcOrderField *pOrder)
 		sprintf(body.UserOrderActionLocalID, "%012lld", m_nMaxOrderRef);
 		++m_nMaxOrderRef;
 		nRet = m_pApi->ReqOrderAction(&body, ++m_lRequestID);
+		if (nRet < 0)
+		{
+			sprintf(m_orderAction_Id, "%d", nRet);
+		}
+		else
+		{
+			memset(m_orderAction_Id, 0, sizeof(OrderIDType));
+		}
 	}
+	strncpy((char*)pOutput, m_orderAction_Id, sizeof(OrderIDType));
+
 	return nRet;
 }
 

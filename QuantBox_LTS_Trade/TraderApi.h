@@ -65,13 +65,14 @@ public:
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	OrderIDType* ReqOrderInsert(
+	int ReqOrderInsert(
+		OrderIDType* pOutput,
 		int OrderRef,
 		OrderField* pOrder,
 		int count);
 
-	int ReqOrderAction(const string& szId);
-	int ReqOrderAction(CSecurityFtdcOrderField *pOrder);
+	int ReqOrderAction(OrderIDType* pOutput, OrderIDType* szIds, int count);
+	int ReqOrderAction(OrderIDType* pOutput, CSecurityFtdcOrderField *pOrder, int count);
 
 	int ReqQuoteInsert(
 		int QuoteRef,
@@ -188,6 +189,7 @@ private:
 	CSecurityFtdcInvestorField	m_Investor;
 
 	OrderIDType					m_orderInsert_Id;
+	OrderIDType					m_orderAction_Id;
 
 	mutex						m_csOrderRef;
 	int							m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增

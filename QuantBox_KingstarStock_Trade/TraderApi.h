@@ -225,6 +225,8 @@ private:
 
 	//unordered_map<string, PositionField*>			m_id_platform_position;
 
+	unordered_map<string, string>					m_cust_acc_no;
+
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;			//发送消息队列指针
 

@@ -19,7 +19,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return nullptr;
 	case GetApiVersion:
-		return (void*)"0.2.0.20150130";
+		return (void*)"0.3.0.20150311";
 	case GetApiName:
 		return (void*)"Queue";
 	case Create:

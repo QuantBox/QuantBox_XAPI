@@ -144,7 +144,8 @@ bool CTraderApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 
 void CTraderApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
-	UserInfoField* pUserInfo)
+	UserInfoField* pUserInfo,
+	int count)
 {
 	m_szPath = szPath;
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
@@ -421,13 +422,14 @@ void CTraderApi::Clear()
 	m_id_platform_position.clear();
 }
 
-OrderIDType* CTraderApi::ReqOrderInsert(
+int CTraderApi::ReqOrderInsert(
+	OrderIDType* pOutput,
 	int OrderRef,
 	OrderField* pOrder,
 	int count)
 {
 	if (nullptr == m_pApi)
-		return nullptr;
+		return -1;
 
 	CThostFtdcInputOrderField body = { 0 };
 
@@ -541,7 +543,7 @@ OrderIDType* CTraderApi::ReqOrderInsert(
 		if (n < 0)
 		{
 			nRet = n;
-			return nullptr;
+			sprintf(m_orderInsert_Id, "%d", nRet);
 		}
 		else
 		{
@@ -552,10 +554,12 @@ OrderIDType* CTraderApi::ReqOrderInsert(
 			memcpy(pField, pOrder, sizeof(OrderField));
 			strcpy(pField->ID, m_orderInsert_Id);
 			m_id_platform_order.insert(pair<string, OrderField*>(m_orderInsert_Id, pField));
+
 		}
+		strncpy((char*)pOutput, m_orderInsert_Id, sizeof(OrderIDType));
 	}
 
-	return &m_orderInsert_Id;
+	return nRet;
 }
 
 void CTraderApi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -627,29 +631,22 @@ void CTraderApi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	OnTrade(pTrade);
 }
 
-int CTraderApi::ReqOrderAction(const string& szId)
+int CTraderApi::ReqOrderAction(OrderIDType* pOutput, OrderIDType* szIds, int count)
 {
-	unordered_map<string, CThostFtdcOrderField*>::iterator it = m_id_api_order.find(szId);
+	unordered_map<string, CThostFtdcOrderField*>::iterator it = m_id_api_order.find(szIds[0]);
 	if (it == m_id_api_order.end())
 	{
-		// <error id="ORDER_NOT_FOUND" value="25" prompt="CTP:撤单找不到相应报单"/>
-		//ErrorField field = { 0 };
-		//field.ErrorID = 25;
-		//sprintf(field.ErrorMsg, "ORDER_NOT_FOUND");
-
-		////TODO:应当通过报单回报通知订单找不到
-
-		//XRespone(ResponeType::OnRtnError, m_msgQueue, this, 0, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
+		sprintf((char*)pOutput, "%d", -100);
 		return -100;
 	}
 	else
 	{
 		// 找到了订单
-		return ReqOrderAction(it->second);
+		return ReqOrderAction(pOutput, it->second, count);
 	}
 }
 
-int CTraderApi::ReqOrderAction(CThostFtdcOrderField *pOrder)
+int CTraderApi::ReqOrderAction(OrderIDType* pOutput, CThostFtdcOrderField *pOrder, int count)
 {
 	if (nullptr == m_pApi)
 		return 0;
@@ -676,6 +673,17 @@ int CTraderApi::ReqOrderAction(CThostFtdcOrderField *pOrder)
 	strncpy(body.InstrumentID, pOrder->InstrumentID, sizeof(TThostFtdcInstrumentIDType));
 
 	int nRet = m_pApi->ReqOrderAction(&body, ++m_lRequestID);
+	if (nRet < 0)
+	{
+		sprintf(m_orderAction_Id, "%d", nRet);
+	}
+	else
+	{
+		memset(m_orderAction_Id, 0, sizeof(OrderIDType));
+	}
+	strncpy((char*)pOutput, m_orderAction_Id, sizeof(OrderIDType));
+
+
 	return nRet;
 }
 

@@ -138,7 +138,7 @@ TMarketCodeType OrderField_2_TMarketCodeType(OrderField* pIn)
 {
 	// 1.合约导入时就导入了对应的市场代码
 	// 2.没有对应的市场代码，只能从合约名中取
-	if (pIn->ExchangeID[0] != 0)
+	if (strlen(pIn->ExchangeID) == 1)
 		return pIn->ExchangeID[0];
 
 	int code = atoi(pIn->InstrumentID);
