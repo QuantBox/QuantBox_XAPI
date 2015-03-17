@@ -340,7 +340,7 @@ void CTraderApi::ReqQryUserInvestor()
 	CUstpFtdcQryUserInvestorField* pBody = (CUstpFtdcQryUserInvestorField*)m_msgQueue_Query->new_block(sizeof(CUstpFtdcQryUserInvestorField));
 
 	strncpy(pBody->BrokerID, m_ServerInfo.BrokerID, sizeof(TUstpFtdcBrokerIDType));
-	strncpy(pBody->UserID, m_UserInfo.UserID, sizeof(TUstpFtdcInvestorIDType));
+	strncpy(pBody->UserID, m_UserInfo.UserID, sizeof(TUstpFtdcUserIDType));
 
 	m_msgQueue_Query->Input_NoCopy(RequestType::E_QryUserInvestorField, this, nullptr, 0, 0,
 		pBody, sizeof(CUstpFtdcQryUserInvestorField), nullptr, 0, nullptr, 0);
