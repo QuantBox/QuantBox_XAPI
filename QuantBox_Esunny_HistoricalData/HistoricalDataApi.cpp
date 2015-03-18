@@ -284,7 +284,10 @@ int __cdecl CHistoricalDataApi::OnRspHistoryQuot(struct STKHISDATA *pHisData)
 		pF->OpenInterest = item.fAmount;
 	}
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnRspQryHistoricalBars, m_msgQueue, this, true, 0, pFields, sizeof(BarField)*pHisData->nCount, &m_RequestBar, sizeof(HistoricalDataRequestField), nullptr, 0);
+	m_msgQueue->Input_Copy(ResponeType::OnRspQryHistoricalBars, m_msgQueue, this, true, 0, pFields, sizeof(BarField)*pHisData->nCount, &m_RequestBar, sizeof(HistoricalDataRequestField), nullptr, 0);
+
+	if (pFields)
+		delete[] pFields;
 
 	return 0;
 }
@@ -398,7 +401,7 @@ int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 
 	bool bIsLast = m_RequestTick.CurrentDate >= m_RequestTick.Date2;
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, bIsLast, 0, pFields, sizeof(TickField)*pTraceData->nCount, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
+	m_msgQueue->Input_Copy(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, bIsLast, 0, pFields, sizeof(TickField)*pTraceData->nCount, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
 
 	if (pFields)
 		delete[] pFields;

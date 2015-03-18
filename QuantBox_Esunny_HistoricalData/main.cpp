@@ -16,7 +16,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return (void*)(ApiType::HistoricalData | ApiType::Instrument);
 	case GetApiVersion:
-		return "0.2.0.20150226";
+		return "0.2.0.20150318";
 	case GetApiName:
 		return "Esunny";
 	case Create:
