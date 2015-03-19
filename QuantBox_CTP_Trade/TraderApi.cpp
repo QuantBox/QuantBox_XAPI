@@ -15,6 +15,7 @@
 
 #include <cstring>
 #include <assert.h>
+#include <cfloat>
 
 void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
@@ -259,7 +260,7 @@ void CTraderApi::OnRspAuthenticate(CThostFtdcRspAuthenticateField *pRspAuthentic
 	else
 	{
 		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
-		
+
 		pField->ErrorID = pRspInfo->ErrorID;
 		strncpy(pField->ErrorMsg, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
 
@@ -270,7 +271,7 @@ void CTraderApi::OnRspAuthenticate(CThostFtdcRspAuthenticateField *pRspAuthentic
 void CTraderApi::ReqUserLogin()
 {
 	CThostFtdcReqUserLoginField* pBody = (CThostFtdcReqUserLoginField*)m_msgQueue_Query->new_block(sizeof(CThostFtdcReqUserLoginField));
-	
+
 	strncpy(pBody->BrokerID, m_ServerInfo.BrokerID, sizeof(TThostFtdcBrokerIDType));
 	strncpy(pBody->UserID, m_UserInfo.UserID, sizeof(TThostFtdcInvestorIDType));
 	strncpy(pBody->Password, m_UserInfo.Password, sizeof(TThostFtdcPasswordType));
@@ -320,7 +321,7 @@ void CTraderApi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CTho
 void CTraderApi::ReqSettlementInfoConfirm()
 {
 	CThostFtdcSettlementInfoConfirmField* pBody = (CThostFtdcSettlementInfoConfirmField*)m_msgQueue_Query->new_block(sizeof(CThostFtdcSettlementInfoConfirmField));
-	
+
 	strncpy(pBody->BrokerID, m_ServerInfo.BrokerID, sizeof(TThostFtdcBrokerIDType));
 	strncpy(pBody->InvestorID, m_UserInfo.UserID, sizeof(TThostFtdcInvestorIDType));
 
@@ -683,7 +684,7 @@ int CTraderApi::ReqOrderAction(OrderIDType* pOutput, CThostFtdcOrderField *pOrde
 	}
 	strncpy((char*)pOutput, m_orderAction_Id, sizeof(OrderIDType));
 
-	
+
 	return nRet;
 }
 
