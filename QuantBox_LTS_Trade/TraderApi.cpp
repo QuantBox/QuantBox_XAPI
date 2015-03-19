@@ -803,8 +803,9 @@ void CTraderApi::OnRspQryInstrument(CSecurityFtdcInstrumentField *pInstrument, C
 			strncpy(pField->ExchangeID, pInstrument->ExchangeID, sizeof(ExchangeIDType));
 
 			sprintf(pField->Symbol,"%s.%s",pInstrument->InstrumentID,pInstrument->ExchangeID);
+			sprintf(pField->InstrumentName, "%s(%s)", pInstrument->ExchangeInstID, pInstrument->InstrumentName);
 
-			strncpy(pField->InstrumentName, pInstrument->InstrumentName, sizeof(InstrumentNameType));
+			//strncpy(pField->InstrumentName, pInstrument->InstrumentName, sizeof(InstrumentNameType));
 			pField->Type = CSecurityFtdcInstrumentField_2_InstrumentType(pInstrument);
 			pField->VolumeMultiple = pInstrument->VolumeMultiple;
 			pField->PriceTick = CSecurityFtdcInstrumentField_2_PriceTick(pInstrument);

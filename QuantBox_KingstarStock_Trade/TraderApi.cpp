@@ -214,8 +214,9 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 				m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 
 				// 登录时查询此账号下的所有报单与成交
-				ReqQryOrder(p_login_req[0].cust_no);
-				ReqQryTrade(p_login_req[0].cust_no);
+				// 此处注意，多个账号查询时会导致每次都是全量查询
+				ReqQryOrder(p_login_req[0].cust_no,"");
+				ReqQryTrade(p_login_req[0].cust_no,"");
 			}
 		}
 	}
@@ -498,7 +499,7 @@ int CTraderApi::ReqOrderInsert(
 	delete[] p_order_req;
 
 	// 应当启动线程，进行可撤单查询
-	ReqQryOrder(pOrder[0].ClientID);
+	ReqQryOrder(pOrder[0].ClientID,"");
 	
 	return 0;
 }
@@ -622,10 +623,11 @@ int CTraderApi::ReqOrderAction(OrderIDType* pOutput, OrderFieldEx* pOrder, int c
 	return 0;
 }
 
-void CTraderApi::ReqQryOrder(TCustNoType cust_no)
+void CTraderApi::ReqQryOrder(TCustNoType cust_no, TSecCodeType sec_code)
 {
 	STQueryOrder* pField = (STQueryOrder*)m_msgQueue->new_block(sizeof(STQueryOrder));
 	strcpy(pField->cust_no, cust_no);
+	strcpy(pField->sec_code, sec_code);
 	pField->market_code = '0';
 	pField->order_no = 0;
 	pField->query_type = 0;
@@ -721,10 +723,11 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 	return 0;
 }
 
-void CTraderApi::ReqQryTrade(TCustNoType cust_no)
+void CTraderApi::ReqQryTrade(TCustNoType cust_no, TSecCodeType sec_code)
 {
 	STQueryDone* pField = (STQueryDone*)m_msgQueue->new_block(sizeof(STQueryDone));
 	strcpy(pField->cust_no, cust_no);
+	strcpy(pField->sec_code, sec_code);
 	pField->market_code = '0';
 	pField->query_type = 0;
 

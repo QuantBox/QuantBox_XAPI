@@ -21,6 +21,35 @@ namespace QuantBox.XAPI.Callback
         
 
         #region 已经订阅的行情
+        public int SubscribedInstrumentsCount
+        {
+            get
+            {
+                lock (locker)
+                {
+                    int cnt = 0;
+                    foreach (var kv in _SubscribedInstruments)
+                    {
+                        cnt += kv.Value.Count;
+                    }
+                    return cnt;
+                }
+            }
+        }
+
+        public bool SubscribedInstrumentsContains(string szInstrument, string szExchange)
+        {
+            lock (locker)
+            {
+                SortedSet<string> instruments;
+                if(_SubscribedInstruments.TryGetValue(szExchange, out instruments))
+                {
+                    return instruments.Contains(szInstrument);
+                }
+                return false;
+            }
+        }
+
         private Dictionary<string, SortedSet<string>> _SubscribedInstruments = new Dictionary<string, SortedSet<string>>();
         public Dictionary<string, SortedSet<string>> SubscribedInstruments
         {

@@ -106,8 +106,8 @@ public:
 	//void ReqQryDepthMarketData(const string& szInstrumentId);
 	//void ReqQrySettlementInfo(const string& szTradingDay);
 
-	void ReqQryOrder(TCustNoType cust_no);
-	void ReqQryTrade(TCustNoType cust_no);
+	void ReqQryOrder(TCustNoType cust_no, TSecCodeType sec_code);
+	void ReqQryTrade(TCustNoType cust_no, TSecCodeType sec_code);
 	//void ReqQryQuote();
 
 	
@@ -228,7 +228,8 @@ private:
 	unordered_map<string, string>					m_cust_acc_no;
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针
-	CMsgQueue*					m_msgQueue_Query;			//发送消息队列指针
+	CMsgQueue*					m_msgQueue_Query;		//发送消息队列指针
+	CMsgQueue*					m_msgQueue_Order;		//报单消息队列指针
 
 	UserInfoField*				m_pUserInfos;
 	int							m_UserInfo_Pos;

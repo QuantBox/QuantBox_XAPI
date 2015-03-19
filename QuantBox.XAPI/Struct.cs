@@ -428,7 +428,7 @@ namespace QuantBox.XAPI
         /// <summary>
         /// 合约名称
         /// </summary>
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 21)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
         public byte[] InstrumentName;
         /// <summary>
         /// 基础商品代码

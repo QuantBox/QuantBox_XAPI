@@ -1161,7 +1161,7 @@ void CTraderApi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CTho
 			pField->PriceTick = pInstrument->PriceTick;
 			pField->ExpireDate = GetDate(pInstrument->ExpireDate);
 			pField->OptionsType = TThostFtdcOptionsTypeType_2_PutCall(pInstrument->OptionsType);
-			pField->StrikePrice = pInstrument->StrikePrice;
+			pField->StrikePrice = pInstrument->StrikePrice < DBL_EPSILON ? 0 : pInstrument->StrikePrice;
 
 			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInstrument, m_msgQueue, this, bIsLast, 0, pField, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
 		}

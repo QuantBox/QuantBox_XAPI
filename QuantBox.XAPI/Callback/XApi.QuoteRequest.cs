@@ -17,6 +17,35 @@ namespace QuantBox.XAPI.Callback
         private DelegateOnRtnQuoteRequest OnRtnQuoteRequest_;
 
         #region 做市商询价订阅，主要是XSpeed这个功能是在交易API中
+        public int SubscribedQuotesCount
+        {
+            get
+            {
+                lock (locker)
+                {
+                    int cnt = 0;
+                    foreach (var kv in _SubscribedQuotes)
+                    {
+                        cnt += kv.Value.Count;
+                    }
+                    return cnt;
+                }
+            }
+        }
+
+        public bool SubscribedQuotesContains(string szInstrument, string szExchange)
+        {
+            lock (locker)
+            {
+                SortedSet<string> instruments;
+                if (_SubscribedQuotes.TryGetValue(szExchange, out instruments))
+                {
+                    return instruments.Contains(szInstrument);
+                }
+                return false;
+            }
+        }
+
         private Dictionary<string, SortedSet<string>> _SubscribedQuotes = new Dictionary<string, SortedSet<string>>();
         public Dictionary<string, SortedSet<string>> SubscribedQuotes
         {
