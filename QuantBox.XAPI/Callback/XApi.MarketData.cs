@@ -21,6 +21,7 @@ namespace QuantBox.XAPI.Callback
         
 
         #region 已经订阅的行情
+        public int MaxSubscribedInstrumentsCount;
         public int SubscribedInstrumentsCount
         {
             get

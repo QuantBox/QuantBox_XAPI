@@ -17,6 +17,7 @@ namespace QuantBox.XAPI.Callback
         private DelegateOnRtnQuoteRequest OnRtnQuoteRequest_;
 
         #region 做市商询价订阅，主要是XSpeed这个功能是在交易API中
+        public int MaxSubscribedQuotesCount;
         public int SubscribedQuotesCount
         {
             get
