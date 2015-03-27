@@ -20,9 +20,9 @@ namespace QuantBox.XAPI
             LOAD_WITH_ALTERED_SEARCH_PATH = 0x00000008
         }
 
-        [DllImport("kernel32.dll")]
+        [DllImport("kernel32.dll", SetLastError = true)]
         private extern static IntPtr LoadLibrary(string lpFileName);
-        [DllImport("kernel32.dll")]
+        [DllImport("kernel32.dll", SetLastError = true)]
         private extern static IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
         [DllImport("kernel32.dll")]
         private extern static bool FreeLibrary(IntPtr hModule);
@@ -33,12 +33,25 @@ namespace QuantBox.XAPI
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern IntPtr LoadLibraryEx(string lpFileName, IntPtr hReservedNull, LoadLibraryFlags dwFlags);
 
+        [DllImport("kernel32.dll")]
+        public extern static int FormatMessage(int flag, ref IntPtr source, int msgid, int langid, ref string buf, int size, ref IntPtr args);
+
+        public static string GetSysErrMsg(int errCode)
+        {
+            IntPtr tempptr = IntPtr.Zero;
+            string msg = null;
+            FormatMessage(0x1300, ref tempptr, errCode, 0, ref msg, 255, ref tempptr);
+            return msg;
+        }
+
         public DllInvoke(string DLLPath)
         {
             hLib = LoadLibraryEx(DLLPath,IntPtr.Zero,LoadLibraryFlags.LOAD_WITH_ALTERED_SEARCH_PATH);
             if (hLib == IntPtr.Zero)
             {
-                throw new Exception(string.Format("无法加载 {0}", DLLPath));
+                int errCode = Marshal.GetLastWin32Error();
+                string errMsg = GetSysErrMsg(errCode);
+                throw new Exception(string.Format("GetLastError:{0},FormatMessage:{1} {2}", errCode, errMsg, DLLPath));
             }
         }
         ~DllInvoke()
