@@ -7,8 +7,6 @@
 
 struct PositionField
 {
-
-
 	PositionSide	Side;
 	QtyType Position;
 	QtyType TdPosition;

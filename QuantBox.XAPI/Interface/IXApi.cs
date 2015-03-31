@@ -45,10 +45,10 @@ namespace QuantBox.XAPI.Interface
         void ReqQryTradingAccount();
         void ReqQryInvestorPosition(string szInstrument, string szExchange);
         void ReqQrySettlementInfo(string szTradingDay);
-        void SendOrder(int OrderRef, ref OrderField[] orders, out string[] OrderRefs);
+        void SendOrder(ref OrderField[] orders, out string[] OrderRefs);
         void CancelOrder(string[] szId,out string[] errs);
-        string SendQuote(int QuoteRef, ref QuoteField quote);
-        int CancelQuote(string szId);
+        void SendQuote(ref QuoteField quote,out string AskRef,out string BidRef);
+        void CancelQuote(string szId,out string err);
     }
 
     public interface IXHistoricalData

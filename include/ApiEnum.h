@@ -17,7 +17,7 @@ enum ConnectionStatus :char
 	Confirmed, //已经确认
 	Doing,
 	Done, //完成
-	Unknown, //未知
+	Unknown_, //未知
 };
 
 enum ApiType :char

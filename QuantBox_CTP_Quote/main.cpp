@@ -39,7 +39,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		delete pApi;
 		return 0;
 	case Register:
-		pApi->Register(ptr1);
+		pApi->Register(ptr1,ptr2);
 		break;
 	case Config:
 		return (void*)pApi->Config((ConfigInfoField*)ptr1);

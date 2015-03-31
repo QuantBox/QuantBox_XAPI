@@ -61,7 +61,7 @@ public:
 	CTraderApi(void);
 	virtual ~CTraderApi(void);
 
-	void Register(void* pCallback);
+	void Register(void* pCallback,void* pClass);
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
@@ -70,24 +70,24 @@ public:
 	void Disconnect();
 
 	int ReqOrderInsert(
-		OrderIDType* pOutput,
-		int OrderRef,
 		OrderField* pOrder,
-		int count);
+		int count,
+		OrderIDType* pInOut);
 
 	char* ReqParkedOrderInsert(int OrderRef,
 		OrderField* pOrder1,
 		OrderField* pOrder2);
 
-	int ReqOrderAction(OrderIDType* pOutput, OrderIDType* szIds, int count);
-	int ReqOrderAction(OrderIDType* pOutput, CThostFtdcOrderField *pOrder, int count);
+	int ReqOrderAction(OrderIDType* szIds, int count, OrderIDType* pOutput);
+	int ReqOrderAction(CThostFtdcOrderField *pOrder, int count, OrderIDType* pOutput);
 
 	char* ReqQuoteInsert(
-		int QuoteRef,
-		QuoteField* pQuote);
+		QuoteField* pQuote,
+		OrderIDType* pAskRef,
+		OrderIDType* pBidRef);
 
-	int ReqQuoteAction(CThostFtdcQuoteField *pQuote);
-	int ReqQuoteAction(const string& szId);
+	int ReqQuoteAction(CThostFtdcQuoteField *pQuote, OrderIDType* pOutput);
+	int ReqQuoteAction(const string& szId, OrderIDType* pOutput);
 
 	void ReqQryTradingAccount();
 	void ReqQryInvestorPosition(const string& szInstrumentId, const string& szExchange);
@@ -228,5 +228,6 @@ private:
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;
+	void*						m_pClass;
 };
 

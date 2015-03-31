@@ -40,9 +40,11 @@ public:
 	void StopThread();
 
 	//将外部的函数地址注册到队列
-	void Register(void* pCallback)
+	void Register(void* pCallback,void* pClass)
 	{
 		m_fnOnRespone = (fnOnRespone)pCallback;
+		// 目前没啥用，只是为了与行情和交易的接口统一
+		m_pClass = pClass;
 	}
 
 	// 对输入的数据做了一次复制，主要是为了解决转过来的指针可能失效的问题。
@@ -181,6 +183,7 @@ private:
 	//ReaderWriterQueue<ResponeItem*>		m_queue;
 	ConcurrentQueue<ResponeItem*>		m_queue;
 	fnOnRespone							m_fnOnRespone;
+	void*								m_pClass;
 };
 
 #pragma warning(pop)
