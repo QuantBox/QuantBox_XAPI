@@ -39,12 +39,10 @@
 			<Add option="-pthread" />
 			<Add option="-fPIC" />
 		</Compiler>
-		<Unit filename="QuantBox_XAPI.cpp" />
 		<Unit filename="XApiC.cpp" />
 		<Unit filename="XApiCpp.cpp" />
 		<Unit filename="XApiImpl.cpp" />
 		<Unit filename="XApiImpl.h" />
-		<Unit filename="main.cpp" />
 		<Unit filename="stdafx.cpp" />
 		<Unit filename="stdafx.h" />
 		<Extensions>

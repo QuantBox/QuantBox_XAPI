@@ -36,6 +36,7 @@
 		<Linker>
 			<Add library="QuantBox_XAPI" />
 			<Add library="dl" />
+			<Add library="pthread" />
 			<Add directory="../bin/Debug" />
 		</Linker>
 		<Unit filename="QuantBox_XAPI_TEST.cpp" />
