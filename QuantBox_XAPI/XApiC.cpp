@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include <stdio.h>
 #include <string.h>
 #include "../include/XApiC.h"
 #include "../include/QueueHeader.h"
@@ -21,7 +22,7 @@ void* X_LoadLib(char* libPath)
 #if defined WINDOWS
 	return LoadLibraryExA(libPath, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
 #else
-    return dlopen(libPath, RTLD_LAZY);
+    return dlopen(libPath, RTLD_NOW);
 #endif
 }
 
@@ -41,7 +42,8 @@ char* X_GetLastError()
     return (char*)lpMsgBuf;
 #else
     extern int errno;
-    return strerror(errno);
+    errno = 0;
+    return dlerror();
 #endif
 }
 

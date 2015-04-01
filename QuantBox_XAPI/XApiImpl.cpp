@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <stdio.h>
 #include <string.h>
 #include "XApiImpl.h"
 
@@ -122,7 +123,6 @@ bool CXApiImpl::Init()
 			return true;
 		}
 	}
-
 	return false;
 }
 
