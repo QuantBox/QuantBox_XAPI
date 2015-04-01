@@ -7,7 +7,7 @@
 		<Option compiler="clang" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin/Debug/libQuantBox_XAPI" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/Debug/QuantBox_XAPI" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="clang" />
@@ -18,7 +18,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="bin/Release/libQuantBox_XAPI" prefix_auto="1" extension_auto="1" />
+				<Option output="../bin/Release/QuantBox_XAPI" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="clang" />
@@ -33,10 +33,20 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-Weverything" />
+			<Add option="-Wall" />
+			<Add option="-std=c++11" />
 			<Add option="-fexceptions" />
+			<Add option="-pthread" />
+			<Add option="-fPIC" />
 		</Compiler>
+		<Unit filename="QuantBox_XAPI.cpp" />
+		<Unit filename="XApiC.cpp" />
+		<Unit filename="XApiCpp.cpp" />
+		<Unit filename="XApiImpl.cpp" />
+		<Unit filename="XApiImpl.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="stdafx.cpp" />
+		<Unit filename="stdafx.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

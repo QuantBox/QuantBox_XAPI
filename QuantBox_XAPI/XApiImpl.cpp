@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <string.h>
 #include "XApiImpl.h"
 
 #include "../include/QueueEnum.h"
@@ -121,7 +122,7 @@ bool CXApiImpl::Init()
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -133,7 +134,7 @@ char* CXApiImpl::GetLastError()
 void CXApiImpl::Connect(char* szPath, ServerInfoField* pServerInfo, UserInfoField* pUserInfo, int count)
 {
 	m_pApi = X_Create(m_pFun);
-	X_Register(m_pFun, m_pApi, OnRespone, this);
+	X_Register(m_pFun, m_pApi, (void*)OnRespone, this);
 	X_Connect(m_pFun, m_pApi, szPath, pServerInfo, pUserInfo, count);
 }
 

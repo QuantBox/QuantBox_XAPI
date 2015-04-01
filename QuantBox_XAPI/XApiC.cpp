@@ -1,21 +1,34 @@
 #include "stdafx.h"
 
+#include <string.h>
 #include "../include/XApiC.h"
-#include <libloaderapi.h>
 #include "../include/QueueHeader.h"
 #include "../include/QueueEnum.h"
+
+#if defined WINDOWS
+#include <libloaderapi.h>
+#else
+#include <dlfcn.h>
+#include <errno.h>
+#endif
+
 
 void* X_LoadLib(char* libPath)
 {
 	if (libPath == nullptr)
 		return nullptr;
 
+#if defined WINDOWS
 	return LoadLibraryExA(libPath, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
+#else
+    return dlopen(libPath, RTLD_LAZY);
+#endif
 }
 
 char* X_GetLastError()
 {
-	char szBuf[256] = {0};
+#if defined WINDOWS
+    char szBuf[256] = {0};
 	LPVOID lpMsgBuf;
 	DWORD dw = GetLastError();
 	FormatMessageA(
@@ -25,16 +38,22 @@ char* X_GetLastError()
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPSTR)&lpMsgBuf,
 		0, NULL);
-
-	return (char*)lpMsgBuf;
+    return (char*)lpMsgBuf;
+#else
+    extern int errno;
+    return strerror(errno);
+#endif
 }
 
 void* X_GetFunction(void* lib)
 {
 	if (lib == nullptr)
 		return nullptr;
-
-	return (fnOnRespone)GetProcAddress((HMODULE)lib, "XRequest");;
+#if defined WINDOWS
+	return (fnOnRespone)GetProcAddress((HMODULE)lib, "XRequest");
+#else
+    return static_cast<fnOnRespone*>(dlsym(lib, "XRequest"));
+#endif
 }
 
 void X_FreeLib(void* lib)
@@ -42,7 +61,11 @@ void X_FreeLib(void* lib)
 	if (lib == nullptr)
 		return;
 
+#if defined WINDOWS
 	FreeLibrary((HMODULE)lib);
+#else
+    dlclose(lib);
+#endif
 }
 
 ApiType X_GetApiType(void* pFun)
@@ -50,7 +73,9 @@ ApiType X_GetApiType(void* pFun)
 	if (pFun == nullptr)
 		return ApiType::Nono;
 
-	return (ApiType)(char)((fnOnRespone)pFun)(RequestType::GetApiType, nullptr, nullptr, 0, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+    void* p = ((fnOnRespone)pFun)(RequestType::GetApiType, nullptr, nullptr, 0, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+
+	return (ApiType)(char)(long long)(p);
 }
 
 char* X_GetApiVersion(void* pFun)

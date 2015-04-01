@@ -2,8 +2,12 @@
 //
 
 #include "stdafx.h"
-#include <Windows.h>
 
+#if defined WINDOWS
+#include <Windows.h>
+#endif
+
+#include <string.h>
 #include "../include/XApiCpp.h"
 
 #ifdef _WIN64
@@ -44,12 +48,12 @@ public:
 	virtual void OnRspQryHistoricalBars(BarField* pBars, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
 };
 
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
 	CXSpiImpl* p = new CXSpiImpl();
 	char DLLPath1[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\CTP\\x86\\QuantBox_CTP_Quote.dll";
 	char DLLPath2[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\CTP\\x86\\QuantBox_CTP_Trade.dll";
-	
+
 	ServerInfoField				m_ServerInfo1 = { 0 };
 	ServerInfoField				m_ServerInfo2 = { 0 };
 	UserInfoField				m_UserInfo = { 0 };
@@ -101,7 +105,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		pOrder->Qty = 1;
 		pOrder->Type = OrderType::Limit;
 		pOrder->Side = OrderSide::Buy;
-		
+
 		pApi2->SendOrder(pOrder, &Out, 1);
 
 		printf("%s\r\n", Out);
