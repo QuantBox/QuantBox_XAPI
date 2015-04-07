@@ -34,7 +34,7 @@ public:
 	CLevel2UserApi(void);
 	virtual ~CLevel2UserApi(void);
 
-	void Register(void* pCallback);
+	void Register(void* pCallback, void* pClass);
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
@@ -98,5 +98,6 @@ private:
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;
+	void*						m_pClass;
 };
 

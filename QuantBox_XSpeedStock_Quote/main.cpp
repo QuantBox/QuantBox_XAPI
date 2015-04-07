@@ -17,7 +17,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return (void*)(ApiType::MarketData|ApiType::Instrument);
 	case GetApiVersion:
-		return (void*)"0.2.0.20150226";
+		return (void*)"0.3.0.20150407";
 	case GetApiName:
 		return (void*)"XSpeedStock";
 	case Create:
@@ -39,7 +39,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		delete pApi;
 		return nullptr;
 	case Register:
-		pApi->Register(ptr1);
+		pApi->Register(ptr1, ptr2);
 		break;
 	case Config:
 		return (void*)pApi->Config((ConfigInfoField*)ptr1);

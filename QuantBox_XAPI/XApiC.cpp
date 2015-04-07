@@ -6,7 +6,7 @@
 #include "../include/QueueHeader.h"
 #include "../include/QueueEnum.h"
 
-#if defined WINDOWS
+#if defined WINDOWS || WIN32
 #include <libloaderapi.h>
 #else
 #include <dlfcn.h>
@@ -19,7 +19,7 @@ void* X_LoadLib(char* libPath)
 	if (libPath == nullptr)
 		return nullptr;
 
-#if defined WINDOWS
+#if defined WINDOWS || WIN32
 	return LoadLibraryExA(libPath, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
 #else
     return dlopen(libPath, RTLD_NOW);
@@ -28,7 +28,7 @@ void* X_LoadLib(char* libPath)
 
 char* X_GetLastError()
 {
-#if defined WINDOWS
+#if defined WINDOWS || WIN32
     char szBuf[256] = {0};
 	LPVOID lpMsgBuf;
 	DWORD dw = GetLastError();
@@ -51,7 +51,7 @@ void* X_GetFunction(void* lib)
 {
 	if (lib == nullptr)
 		return nullptr;
-#if defined WINDOWS
+#if defined WINDOWS || WIN32
 	return (fnOnRespone)GetProcAddress((HMODULE)lib, "XRequest");
 #else
     return static_cast<fnOnRespone*>(dlsym(lib, "XRequest"));
@@ -63,7 +63,7 @@ void X_FreeLib(void* lib)
 	if (lib == nullptr)
 		return;
 
-#if defined WINDOWS
+#if defined WINDOWS || WIN32
 	FreeLibrary((HMODULE)lib);
 #else
     dlclose(lib);

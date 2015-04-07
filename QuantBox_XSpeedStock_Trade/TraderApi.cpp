@@ -19,7 +19,7 @@
 void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	// 由内部调用，不用检查是否为空
-	CTraderApi* pApi = (CTraderApi*)pApi1;
+	CTraderApi* pApi = (CTraderApi*)pApi2;
 	pApi->QueryInThread(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 	return nullptr;
 }
@@ -63,7 +63,7 @@ CTraderApi::CTraderApi(void)
 	m_msgQueue = new CMsgQueue();
 	m_msgQueue_Query = new CMsgQueue();
 
-	m_msgQueue_Query->Register(Query);
+	m_msgQueue_Query->Register(Query,this);
 	m_msgQueue_Query->StartThread();
 }
 
@@ -73,13 +73,14 @@ CTraderApi::~CTraderApi(void)
 	Disconnect();
 }
 
-void CTraderApi::Register(void* pCallback)
+void CTraderApi::Register(void* pCallback, void* pClass)
 {
+	m_pClass = pClass;
 	if (m_msgQueue == nullptr)
 		return;
 
-	m_msgQueue_Query->Register(Query);
-	m_msgQueue->Register(pCallback);
+	m_msgQueue_Query->Register(Query,this);
+	m_msgQueue->Register(pCallback,this);
 	if (pCallback)
 	{
 		m_msgQueue_Query->StartThread();
@@ -102,7 +103,7 @@ bool CTraderApi::IsErrorRspInfo_Output(struct DFITCSECRspInfoField *pRspInfo)
 		pField->ErrorID = pRspInfo->errorID;
 		strcpy(pField->ErrorMsg, pRspInfo->errorMsg);
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, this, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
 	return bRet;
 }
@@ -122,7 +123,7 @@ void CTraderApi::Connect(const string& szPath,
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
-	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, this, nullptr, 0, 0,
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, m_msgQueue_Query, this, 0, 0,
 		nullptr, 0, nullptr, 0, nullptr, 0);
 }
 
@@ -133,13 +134,13 @@ void CTraderApi::ReqStockUserLogin()
 	strncpy(pBody->accountID, m_UserInfo.UserID, sizeof(DFITCSECAccountIDType));
 	strncpy(pBody->passWord, m_UserInfo.Password, sizeof(DFITCSECPasswordType));
 
-	m_msgQueue_Query->Input_NoCopy(RequestType::E_StockUserLoginField, this, nullptr, 0, 0,
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_StockUserLoginField, m_msgQueue_Query, this, 0, 0,
 		pBody, sizeof(DFITCSECReqUserLoginField), nullptr, 0, nullptr, 0);
 }
 
 int CTraderApi::_ReqStockUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	DFITCSECReqUserLoginField* pBody = (DFITCSECReqUserLoginField*)ptr1;
 	pBody->requestID = ++m_lRequestID;
@@ -153,13 +154,13 @@ void CTraderApi::ReqSOPUserLogin()
 	strncpy(pBody->accountID, m_UserInfo.UserID, sizeof(DFITCSECAccountIDType));
 	strncpy(pBody->passWord, m_UserInfo.Password, sizeof(DFITCSECPasswordType));
 
-	m_msgQueue_Query->Input_NoCopy(RequestType::E_SOPUserLoginField, this, nullptr, 0, 0,
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_SOPUserLoginField, m_msgQueue_Query, this, 0, 0,
 		pBody, sizeof(DFITCSECReqUserLoginField), nullptr, 0, nullptr, 0);
 }
 
 int CTraderApi::_ReqSOPUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	DFITCSECReqUserLoginField* pBody = (DFITCSECReqUserLoginField*)ptr1;
 	pBody->requestID = ++m_lRequestID;
@@ -173,13 +174,13 @@ void CTraderApi::ReqFASLUserLogin()
 	strncpy(pBody->accountID, m_UserInfo.UserID, sizeof(DFITCSECAccountIDType));
 	strncpy(pBody->passWord, m_UserInfo.Password, sizeof(DFITCSECPasswordType));
 	
-	m_msgQueue_Query->Input_NoCopy(RequestType::E_FASLUserLoginField, this, nullptr, 0, 0,
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_FASLUserLoginField, m_msgQueue_Query, this, 0, 0,
 		pBody, sizeof(DFITCSECReqUserLoginField), nullptr, 0, nullptr, 0);
 }
 
 int CTraderApi::_ReqFASLUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	DFITCSECReqUserLoginField* pBody = (DFITCSECReqUserLoginField*)ptr1;
 	pBody->requestID = ++m_lRequestID;
@@ -189,9 +190,9 @@ int CTraderApi::_ReqFASLUserLogin(char type, void* pApi1, void* pApi2, double do
 int CTraderApi::_Init()
 {
 	m_pApi = DFITCSECTraderApi::CreateDFITCSECTraderApi();
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	//初始化连接
 	int iRet = m_pApi->Init(m_ServerInfo.Address, this);
 	if (0 == iRet)
@@ -204,7 +205,7 @@ int CTraderApi::_Init()
 		pField->ErrorID = iRet;
 		strcpy(pField->ErrorMsg, "连接超时");
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
 	return iRet;
 }
@@ -215,7 +216,7 @@ void CTraderApi::Disconnect()
 	if (m_msgQueue_Query)
 	{
 		m_msgQueue_Query->StopThread();
-		m_msgQueue_Query->Register(nullptr);
+		m_msgQueue_Query->Register(nullptr,nullptr);
 		m_msgQueue_Query->Clear();
 		delete m_msgQueue_Query;
 		m_msgQueue_Query = nullptr;
@@ -229,7 +230,7 @@ void CTraderApi::Disconnect()
 
 		// 全清理，只留最后一个
 		m_msgQueue->Clear();
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 		// 主动触发
 		m_msgQueue->Process();
 	}
@@ -238,7 +239,7 @@ void CTraderApi::Disconnect()
 	if (m_msgQueue)
 	{
 		m_msgQueue->StopThread();
-		m_msgQueue->Register(nullptr);
+		m_msgQueue->Register(nullptr,nullptr);
 		m_msgQueue->Clear();
 		delete m_msgQueue;
 		m_msgQueue = nullptr;
@@ -273,7 +274,7 @@ void CTraderApi::Clear()
 
 void CTraderApi::OnFrontConnected()
 {
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	////连接成功后自动请求认证或登录
 	//if(m_szAuthCode.length()>0
@@ -298,7 +299,7 @@ void CTraderApi::OnFrontDisconnected(int nReason)
 	pField->ErrorID = nReason;
 	GetOnFrontDisconnectedMsg(nReason, pField->ErrorMsg);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 }
 
 void CTraderApi::OnRspStockUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECRspInfoField *pRspInfo)
@@ -313,8 +314,8 @@ void CTraderApi::OnRspStockUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECR
 
 		sprintf(pField->SessionID, "%d:%d", pData->frontID, pData->sessionID);
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 		// 记下登录信息，可能会用到
 		memcpy(&m_RspUserLogin, pData, sizeof(DFITCSECRspUserLoginField));
@@ -328,7 +329,7 @@ void CTraderApi::OnRspStockUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECR
 		pField->ErrorID = pRspInfo->errorID;
 		strncpy(pField->ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
 }
 
@@ -345,8 +346,8 @@ void CTraderApi::OnRspSOPUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECRsp
 
 		sprintf(pField->SessionID, "%d:%d", pData->frontID, pData->sessionID);
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 		// 记下登录信息，可能会用到
 		memcpy(&m_RspUserLogin, pData, sizeof(DFITCSECRspUserLoginField));
@@ -360,7 +361,7 @@ void CTraderApi::OnRspSOPUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECRsp
 		pField->ErrorID = pRspInfo->errorID;
 		strncpy(pField->ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
 }
 
@@ -377,8 +378,8 @@ void CTraderApi::OnRspFASLUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECRs
 
 		sprintf(pField->SessionID, "%d:%d", pData->frontID, pData->sessionID);
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 		// 记下登录信息，可能会用到
 		memcpy(&m_RspUserLogin, pData, sizeof(DFITCSECRspUserLoginField));
@@ -392,17 +393,17 @@ void CTraderApi::OnRspFASLUserLogin(DFITCSECRspUserLoginField *pData, DFITCSECRs
 		pField->ErrorID = pRspInfo->errorID;
 		strncpy(pField->ErrorMsg, pRspInfo->errorMsg, sizeof(ErrorMsgType));
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
 }
 
-OrderIDType* CTraderApi::ReqOrderInsert(
-	int OrderRef,
+int CTraderApi::ReqOrderInsert(
 	OrderField* pOrder,
-	int count)
+	int count,
+	OrderIDType* pInOut)
 {
 	//if (nullptr == m_pApi)
-		return nullptr;
+		return -1;
 
 	//DFITCInsertOrderField body = {};
 
@@ -496,7 +497,7 @@ OrderIDType* CTraderApi::ReqOrderInsert(
 //		pField->Status = OrderStatus::Rejected;
 //		pField->ErrorID = pErrorInfo->nErrorID;
 //		strncpy(pField->Text, pErrorInfo->errorMsg, sizeof(DFITCErrorMsgInfoType));
-//		m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
+//		m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 //	}
 //}
 //
@@ -520,7 +521,7 @@ OrderIDType* CTraderApi::ReqOrderInsert(
 //		pField->Status = OrderStatus::Rejected;
 //		pField->ErrorID = pRspInfo->ErrorID;
 //		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(TThostFtdcErrorMsgType));
-//		m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, this, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
+//		m_msgQueue->Input(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 //	}
 //}
 
@@ -680,7 +681,7 @@ OrderIDType* CTraderApi::ReqOrderInsert(
 //
 //		////TODO:应当通过报单回报通知订单找不到
 //
-//		//m_msgQueue->Input(ResponeType::OnRtnError, m_msgQueue, this, 0, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
+//		//m_msgQueue->Input(ResponeType::OnRtnError, m_msgQueue, m_pClass, 0, 0, &field, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 //		return -100;
 //	}
 //	else

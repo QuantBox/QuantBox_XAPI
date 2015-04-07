@@ -156,6 +156,7 @@ TMarketCodeType OrderField_2_TMarketCodeType(OrderField* pIn)
 		// 300000
 		return '2';
 	}
+	return '1';
 }
 
 TMarketCodeType TSecCodeType_2_TMarketCodeType(TSecCodeType* pIn)

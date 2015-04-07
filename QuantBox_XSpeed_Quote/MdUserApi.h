@@ -39,7 +39,7 @@ public:
 	CMdUserApi(void);
 	virtual ~CMdUserApi(void);
 
-	void Register(void* pCallback);
+	void Register(void* pCallback, void* pClass);
 	ConfigInfoField* Config(ConfigInfoField* pConfigInfo);
 
 	void Connect(const string& szPath,
@@ -104,5 +104,6 @@ private:
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;
+	void*						m_pClass;
 };
 

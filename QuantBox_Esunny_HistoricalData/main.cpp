@@ -16,9 +16,9 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return (void*)(ApiType::HistoricalData | ApiType::Instrument);
 	case GetApiVersion:
-		return "0.2.0.20150318";
+		return (void*)"0.3.0.20150407";
 	case GetApiName:
-		return "Esunny";
+		return (void*)"Esunny";
 	case Create:
 		return new CHistoricalDataApi();
 	default:
@@ -38,7 +38,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		delete pApi;
 		return nullptr;
 	case Register:
-		pApi->Register(ptr1);
+		pApi->Register(ptr1, ptr2);
 		break;
 	case Connect:
 		pApi->Connect((const char*)ptr3, (ServerInfoField*)ptr1, (UserInfoField*)ptr2);

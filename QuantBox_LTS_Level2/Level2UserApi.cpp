@@ -19,7 +19,7 @@ using namespace std;
 void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	// 由内部调用，不用检查是否为空
-	CLevel2UserApi* pApi = (CLevel2UserApi*)pApi1;
+	CLevel2UserApi* pApi = (CLevel2UserApi*)pApi2;
 	pApi->QueryInThread(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 	return nullptr;
 }
@@ -63,7 +63,7 @@ CLevel2UserApi::CLevel2UserApi(void)
 	m_msgQueue = new CMsgQueue();
 	m_msgQueue_Query = new CMsgQueue();
 
-	m_msgQueue_Query->Register((void*)Query);
+	m_msgQueue_Query->Register((void*)Query,this);
 	m_msgQueue_Query->StartThread();
 }
 
@@ -72,13 +72,14 @@ CLevel2UserApi::~CLevel2UserApi(void)
 	Disconnect();
 }
 
-void CLevel2UserApi::Register(void* pCallback)
+void CLevel2UserApi::Register(void* pCallback, void* pClass)
 {
+	m_pClass = pClass;
 	if (m_msgQueue == nullptr)
 		return;
 
-	m_msgQueue_Query->Register((void*)Query);
-	m_msgQueue->Register(pCallback);
+	m_msgQueue_Query->Register((void*)Query, this);
+	m_msgQueue->Register(pCallback, this);
 	if (pCallback)
 	{
 		m_msgQueue_Query->StartThread();
@@ -101,7 +102,7 @@ bool CLevel2UserApi::IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo, int nRe
 		pField->ErrorID = pRspInfo->ErrorID;
 		strcpy(pField->ErrorMsg, pRspInfo->ErrorMsg);
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, this, bIsLast, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, bIsLast, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
 	return bRet;
 }
@@ -121,7 +122,7 @@ void CLevel2UserApi::Connect(const string& szPath,
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
-	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, this, nullptr, 0, 0,
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, m_msgQueue_Query, this, 0, 0,
 		nullptr, 0, nullptr, 0, nullptr, 0);
 }
 
@@ -129,7 +130,7 @@ int CLevel2UserApi::_Init()
 {
 	m_pApi = CSecurityFtdcL2MDUserApi::CreateFtdcL2MDUserApi(m_ServerInfo.IsMulticast);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	if (m_pApi)
 	{
@@ -153,7 +154,7 @@ int CLevel2UserApi::_Init()
 
 		//初始化连接
 		m_pApi->Init();
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	}
 
 	return 0;
@@ -167,13 +168,13 @@ void CLevel2UserApi::ReqUserLogin()
 	strncpy(pBody->UserID, m_UserInfo.UserID, sizeof(TSecurityFtdcUserIDType));
 	strncpy(pBody->Password, m_UserInfo.Password, sizeof(TSecurityFtdcPasswordType));
 
-	m_msgQueue_Query->Input_NoCopy(RequestType::E_ReqUserLoginField, this, nullptr, 0, 0,
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_ReqUserLoginField, m_msgQueue_Query, this, 0, 0,
 		pBody, sizeof(CSecurityFtdcUserLoginField), nullptr, 0, nullptr, 0);
 }
 
 int CLevel2UserApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	return m_pApi->ReqUserLogin((CSecurityFtdcUserLoginField*)ptr1, ++m_lRequestID);
 }
 
@@ -183,7 +184,7 @@ void CLevel2UserApi::Disconnect()
 	if (m_msgQueue_Query)
 	{
 		m_msgQueue_Query->StopThread();
-		m_msgQueue_Query->Register(nullptr);
+		m_msgQueue_Query->Register(nullptr,nullptr);
 		m_msgQueue_Query->Clear();
 		delete m_msgQueue_Query;
 		m_msgQueue_Query = nullptr;
@@ -197,7 +198,7 @@ void CLevel2UserApi::Disconnect()
 
 		// 全清理，只留最后一个
 		m_msgQueue->Clear();
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 		// 主动触发
 		m_msgQueue->Process();
 	}
@@ -206,7 +207,7 @@ void CLevel2UserApi::Disconnect()
 	if (m_msgQueue)
 	{
 		m_msgQueue->StopThread();
-		m_msgQueue->Register(nullptr);
+		m_msgQueue->Register(nullptr,nullptr);
 		m_msgQueue->Clear();
 		delete m_msgQueue;
 		m_msgQueue = nullptr;
@@ -215,7 +216,7 @@ void CLevel2UserApi::Disconnect()
 
 void CLevel2UserApi::OnFrontConnected()
 {
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	//连接成功后自动请求登录
 	ReqUserLogin();
@@ -228,7 +229,7 @@ void CLevel2UserApi::OnFrontDisconnected(int nReason)
 	pField->ErrorID = nReason;
 	GetOnFrontDisconnectedMsg(nReason, pField->ErrorMsg);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 }
 
 void CLevel2UserApi::OnRspUserLogin(CSecurityFtdcUserLoginField *pUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -273,7 +274,7 @@ void CLevel2UserApi::OnRspUserLogin(CSecurityFtdcUserLoginField *pUserLogin, CSe
 		pField->ErrorID = pRspInfo->ErrorID;
 		strncpy(pField->ErrorMsg, pRspInfo->ErrorMsg, sizeof(pRspInfo->ErrorMsg));
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
 }
 
@@ -498,7 +499,7 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 		pField->AskVolume5 = pL2MarketData->OfferVolume5;
 	} while (false);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }
 
 void CLevel2UserApi::SubscribeL2Index(const string& szInstrumentIDs, const string& szExchageID)
@@ -688,5 +689,5 @@ void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 	//	marketData.AskVolume5 = pL2MarketData->OfferVolume5;
 	//}
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, this, DepthLevelType::L0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::L0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
 }

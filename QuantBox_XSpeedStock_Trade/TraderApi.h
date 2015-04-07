@@ -57,17 +57,17 @@ public:
 	CTraderApi(void);
 	virtual ~CTraderApi(void);
 
-	void Register(void* pCallback);
+	void Register(void* pCallback, void* pClass);
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	OrderIDType* ReqOrderInsert(
-		int OrderRef,
+	int ReqOrderInsert(
 		OrderField* pOrder,
-		int count);
+		int count,
+		OrderIDType* pInOut);
 
 	//int ReqParkedOrderInsert(int OrderRef,
 	//	OrderField* pOrder1,
@@ -210,5 +210,6 @@ private:
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;
+	void*						m_pClass;
 };
 

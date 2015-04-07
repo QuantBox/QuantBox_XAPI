@@ -69,7 +69,7 @@ public:
 	CTraderApi(void);
 	virtual ~CTraderApi(void);
 
-	void Register(void* pCallback);
+	void Register(void* pCallback, void* pClass);
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
@@ -78,17 +78,16 @@ public:
 	void Disconnect();
 
 	int ReqOrderInsert(
-		OrderIDType* pOutput,
-		int OrderRef,
 		OrderField* pOrder,
-		int count);
+		int count,
+		OrderIDType* pInOut);
 
 	//char* ReqParkedOrderInsert(int OrderRef,
 	//	OrderField* pOrder1,
 	//	OrderField* pOrder2);
 
-	int ReqOrderAction(OrderIDType* pOutput, OrderIDType* szId, int count);
-	int ReqOrderAction(OrderIDType* pOutput, OrderFieldEx *pOrder, int count);
+	int ReqOrderAction(OrderIDType* szId, int count, OrderIDType* pOutput);
+	int ReqOrderAction(OrderFieldEx *pOrder, int count, OrderIDType* pOutput);
 
 	//char* ReqQuoteInsert(
 	//	int QuoteRef,
@@ -236,5 +235,7 @@ private:
 	int							m_UserInfo_Count;
 
 	STOrderCancel				m_temp_ordercancel;
+
+	void*						m_pClass;
 };
 

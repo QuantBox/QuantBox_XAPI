@@ -57,20 +57,20 @@ public:
 	CTraderApi(void);
 	virtual ~CTraderApi(void);
 
-	void Register(void* pMsgQueue);
+	void Register(void* pCallback, void* pClass);
 
 	void Connect(const string& szPath,
 		ServerInfoField* pServerInfo,
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	char* ReqOrderInsert(
-		int OrderRef,
-		OrderField* pOrder1);
+	int ReqOrderInsert(
+		OrderField* pOrder,
+		int count,
+		OrderIDType* pInOut);
 
-	int ReqOrderAction(const string& szId);
-	int ReqOrderAction(CThostFtdcOrderField *pOrder);
-
+	int ReqOrderAction(OrderIDType* szIds, int count, OrderIDType* pOutput);
+	int ReqOrderAction(CThostFtdcOrderField *pOrder, int count, OrderIDType* pOutput);
 
 	void ReqQryTradingAccount();
 	void ReqQryInvestorPosition(const string& szInstrumentId);
@@ -197,5 +197,6 @@ private:
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;
+	void*						m_pClass;
 };
 

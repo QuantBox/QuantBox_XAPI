@@ -17,7 +17,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return (void*)(ApiType::MarketData | ApiType::QuoteRequest);
 	case GetApiVersion:
-		return (void*)"0.2.0.20150226";
+		return (void*)"0.3.0.20150407";
 	case GetApiName:
 		return (void*)"Kingstar";
 	case Create:
@@ -39,12 +39,12 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		delete pApi;
 		return 0;
 	case Register:
-		pApi->Register(ptr1);
+		pApi->Register(ptr1, ptr2);
 		break;
 	case Config:
 		return (void*)pApi->Config((ConfigInfoField*)ptr1);
 	case Connect:
-		pApi->Connect((const char*)ptr3, (ServerInfoField*)ptr1, (UserInfoField*)ptr2);
+		pApi->Connect((const char*)ptr3, (ServerInfoField*)ptr1, (UserInfoField*)ptr2, size2);
 		break;
 	case Disconnect:
 		pApi->Disconnect();

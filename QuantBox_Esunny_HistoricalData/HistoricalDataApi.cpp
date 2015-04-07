@@ -56,7 +56,7 @@ int GetNextTradingDate(int date)
 void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	// 由内部调用，不用检查是否为空
-	CHistoricalDataApi* pApi = (CHistoricalDataApi*)pApi1;
+	CHistoricalDataApi* pApi = (CHistoricalDataApi*)pApi2;
 	pApi->QueryInThread(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 	return nullptr;
 }
@@ -119,7 +119,7 @@ CHistoricalDataApi::CHistoricalDataApi(void)
 	m_msgQueue = new CMsgQueue();
 	m_msgQueue_Query = new CMsgQueue();
 
-	m_msgQueue_Query->Register(Query);
+	m_msgQueue_Query->Register(Query,this);
 	m_msgQueue_Query->StartThread();
 
 	m_nHdRequestId = 0;
@@ -131,13 +131,14 @@ CHistoricalDataApi::~CHistoricalDataApi(void)
 	Disconnect();
 }
 
-void CHistoricalDataApi::Register(void* pCallback)
+void CHistoricalDataApi::Register(void* pCallback, void* pClass)
 {
+	m_pClass = pClass;
 	if (m_msgQueue == nullptr)
 		return;
 
-	m_msgQueue_Query->Register(Query);
-	m_msgQueue->Register(pCallback);
+	m_msgQueue_Query->Register(Query,this);
+	m_msgQueue->Register(pCallback,this);
 	if (pCallback)
 	{
 		m_msgQueue_Query->StartThread();
@@ -158,23 +159,23 @@ void CHistoricalDataApi::Connect(const string& szPath,
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
-	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, this, nullptr, 0, 0,
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, m_msgQueue_Query, this, 0, 0,
 		nullptr, 0, nullptr, 0, nullptr, 0);
 }
 
 int CHistoricalDataApi::_Init()
 {
 	m_pApi = CreateEsunnyQuotClient(this);
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	//初始化连接
 	int iRet = m_pApi->Connect(m_ServerInfo.Address, m_ServerInfo.Port);
 	if (0 == iRet)
 	{
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 		iRet = m_pApi->Login(m_UserInfo.UserID, m_UserInfo.Password);
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	}
 	else
 	{
@@ -183,7 +184,7 @@ int CHistoricalDataApi::_Init()
 		pField->ErrorID = iRet;
 		strcpy(pField->ErrorMsg, "连接超时");
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 
 		return iRet;
 	}
@@ -196,7 +197,7 @@ void CHistoricalDataApi::Disconnect()
 	if (m_msgQueue_Query)
 	{
 		m_msgQueue_Query->StopThread();
-		m_msgQueue_Query->Register(nullptr);
+		m_msgQueue_Query->Register(nullptr,nullptr);
 		m_msgQueue_Query->Clear();
 		delete m_msgQueue_Query;
 		m_msgQueue_Query = nullptr;
@@ -210,7 +211,7 @@ void CHistoricalDataApi::Disconnect()
 
 		// 全清理，只留最后一个
 		m_msgQueue->Clear();
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 		// 主动触发
 		m_msgQueue->Process();
 	}
@@ -219,7 +220,7 @@ void CHistoricalDataApi::Disconnect()
 	if (m_msgQueue)
 	{
 		m_msgQueue->StopThread();
-		m_msgQueue->Register(nullptr);
+		m_msgQueue->Register(nullptr,nullptr);
 		m_msgQueue->Clear();
 		delete m_msgQueue;
 		m_msgQueue = nullptr;
@@ -237,12 +238,12 @@ int __cdecl CHistoricalDataApi::OnRspLogin(int err, const char *errtext)
 
 	if (err == 0)
 	{
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	}
 	else
 	{
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 	}
 
 	return 0;
@@ -255,7 +256,7 @@ int __cdecl CHistoricalDataApi::OnChannelLost(int err, const char *errtext)
 	pField->ErrorID = err;
 	strcpy(pField->ErrorMsg, errtext);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, this, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 
 	return 0;
 }
@@ -284,7 +285,7 @@ int __cdecl CHistoricalDataApi::OnRspHistoryQuot(struct STKHISDATA *pHisData)
 		pF->OpenInterest = item.fAmount;
 	}
 
-	m_msgQueue->Input_Copy(ResponeType::OnRspQryHistoricalBars, m_msgQueue, this, true, 0, pFields, sizeof(BarField)*pHisData->nCount, &m_RequestBar, sizeof(HistoricalDataRequestField), nullptr, 0);
+	m_msgQueue->Input_Copy(ResponeType::OnRspQryHistoricalBars, m_msgQueue, m_pClass, true, 0, pFields, sizeof(BarField)*pHisData->nCount, &m_RequestBar, sizeof(HistoricalDataRequestField), nullptr, 0);
 
 	if (pFields)
 		delete[] pFields;
@@ -303,7 +304,7 @@ int CHistoricalDataApi::ReqQryHistoricalTicks(HistoricalDataRequestField* reques
 	request->RequestId = m_nHdRequestId;
 	request->CurrentDate = request->Date1;
 
-	m_msgQueue_Query->Input_Copy(RequestType::E_ReqQryHistoricalTicks, this, nullptr, 0, 0,
+	m_msgQueue_Query->Input_Copy(RequestType::E_ReqQryHistoricalTicks, m_msgQueue_Query, this, 0, 0,
 		request, sizeof(HistoricalDataRequestField), nullptr, 0, nullptr, 0);
 
 	return m_nHdRequestId;
@@ -326,7 +327,7 @@ int CHistoricalDataApi::ReqQryHistoricalTicks_(HistoricalDataRequestField* reque
 	{
 		// 每天早上如9点前，前是查了没有返回的，所以要延时检查,没有就发回一个结束的标识
 		m_timer_1 = time(NULL);
-		m_msgQueue_Query->Input_NoCopy(RequestType::E_ReqQryHistoricalTicks_Check, this, nullptr, 0, 0,
+		m_msgQueue_Query->Input_NoCopy(RequestType::E_ReqQryHistoricalTicks_Check, m_msgQueue_Query, this, 0, 0,
 			nullptr, 0, nullptr, 0, nullptr, 0);
 	}
 	else
@@ -357,13 +358,13 @@ int CHistoricalDataApi::RtnEmptyRspQryHistoricalTicks()
 {
 	bool bIsLast = m_RequestTick.CurrentDate >= m_RequestTick.Date2;
 
-	m_msgQueue->Input_Copy(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, bIsLast, 0, 0, 0, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
+	m_msgQueue->Input_Copy(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, m_pClass, bIsLast, 0, 0, 0, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
 
 	if (!bIsLast)
 	{
 		m_RequestTick.CurrentDate = GetNextTradingDate(m_RequestTick.CurrentDate);
 
-		m_msgQueue_Query->Input_Copy(RequestType::E_ReqQryHistoricalTicks, this, nullptr, 0, 0,
+		m_msgQueue_Query->Input_Copy(RequestType::E_ReqQryHistoricalTicks, m_msgQueue_Query, this, 0, 0,
 			&m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0, nullptr, 0);
 	}
 
@@ -401,7 +402,7 @@ int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 
 	bool bIsLast = m_RequestTick.CurrentDate >= m_RequestTick.Date2;
 
-	m_msgQueue->Input_Copy(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, this, bIsLast, 0, pFields, sizeof(TickField)*pTraceData->nCount, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
+	m_msgQueue->Input_Copy(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, m_pClass, bIsLast, 0, pFields, sizeof(TickField)*pTraceData->nCount, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
 
 	if (pFields)
 		delete[] pFields;
@@ -409,7 +410,7 @@ int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 	if (!bIsLast)
 	{
 		m_RequestTick.CurrentDate = GetNextTradingDate(m_RequestTick.CurrentDate);
-		m_msgQueue_Query->Input_Copy(RequestType::E_ReqQryHistoricalTicks, this, nullptr, 0, 0,
+		m_msgQueue_Query->Input_Copy(RequestType::E_ReqQryHistoricalTicks, m_msgQueue_Query, this, 0, 0,
 			&m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0, nullptr, 0);
 	}
 
@@ -432,7 +433,7 @@ int __cdecl CHistoricalDataApi::OnRspMarketInfo(struct MarketInfo *pMarketInfo, 
 		strcpy(pField->InstrumentName, item.szName);
 		pField->Type = InstrumentType::Future;
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInstrument, m_msgQueue, this, i >= pMarketInfo->stocknum - 1, 0, pField, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInstrument, m_msgQueue, m_pClass, i >= pMarketInfo->stocknum - 1, 0, pField, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
 	}
 
 	return 0;
@@ -490,7 +491,7 @@ int CHistoricalDataApi::ReqQryHistoricalBars(HistoricalDataRequestField* request
 	++m_nHdRequestId;
 	request->RequestId = m_nHdRequestId;
 
-	m_msgQueue_Query->Input_Copy(RequestType::E_ReqQryHistoricalBars, this, nullptr, 0, 0,
+	m_msgQueue_Query->Input_Copy(RequestType::E_ReqQryHistoricalBars, m_msgQueue_Query, this, 0, 0,
 		request, sizeof(HistoricalDataRequestField), nullptr, 0, nullptr, 0);
 
 	return m_nHdRequestId;
