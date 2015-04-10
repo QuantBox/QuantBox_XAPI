@@ -76,6 +76,11 @@ namespace QuantBox.XAPI
         /// </summary>
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 512)]
         public string Address;
+        /// <summary>
+        /// 扩展信息
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
+        public string ExtendInformation;
     }
 
     /// <summary>

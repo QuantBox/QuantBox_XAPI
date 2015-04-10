@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 
-#if defined WINDOWS
+#if defined WINDOWS || _WIN32
 #include <Windows.h>
 #endif
 
@@ -48,10 +48,10 @@ public:
 	virtual void OnRspQryHistoricalBars(BarField* pBars, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
 };
 
-int main(int argc, char* argv[])
+int main_1(int argc, char* argv[])
 {
 	CXSpiImpl* p = new CXSpiImpl();
-#if defined WINDOWS
+#if defined WINDOWS || _WIN32
 	char DLLPath1[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\CTP\\x86\\QuantBox_CTP_Quote.dll";
 	char DLLPath2[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\CTP\\x86\\QuantBox_CTP_Trade.dll";
 #else
@@ -134,3 +134,50 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
+
+int main(int argc, char* argv[])
+{
+	CXSpiImpl* p = new CXSpiImpl();
+#if defined WINDOWS || _WIN32
+	char DLLPath1[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\ZeroMQ\\x86\\QuantBox_ZeroMQ_Quote.dll";
+#else
+	char DLLPath1[250] = "libQuantBox_ZeroMQ_Quote.so";
+#endif
+
+	ServerInfoField				m_ServerInfo1 = { 0 };
+	UserInfoField				m_UserInfo = { 0 };
+
+	strcpy(m_ServerInfo1.Address, "tcp://127.0.0.1:5555");
+	//strcpy(m_ServerInfo1.Address, "pgm://10.10.9.95;239.192.1.1:5555");
+
+	CXApi* pApi1 = CXApi::CreateApi(DLLPath1);
+	if (pApi1)
+	{
+		if (!pApi1->Init())
+		{
+			printf("%s\r\n", pApi1->GetLastError());
+			pApi1->Disconnect();
+			return -1;
+		}
+
+		pApi1->RegisterSpi(p);
+
+#if defined WINDOWS || _WIN32
+		pApi1->Connect("D:\\", &m_ServerInfo1, &m_UserInfo, 1);
+#else
+		pApi1->Connect("./", &m_ServerInfo1, &m_UserInfo, 1);
+#endif
+
+		getchar();
+
+		pApi1->Subscribe("IF1504", "");
+
+		getchar();
+
+		getchar();
+
+		pApi1->Disconnect();
+	}
+
+	return 0;
+}

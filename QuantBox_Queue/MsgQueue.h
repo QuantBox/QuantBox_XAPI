@@ -9,7 +9,9 @@
 
 #include "../include/QueueHeader.h"
 #include "../include/QueueStruct.h"
-#include "readerwriterqueue.h"
+#include "../include/ApiStruct.h"
+
+//#include "readerwriterqueue.h"
 #include "concurrentqueue.h"
 
 using namespace std;
@@ -21,6 +23,8 @@ using namespace moodycamel;
 class DLL_PUBLIC CMsgQueue
 {
 public:
+	bool m_bDirectOutput;
+
 	CMsgQueue();
 	virtual ~CMsgQueue()
 	{
@@ -47,10 +51,52 @@ public:
 		m_pClass = pClass;
 	}
 
+	ConfigInfoField* Config(ConfigInfoField* pConfigInfo);
+
+	void* new_block(int size)
+	{
+		// 下次改用内存池
+		void* p = new char[size];
+		if (p == nullptr)
+			return nullptr;
+
+		memset(p, 0, size);
+		return p;
+	}
+
+	void delete_block(void* p)
+	{
+		if (p != nullptr)
+			delete[] p;
+		p = nullptr;
+	}
+
+	// 直接发送，不入队列
+	void Input_Output(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+	{
+		try
+		{
+			if (m_fnOnRespone)
+				(*m_fnOnRespone)(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		}
+		catch (...)
+		{
+			m_fnOnRespone = nullptr;
+		}
+	}
+
 	// 对输入的数据做了一次复制，主要是为了解决转过来的指针可能失效的问题。
 	// 比如说STL中的指针跨线程指向的地址就无效了。所以从map中取的OrderField等都是做了次复制
 	void Input_Copy(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 	{
+		if (m_bDirectOutput)
+		{
+			Input_Output(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+			delete_block(ptr1);
+			delete_block(ptr2);
+			delete_block(ptr3);
+			return;
+		}
 		ResponeItem* pItem = new ResponeItem;
 		memset(pItem, 0, sizeof(ResponeItem));
 		pItem->bNeedDelete = true;
@@ -89,22 +135,19 @@ public:
 		m_cv.notify_all();
 	}
 
-	void* new_block(int size)
-	{
-		// 下次改用内存池
-		void* p = new char[size];
-		if (p == nullptr)
-			return nullptr;
-
-		memset(p, 0, size);
-		return p;
-	}
-
 	// 对于过来的指针不做复制，直接使用
 	// 由于是跨DLL进行操作，由另一个DLL创建的内存块交给此队列进行处理时delete可能实现有变化导致出错
 	// 所以必须是由此DLL new出来的内存块交给另一DLL修改返回后，再由此DLL delete，所以提前用到new_block
 	void Input_NoCopy(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 	{
+		if (m_bDirectOutput)
+		{
+			Input_Output(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+			delete_block(ptr1);
+			delete_block(ptr2);
+			delete_block(ptr3);
+			return;
+		}
 		ResponeItem* pItem = new ResponeItem;
 		pItem->bNeedDelete = true;
 
@@ -131,6 +174,11 @@ public:
 	// 不做拷贝也不做delete，这种必须由其它DLL进行delete
 	void Input_NoCopy_NoDelete(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 	{
+		if (m_bDirectOutput)
+		{
+			Input_Output(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+			return;
+		}
 		ResponeItem* pItem = new ResponeItem;
 		pItem->bNeedDelete = false;
 
@@ -154,33 +202,24 @@ public:
 		m_cv.notify_all();
 	}
 
+protected:
+	virtual void RunInThread();
+	virtual void Output(ResponeItem* pItem);
+
 private:
 	static void ProcessThread(CMsgQueue* lpParam)
 	{
 		if (lpParam)
 			lpParam->RunInThread();
 	}
-	void RunInThread();
-	void Output(ResponeItem* pItem)
-	{
-		try
-		{
-			if (m_fnOnRespone)
-				(*m_fnOnRespone)(pItem->type, pItem->pApi1, pItem->pApi2, pItem->double1, pItem->double2, pItem->ptr1, pItem->size1, pItem->ptr2, pItem->size2, pItem->ptr3, pItem->size3);
-		}
-		catch (...)
-		{
-			m_fnOnRespone = nullptr;
-		}
-	}
-
-private:
+protected:
 	volatile bool						m_bRunning;
 	mutex								m_mtx;
 	mutex								m_mtx_del;
 	condition_variable					m_cv;
 	thread*								m_hThread;
-	//ReaderWriterQueue<ResponeItem*>		m_queue;
+
+private:
 	ConcurrentQueue<ResponeItem*>		m_queue;
 	fnOnRespone							m_fnOnRespone;
 	void*								m_pClass;

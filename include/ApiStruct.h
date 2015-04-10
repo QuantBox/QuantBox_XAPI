@@ -114,11 +114,12 @@ struct ServerInfoField
 	ProductInfoType	UserProductInfo;
 	AuthCodeType	AuthCode;
 	AddressType	Address;
+	ExtendInformationType	ExtendInformation;
 };
 
 struct ConfigInfoField
 {
-
+	bool DirectOutput;
 };
 
 // 用户信息

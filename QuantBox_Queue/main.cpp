@@ -5,6 +5,7 @@
 #include "../include/QueueStruct.h"
 
 #include "../include/ApiHeader.h"
+#include "../include/ApiStruct.h"
 
 inline CMsgQueue* GetQueue(void* pMsgQueue)
 {
@@ -19,7 +20,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return nullptr;
 	case GetApiVersion:
-		return (void*)"0.3.0.20150407";
+		return (void*)"0.3.0.20150402";
 	case GetApiName:
 		return (void*)"Queue";
 	case Create:
@@ -44,7 +45,7 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		pQueue->Register(ptr1,ptr2);
 		break;
 	case Config:
-		break;
+		return (void*)pQueue->Config((ConfigInfoField*)ptr1);
 	case Connect:
 		pQueue->StartThread();
 		break;
@@ -58,7 +59,8 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		pQueue->Process();
 		break;
 	default:
-		//pQueue->Input_Copy(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		// 如果动态调用，使用直接输出的方式
+		pQueue->Input_Output(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 		break;
 	}
 

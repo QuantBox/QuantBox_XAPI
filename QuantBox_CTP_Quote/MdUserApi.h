@@ -3,6 +3,7 @@
 #include "../include/ApiStruct.h"
 #include "../include/CTP/ThostFtdcMdApi.h"
 
+
 #ifdef _WIN64
 #pragma comment(lib, "../include/CTP/win64/thostmduserapi.lib")
 #pragma comment(lib, "../lib/QuantBox_Queue_x64.lib")
@@ -96,5 +97,7 @@ private:
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;
 	void*						m_pClass;
+
+	CMsgQueue*					m_remoteQueue;
 };
 

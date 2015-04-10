@@ -8,6 +8,9 @@
 #include "../include/toolkit.h"
 
 #include "../QuantBox_Queue/MsgQueue.h"
+#ifdef _REMOTE
+#include "../QuantBox_Queue/RemoteQueue.h"
+#endif
 
 #include <string.h>
 #include <cfloat>
@@ -36,6 +39,10 @@ CMdUserApi::CMdUserApi(void)
 
 	m_msgQueue_Query->Register((void*)Query, this);
 	m_msgQueue_Query->StartThread();
+
+	//m_msgQueue->m_bDirectOutput = true;
+
+	m_remoteQueue = nullptr;
 }
 
 CMdUserApi::~CMdUserApi(void)
@@ -131,6 +138,15 @@ void CMdUserApi::Connect(const string& szPath,
 
 	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, m_msgQueue_Query, this, 0, 0,
 		nullptr, 0, nullptr, 0, nullptr, 0);
+
+#ifdef _REMOTE
+	// 将收到的行情通过ZeroMQ发送出去
+	if (strlen(m_ServerInfo.ExtendInformation) > 0)
+	{
+		m_remoteQueue = new CRemoteQueue(m_ServerInfo.ExtendInformation);
+		m_remoteQueue->StartThread();
+	}
+#endif
 }
 
 int CMdUserApi::_Init()
@@ -224,6 +240,16 @@ void CMdUserApi::Disconnect()
 		m_msgQueue->Clear();
 		delete m_msgQueue;
 		m_msgQueue = nullptr;
+	}
+
+	// 清理队列
+	if (m_remoteQueue)
+	{
+		m_remoteQueue->StopThread();
+		m_remoteQueue->Register(nullptr, nullptr);
+		m_remoteQueue->Clear();
+		delete m_remoteQueue;
+		m_remoteQueue = nullptr;
 	}
 }
 
@@ -551,8 +577,18 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 			pField->AskVolume5 = pDepthMarketData->AskVolume5;
 		} while (false);
 
+		// 这两个队列先头循序不要搞混，有删除功能的语句要放在后面
+		// 如果放前面，会导致远程收到乱码
+#ifdef _REMOTE
+		if (m_remoteQueue)
+		{
+			m_remoteQueue->Input_Copy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+		}
+#endif
+		
 		m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
-	//}
+		// 要关注一下其内的
+	//}	
 }
 
 void CMdUserApi::OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

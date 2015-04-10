@@ -1,0 +1,12 @@
+必需要编译才能使用，由于这三个库打包前有9MB，文件也有上千个，为了方便，打成了ZeroMQ.zip文件。
+用户如果要再编译，需要自行解压。
+
+然后进入到
+libzmq
+libsouium
+czmq
+中先后进行编译
+
+都有builds/msvc/vs2013/*.sln
+目前我都是用的DynDebugDll进行的编译，编译好的东西都放在了x86下。
+解压ZeroMQ.zip后，需要将zmq和czmq的目录在Additional Include Directories中添加，不然找不到头文件

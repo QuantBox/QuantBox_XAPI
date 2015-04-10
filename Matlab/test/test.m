@@ -16,7 +16,7 @@ md.User.Password = '123456';
 addlistener(md,'OnConnectionStatus',@OnMdConnectionStatus);
 addlistener(md,'OnRtnDepthMarketData',@OnRtnDepthMarketData);
 
-%md.Connect();
+md.Connect();
 
 %% ½»Ò×
 global td;

@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="include">
-      <UniqueIdentifier>{7326792e-9027-4aff-bfd3-1035b5f2d27f}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -27,25 +24,10 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MsgQueue.h">
+    <ClInclude Include="MdUserApi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\CrossPlatform.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\QueueHeader.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\QueueStruct.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\ApiHeader.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\QueueEnum.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="RemoteQueue.h">
+    <ClInclude Include="..\include\toolkit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,10 +41,10 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MsgQueue.cpp">
+    <ClCompile Include="MdUserApi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RemoteQueue.cpp">
+    <ClCompile Include="..\include\toolkit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
