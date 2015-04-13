@@ -6,6 +6,7 @@
 #if defined WINDOWS || _WIN32
 #include <Windows.h>
 #endif
+#include <time.h>
 
 #include <string.h>
 #include "../include/XApiCpp.h"
@@ -22,6 +23,26 @@ public:
 	virtual void OnConnectionStatus(ConnectionStatus status, RspUserLoginField* pUserLogin, int size1)
 	{
 		printf("%d\r\n", status);
+		if (status == ConnectionStatus::Done)
+		{
+			// 得到当前的时间
+			time_t rawtime;
+			struct tm * timeinfo;
+			time(&rawtime);
+			timeinfo = localtime(&rawtime);
+			int mon = timeinfo->tm_mon;
+			char buf[64] = { 0 };
+			for (int i = 0; i < 12; ++i)
+			{
+				int x = mon + i;
+				int a = x / 12;
+				int b = x % 12;
+				sprintf(buf, "IF%d%02d", (1900 + timeinfo->tm_year + a) % 100, b + 1);
+				m_pApi->Subscribe(buf, "");
+				sprintf(buf, "TF%d%02d", (1900 + timeinfo->tm_year + a) % 100, b + 1);
+				m_pApi->Subscribe(buf, "");
+			}
+		}
 	}
 	virtual void OnRtnError(ErrorField* pError){};
 
@@ -46,6 +67,9 @@ public:
 
 	virtual void OnRspQryHistoricalTicks(TickField* pTicks, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
 	virtual void OnRspQryHistoricalBars(BarField* pBars, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
+
+public:
+	CXApi* m_pApi;
 };
 
 int main_1(int argc, char* argv[])
@@ -134,8 +158,7 @@ int main_1(int argc, char* argv[])
 	return 0;
 }
 
-
-int main(int argc, char* argv[])
+int main_2(int argc, char* argv[])
 {
 	CXSpiImpl* p = new CXSpiImpl();
 #if defined WINDOWS || _WIN32
@@ -181,3 +204,58 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
+
+
+int main(int argc, char* argv[])
+{
+	CXSpiImpl* p = new CXSpiImpl();
+#if defined WINDOWS || _WIN32
+	char DLLPath1[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\CTP\\x86\\QuantBox_CTP_Quote.dll";
+#else
+	char DLLPath1[250] = "libQuantBox_CTP_Quote.so";
+#endif
+
+	ServerInfoField				m_ServerInfo1 = { 0 };
+	UserInfoField				m_UserInfo = { 0 };
+
+	strcpy(m_ServerInfo1.BrokerID, "0272");
+	strcpy(m_ServerInfo1.Address, "tcp://180.168.146.181:10210");
+	m_ServerInfo1.TopicId = 100;// femas这个地方一定不能省
+	strcpy(m_ServerInfo1.ExtendInformation, "tcp://*:5555");//这需要对Femas进行改造
+	
+	strcpy(m_UserInfo.UserID, "00049");
+	strcpy(m_UserInfo.Password, "123456");
+
+	CXApi* pApi1 = CXApi::CreateApi(DLLPath1);
+	if (pApi1)
+	{
+		if (!pApi1->Init())
+		{
+			printf("%s\r\n", pApi1->GetLastError());
+			pApi1->Disconnect();
+			return -1;
+		}
+
+		p->m_pApi = pApi1;
+		pApi1->RegisterSpi(p);
+
+#if defined WINDOWS || _WIN32
+		pApi1->Connect("D:\\", &m_ServerInfo1, &m_UserInfo, 1);
+#else
+		pApi1->Connect("./", &m_ServerInfo1, &m_UserInfo, 1);
+#endif
+
+		do
+		{
+			int c = getchar();
+			if (c == 'q')
+				break;
+		} while (true);
+
+		pApi1->Disconnect();
+	}
+
+	return 0;
+}
+
+
