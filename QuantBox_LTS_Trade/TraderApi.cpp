@@ -386,7 +386,7 @@ int CTraderApi::ReqOrderInsert(
 	case Stop:
 	case MarketOnClose:
 	case TrailingStop:
-		body.OrderPriceType = SECURITY_FTDC_OPT_AnyPrice;
+		body.OrderPriceType = SECURITY_FTDC_OPT_BestPrice;
 		body.TimeCondition = SECURITY_FTDC_TC_IOC;
 		break;
 	case Limit:
