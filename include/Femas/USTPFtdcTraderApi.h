@@ -74,15 +74,6 @@ public:
 	///报单操作应答
 	virtual void OnRspOrderAction(CUstpFtdcOrderActionField *pOrderAction, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	///报价录入应答
-	virtual void OnRspQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
-
-	///报价操作应答
-	virtual void OnRspQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
-
-	///询价请求应答
-	virtual void OnRspForQuote(CUstpFtdcReqForQuoteField *pReqForQuote, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
-
 	///数据流回退通知
 	virtual void OnRtnFlowMessageCancel(CUstpFtdcFlowMessageCancelField *pFlowMessageCancel) {};
 
@@ -103,15 +94,6 @@ public:
 
 	///账户出入金回报
 	virtual void OnRtnInvestorAccountDeposit(CUstpFtdcInvestorAccountDepositResField *pInvestorAccountDepositRes) {};
-
-	///报价回报
-	virtual void OnRtnQuote(CUstpFtdcRtnQuoteField *pRtnQuote) {};
-
-	///报价录入错误回报
-	virtual void OnErrRtnQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUstpFtdcRspInfoField *pRspInfo) {};
-
-	///询价回报
-	virtual void OnRtnForQuote(CUstpFtdcReqForQuoteField *pReqForQuote) {};
 
 	///报单查询应答
 	virtual void OnRspQryOrder(CUstpFtdcOrderField *pOrder, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
@@ -237,14 +219,6 @@ public:
 	///        USTP_TERT_QUICK:只传送登录后交易员流的内容
 	///@remark 该方法要在Init方法前调用。若不调用则不会收到交易员流的数据。
 	virtual void SubscribeUserTopic(USTP_TE_RESUME_TYPE nResumeType) = 0;
-
-	///订阅询价流。
-	///@param nResumeType 交易员流重传方式  
-	///        USTP_TERT_RESTART:从本交易日开始重传
-	///        USTP_TERT_RESUME:从上次收到的续传
-	///        USTP_TERT_QUICK:只传送登录后交易员流的内容
-	///@remark 该方法要在Init方法前调用。若不调用则不会收到交易员流的数据。
-	virtual void SubscribeForQuote(USTP_TE_RESUME_TYPE nResumeType) = 0;
 	
 	///设置心跳超时时间。
 	///@param timeout 心跳超时时间(秒)  
@@ -277,15 +251,6 @@ public:
 
 	///报单操作请求
 	virtual int ReqOrderAction(CUstpFtdcOrderActionField *pOrderAction, int nRequestID) = 0;
-
-	///请求报价录入
-	virtual int ReqQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, int nRequestID) = 0;
-
-	///报价操作请求
-	virtual int ReqQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, int nRequestID) = 0;
-
-	///客户询价请求
-	virtual int ReqForQuote(CUstpFtdcReqForQuoteField *pReqForQuote, int nRequestID) = 0;
 
 	///报单查询请求
 	virtual int ReqQryOrder(CUstpFtdcQryOrderField *pQryOrder, int nRequestID) = 0;

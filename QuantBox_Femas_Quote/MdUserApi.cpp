@@ -386,12 +386,12 @@ void CMdUserApi::OnRtnDepthMarketData(CUstpFtdcDepthMarketDataField *pDepthMarke
 	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
 
 	strcpy(pField->InstrumentID, pDepthMarketData->InstrumentID);
-	//strcpy(marketData.ExchangeID, pDepthMarketData->ExchangeID);
+	//strcpy(pField->ExchangeID, pDepthMarketData->ExchangeID);
 	strcpy(pField->ExchangeID, "CFFEX");
 
 	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
 
-	GetExchangeTime(pDepthMarketData->TradingDay, pDepthMarketData->TradingDay, pDepthMarketData->UpdateTime
+	GetExchangeTime(pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
 		, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
 	pField->UpdateMillisec = pDepthMarketData->UpdateMillisec;
 

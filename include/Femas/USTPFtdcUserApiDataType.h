@@ -22,7 +22,6 @@ const int USTP_TSS_PRIVATE = 2;		//客户私有流
 const int USTP_TSS_PUBLIC = 3;		//公共流
 const int USTP_TSS_QUERY = 4;		//查询
 const int USTP_TSS_USER = 5;		//用户私有流
-const int USTP_TSS_QUOTE = 6;		//询价流
 
 /////////////////////////////////////////////////////////////////////////
 ///TFtdcUstpPriceTickType是一个最小变动价位类型
@@ -93,6 +92,11 @@ typedef int TUstpFtdcDataCenterIDType;
 ///TFtdcUstpSettlementIDType是一个结算编号类型
 /////////////////////////////////////////////////////////////////////////
 typedef int TUstpFtdcSettlementIDType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcUstpBusinessLocalIDType是一个本地业务标识类型
+/////////////////////////////////////////////////////////////////////////
+typedef int TUstpFtdcBusinessLocalIDType;
 
 /////////////////////////////////////////////////////////////////////////
 ///TFtdcUstpMonthType是一个月份类型
@@ -167,7 +171,7 @@ typedef char TUstpFtdcExchangeIDType[11];
 /////////////////////////////////////////////////////////////////////////
 ///TFtdcUstpDateType是一个日期类型
 /////////////////////////////////////////////////////////////////////////
-typedef char TUstpFtdcDateType[9];
+typedef char TUstpFtdcDateType[10];
 
 /////////////////////////////////////////////////////////////////////////
 ///TFtdcUstpTimeType是一个时间类型
@@ -252,7 +256,7 @@ typedef char TUstpFtdcCustomType[65];
 /////////////////////////////////////////////////////////////////////////
 ///TFtdcUstpTradingDayType是一个交易日类型
 /////////////////////////////////////////////////////////////////////////
-typedef char TUstpFtdcTradingDayType[9];
+typedef char TUstpFtdcTradingDayType[10];
 
 /////////////////////////////////////////////////////////////////////////
 ///TFtdcUstpDepartmentType是一个营业部类型
@@ -309,6 +313,14 @@ typedef char TUstpFtdcVolumeConditionType;
 #define USTP_FTDC_FCR_MemberOverPositionLimit '3'
 ///持仓非整数倍
 #define USTP_FTDC_FCR_NotMultiple '4'
+///违规
+#define USTP_FTDC_FCR_Violation '5'
+///其他
+#define USTP_FTDC_FCR_Other '6'
+///自然人临近交割
+#define USTP_FTDC_FCR_PersonDeliv '7'
+///客户套保超仓
+#define USTP_FTDC_FCR_HedgeOverPositionLimit '8'
 
 typedef char TUstpFtdcForceCloseReasonType;
 
@@ -433,8 +445,6 @@ typedef char TUstpFtdcTimeConditionType;
 #define USTP_FTDC_OS_Participant '0'
 ///来自管理员
 #define USTP_FTDC_OS_Administrator '1'
-///报价单拆分出来的买单或卖单
-#define USTP_FTDC_OS_QuoteSplit '2'
 
 typedef char TUstpFtdcOrderSourceType;
 
@@ -531,41 +541,6 @@ typedef char TUstpFtdcIsActiveType;
 /////////////////////////////////////////////////////////////////////////
 ///TFtdcUstpCurrencyIDType是一个币种代码类型
 /////////////////////////////////////////////////////////////////////////
-typedef char TUstpFtdcCurrencyIDType[4];
-
-/////////////////////////////////////////////////////////////////////////
-///TFtdcUstpQuoteSysIDType是一个报价编号类型
-/////////////////////////////////////////////////////////////////////////
-typedef char TUstpFtdcQuoteSysIDType[31];
-
-/////////////////////////////////////////////////////////////////////////
-///TFtdcUstpUserQuoteLocalIDType是一个用户本地报价编号类型
-/////////////////////////////////////////////////////////////////////////
-typedef char TUstpFtdcUserQuoteLocalIDType[21];
-
-/////////////////////////////////////////////////////////////////////////
-///TFtdcUstpQuoteLocalIDType是一个飞马本地报价编号类型
-/////////////////////////////////////////////////////////////////////////
-typedef char TUstpFtdcQuoteLocalIDType[13];
-
-/////////////////////////////////////////////////////////////////////////
-///TFtdcUstpQuoteStatusType是一个报价单状态类型类型
-/////////////////////////////////////////////////////////////////////////
-///在飞马中还未进入交易系统
-#define USTP_FTDC_QS_Inited_InFEMAS '0'
-///已经报入交易系统中
-#define USTP_FTDC_QS_Accepted_InTradingSystem '1'
-///已经撤掉单腿
-#define USTP_FTDC_QS_Canceled_SingleLeg '2'
-///已经全部撤掉
-#define USTP_FTDC_QS_Canceled_All '3'
-///已经有单腿成交
-#define USTP_FTDC_QS_Traded_SingleLeg '4'
-///已经全部成交
-#define USTP_FTDC_QS_Traded_All '5'
-///错误的撤消报价请求
-#define USTP_FTDC_QS_Error_QuoteAction '6'
-
-typedef char TUstpFtdcQuoteStatusType;
+typedef char TUstpFtdcCurrencyIDType[5];
 
 #endif
