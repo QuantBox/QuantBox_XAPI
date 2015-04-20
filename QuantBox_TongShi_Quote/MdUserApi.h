@@ -1,5 +1,7 @@
 #pragma once
-
+#ifndef _USE_32BIT_TIME_T
+#define _USE_32BIT_TIME_T
+#endif
 #include "../include/ApiStruct.h"
 #include <stdlib.h>
 #include "Stockdrv.h"
@@ -15,8 +17,12 @@
 #include <string>
 #include <atomic>
 #include <mutex>
+#include <thread>
 
 using namespace std;
+
+typedef int  (WINAPI *pFunStock_Init)(HWND hWnd, UINT Msg, int nWorkMode);
+typedef int  (WINAPI *pFunStock_Quit)(HWND hWnd);
 
 class CMsgQueue;
 
@@ -29,6 +35,10 @@ class CMdUserApi
 	};
 
 public:
+	static CMdUserApi * pThis;
+	static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	LRESULT _OnMsg(WPARAM wParam, LPARAM lParam);
+
 	CMdUserApi(void);
 	virtual ~CMdUserApi(void);
 
@@ -46,6 +56,16 @@ public:
 
 	//void SubscribeQuote(const string& szInstrumentIDs, const string& szExchageID);
 	//void UnsubscribeQuote(const string& szInstrumentIDs, const string& szExchageID);
+private:
+	void StartThread();
+	void StopThread();
+
+	static void ProcessThread(CMdUserApi* lpParam)
+	{
+		if (lpParam)
+			lpParam->RunInThread();
+	}
+	void RunInThread();
 
 private:
 	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
@@ -67,7 +87,7 @@ private:
 
 	//virtual void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	//virtual void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
+	void OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData);
 
 	//virtual void OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -96,6 +116,15 @@ private:
 	CMsgQueue*					m_msgQueue_Query;
 	void*						m_pClass;
 
-	CMsgQueue*					m_remoteQueue;
+	volatile bool						m_bRunning;
+	mutex								m_mtx;
+	mutex								m_mtx_del;
+	//condition_variable					m_cv;
+	thread*								m_hThread;
+
+	HWND						m_hWnd;
+	void*						m_hModule;
+	pFunStock_Init				m_pStock_Init;
+	pFunStock_Quit				m_pStock_Quit;
 };
 

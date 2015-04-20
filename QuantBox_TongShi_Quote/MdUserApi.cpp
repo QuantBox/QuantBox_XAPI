@@ -9,12 +9,73 @@
 
 #include "../QuantBox_Queue/MsgQueue.h"
 
+#include "../include/XApiC.h"
+
+
+
+#include "TypeConvert.h"
+
 #include <string.h>
 #include <cfloat>
 
 #include <mutex>
 #include <vector>
+//#include <tchar.h>
+#include <windows.h>
+
 using namespace std;
+
+
+#define WM_USER_STOCK	2000
+
+CMdUserApi* CMdUserApi::pThis = nullptr;
+
+LRESULT CALLBACK CMdUserApi::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	if (message == WM_USER_STOCK)
+	{
+		return pThis->_OnMsg(wParam, lParam);
+	}
+	return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
+LRESULT CMdUserApi::_OnMsg(WPARAM wParam, LPARAM lParam)
+{
+	RCV_DATA* pHeader;
+	int i;
+
+	pHeader = (RCV_DATA*)lParam;
+
+	//	对于处理速度慢的数据类型,最好将 pHeader->m_pData 指向的数据备份, 再作处理
+	switch (wParam)
+	{
+	case RCV_REPORT:						// 股票行情
+		for (i = 0; i < pHeader->m_nPacketNum; i++)
+		{
+			// 数据处理
+			m_msgQueue->m_bDirectOutput;
+			OnRtnDepthMarketData((RCV_REPORT_STRUCTEx*)&(pHeader->m_pReport[i]));
+		}
+		break;
+
+	case RCV_FILEDATA:						// 文件
+		switch (pHeader->m_wDataType)
+		{
+		case FILE_HISTORY_EX:				// 补日线数据
+			break;
+
+		case FILE_MINUTE_EX:				// 补分钟线数据
+			break;
+		default:
+			return 0;
+		}
+		break;
+
+	default:
+		return 0;							// unknown data
+	}
+	return 1;
+}
 
 void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
@@ -39,7 +100,14 @@ CMdUserApi::CMdUserApi(void)
 
 	//m_msgQueue->m_bDirectOutput = true;
 
-	m_remoteQueue = nullptr;
+	m_bRunning = false;
+	m_hThread = nullptr;
+	m_hWnd = nullptr;
+	m_hModule = nullptr;
+	m_pStock_Init = nullptr;
+	m_pStock_Quit = nullptr;
+
+	pThis = this;
 }
 
 CMdUserApi::~CMdUserApi(void)
@@ -124,32 +192,6 @@ ConfigInfoField* CMdUserApi::Config(ConfigInfoField* pConfigInfo)
 //	return bRet;
 //}
 
-#include <tchar.h>
-#include <windows.h>
-
-LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	TCHAR szText[MAX_PATH] = { 0 };
-	//_stprintf(szText, _T("wParam=%d lParam=%d"), wParam, lParam);
-
-	switch (message)
-	{
-	case WM_USER + 100:
-		OutputDebugString(_T("WM_USER + 100"));
-		OutputDebugString(szText);
-		return 0;
-	case WM_USER + 200:
-		OutputDebugString(_T("WM_USER + 200"));
-		OutputDebugString(szText);
-		PostQuitMessage(0);
-		return 0;
-	default:
-		OutputDebugString(_T("default"));
-		OutputDebugString(szText);
-		break;
-	}
-	return DefWindowProc(hwnd, message, wParam, lParam);
-}
 
 void CMdUserApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
@@ -160,95 +202,23 @@ void CMdUserApi::Connect(const string& szPath,
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
 
-	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, m_msgQueue_Query, this, 0, 0,
-		nullptr, 0, nullptr, 0, nullptr, 0);
+	StartThread();
 
-	HWND hWnd = CreateWindow(
-		_T("static"),
-		_T("MsgRecv"),
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		NULL,
-		NULL,
-		NULL,
-		NULL);
-
-	if (hWnd != NULL && IsWindow(hWnd))
-	{
-		SetWindowLong(hWnd, GWL_WNDPROC, (LONG)WndProc);
-	}
-
-	MSG msg;
-	while (GetMessage(&msg, NULL, 0, 0))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
+	//m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, m_msgQueue_Query, this, 0, 0,
+	//	nullptr, 0, nullptr, 0, nullptr, 0);
 }
 
 int CMdUserApi::_Init()
 {
-	//char *pszPath = new char[m_szPath.length() + 1024];
-	//srand((unsigned int)time(NULL));
-	//sprintf(pszPath, "%s/%s/%s/Md/%d/", m_szPath.c_str(), m_ServerInfo.BrokerID, m_UserInfo.UserID, rand());
-	//makedirs(pszPath);
-
-	//m_pApi = CThostFtdcMdApi::CreateFtdcMdApi(pszPath, m_ServerInfo.IsUsingUdp, m_ServerInfo.IsMulticast);
-	//delete[] pszPath;
-
-	//m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-
-	//if (m_pApi)
-	//{
-	//	m_pApi->RegisterSpi(this);
-
-	//	//添加地址
-	//	size_t len = strlen(m_ServerInfo.Address) + 1;
-	//	char* buf = new char[len];
-	//	strncpy(buf, m_ServerInfo.Address, len);
-
-	//	char* token = strtok(buf, _QUANTBOX_SEPS_);
-	//	while (token)
-	//	{
-	//		if (strlen(token)>0)
-	//		{
-	//			m_pApi->RegisterFront(token);
-	//		}
-	//		token = strtok(NULL, _QUANTBOX_SEPS_);
-	//	}
-	//	delete[] buf;
-
-	//	//初始化连接
-	//	m_pApi->Init();
-	//	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-	//}
+	//StartThread();
 
 	return 0;
 }
 
-//void CMdUserApi::ReqUserLogin()
-//{
-//	//CThostFtdcReqUserLoginField* pBody = (CThostFtdcReqUserLoginField*)m_msgQueue_Query->new_block(sizeof(CThostFtdcReqUserLoginField));
-//
-//	//strncpy(pBody->BrokerID, m_ServerInfo.BrokerID, sizeof(TThostFtdcBrokerIDType));
-//	//strncpy(pBody->UserID, m_UserInfo.UserID, sizeof(TThostFtdcInvestorIDType));
-//	//strncpy(pBody->Password, m_UserInfo.Password, sizeof(TThostFtdcPasswordType));
-//
-//	//m_msgQueue_Query->Input_NoCopy(RequestType::E_ReqUserLoginField, m_msgQueue_Query, this, 0, 0,
-//	//	pBody, sizeof(CThostFtdcReqUserLoginField), nullptr, 0, nullptr, 0);
-//}
-
-//int CMdUserApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
-//{
-//	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-//	return m_pApi->ReqUserLogin((CThostFtdcReqUserLoginField*)ptr1, ++m_lRequestID);
-//}
-
 void CMdUserApi::Disconnect()
 {
+	StopThread();
+
 	// 清理查询队列
 	if (m_msgQueue_Query)
 	{
@@ -265,11 +235,15 @@ void CMdUserApi::Disconnect()
 	//	m_pApi->Release();
 	//	m_pApi = NULL;
 
-	//	// 全清理，只留最后一个
-	//	m_msgQueue->Clear();
-	//	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-	//	// 主动触发
-	//	m_msgQueue->Process();
+		// 全清理，只留最后一个
+		// 由于这个dll中设计的线程在连接失败时直接退出，所以这个地方要加一个判断，防出错
+		if (m_msgQueue)
+		{
+			m_msgQueue->Clear();
+			m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+			// 主动触发
+			m_msgQueue->Process();
+		}
 	//}
 
 	// 清理响应队列
@@ -281,398 +255,184 @@ void CMdUserApi::Disconnect()
 		delete m_msgQueue;
 		m_msgQueue = nullptr;
 	}
+}
 
-	// 清理队列
-	if (m_remoteQueue)
+//行情回调，得保证此函数尽快返回
+void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData)
+{
+	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
+
+	strcpy(pField->InstrumentID, OldSymbol_2_NewSymbol(pDepthMarketData->m_szLabel, pDepthMarketData->m_wMarket));
+	strcpy(pField->ExchangeID, Market_2_Exchange(pDepthMarketData->m_wMarket));
+
+	//if (pDepthMarketData->m_szLabel[1] >= 'A')
+	//if (strcmp(pField->InstrumentID, "000001") == 0)
+	//{
+	//	int a = 1;
+	//}
+
+	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
+
+	GetExchangeTime(pDepthMarketData->m_time, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime);
+	
+	pField->LastPrice = my_round(pDepthMarketData->m_fNewPrice);
+	pField->Volume = pDepthMarketData->m_fVolume;
+	pField->Turnover = pDepthMarketData->m_fAmount;
+
+	pField->OpenPrice = my_round(pDepthMarketData->m_fOpen);
+	pField->HighestPrice = my_round(pDepthMarketData->m_fHigh);
+	pField->LowestPrice = my_round(pDepthMarketData->m_fLow);
+
+	pField->PreClosePrice = my_round(pDepthMarketData->m_fLastClose);
+
+	int nLots = 1;
+
+	do
 	{
-		m_remoteQueue->StopThread();
-		m_remoteQueue->Register(nullptr, nullptr);
-		m_remoteQueue->Clear();
-		delete m_remoteQueue;
-		m_remoteQueue = nullptr;
+		if (pDepthMarketData->m_fBuyVolume[0] == 0)
+			break;
+		pField->BidPrice1 = my_round(pDepthMarketData->m_fBuyPrice[0]);
+		pField->BidVolume1 = pDepthMarketData->m_fBuyVolume[0] * nLots;
+
+		if (pDepthMarketData->m_fBuyVolume[1] == 0)
+			break;
+		pField->BidPrice2 = my_round(pDepthMarketData->m_fBuyPrice[1]);
+		pField->BidVolume2 = pDepthMarketData->m_fBuyVolume[1] * nLots;
+
+		if (pDepthMarketData->m_fBuyVolume[2] == 0)
+			break;
+		pField->BidPrice3 = my_round(pDepthMarketData->m_fBuyPrice[2]);
+		pField->BidVolume3 = pDepthMarketData->m_fBuyVolume[2] * nLots;
+
+		if (pDepthMarketData->m_fBuyVolume4 == 0)
+			break;
+		pField->BidPrice4 = my_round(pDepthMarketData->m_fBuyPrice4);
+		pField->BidVolume4 = pDepthMarketData->m_fBuyVolume4 * nLots;
+
+		if (pDepthMarketData->m_fBuyVolume5 == 0)
+			break;
+		pField->BidPrice5 = my_round(pDepthMarketData->m_fBuyPrice5);
+		pField->BidVolume5 = pDepthMarketData->m_fBuyVolume5 * nLots;
+	} while (false);
+
+	do
+	{
+		if (pDepthMarketData->m_fSellVolume[0] == 0)
+			break;
+		pField->AskPrice1 = my_round(pDepthMarketData->m_fSellPrice[0]);
+		pField->AskVolume1 = pDepthMarketData->m_fSellVolume[0] * nLots;
+
+		if (pDepthMarketData->m_fSellVolume[1] == 0)
+			break;
+		pField->AskPrice2 = my_round(pDepthMarketData->m_fSellPrice[1]);
+		pField->AskVolume2 = pDepthMarketData->m_fSellVolume[1] * nLots;
+
+		if (pDepthMarketData->m_fSellVolume[2] == 0)
+			break;
+		pField->AskPrice3 = my_round(pDepthMarketData->m_fSellPrice[2]);
+		pField->AskVolume3 = pDepthMarketData->m_fSellVolume[2] * nLots;
+
+		if (pDepthMarketData->m_fSellVolume4 == 0)
+			break;
+		pField->AskPrice4 = my_round(pDepthMarketData->m_fSellPrice4);
+		pField->AskVolume4 = pDepthMarketData->m_fSellVolume4 * nLots;
+
+		if (pDepthMarketData->m_fSellVolume5 == 0)
+			break;
+		pField->AskPrice5 = my_round(pDepthMarketData->m_fSellPrice5);
+		pField->AskVolume5 = pDepthMarketData->m_fSellVolume5 * nLots;
+	} while (false);
+
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+}
+
+void CMdUserApi::StartThread()
+{
+	if (nullptr == m_hThread)
+	{
+		m_bRunning = true;
+		m_hThread = new thread(ProcessThread, this);
+	}
+}
+
+void CMdUserApi::StopThread()
+{
+	m_bRunning = false;
+	//m_cv.notify_all();
+	lock_guard<mutex> cl(m_mtx_del);
+	if (m_hThread)
+	{
+		m_hThread->join();
+		delete m_hThread;
+		m_hThread = nullptr;
 	}
 }
 
 
-//void CMdUserApi::Subscribe(const string& szInstrumentIDs, const string& szExchageID)
-//{
-//	if(nullptr == m_pApi)
-//		return;
-//
-//	vector<char*> vct;
-//	set<char*> st;
-//
-//	lock_guard<mutex> cl(m_csMapInstrumentIDs);
-//	char* pBuf = GetSetFromString(szInstrumentIDs.c_str(), _QUANTBOX_SEPS_, vct, st, 1, m_setInstrumentIDs);
-//
-//	if(vct.size()>0)
-//	{
-//		//转成字符串数组
-//		char** pArray = new char*[vct.size()];
-//		for (size_t j = 0; j<vct.size(); ++j)
-//		{
-//			pArray[j] = vct[j];
-//		}
-//
-//		//订阅
-//		m_pApi->SubscribeMarketData(pArray,(int)vct.size());
-//
-//		delete[] pArray;
-//	}
-//	delete[] pBuf;
-//}
-//
-//void CMdUserApi::Subscribe(const set<string>& instrumentIDs, const string& szExchageID)
-//{
-//	if(nullptr == m_pApi)
-//		return;
-//
-//	string szInstrumentIDs;
-//	for(set<string>::iterator i=instrumentIDs.begin();i!=instrumentIDs.end();++i)
-//	{
-//		szInstrumentIDs.append(*i);
-//		szInstrumentIDs.append(";");
-//	}
-//
-//	if (szInstrumentIDs.length()>1)
-//	{
-//		Subscribe(szInstrumentIDs, szExchageID);
-//	}
-//}
-//
-//void CMdUserApi::Unsubscribe(const string& szInstrumentIDs, const string& szExchageID)
-//{
-//	if(nullptr == m_pApi)
-//		return;
-//
-//	vector<char*> vct;
-//	set<char*> st;
-//
-//	lock_guard<mutex> cl(m_csMapInstrumentIDs);
-//	char* pBuf = GetSetFromString(szInstrumentIDs.c_str(), _QUANTBOX_SEPS_, vct, st, -1, m_setInstrumentIDs);
-//
-//	if(vct.size()>0)
-//	{
-//		//转成字符串数组
-//		char** pArray = new char*[vct.size()];
-//		for (size_t j = 0; j<vct.size(); ++j)
-//		{
-//			pArray[j] = vct[j];
-//		}
-//
-//		//订阅
-//		m_pApi->UnSubscribeMarketData(pArray,(int)vct.size());
-//
-//		delete[] pArray;
-//	}
-//	delete[] pBuf;
-//}
-//
-//void CMdUserApi::SubscribeQuote(const string& szInstrumentIDs, const string& szExchageID)
-//{
-//	if (nullptr == m_pApi)
-//		return;
-//
-//	vector<char*> vct;
-//	set<char*> st;
-//
-//	lock_guard<mutex> cl(m_csMapQuoteInstrumentIDs);
-//	char* pBuf = GetSetFromString(szInstrumentIDs.c_str(), _QUANTBOX_SEPS_, vct, st, 1, m_setQuoteInstrumentIDs);
-//
-//	if (vct.size()>0)
-//	{
-//		//转成字符串数组
-//		char** pArray = new char*[vct.size()];
-//		for (size_t j = 0; j<vct.size(); ++j)
-//		{
-//			pArray[j] = vct[j];
-//		}
-//
-//		//订阅
-//		m_pApi->SubscribeForQuoteRsp(pArray, (int)vct.size());
-//
-//		delete[] pArray;
-//	}
-//	delete[] pBuf;
-//}
-//
-//void CMdUserApi::SubscribeQuote(const set<string>& instrumentIDs, const string& szExchageID)
-//{
-//	if (nullptr == m_pApi)
-//		return;
-//
-//	string szInstrumentIDs;
-//	for (set<string>::iterator i = instrumentIDs.begin(); i != instrumentIDs.end(); ++i)
-//	{
-//		szInstrumentIDs.append(*i);
-//		szInstrumentIDs.append(";");
-//	}
-//
-//	if (szInstrumentIDs.length()>1)
-//	{
-//		SubscribeQuote(szInstrumentIDs, szExchageID);
-//	}
-//}
-//
-//void CMdUserApi::UnsubscribeQuote(const string& szInstrumentIDs, const string& szExchageID)
-//{
-//	if (nullptr == m_pApi)
-//		return;
-//
-//	vector<char*> vct;
-//	set<char*> st;
-//
-//	lock_guard<mutex> cl(m_csMapQuoteInstrumentIDs);
-//	char* pBuf = GetSetFromString(szInstrumentIDs.c_str(), _QUANTBOX_SEPS_, vct, st, -1, m_setQuoteInstrumentIDs);
-//
-//	if (vct.size()>0)
-//	{
-//		//转成字符串数组
-//		char** pArray = new char*[vct.size()];
-//		for (size_t j = 0; j<vct.size(); ++j)
-//		{
-//			pArray[j] = vct[j];
-//		}
-//
-//		//订阅
-//		m_pApi->UnSubscribeForQuoteRsp(pArray, (int)vct.size());
-//
-//		delete[] pArray;
-//	}
-//	delete[] pBuf;
-//}
-//
-//void CMdUserApi::OnFrontConnected()
-//{
-//	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-//
-//	//连接成功后自动请求登录
-//	ReqUserLogin();
-//}
-//
-//void CMdUserApi::OnFrontDisconnected(int nReason)
-//{
-//	RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
-//	//连接失败返回的信息是拼接而成，主要是为了统一输出
-//	pField->ErrorID = nReason;
-//	GetOnFrontDisconnectedMsg(nReason, pField->ErrorMsg);
-//
-//	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-//}
-//
-//void CMdUserApi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-//{
-//	RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
-//
-//	if (!IsErrorRspInfo(pRspInfo)
-//		&&pRspUserLogin)
-//	{
-//		pField->TradingDay = GetDate(pRspUserLogin->TradingDay);
-//		pField->LoginTime = GetTime(pRspUserLogin->LoginTime);
-//
-//		sprintf(pField->SessionID, "%d:%d", pRspUserLogin->FrontID, pRspUserLogin->SessionID);
-//
-//		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-//		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-//
-//		//有可能断线了，本处是断线重连后重新订阅
-//		set<string> mapOld = m_setInstrumentIDs;//记下上次订阅的合约
-//		//Unsubscribe(mapOld);//由于已经断线了，没有必要再取消订阅
-//		Subscribe(mapOld,"");//订阅
-//
-//		//有可能断线了，本处是断线重连后重新订阅
-//		mapOld = m_setQuoteInstrumentIDs;//记下上次订阅的合约
-//		SubscribeQuote(mapOld, "");//订阅
-//	}
-//	else
-//	{
-//		pField->ErrorID = pRspInfo->ErrorID;
-//		strncpy(pField->ErrorMsg, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
-//
-//		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-//	}
-//}
-//
-//void CMdUserApi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-//{
-//	IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
-//}
-//
-//void CMdUserApi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-//{
-//	//在模拟平台可能这个函数不会触发，所以要自己维护一张已经订阅的合约列表
-//	if(!IsErrorRspInfo(pRspInfo,nRequestID,bIsLast)
-//		&&pSpecificInstrument)
-//	{
-//		lock_guard<mutex> cl(m_csMapInstrumentIDs);
-//
-//		m_setInstrumentIDs.insert(pSpecificInstrument->InstrumentID);
-//	}
-//}
-//
-//void CMdUserApi::OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-//{
-//	//模拟平台可能这个函数不会触发
-//	if(!IsErrorRspInfo(pRspInfo,nRequestID,bIsLast)
-//		&&pSpecificInstrument)
-//	{
-//		lock_guard<mutex> cl(m_csMapInstrumentIDs);
-//
-//		m_setInstrumentIDs.erase(pSpecificInstrument->InstrumentID);
-//	}
-//}
-//
-////行情回调，得保证此函数尽快返回
-//void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
-//{
-//	//for (int i = 0; i < 50; ++i)
-//	//{
-//	//	// 测试平台穿越速度，用完后需要注释掉
-//	//	WriteLog("CTP:OnRtnDepthMarketData:%s %f %s.%03d", pDepthMarketData->InstrumentID, pDepthMarketData->LastPrice, pDepthMarketData->UpdateTime, pDepthMarketData->UpdateMillisec);
-//
-//		DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
-//
-//		strcpy(pField->InstrumentID, pDepthMarketData->InstrumentID);
-//		strcpy(pField->ExchangeID, pDepthMarketData->ExchangeID);
-//
-//		sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
-//
-//		//TODO:CTP大连没有ActionDay，所以API中是将TradingDay填到了这里，所以这里这种用法可能会出错，要测
-//		GetExchangeTime(pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
-//			, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
-//
-//		pField->UpdateMillisec = pDepthMarketData->UpdateMillisec;
-//
-//		pField->LastPrice = pDepthMarketData->LastPrice;
-//		pField->Volume = pDepthMarketData->Volume;
-//		pField->Turnover = pDepthMarketData->Turnover;
-//		pField->OpenInterest = pDepthMarketData->OpenInterest;
-//		pField->AveragePrice = pDepthMarketData->AveragePrice;
-//
-//		if (pDepthMarketData->OpenPrice != DBL_MAX)
-//		{
-//			pField->OpenPrice = pDepthMarketData->OpenPrice;
-//			pField->HighestPrice = pDepthMarketData->HighestPrice;
-//			pField->LowestPrice = pDepthMarketData->LowestPrice;
-//		}
-//		else
-//		{
-//			pField->OpenPrice = 0;
-//			pField->HighestPrice = 0;
-//			pField->LowestPrice = 0;
-//		}
-//		pField->SettlementPrice = pDepthMarketData->SettlementPrice != DBL_MAX ? pDepthMarketData->SettlementPrice : 0;
-//
-//		pField->UpperLimitPrice = pDepthMarketData->UpperLimitPrice;
-//		pField->LowerLimitPrice = pDepthMarketData->LowerLimitPrice;
-//		pField->PreClosePrice = pDepthMarketData->PreClosePrice;
-//		pField->PreSettlementPrice = pDepthMarketData->PreSettlementPrice;
-//		pField->PreOpenInterest = pDepthMarketData->PreOpenInterest;
-//
-//		do
-//		{
-//			if (pDepthMarketData->BidVolume1 == 0)
-//				break;
-//			pField->BidPrice1 = pDepthMarketData->BidPrice1;
-//			pField->BidVolume1 = pDepthMarketData->BidVolume1;
-//
-//			if (pDepthMarketData->BidVolume2 == 0)
-//				break;
-//			pField->BidPrice2 = pDepthMarketData->BidPrice2;
-//			pField->BidVolume2 = pDepthMarketData->BidVolume2;
-//
-//			if (pDepthMarketData->BidVolume3 == 0)
-//				break;
-//			pField->BidPrice3 = pDepthMarketData->BidPrice3;
-//			pField->BidVolume3 = pDepthMarketData->BidVolume3;
-//
-//			if (pDepthMarketData->BidVolume4 == 0)
-//				break;
-//			pField->BidPrice4 = pDepthMarketData->BidPrice4;
-//			pField->BidVolume4 = pDepthMarketData->BidVolume4;
-//
-//			if (pDepthMarketData->BidVolume5 == 0)
-//				break;
-//			pField->BidPrice5 = pDepthMarketData->BidPrice5;
-//			pField->BidVolume5 = pDepthMarketData->BidVolume5;
-//		} while (false);
-//
-//		do
-//		{
-//			if (pDepthMarketData->AskVolume1 == 0)
-//				break;
-//			pField->AskPrice1 = pDepthMarketData->AskPrice1;
-//			pField->AskVolume1 = pDepthMarketData->AskVolume1;
-//
-//			if (pDepthMarketData->AskVolume2 == 0)
-//				break;
-//			pField->AskPrice2 = pDepthMarketData->AskPrice2;
-//			pField->AskVolume2 = pDepthMarketData->AskVolume2;
-//
-//			if (pDepthMarketData->AskVolume3 == 0)
-//				break;
-//			pField->AskPrice3 = pDepthMarketData->AskPrice3;
-//			pField->AskVolume3 = pDepthMarketData->AskVolume3;
-//
-//			if (pDepthMarketData->AskVolume4 == 0)
-//				break;
-//			pField->AskPrice4 = pDepthMarketData->AskPrice4;
-//			pField->AskVolume4 = pDepthMarketData->AskVolume4;
-//
-//			if (pDepthMarketData->AskVolume5 == 0)
-//				break;
-//			pField->AskPrice5 = pDepthMarketData->AskPrice5;
-//			pField->AskVolume5 = pDepthMarketData->AskVolume5;
-//		} while (false);
-//
-//		// 这两个队列先头循序不要搞混，有删除功能的语句要放在后面
-//		// 如果放前面，会导致远程收到乱码
-//#ifdef _REMOTE
-//		if (m_remoteQueue)
-//		{
-//			m_remoteQueue->Input_Copy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
-//		}
-//#endif
-//		
-//		m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
-//		// 要关注一下其内的
-//	//}	
-//}
-//
-//void CMdUserApi::OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-//{
-//	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast)
-//		&& pSpecificInstrument)
-//	{
-//		lock_guard<mutex> cl(m_csMapQuoteInstrumentIDs);
-//
-//		m_setQuoteInstrumentIDs.insert(pSpecificInstrument->InstrumentID);
-//	}
-//}
-//
-//void CMdUserApi::OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-//{
-//	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast)
-//		&& pSpecificInstrument)
-//	{
-//		lock_guard<mutex> cl(m_csMapQuoteInstrumentIDs);
-//
-//		m_setQuoteInstrumentIDs.erase(pSpecificInstrument->InstrumentID);
-//	}
-//}
-//
-//void CMdUserApi::OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp)
-//{
-//	// 上期技术的人说，上海中金走的交易接口，大商，郑商走行情，所以这个地方后期可能要改
-//	QuoteRequestField* pField = (QuoteRequestField*)m_msgQueue->new_block(sizeof(QuoteRequestField));
-//
-//	pField->TradingDay = GetDate(pForQuoteRsp->TradingDay);
-//	pField->QuoteTime = GetDate(pForQuoteRsp->ForQuoteTime);
-//	strcpy(pField->Symbol, pForQuoteRsp->InstrumentID);
-//	strcpy(pField->InstrumentID, pForQuoteRsp->InstrumentID);
-//	strcpy(pField->ExchangeID, pForQuoteRsp->ExchangeID);
-//	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
-//	strcpy(pField->QuoteID, pForQuoteRsp->ForQuoteSysID);
-//
-//	m_msgQueue->Input_NoCopy(ResponeType::OnRtnQuoteRequest, m_msgQueue, m_pClass, 0, 0, pField, sizeof(QuoteRequestField), nullptr, 0, nullptr, 0);
-//}
+void CMdUserApi::RunInThread()
+{
+	m_hModule = X_LoadLib(m_ServerInfo.Address);
+	if (m_hModule == nullptr)
+	{
+		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+
+		pField->ErrorID = GetLastError();
+		strncpy(pField->ErrorMsg, X_GetLastError(), sizeof(ErrorMsgType));
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		return;
+	}
+
+	m_pStock_Init = (pFunStock_Init)X_GetFunction(m_hModule, "Stock_Init");
+	m_pStock_Quit = (pFunStock_Quit)X_GetFunction(m_hModule, "Stock_Quit");
+	if (m_pStock_Init == nullptr)
+	{
+		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+
+		pField->ErrorID = GetLastError();
+		strncpy(pField->ErrorMsg, X_GetLastError(), sizeof(ErrorMsgType));
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		return;
+	}
+
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+
+
+	m_hWnd = CreateWindowA(
+		"static",
+		"MsgRecv",
+		WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		NULL,
+		NULL,
+		NULL,
+		NULL);
+
+	if (m_hWnd != NULL && IsWindow(m_hWnd))
+	{
+		SetWindowLong(m_hWnd, GWL_WNDPROC, (LONG)WndProc);
+	}
+	m_pStock_Init(m_hWnd, WM_USER_STOCK, RCV_WORK_SENDMSG);
+
+	MSG msg;
+	while (m_bRunning && GetMessage(&msg, NULL, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	m_pStock_Quit(m_hWnd);
+	DestroyWindow(m_hWnd);
+
+	X_FreeLib(m_hModule);
+	m_hModule = nullptr;
+	m_hWnd = nullptr;
+
+	// 清理线程
+	m_hThread = nullptr;
+	m_bRunning = false;
+}

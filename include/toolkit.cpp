@@ -49,6 +49,13 @@ void makedirs(const char* dir)
 	delete[] p;
 }
 
+double my_round(float val, int x)
+{
+	double i = ((long)(val * 10000.0 + 0.5)) / 10000.0;
+	return i;
+}
+
+
 char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vct, set<char*>& st, int modify, set<string>& st2, int before, const char* prefix)
 {
 	vct.clear();
@@ -231,6 +238,29 @@ void GetExchangeTime(char* TradingDay, char* ActionDay, char* UpdateTime, int* _
 		}
 
 		*_ActionDay = (1900 + ptmNow->tm_year) * 10000 + (1 + ptmNow->tm_mon) * 100 + ptmNow->tm_mday;
+	}
+}
+
+void GetExchangeTime(time_t Time, int* _TradingDay, int* _ActionDay, int* _UpdateTime)
+{
+	struct tm *ptmNow = localtime(&Time);
+
+	int date = (ptmNow->tm_year + 1900) * 10000 + (ptmNow->tm_mon + 1) * 100 + ptmNow->tm_mday;
+	int time = (ptmNow->tm_hour) * 10000 + (ptmNow->tm_min) * 100 + ptmNow->tm_sec;
+
+	if (_TradingDay)
+	{
+		*_TradingDay = date;
+	}
+
+	if (_ActionDay)
+	{
+		*_ActionDay = date;
+	}
+
+	if (_UpdateTime)
+	{
+		*_UpdateTime = time;
 	}
 }
 

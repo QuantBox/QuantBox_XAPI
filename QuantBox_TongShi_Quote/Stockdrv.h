@@ -23,7 +23,6 @@
 #ifndef __STOCKDRV_H__
 #define __STOCKDRV_H__
 
-
 // 工作方式类型定义
 #define RCV_WORK_REQUEST			0			// 如果自编软件建议使用此方式
 #define RCV_WORK_SENDMSG			4			// 版本 2 建议使用的方式
