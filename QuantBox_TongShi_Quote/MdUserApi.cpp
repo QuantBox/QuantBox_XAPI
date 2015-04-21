@@ -11,8 +11,7 @@
 
 #include "../include/XApiC.h"
 
-
-
+#include "../include/ChinaStock.h"
 #include "TypeConvert.h"
 
 #include <string.h>
@@ -20,8 +19,6 @@
 
 #include <mutex>
 #include <vector>
-//#include <tchar.h>
-#include <windows.h>
 
 using namespace std;
 
@@ -36,6 +33,11 @@ LRESULT CALLBACK CMdUserApi::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 	{
 		return pThis->_OnMsg(wParam, lParam);
 	}
+	else if (message == WM_NCDESTROY)
+	{
+		WriteLog("TS:5555,%d,%d", message, wParam);
+	}
+	WriteLog("TS:%d,%d", message, wParam);
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
@@ -53,8 +55,7 @@ LRESULT CMdUserApi::_OnMsg(WPARAM wParam, LPARAM lParam)
 		for (i = 0; i < pHeader->m_nPacketNum; i++)
 		{
 			// 数据处理
-			m_msgQueue->m_bDirectOutput;
-			OnRtnDepthMarketData((RCV_REPORT_STRUCTEx*)&(pHeader->m_pReport[i]));
+			OnRtnDepthMarketData((RCV_REPORT_STRUCTEx*)&(pHeader->m_pReport[i]), i, pHeader->m_nPacketNum);
 		}
 		break;
 
@@ -192,6 +193,7 @@ ConfigInfoField* CMdUserApi::Config(ConfigInfoField* pConfigInfo)
 //	return bRet;
 //}
 
+#include "DialogStockDrv.h"
 
 void CMdUserApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
@@ -201,6 +203,12 @@ void CMdUserApi::Connect(const string& szPath,
 	m_szPath = szPath;
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
+
+	//CDialogStockDrv* p = new CDialogStockDrv();
+	//p->Create(CDialogStockDrv::IDD, this);
+	//p->ShowWindow(SW_NORMAL);
+
+	
 
 	StartThread();
 
@@ -257,21 +265,52 @@ void CMdUserApi::Disconnect()
 	}
 }
 
+void CMdUserApi::OnRspQryInstrument(RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count)
+{
+	InstrumentField* pField = (InstrumentField*)m_msgQueue->new_block(sizeof(InstrumentField));
+
+	strcpy(pField->InstrumentID, OldSymbol_2_NewSymbol(pDepthMarketData->m_szLabel, pDepthMarketData->m_wMarket));
+	strcpy(pField->ExchangeID, Market_2_Exchange(pDepthMarketData->m_wMarket));
+
+	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
+
+	strncpy(pField->InstrumentName, pDepthMarketData->m_szName, sizeof(InstrumentNameType));
+	pField->VolumeMultiple = 1;
+
+	switch (pDepthMarketData->m_wMarket)
+	{
+	case SH_MARKET_EX:
+		pField->Type = InstrumentID_2_InstrumentType_SSE(pField->InstrumentID);
+		pField->PriceTick = InstrumentID_2_PriceTick_SSE(pField->InstrumentID);
+		break;
+	case SZ_MARKET_EX:
+		pField->Type = InstrumentID_2_InstrumentType_SZE(pField->InstrumentID);
+		pField->PriceTick = InstrumentID_2_PriceTick_SZE(pField->InstrumentID);
+		break;
+	default:
+		break;
+	}
+
+	m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInstrument, m_msgQueue, m_pClass, index >= Count - 1, 0, pField, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
+}
+
 //行情回调，得保证此函数尽快返回
-void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData)
+void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count)
 {
 	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
 
 	strcpy(pField->InstrumentID, OldSymbol_2_NewSymbol(pDepthMarketData->m_szLabel, pDepthMarketData->m_wMarket));
 	strcpy(pField->ExchangeID, Market_2_Exchange(pDepthMarketData->m_wMarket));
 
-	//if (pDepthMarketData->m_szLabel[1] >= 'A')
-	//if (strcmp(pField->InstrumentID, "000001") == 0)
-	//{
-	//	int a = 1;
-	//}
-
 	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
+
+	// 为合约导入功能所加，做行情处理时还是注释了比较好
+	set<string>::iterator it = m_setInstrumentIDsReceived.find(pField->Symbol);
+	if (it == m_setInstrumentIDsReceived.end())
+	{
+		OnRspQryInstrument(pDepthMarketData, index, Count);
+		m_setInstrumentIDsReceived.insert(pField->Symbol);
+	}
 
 	GetExchangeTime(pDepthMarketData->m_time, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime);
 	
@@ -358,6 +397,7 @@ void CMdUserApi::StartThread()
 void CMdUserApi::StopThread()
 {
 	m_bRunning = false;
+
 	//m_cv.notify_all();
 	lock_guard<mutex> cl(m_mtx_del);
 	if (m_hThread)
@@ -371,6 +411,21 @@ void CMdUserApi::StopThread()
 
 void CMdUserApi::RunInThread()
 {
+	m_setInstrumentIDsReceived.clear();
+
+	m_hWnd = CreateWindowA(
+		"static",
+		"MsgRecv",
+		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		NULL,
+		NULL,
+		NULL,
+		NULL);
+
 	m_hModule = X_LoadLib(m_ServerInfo.Address);
 	if (m_hModule == nullptr)
 	{
@@ -399,36 +454,40 @@ void CMdUserApi::RunInThread()
 	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
-
-	m_hWnd = CreateWindowA(
-		"static",
-		"MsgRecv",
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		NULL,
-		NULL,
-		NULL,
-		NULL);
-
 	if (m_hWnd != NULL && IsWindow(m_hWnd))
 	{
-		SetWindowLong(m_hWnd, GWL_WNDPROC, (LONG)WndProc);
+		LONG l = SetWindowLong(m_hWnd, GWL_WNDPROC, (LONG)WndProc);
+		WriteLog("TS:%x", l);
+		WriteLog("TS:22222");
 	}
 	m_pStock_Init(m_hWnd, WM_USER_STOCK, RCV_WORK_SENDMSG);
+	
+
+	HWND a = FindWindowA("static","MsgRecv");
+	WriteLog("TS:a %x", a);
+
+	WriteLog("TS:%x", m_hWnd);
+	WriteLog("TS:11111");
 
 	MSG msg;
-	while (m_bRunning && GetMessage(&msg, NULL, 0, 0))
+	while (m_bRunning)
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		if (PeekMessage(&msg, m_hWnd, 0, 0, PM_REMOVE))
+		//if (GetMessage(&msg, NULL, 0, 0))
+		{
+			WriteLog("TS:333");
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 	}
+	WriteLog("TS:!11111");
 	m_pStock_Quit(m_hWnd);
+	WriteLog("TS:!22222");
 	DestroyWindow(m_hWnd);
+	WriteLog("TS:!33333");
 
 	X_FreeLib(m_hModule);
+	WriteLog("TS:!44444");
 	m_hModule = nullptr;
 	m_hWnd = nullptr;
 

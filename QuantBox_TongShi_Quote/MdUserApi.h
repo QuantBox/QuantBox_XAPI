@@ -87,7 +87,9 @@ private:
 
 	//virtual void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	void OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData);
+	void OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count);
+	void OnRspQryInstrument(RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count);
+
 
 	//virtual void OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -126,5 +128,7 @@ private:
 	void*						m_hModule;
 	pFunStock_Init				m_pStock_Init;
 	pFunStock_Quit				m_pStock_Quit;
+
+	set<string>					m_setInstrumentIDsReceived;		//正在订阅的合约
 };
 
