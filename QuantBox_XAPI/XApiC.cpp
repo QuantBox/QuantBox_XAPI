@@ -47,14 +47,14 @@ char* X_GetLastError()
 #endif
 }
 
-void* X_GetFunction(void* lib)
+void* X_GetFunction(void* lib,char* ProcName)
 {
 	if (lib == nullptr)
 		return nullptr;
 #if defined WINDOWS || WIN32
-	return (fnOnRespone)GetProcAddress((HMODULE)lib, "XRequest");
+	return GetProcAddress((HMODULE)lib, ProcName);
 #else
-    return static_cast<fnOnRespone*>(dlsym(lib, "XRequest"));
+	return (dlsym(lib, ProcName));
 #endif
 }
 

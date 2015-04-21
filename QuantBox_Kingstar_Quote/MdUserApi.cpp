@@ -484,11 +484,19 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	pField->OpenInterest = pDepthMarketData->OpenInterest;
 	pField->AveragePrice = pDepthMarketData->AveragePrice;
 
-	pField->OpenPrice = pDepthMarketData->OpenPrice != DBL_MAX ? pDepthMarketData->OpenPrice : 0;
-	pField->HighestPrice = pDepthMarketData->HighestPrice != DBL_MAX ? pDepthMarketData->HighestPrice : 0;
-	pField->LowestPrice = pDepthMarketData->LowestPrice != DBL_MAX ? pDepthMarketData->LowestPrice : 0;
-	pField->ClosePrice = pDepthMarketData->ClosePrice != DBL_MAX ? pDepthMarketData->ClosePrice : 0;
-	pField->SettlementPrice = pDepthMarketData->SettlementPrice;
+	if (pDepthMarketData->OpenPrice != DBL_MAX)
+	{
+		pField->OpenPrice = pDepthMarketData->OpenPrice;
+		pField->HighestPrice = pDepthMarketData->HighestPrice;
+		pField->LowestPrice = pDepthMarketData->LowestPrice;
+	}
+	else
+	{
+		pField->OpenPrice = 0;
+		pField->HighestPrice = 0;
+		pField->LowestPrice = 0;
+	}
+	pField->SettlementPrice = pDepthMarketData->SettlementPrice != DBL_MAX ? pDepthMarketData->SettlementPrice : 0;
 
 	pField->UpperLimitPrice = pDepthMarketData->UpperLimitPrice;
 	pField->LowerLimitPrice = pDepthMarketData->LowerLimitPrice;

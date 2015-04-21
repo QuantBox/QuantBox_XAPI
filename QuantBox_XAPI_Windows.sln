@@ -47,6 +47,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuantBox_XAPI_TEST", "Quant
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuantBox_ZeroMQ_Quote", "QuantBox_ZeroMQ_Quote\QuantBox_ZeroMQ_Quote.vcxproj", "{66FF43DF-8075-421D-A338-C651E9F02692}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuantBox_TongShi_Quote", "QuantBox_TongShi_Quote\QuantBox_TongShi_Quote.vcxproj", "{14FD0042-733E-4CCA-8B19-D26C1BEA954E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -501,6 +503,24 @@ Global
 		{66FF43DF-8075-421D-A338-C651E9F02692}.Release|Win32.ActiveCfg = Release|Win32
 		{66FF43DF-8075-421D-A338-C651E9F02692}.Release|Win32.Build.0 = Release|Win32
 		{66FF43DF-8075-421D-A338-C651E9F02692}.Release|x64.ActiveCfg = Release|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Debug|Win32.Build.0 = Debug|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Debug|x64.ActiveCfg = Debug|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Debug64|Any CPU.ActiveCfg = Debug|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Debug64|Mixed Platforms.ActiveCfg = Debug|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Debug64|Mixed Platforms.Build.0 = Debug|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Debug64|Win32.ActiveCfg = Debug|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Debug64|Win32.Build.0 = Debug|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Debug64|x64.ActiveCfg = Debug|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Release|Any CPU.ActiveCfg = Release|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Release|Win32.ActiveCfg = Release|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Release|Win32.Build.0 = Release|Win32
+		{14FD0042-733E-4CCA-8B19-D26C1BEA954E}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

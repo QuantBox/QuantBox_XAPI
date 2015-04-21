@@ -17,9 +17,9 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case GetApiType:
 		return (void*)(ApiType::MarketData);
 	case GetApiVersion:
-		return (void*)"0.1.0.20150401";
+		return (void*)"0.2.0.20150419";
 	case GetApiName:
-		return (void*)"ZeroMQ";
+		return (void*)"TongShi";
 	case Create:
 		return new CMdUserApi();
 	default:
@@ -49,12 +49,12 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case Disconnect:
 		pApi->Disconnect();
 		break;
-	case Subscribe:
-		pApi->Subscribe((const char*)ptr1, (const char*)ptr2);
-		break;
-	case Unsubscribe:
-		pApi->Unsubscribe((const char*)ptr1, (const char*)ptr2);
-		break;
+	//case Subscribe:
+	//	pApi->Subscribe((const char*)ptr1, (const char*)ptr2);
+	//	break;
+	//case Unsubscribe:
+	//	pApi->Unsubscribe((const char*)ptr1, (const char*)ptr2);
+	//	break;
 	//case SubscribeQuote:
 	//	pApi->SubscribeQuote((const char*)ptr1, (const char*)ptr2);
 	//	break;

@@ -191,46 +191,46 @@ ExecType CUstpFtdcOrderField_2_ExecType(CUstpFtdcOrderField* pIn)
 	}
 }
 
-OrderStatus CUstpFtdcRtnQuoteField_2_OrderStatus(CUstpFtdcRtnQuoteField* pIn)
-{
-	switch (pIn->QuoteStatus)
-	{
-	case USTP_FTDC_QS_Inited_InFEMAS:
-	case USTP_FTDC_QS_Accepted_InTradingSystem:
-		return OrderStatus::New;
-	case USTP_FTDC_QS_Canceled_SingleLeg:
-	case USTP_FTDC_QS_Canceled_All:
-		return OrderStatus::Cancelled;
-	case USTP_FTDC_QS_Traded_SingleLeg:
-		return OrderStatus::PartiallyFilled;
-	case USTP_FTDC_QS_Traded_All:
-		return OrderStatus::Filled;
-	case USTP_FTDC_QS_Error_QuoteAction:
-		return OrderStatus::PendingCancel;
-	default:
-		return OrderStatus::New;
-	}
-}
+//OrderStatus CUstpFtdcRtnQuoteField_2_OrderStatus(CUstpFtdcRtnQuoteField* pIn)
+//{
+//	switch (pIn->QuoteStatus)
+//	{
+//	case USTP_FTDC_QS_Inited_InFEMAS:
+//	case USTP_FTDC_QS_Accepted_InTradingSystem:
+//		return OrderStatus::New;
+//	case USTP_FTDC_QS_Canceled_SingleLeg:
+//	case USTP_FTDC_QS_Canceled_All:
+//		return OrderStatus::Cancelled;
+//	case USTP_FTDC_QS_Traded_SingleLeg:
+//		return OrderStatus::PartiallyFilled;
+//	case USTP_FTDC_QS_Traded_All:
+//		return OrderStatus::Filled;
+//	case USTP_FTDC_QS_Error_QuoteAction:
+//		return OrderStatus::PendingCancel;
+//	default:
+//		return OrderStatus::New;
+//	}
+//}
 
-ExecType CUstpFtdcRtnQuoteField_2_ExecType(CUstpFtdcRtnQuoteField* pIn)
-{
-	switch (pIn->QuoteStatus)
-	{
-	case USTP_FTDC_QS_Inited_InFEMAS:
-	case USTP_FTDC_QS_Accepted_InTradingSystem:
-		return ExecType::ExecNew;
-	case USTP_FTDC_QS_Canceled_SingleLeg:
-	case USTP_FTDC_QS_Canceled_All:
-		return ExecType::ExecCancelled;
-	case USTP_FTDC_QS_Traded_SingleLeg:
-	case USTP_FTDC_QS_Traded_All:
-		return ExecType::ExecTrade;
-	case USTP_FTDC_QS_Error_QuoteAction:
-		return ExecType::ExecCancelReject;
-	default:
-		return ExecType::ExecNew;
-	}
-}
+//ExecType CUstpFtdcRtnQuoteField_2_ExecType(CUstpFtdcRtnQuoteField* pIn)
+//{
+//	switch (pIn->QuoteStatus)
+//	{
+//	case USTP_FTDC_QS_Inited_InFEMAS:
+//	case USTP_FTDC_QS_Accepted_InTradingSystem:
+//		return ExecType::ExecNew;
+//	case USTP_FTDC_QS_Canceled_SingleLeg:
+//	case USTP_FTDC_QS_Canceled_All:
+//		return ExecType::ExecCancelled;
+//	case USTP_FTDC_QS_Traded_SingleLeg:
+//	case USTP_FTDC_QS_Traded_All:
+//		return ExecType::ExecTrade;
+//	case USTP_FTDC_QS_Error_QuoteAction:
+//		return ExecType::ExecCancelReject;
+//	default:
+//		return ExecType::ExecNew;
+//	}
+//}
 
 InstrumentType CUstpFtdcRspInstrumentField_2_InstrumentType(CUstpFtdcRspInstrumentField* pIn)
 {

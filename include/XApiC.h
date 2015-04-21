@@ -8,7 +8,7 @@ extern "C" {
 
 void* X_LoadLib(char* libPath);
 char* X_GetLastError();
-void* X_GetFunction(void* lib);
+void* X_GetFunction(void* lib, char* ProcName = "XRequest");
 void X_FreeLib(void* lib);
 
 ApiType X_GetApiType(void* pFun);

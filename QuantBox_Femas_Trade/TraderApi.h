@@ -76,8 +76,8 @@ public:
 		int QuoteRef,
 		QuoteField* pQuote);
 
-	int ReqQuoteAction(CUstpFtdcRtnQuoteField *pQuote);
-	int ReqQuoteAction(const string& szId);
+	//int ReqQuoteAction(CUstpFtdcRtnQuoteField *pQuote);
+	//int ReqQuoteAction(const string& szId);
 
 	void ReqQryInvestorAccount();
 	void ReqQryInvestorPosition(const string& szInstrumentId);
@@ -113,7 +113,7 @@ private:
 
 	void OnOrder(CUstpFtdcOrderField *pOrder);
 	void OnTrade(CUstpFtdcTradeField *pTrade);
-	void OnQuote(CUstpFtdcRtnQuoteField *pQuote);
+	//void OnQuote(CUstpFtdcRtnQuoteField *pQuote);
 
 	//检查是否出错
 	bool IsErrorRspInfo(CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
@@ -143,14 +143,14 @@ private:
 	virtual void OnRspQryTrade(CUstpFtdcTradeField *pTrade, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	virtual void OnRtnTrade(CUstpFtdcTradeField *pTrade);
 
-	//报价录入
-	virtual void OnRspQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	virtual void OnErrRtnQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUstpFtdcRspInfoField *pRspInfo);
-	virtual void OnRtnQuote(CUstpFtdcRtnQuoteField *pRtnQuote);
+	////报价录入
+	//virtual void OnRspQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//virtual void OnErrRtnQuoteInsert(CUstpFtdcInputQuoteField *pInputQuote, CUstpFtdcRspInfoField *pRspInfo);
+	//virtual void OnRtnQuote(CUstpFtdcRtnQuoteField *pRtnQuote);
 
-	//报价撤单
-	virtual void OnRspQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	virtual void OnErrRtnQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CUstpFtdcRspInfoField *pRspInfo);
+	////报价撤单
+	//virtual void OnRspQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//virtual void OnErrRtnQuoteAction(CUstpFtdcQuoteActionField *pQuoteAction, CUstpFtdcRspInfoField *pRspInfo);
 
 	//仓位
 	virtual void OnRspQryInvestorPosition(CUstpFtdcRspInvestorPositionField *pRspInvestorPosition, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -168,7 +168,7 @@ private:
 	virtual void OnRtnInstrumentStatus(CUstpFtdcInstrumentStatusField *pInstrumentStatus);
 
 	//询价回报
-	virtual void OnRtnForQuote(CUstpFtdcReqForQuoteField *pReqForQuote);
+	//virtual void OnRtnForQuote(CUstpFtdcReqForQuoteField *pReqForQuote);
 
 private:
 	atomic<int>					m_lRequestID;			//请求ID,得保持自增
@@ -197,7 +197,7 @@ private:
 	//unordered_map<string, string>					m_sysId_orderId;
 
 	unordered_map<string, QuoteField*>				m_id_platform_quote;
-	unordered_map<string, CUstpFtdcRtnQuoteField*>		m_id_api_quote;
+	//unordered_map<string, CUstpFtdcRtnQuoteField*>		m_id_api_quote;
 	//unordered_map<string, string>					m_sysId_quoteId;
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针

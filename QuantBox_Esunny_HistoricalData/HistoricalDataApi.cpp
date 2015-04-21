@@ -277,8 +277,8 @@ int __cdecl CHistoricalDataApi::OnRspHistoryQuot(struct STKHISDATA *pHisData)
 		BarField* pF = &pFields[i];
 		//memset(pF, 0, sizeof(BarField));
 		DateTimeChat2Int(item.time, pF->Date, pF->Time);
-		pF->Open = round(item.fOpen);
-		pF->High = round(item.fHigh);
+		pF->Open = my_round(item.fOpen);
+		pF->High = my_round(item.fHigh);
 		pF->Low = item.fLow;
 		pF->Close = item.fClose;
 		pF->Volume = item.fVolume;
@@ -369,12 +369,6 @@ int CHistoricalDataApi::RtnEmptyRspQryHistoricalTicks()
 	}
 
 	return 0;
-}
-
-double my_round(float val, int x = 0)
-{
-	double i = ((int)(val * 10000 + 0.5)) / 10000.0;
-	return i;
 }
 
 int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
