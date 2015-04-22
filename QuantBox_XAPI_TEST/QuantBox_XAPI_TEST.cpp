@@ -168,7 +168,13 @@ _pFirstBlock == pHead
 TongShi这个模块Disconnect不能正常退出，将一些释放的代码都已经全注释都无法解决
 
 准备：
-1.先到这个路径下载数 数畅信息平台V5.3
+1.先到这个路径下载数
+数数畅信息平台V5.0
+http://www.36ce.com/chanpin/1.htm
+数数畅信息平台V5.3
+
+先安5.0，再安5.3，这样就有一个账号可用
+
 内置了一个账号，被多人用，会被踢，没关系，在踢前已经取到一次行情了。
 http://www.dbszx.net/Downs/indexshow.asp?SortID=9&ID=10
 
@@ -198,8 +204,8 @@ int main(int argc, char* argv[])
 	ServerInfoField				m_ServerInfo1 = { 0 };
 	UserInfoField				m_UserInfo = { 0 };
 
-	strcpy(m_ServerInfo1.Address, "D:\\Scengine\\Stock.dll");
-	//strcpy(m_ServerInfo1.Address, "D:\\YjStock\\Stock.dll");
+	//strcpy(m_ServerInfo1.Address, "D:\\Scengine\\Stock.dll");
+	strcpy(m_ServerInfo1.Address, "D:\\JStockclt\\Stock.dll");
 
 	CXApi* pApi1 = CXApi::CreateApi(DLLPath1);
 	if (pApi1)

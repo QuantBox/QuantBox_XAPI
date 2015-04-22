@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "MdUserApi.h"
 #include "../include/QueueEnum.h"
 
@@ -49,24 +49,35 @@ LRESULT CMdUserApi::_OnMsg(WPARAM wParam, LPARAM lParam)
 
 	pHeader = (RCV_DATA*)lParam;
 
-	//	¶ÔÓÚ´¦ÀíËÙ¶ÈÂıµÄÊı¾İÀàĞÍ,×îºÃ½« pHeader->m_pData Ö¸ÏòµÄÊı¾İ±¸·İ, ÔÙ×÷´¦Àí
+	//	å¯¹äºå¤„ç†é€Ÿåº¦æ…¢çš„æ•°æ®ç±»å‹,æœ€å¥½å°† pHeader->m_pData æŒ‡å‘çš„æ•°æ®å¤‡ä»½, å†ä½œå¤„ç†
 	switch (wParam)
 	{
-	case RCV_REPORT:						// ¹ÉÆ±ĞĞÇé
-		for (i = 0; i < pHeader->m_nPacketNum; i++)
-		{
-			// Êı¾İ´¦Àí
-			OnRtnDepthMarketData((RCV_REPORT_STRUCTEx*)&(pHeader->m_pReport[i]), i, pHeader->m_nPacketNum);
-		}
+	case RCV_REPORT:						// è‚¡ç¥¨è¡Œæƒ…
+		// å–ç¬¬ä¸€ä¸ªå’Œæœ€åä¸€ä¸ªï¼Œå¦‚æœå‘ç°å…¨éƒ½æ˜¯ä¸è¦çš„ï¼Œå¦‚ä¸‰æ¿ï¼Œç›´æ¥ä¸¢å¼ƒ
+		// è¿™ä¸ªåœ°æ–¹å¯èƒ½æœ‰é—®é¢˜ï¼Œå¦‚æœå…ƒç´ ä¸º0å°±å‡ºäº‹äº†
+	{
+												RCV_REPORT_STRUCTEx* pFirst = &pHeader->m_pReport[0];
+												RCV_REPORT_STRUCTEx* pLast = &pHeader->m_pReport[pHeader->m_nPacketNum - 1];
+
+												// å‰åéƒ½ä¸åˆè¦æ±‚æ‰è·³è¿‡
+												if (FilterExchange(pFirst->m_wMarket) || FilterExchange(pLast->m_wMarket))
+												{
+													for (i = 0; i < pHeader->m_nPacketNum; i++)
+													{
+														// æ•°æ®å¤„ç†
+														OnRtnDepthMarketData(&pHeader->m_pReport[i], i, pHeader->m_nPacketNum);
+													}
+												}
+	}
 		break;
 
-	case RCV_FILEDATA:						// ÎÄ¼ş
+	case RCV_FILEDATA:						// æ–‡ä»¶
 		switch (pHeader->m_wDataType)
 		{
-		case FILE_HISTORY_EX:				// ²¹ÈÕÏßÊı¾İ
+		case FILE_HISTORY_EX:				// è¡¥æ—¥çº¿æ•°æ®
 			break;
 
-		case FILE_MINUTE_EX:				// ²¹·ÖÖÓÏßÊı¾İ
+		case FILE_MINUTE_EX:				// è¡¥åˆ†é’Ÿçº¿æ•°æ®
 			break;
 		default:
 			return 0;
@@ -81,7 +92,7 @@ LRESULT CMdUserApi::_OnMsg(WPARAM wParam, LPARAM lParam)
 
 void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	// ÓÉÄÚ²¿µ÷ÓÃ£¬²»ÓÃ¼ì²éÊÇ·ñÎª¿Õ
+	// ç”±å†…éƒ¨è°ƒç”¨ï¼Œä¸ç”¨æ£€æŸ¥æ˜¯å¦ä¸ºç©º
 	CMdUserApi* pApi = (CMdUserApi*)pApi2;
 	pApi->QueryInThread(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 	return nullptr;
@@ -93,7 +104,7 @@ CMdUserApi::CMdUserApi(void)
 	m_lRequestID = 0;
 	m_nSleep = 1;
 
-	// ×Ô¼ºÎ¬»¤Á½¸öÏûÏ¢¶ÓÁĞ
+	// è‡ªå·±ç»´æŠ¤ä¸¤ä¸ªæ¶ˆæ¯é˜Ÿåˆ—
 	m_msgQueue = new CMsgQueue();
 	m_msgQueue_Query = new CMsgQueue();
 
@@ -134,13 +145,13 @@ void CMdUserApi::QueryInThread(char type, void* pApi1, void* pApi2, double doubl
 
 	if (0 == iRet)
 	{
-		//·µ»Ø³É¹¦£¬Ìî¼Óµ½ÒÑ·¢ËÍ³Ø
+		//è¿”å›æˆåŠŸï¼Œå¡«åŠ åˆ°å·²å‘é€æ± 
 		m_nSleep = 1;
 	}
 	else
 	{
 		m_msgQueue_Query->Input_Copy(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
-		//Ê§°Ü£¬°´4µÄÃİ½øĞĞÑÓÊ±£¬µ«²»³¬¹ı1s
+		//å¤±è´¥ï¼ŒæŒ‰4çš„å¹‚è¿›è¡Œå»¶æ—¶ï¼Œä½†ä¸è¶…è¿‡1s
 		m_nSleep *= 4;
 		m_nSleep %= 1023;
 	}
@@ -172,28 +183,6 @@ ConfigInfoField* CMdUserApi::Config(ConfigInfoField* pConfigInfo)
 	return nullptr;
 }
 
-//bool CMdUserApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-//{
-//	bool bRet = ((pRspInfo) && (pRspInfo->ErrorID != 0));
-//	if(bRet)
-//	{
-//		ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
-//
-//		pField->ErrorID = pRspInfo->ErrorID;
-//		strcpy(pField->ErrorMsg, pRspInfo->ErrorMsg);
-//
-//		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, bIsLast, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
-//	}
-//	return bRet;
-//}
-//
-//bool CMdUserApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
-//{
-//	bool bRet = ((pRspInfo) && (pRspInfo->ErrorID != 0));
-//
-//	return bRet;
-//}
-
 void CMdUserApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
 	UserInfoField* pUserInfo,
@@ -218,7 +207,7 @@ void CMdUserApi::Disconnect()
 {
 	StopThread();
 
-	// ÇåÀí²éÑ¯¶ÓÁĞ
+	// æ¸…ç†æŸ¥è¯¢é˜Ÿåˆ—
 	if (m_msgQueue_Query)
 	{
 		m_msgQueue_Query->StopThread();
@@ -234,18 +223,18 @@ void CMdUserApi::Disconnect()
 	//	m_pApi->Release();
 	//	m_pApi = NULL;
 
-		// È«ÇåÀí£¬Ö»Áô×îºóÒ»¸ö
-		// ÓÉÓÚÕâ¸ödllÖĞÉè¼ÆµÄÏß³ÌÔÚÁ¬½ÓÊ§°ÜÊ±Ö±½ÓÍË³ö£¬ËùÒÔÕâ¸öµØ·½Òª¼ÓÒ»¸öÅĞ¶Ï£¬·À³ö´í
+		// å…¨æ¸…ç†ï¼Œåªç•™æœ€åä¸€ä¸ª
+		// ç”±äºè¿™ä¸ªdllä¸­è®¾è®¡çš„çº¿ç¨‹åœ¨è¿æ¥å¤±è´¥æ—¶ç›´æ¥é€€å‡ºï¼Œæ‰€ä»¥è¿™ä¸ªåœ°æ–¹è¦åŠ ä¸€ä¸ªåˆ¤æ–­ï¼Œé˜²å‡ºé”™
 		if (m_msgQueue)
 		{
 			m_msgQueue->Clear();
 			m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-			// Ö÷¶¯´¥·¢
+			// ä¸»åŠ¨è§¦å‘
 			m_msgQueue->Process();
 		}
 	//}
 
-	// ÇåÀíÏìÓ¦¶ÓÁĞ
+	// æ¸…ç†å“åº”é˜Ÿåˆ—
 	if (m_msgQueue)
 	{
 		m_msgQueue->StopThread();
@@ -290,9 +279,43 @@ void CMdUserApi::OnRspQryInstrument(DepthMarketDataField* _pField,RCV_REPORT_STR
 	m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInstrument, m_msgQueue, m_pClass, index >= Count - 1, 0, pField, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
 }
 
-//ĞĞÇé»Øµ÷£¬µÃ±£Ö¤´Ëº¯Êı¾¡¿ì·µ»Ø
+bool CMdUserApi::FilterExchange(WORD wMarket)
+{
+	// åªè¦ä¸Šæµ·ä¸æ·±åœ³ï¼Œä¸å¤„ç†ä¸‰æ¿
+	return wMarket != SB_MARKET_EX;
+}
+
+bool CMdUserApi::FilterInstrument(WORD wMarket, int instrument)
+{
+	// åªå¤„ç†Aè‚¡ï¼Œä¸å¤„ç†å€ºåˆ¸ä¸åŸºé‡‘
+	int prefix1 = instrument / 100000;
+	switch (wMarket)
+	{
+	case SH_MARKET_EX:
+		return (prefix1 == 6);
+	case SZ_MARKET_EX:
+		return (prefix1 == 0) || (prefix1 == 3);
+	default:
+		break;
+	}
+	return false;
+}
+
+//è¡Œæƒ…å›è°ƒï¼Œå¾—ä¿è¯æ­¤å‡½æ•°å°½å¿«è¿”å›
 void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count)
 {
+	// æŠŠä¸æƒ³è¦çš„è¿‡æ»¤äº†ï¼ŒåŠ å¿«é€Ÿåº¦
+	if (
+		FilterExchange(pDepthMarketData->m_wMarket)
+		&&FilterInstrument(pDepthMarketData->m_wMarket, atoi(pDepthMarketData->m_szLabel))
+		)
+	{
+	}
+	else
+	{
+		return;
+	}
+
 	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
 
 	strcpy(pField->InstrumentID, OldSymbol_2_NewSymbol(pDepthMarketData->m_szLabel, pDepthMarketData->m_wMarket));
@@ -300,7 +323,7 @@ void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int
 
 	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
 
-	// ÎªºÏÔ¼µ¼Èë¹¦ÄÜËù¼Ó£¬×öĞĞÇé´¦ÀíÊ±»¹ÊÇ×¢ÊÍÁË±È½ÏºÃ
+	// ä¸ºåˆçº¦å¯¼å…¥åŠŸèƒ½æ‰€åŠ ï¼Œå¦‚æœåˆçº¦ä¸éœ€è¦å†å¯¼å…¥ï¼Œè¿˜æ˜¯æ³¨é‡Šäº†æ¯”è¾ƒå¥½
 	set<string>::iterator it = m_setInstrumentIDsReceived.find(pField->Symbol);
 	if (it == m_setInstrumentIDsReceived.end())
 	{
@@ -410,14 +433,15 @@ void CMdUserApi::RunInThread()
 {
 	m_setInstrumentIDsReceived.clear();
 
+	// é“¶æ±Ÿè¦è®¾ç½®æˆ WS_VISIBLE ä¸ç„¶ä¸è°ƒç”¨é“¶æ±Ÿæ¥å£
 	m_hWnd = CreateWindowA(
 		"static",
-		"MsgRecv",
-		WS_OVERLAPPEDWINDOW|WS_VISIBLE,
+		"è¯·ä¸è¦å…³é—­æˆ‘ï¼å¦åˆ™æ”¶ä¸åˆ°è¡Œæƒ…",
+		WS_OVERLAPPEDWINDOW | WS_VISIBLE,// | WS_MINIMIZE,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
+		400,//CW_USEDEFAULT,
+		5,//CW_USEDEFAULT,
 		NULL,
 		NULL,
 		NULL,
@@ -463,6 +487,7 @@ void CMdUserApi::RunInThread()
 		SetWindowLong(m_hWnd, GWL_WNDPROC, (LONG)WndProc);
 	}
 	m_pfnStock_Init(m_hWnd, WM_USER_STOCK, RCV_WORK_SENDMSG);
+	ShowWindow(m_hWnd, SW_HIDE);
 
 	MSG msg;
 	while (m_bRunning)
@@ -487,7 +512,7 @@ void CMdUserApi::RunInThread()
 	m_hModule = nullptr;
 	m_hWnd = nullptr;
 
-	// ÇåÀíÏß³Ì
+	// æ¸…ç†çº¿ç¨‹
 	m_hThread = nullptr;
 	m_bRunning = false;
 }

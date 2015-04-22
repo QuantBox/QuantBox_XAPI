@@ -52,6 +52,10 @@ public:
 		int count);
 	void Disconnect();
 
+	bool FilterExchange(WORD wMarket);
+	bool FilterInstrument(WORD wMarket,int instrument);
+
+
 	//void Subscribe(const string& szInstrumentIDs, const string& szExchageID);
 	//void Unsubscribe(const string& szInstrumentIDs, const string& szExchageID);
 
