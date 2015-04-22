@@ -114,7 +114,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>QuantBox_Queue_x86</TargetName>
-    <OutDir>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\x86</OutDir>
+    <OutDir>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\TongShi\x86</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>

@@ -16,6 +16,7 @@
 
 #include <string.h>
 #include <cfloat>
+#include <tchar.h>
 
 #include <mutex>
 #include <vector>
@@ -105,8 +106,8 @@ CMdUserApi::CMdUserApi(void)
 	m_hThread = nullptr;
 	m_hWnd = nullptr;
 	m_hModule = nullptr;
-	m_pStock_Init = nullptr;
-	m_pStock_Quit = nullptr;
+	m_pfnStock_Init = nullptr;
+	m_pfnStock_Quit = nullptr;
 
 	pThis = this;
 }
@@ -193,8 +194,6 @@ ConfigInfoField* CMdUserApi::Config(ConfigInfoField* pConfigInfo)
 //	return bRet;
 //}
 
-#include "DialogStockDrv.h"
-
 void CMdUserApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
 	UserInfoField* pUserInfo,
@@ -203,22 +202,14 @@ void CMdUserApi::Connect(const string& szPath,
 	m_szPath = szPath;
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
-
-	//CDialogStockDrv* p = new CDialogStockDrv();
-	//p->Create(CDialogStockDrv::IDD, this);
-	//p->ShowWindow(SW_NORMAL);
-
 	
-
-	StartThread();
-
-	//m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, m_msgQueue_Query, this, 0, 0,
-	//	nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, m_msgQueue_Query, this, 0, 0,
+		nullptr, 0, nullptr, 0, nullptr, 0);
 }
 
 int CMdUserApi::_Init()
 {
-	//StartThread();
+	StartThread();
 
 	return 0;
 }
@@ -265,27 +256,32 @@ void CMdUserApi::Disconnect()
 	}
 }
 
-void CMdUserApi::OnRspQryInstrument(RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count)
+void CMdUserApi::OnRspQryInstrument(DepthMarketDataField* _pField,RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count)
 {
 	InstrumentField* pField = (InstrumentField*)m_msgQueue->new_block(sizeof(InstrumentField));
 
-	strcpy(pField->InstrumentID, OldSymbol_2_NewSymbol(pDepthMarketData->m_szLabel, pDepthMarketData->m_wMarket));
-	strcpy(pField->ExchangeID, Market_2_Exchange(pDepthMarketData->m_wMarket));
-
-	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
+	strcpy(pField->InstrumentID, _pField->InstrumentID);
+	strcpy(pField->ExchangeID, _pField->ExchangeID);
+	strcpy(pField->Symbol, _pField->Symbol);
 
 	strncpy(pField->InstrumentName, pDepthMarketData->m_szName, sizeof(InstrumentNameType));
 	pField->VolumeMultiple = 1;
 
+	int instrumentInt = atoi(pField->InstrumentID);
+
 	switch (pDepthMarketData->m_wMarket)
 	{
 	case SH_MARKET_EX:
-		pField->Type = InstrumentID_2_InstrumentType_SSE(pField->InstrumentID);
-		pField->PriceTick = InstrumentID_2_PriceTick_SSE(pField->InstrumentID);
+		pField->Type = InstrumentID_2_InstrumentType_SSE(instrumentInt);
+		pField->PriceTick = InstrumentID_2_PriceTick_SSE(instrumentInt);
 		break;
 	case SZ_MARKET_EX:
-		pField->Type = InstrumentID_2_InstrumentType_SZE(pField->InstrumentID);
-		pField->PriceTick = InstrumentID_2_PriceTick_SZE(pField->InstrumentID);
+		pField->Type = InstrumentID_2_InstrumentType_SZE(instrumentInt);
+		pField->PriceTick = InstrumentID_2_PriceTick_SZE(instrumentInt);
+		break;
+	case SB_MARKET_EX:
+		pField->Type = InstrumentID_2_InstrumentType_NEEQ(instrumentInt);
+		pField->PriceTick = InstrumentID_2_PriceTick_NEEQ(instrumentInt);
 		break;
 	default:
 		break;
@@ -308,7 +304,7 @@ void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int
 	set<string>::iterator it = m_setInstrumentIDsReceived.find(pField->Symbol);
 	if (it == m_setInstrumentIDsReceived.end())
 	{
-		OnRspQryInstrument(pDepthMarketData, index, Count);
+		OnRspQryInstrument(pField, pDepthMarketData, index, Count);
 		m_setInstrumentIDsReceived.insert(pField->Symbol);
 	}
 
@@ -383,6 +379,7 @@ void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int
 	} while (false);
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	//m_msgQueue->delete_block(pField);
 }
 
 void CMdUserApi::StartThread()
@@ -416,7 +413,7 @@ void CMdUserApi::RunInThread()
 	m_hWnd = CreateWindowA(
 		"static",
 		"MsgRecv",
-		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
@@ -438,9 +435,9 @@ void CMdUserApi::RunInThread()
 		return;
 	}
 
-	m_pStock_Init = (pFunStock_Init)X_GetFunction(m_hModule, "Stock_Init");
-	m_pStock_Quit = (pFunStock_Quit)X_GetFunction(m_hModule, "Stock_Quit");
-	if (m_pStock_Init == nullptr)
+	m_pfnStock_Init = (Stock_Init_PROC)X_GetFunction(m_hModule, "Stock_Init");
+	m_pfnStock_Quit = (Stock_Quit_PROC)X_GetFunction(m_hModule, "Stock_Quit");
+	if (m_pfnStock_Init == nullptr)
 	{
 		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
 
@@ -451,43 +448,42 @@ void CMdUserApi::RunInThread()
 		return;
 	}
 
+	m_pfnChangeWindowMessageFilter =
+		(ChangeWindowMessageFilter_PROC)::GetProcAddress(::GetModuleHandle(_T("USER32")), "ChangeWindowMessageFilter");
+	if (m_pfnChangeWindowMessageFilter)
+	{
+		m_pfnChangeWindowMessageFilter(WM_USER_STOCK, MSGFLT_ADD);
+	}
+
 	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 	if (m_hWnd != NULL && IsWindow(m_hWnd))
 	{
-		LONG l = SetWindowLong(m_hWnd, GWL_WNDPROC, (LONG)WndProc);
-		WriteLog("TS:%x", l);
-		WriteLog("TS:22222");
+		SetWindowLong(m_hWnd, GWL_WNDPROC, (LONG)WndProc);
 	}
-	m_pStock_Init(m_hWnd, WM_USER_STOCK, RCV_WORK_SENDMSG);
-	
-
-	HWND a = FindWindowA("static","MsgRecv");
-	WriteLog("TS:a %x", a);
-
-	WriteLog("TS:%x", m_hWnd);
-	WriteLog("TS:11111");
+	m_pfnStock_Init(m_hWnd, WM_USER_STOCK, RCV_WORK_SENDMSG);
 
 	MSG msg;
 	while (m_bRunning)
 	{
-		if (PeekMessage(&msg, m_hWnd, 0, 0, PM_REMOVE))
-		//if (GetMessage(&msg, NULL, 0, 0))
+		if (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
 		{
-			WriteLog("TS:333");
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			if (GetMessage(&msg, NULL, 0, 0))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		}
+		else
+		{
+			Sleep(1);
 		}
 	}
-	WriteLog("TS:!11111");
-	m_pStock_Quit(m_hWnd);
-	WriteLog("TS:!22222");
+	m_pfnStock_Quit(m_hWnd);
 	DestroyWindow(m_hWnd);
-	WriteLog("TS:!33333");
 
 	X_FreeLib(m_hModule);
-	WriteLog("TS:!44444");
 	m_hModule = nullptr;
 	m_hWnd = nullptr;
 

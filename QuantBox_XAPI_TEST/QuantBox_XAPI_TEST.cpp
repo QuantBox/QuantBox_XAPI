@@ -32,7 +32,7 @@ public:
 			timeinfo = localtime(&rawtime);
 			int mon = timeinfo->tm_mon;
 			char buf[64] = { 0 };
-			for (int i = 0; i < 12; ++i)
+			/*for (int i = 0; i < 12; ++i)
 			{
 				int x = mon + i;
 				int a = x / 12;
@@ -41,7 +41,7 @@ public:
 				m_pApi->Subscribe(buf, "");
 				sprintf(buf, "TF%d%02d", (1900 + timeinfo->tm_year + a) % 100, b + 1);
 				m_pApi->Subscribe(buf, "");
-			}
+			}*/
 		}
 	}
 	virtual void OnRtnError(ErrorField* pError){};
@@ -158,11 +158,11 @@ int main_1(int argc, char* argv[])
 	return 0;
 }
 
-int main_2(int argc, char* argv[])
+int main_4(int argc, char* argv[])
 {
 	CXSpiImpl* p = new CXSpiImpl();
 #if defined WINDOWS || _WIN32
-	char DLLPath1[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\ZeroMQ\\x86\\QuantBox_ZeroMQ_Quote.dll";
+	char DLLPath1[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\TongShi\\x86\\QuantBox_TongShi_Quote.dll";
 #else
 	char DLLPath1[250] = "libQuantBox_ZeroMQ_Quote.so";
 #endif
@@ -170,7 +170,7 @@ int main_2(int argc, char* argv[])
 	ServerInfoField				m_ServerInfo1 = { 0 };
 	UserInfoField				m_UserInfo = { 0 };
 
-	strcpy(m_ServerInfo1.Address, "tcp://127.0.0.1:5555");
+	strcpy(m_ServerInfo1.Address, "D:\\YjStock\\Stock.dll");
 	//strcpy(m_ServerInfo1.Address, "pgm://10.10.9.95;239.192.1.1:5555");
 
 	CXApi* pApi1 = CXApi::CreateApi(DLLPath1);
@@ -206,7 +206,7 @@ int main_2(int argc, char* argv[])
 }
 
 
-int main(int argc, char* argv[])
+int main_3(int argc, char* argv[])
 {
 	CXSpiImpl* p = new CXSpiImpl();
 #if defined WINDOWS || _WIN32
@@ -254,6 +254,96 @@ int main(int argc, char* argv[])
 
 		pApi1->Disconnect();
 	}
+
+	return 0;
+}
+
+#include "../include/XApiC.h"
+#include <stdlib.h>
+#include "../QuantBox_TongShi_Quote/Stockdrv.h"
+
+
+#define WM_USER_STOCK	2000
+
+typedef int  (WINAPI *pFunStock_Init)(HWND hWnd, UINT Msg, int nWorkMode);
+typedef int  (WINAPI *pFunStock_Quit)(HWND hWnd);
+
+LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	if (message == WM_USER_STOCK)
+	{
+		printf("%d",wParam);
+	}
+	else if (message == WM_NCDESTROY)
+	{
+	}
+	return DefWindowProc(hwnd, message, wParam, lParam);
+}
+
+int main(int argc, char* argv[])
+{
+	HWND						m_hWnd;
+	HMODULE						m_hModule;
+	pFunStock_Init				m_pStock_Init;
+	pFunStock_Quit				m_pStock_Quit;
+
+	m_hWnd = CreateWindowA(
+		"static",
+		"MsgRecv",
+		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		NULL,
+		NULL,
+		NULL,
+		NULL);
+
+	m_hModule = LoadLibraryExA("D:\\Scengine\\Stock.dll", nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
+	if (m_hModule == nullptr)
+	{
+		return 0;
+	}
+
+	m_pStock_Init = (pFunStock_Init)GetProcAddress(m_hModule, "Stock_Init");
+	m_pStock_Quit = (pFunStock_Quit)GetProcAddress(m_hModule, "Stock_Quit");
+	if (m_pStock_Init == nullptr)
+	{
+		return 0;
+	}
+
+	if (m_hWnd != NULL && IsWindow(m_hWnd))
+	{
+		LONG l = SetWindowLong(m_hWnd, GWL_WNDPROC, (LONG)WndProc);
+	}
+	m_pStock_Init(m_hWnd, WM_USER_STOCK, RCV_WORK_SENDMSG);
+
+
+	MSG msg;
+	while (true)
+	{
+		if (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+		{
+			if (GetMessage(&msg, NULL, 0, 0))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		}
+		else
+		{
+			Sleep(1);
+		}
+
+	}
+	m_pStock_Quit(m_hWnd);
+	DestroyWindow(m_hWnd);
+
+	//X_FreeLib(m_hModule);
+	m_hModule = nullptr;
+	m_hWnd = nullptr;
+
 
 	return 0;
 }

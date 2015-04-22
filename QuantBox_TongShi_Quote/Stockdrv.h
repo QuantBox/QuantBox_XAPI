@@ -41,6 +41,7 @@
 #define SZ_MARKET_EX				'ZS'		// 深圳
 #define HK_MARKET_EX			    'KH'		// 香港
 #define EB_MARKET_EX			    'BE'		// 二板
+#define SB_MARKET_EX			    'BS'		// 三板
 
 
 // 文件数据类型

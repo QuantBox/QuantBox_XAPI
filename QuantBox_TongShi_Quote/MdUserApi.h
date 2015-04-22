@@ -21,8 +21,9 @@
 
 using namespace std;
 
-typedef int  (WINAPI *pFunStock_Init)(HWND hWnd, UINT Msg, int nWorkMode);
-typedef int  (WINAPI *pFunStock_Quit)(HWND hWnd);
+typedef int  (WINAPI *Stock_Init_PROC)(HWND hWnd, UINT Msg, int nWorkMode);
+typedef int  (WINAPI *Stock_Quit_PROC)(HWND hWnd);
+typedef BOOL(WINAPI FAR *ChangeWindowMessageFilter_PROC)(UINT, DWORD);
 
 class CMsgQueue;
 
@@ -88,7 +89,7 @@ private:
 	//virtual void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	void OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count);
-	void OnRspQryInstrument(RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count);
+	void OnRspQryInstrument(DepthMarketDataField* pField,RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count);
 
 
 	//virtual void OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -126,8 +127,9 @@ private:
 
 	HWND						m_hWnd;
 	void*						m_hModule;
-	pFunStock_Init				m_pStock_Init;
-	pFunStock_Quit				m_pStock_Quit;
+	Stock_Init_PROC				m_pfnStock_Init;
+	Stock_Quit_PROC				m_pfnStock_Quit;
+	ChangeWindowMessageFilter_PROC m_pfnChangeWindowMessageFilter;
 
 	set<string>					m_setInstrumentIDsReceived;		//正在订阅的合约
 };

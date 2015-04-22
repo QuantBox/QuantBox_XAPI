@@ -1,15 +1,13 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "ChinaStock.h"
 
 #include <stdlib.h>
 
-// ÉÏº£Ö¤È¯½»Ò×ËùÖ¤È¯´úÂë·ÖÅä¹æÔò
-// http://wenku.baidu.com/link?url=fhnAW62VTXqHTn8p9xlyXKa_oDIfR2xIxBF3y_fryeoFnz7MFbeWJbMLx4n1H61ERFnhr6PtaxF_j01x8iIT0wArZzrBtABRysi-KEpBa9S
-InstrumentType InstrumentID_2_InstrumentType_SSE(char* pIn)
+InstrumentType InstrumentID_2_InstrumentType_SSE(int In)
 {
-// Ö»ÓĞ6Î»£¬8Î»µÄÆÚÈ¨ÒÑ¾­ÌáÇ°¹ıÂË
-	int prefix1 = atoi(pIn) / 100000;
-	int prefix3 = atoi(pIn) / 1000;
+	// åªæœ‰6ä½ï¼Œ8ä½çš„æœŸæƒå·²ç»æå‰è¿‡æ»¤
+	int prefix1 = In / 100000;
+	int prefix3 = In / 1000;
 	switch (prefix1)
 	{
 	case 0:
@@ -57,13 +55,11 @@ InstrumentType InstrumentID_2_InstrumentType_SSE(char* pIn)
 	}
 }
 
-// ÉîÛÚÖ¤È¯½»Ò×ËùÖ¤È¯´úÂë±àÂë·½°¸
-// http://wenku.baidu.com/view/e41fba85ec3a87c24028c416.html
-InstrumentType InstrumentID_2_InstrumentType_SZE(char* pIn)
+InstrumentType InstrumentID_2_InstrumentType_SZE(int In)
 {
-// Ö»ÓĞ6Î»£¬È¡Ç°2
-	int prefix1 = atoi(pIn) / 100000;
-	int prefix2 = atoi(pIn) / 10000;
+	// åªæœ‰6ä½ï¼Œå–å‰2
+	int prefix1 = In / 100000;
+	int prefix2 = In / 10000;
 	switch (prefix2)
 	{
 	case 0:
@@ -97,11 +93,16 @@ InstrumentType InstrumentID_2_InstrumentType_SZE(char* pIn)
 	}
 }
 
-PriceType InstrumentID_2_PriceTick_SSE(char* pIn)
+InstrumentType InstrumentID_2_InstrumentType_NEEQ(int In)
 {
-	// Ö»ÓĞ6Î»£¬8Î»µÄÆÚÈ¨ÒÑ¾­ÌáÇ°¹ıÂË
-	int prefix1 = atoi(pIn) / 100000;
-	int prefix3 = atoi(pIn) / 1000;
+	return InstrumentType::Stock;
+}
+
+PriceType InstrumentID_2_PriceTick_SSE(int In)
+{
+	// åªæœ‰6ä½ï¼Œ8ä½çš„æœŸæƒå·²ç»æå‰è¿‡æ»¤
+	int prefix1 = In / 100000;
+	int prefix3 = In / 1000;
 	switch (prefix1)
 	{
 	case 0:
@@ -129,11 +130,11 @@ PriceType InstrumentID_2_PriceTick_SSE(char* pIn)
 	return 0.01;
 }
 
-PriceType InstrumentID_2_PriceTick_SZE(char* pIn)
+PriceType InstrumentID_2_PriceTick_SZE(int In)
 {
-	// Ö»ÓĞ6Î»£¬È¡Ç°2
-	int prefix1 = atoi(pIn) / 100000;
-	int prefix2 = atoi(pIn) / 10000;
+	// åªæœ‰6ä½ï¼Œå–å‰2
+	int prefix1 = In / 100000;
+	int prefix2 = In / 10000;
 	switch (prefix2)
 	{
 	case 0:
@@ -165,4 +166,9 @@ PriceType InstrumentID_2_PriceTick_SZE(char* pIn)
 	default:
 		return 0.01;
 	}
+}
+
+PriceType InstrumentID_2_PriceTick_NEEQ(int In)
+{
+	return 0.01;
 }

@@ -245,11 +245,11 @@ InstrumentType CSecurityFtdcInstrumentField_2_InstrumentType(CSecurityFtdcInstru
 		}
 		if (pIn->ExchangeID[1] == 'Z')
 		{
-			return InstrumentID_2_InstrumentType_SZE(pIn->InstrumentID);
+			return InstrumentID_2_InstrumentType_SZE(atoi(pIn->InstrumentID));
 		}
 		else
 		{
-			return InstrumentID_2_InstrumentType_SSE(pIn->InstrumentID);
+			return InstrumentID_2_InstrumentType_SSE(atoi(pIn->InstrumentID));
 		}
 	}
 }
@@ -267,11 +267,11 @@ PriceType CSecurityFtdcInstrumentField_2_PriceTick(CSecurityFtdcInstrumentField*
 
 	if (pIn->ExchangeID[1] == 'Z')
 	{
-		return InstrumentID_2_PriceTick_SZE(pIn->InstrumentID);
+		return InstrumentID_2_PriceTick_SZE(atoi(pIn->InstrumentID));
 	}
 	else
 	{
-		return InstrumentID_2_PriceTick_SSE(pIn->InstrumentID);
+		return InstrumentID_2_PriceTick_SSE(atoi(pIn->InstrumentID));
 	}
 }
 

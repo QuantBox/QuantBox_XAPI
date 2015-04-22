@@ -13,6 +13,8 @@ char* Market_2_Exchange(WORD In)
 		return "HK";
 	case EB_MARKET_EX:
 		return "EB";
+	case SB_MARKET_EX:
+		return "NEEQ";
 	default:
 		return "";
 	}

@@ -68,7 +68,6 @@ public:
 	{
 		if (p != nullptr)
 			delete[] p;
-		p = nullptr;
 	}
 
 	// 直接发送，不入队列

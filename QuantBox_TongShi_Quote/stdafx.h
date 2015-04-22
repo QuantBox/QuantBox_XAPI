@@ -5,13 +5,19 @@
 
 #pragma once
 
+//#include "targetver.h"
+//
+//#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+//// Windows Header Files:
+//#include <windows.h>
+
+// TODO: reference additional headers your program requires here
+#if defined _WIN32 || WIN32 || _WINDOWS
 #include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
-//#include <windows.h>
-#include <afxcontrolbars.h>
+#include <windows.h>
+#else
 
-
-
-// TODO: reference additional headers your program requires here
+#endif // defined
