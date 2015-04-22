@@ -34,11 +34,11 @@ LRESULT CALLBACK CMdUserApi::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 	{
 		return pThis->_OnMsg(wParam, lParam);
 	}
-	else if (message == WM_NCDESTROY)
-	{
-		WriteLog("TS:5555,%d,%d", message, wParam);
-	}
-	WriteLog("TS:%d,%d", message, wParam);
+	//else if (message == WM_NCDESTROY)
+	//{
+	//	WriteLog("TS:5555,%d,%d", message, wParam);
+	//}
+	//WriteLog("TS:%d,%d", message, wParam);
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
@@ -413,7 +413,7 @@ void CMdUserApi::RunInThread()
 	m_hWnd = CreateWindowA(
 		"static",
 		"MsgRecv",
-		WS_OVERLAPPEDWINDOW,
+		WS_OVERLAPPEDWINDOW|WS_VISIBLE,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
