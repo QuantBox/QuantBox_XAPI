@@ -26,6 +26,7 @@ typedef int  (WINAPI *Stock_Quit_PROC)(HWND hWnd);
 typedef BOOL(WINAPI FAR *ChangeWindowMessageFilter_PROC)(UINT, DWORD);
 
 class CMsgQueue;
+class CDialogStockDrv;
 
 class CMdUserApi
 {
@@ -36,8 +37,6 @@ class CMdUserApi
 	};
 
 public:
-	static CMdUserApi * pThis;
-	static LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 	LRESULT _OnMsg(WPARAM wParam, LPARAM lParam);
 
 	CMdUserApi(void);
@@ -55,7 +54,8 @@ public:
 	bool FilterExchange(WORD wMarket);
 	bool FilterInstrument(WORD wMarket,int instrument);
 
-
+	void InitDriver(HWND hWnd, UINT Msg);
+	void QuitDriver();
 	//void Subscribe(const string& szInstrumentIDs, const string& szExchageID);
 	//void Unsubscribe(const string& szInstrumentIDs, const string& szExchageID);
 
@@ -64,6 +64,8 @@ public:
 private:
 	void StartThread();
 	void StopThread();
+
+
 
 	static void ProcessThread(CMdUserApi* lpParam)
 	{
@@ -120,7 +122,7 @@ private:
 	int							m_nSleep;
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针
-	CMsgQueue*					m_msgQueue_Query;
+	//CMsgQueue*					m_msgQueue_Query;
 	void*						m_pClass;
 
 	volatile bool						m_bRunning;
@@ -136,5 +138,8 @@ private:
 	ChangeWindowMessageFilter_PROC m_pfnChangeWindowMessageFilter;
 
 	set<string>					m_setInstrumentIDsReceived;		//正在订阅的合约
+	int							m_nInited;
+
+	CDialogStockDrv*			m_pDlg;
 };
 

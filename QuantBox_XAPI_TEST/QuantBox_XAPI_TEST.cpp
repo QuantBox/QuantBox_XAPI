@@ -158,43 +158,7 @@ int main_1(int argc, char* argv[])
 	return 0;
 }
 
-/*
-不知谁能帮解决此问题
 
-2.问题一
-_pFirstBlock == pHead
-这个地方可能是消息队列有问题，在TongShi这个模块中东西放队列中就有可能出错
-1.问题二
-TongShi这个模块Disconnect不能正常退出，将一些释放的代码都已经全注释都无法解决
-
-准备：
-1.先到这个路径下载数
-数数畅信息平台V5.0
-http://www.36ce.com/chanpin/1.htm
-数数畅信息平台V5.3
-
-先安5.0，再安5.3，这样就有一个账号可用
-
-内置了一个账号，被多人用，会被踢，没关系，在踢前已经取到一次行情了。
-http://www.dbszx.net/Downs/indexshow.asp?SortID=9&ID=10
-
-目前不使用银江，因为银江没有免费账号，得到淘宝上买
-
-
-其它
-运行时权限有要求
-由于通视是用的SendMessage/PostMessage来实现的，在Win7/Win8下跨进程的的发送消息权限不够
-网上搜索ChangeWindowMessageFilter
-
-我的VS2013是以管理员方式运行的。
-使用银江在IDE中运行测试程序可以收到行情，但直接双击运行却收不到。
-
-找了两天，才找到是因为权限问题
-
-目前TEST以管理员方式运行，银江才能正常使用
-TEST以普通用户运行，数畅可以使用，也可以将数畅设成管理员方式运行
-实际上出现无法收数时，请做部分调整即可。
-*/
 int main(int argc, char* argv[])
 {
 	CXSpiImpl* p = new CXSpiImpl();
@@ -204,8 +168,8 @@ int main(int argc, char* argv[])
 	ServerInfoField				m_ServerInfo1 = { 0 };
 	UserInfoField				m_UserInfo = { 0 };
 
-	//strcpy(m_ServerInfo1.Address, "D:\\Scengine\\Stock.dll");
-	strcpy(m_ServerInfo1.Address, "D:\\JStockclt\\Stock.dll");
+	strcpy(m_ServerInfo1.Address, "D:\\Scengine\\Stock.dll");
+	//strcpy(m_ServerInfo1.Address, "D:\\YjStock\\Stock.dll");
 
 	CXApi* pApi1 = CXApi::CreateApi(DLLPath1);
 	if (pApi1)
@@ -226,7 +190,7 @@ int main(int argc, char* argv[])
 		printf("退出");
 		
 		pApi1->Disconnect();
-		// 到不了这一步
+
 		printf("退出成功");
 	}
 

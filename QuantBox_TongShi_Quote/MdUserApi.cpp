@@ -21,26 +21,13 @@
 #include <mutex>
 #include <vector>
 
+#include "resource.h"
+#include "DialogStockDrv.h"
+
 using namespace std;
 
 
 #define WM_USER_STOCK	2000
-
-CMdUserApi* CMdUserApi::pThis = nullptr;
-
-LRESULT CALLBACK CMdUserApi::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	if (message == WM_USER_STOCK)
-	{
-		return pThis->_OnMsg(wParam, lParam);
-	}
-	//else if (message == WM_NCDESTROY)
-	//{
-	//	WriteLog("TS:5555,%d,%d", message, wParam);
-	//}
-	//WriteLog("TS:%d,%d", message, wParam);
-	return DefWindowProc(hwnd, message, wParam, lParam);
-}
 
 LRESULT CMdUserApi::_OnMsg(WPARAM wParam, LPARAM lParam)
 {
@@ -60,7 +47,7 @@ LRESULT CMdUserApi::_OnMsg(WPARAM wParam, LPARAM lParam)
 												RCV_REPORT_STRUCTEx* pLast = &pHeader->m_pReport[pHeader->m_nPacketNum - 1];
 
 												// 前后都不合要求才跳过
-												if (FilterExchange(pFirst->m_wMarket) || FilterExchange(pLast->m_wMarket))
+												//if (FilterExchange(pFirst->m_wMarket) || FilterExchange(pLast->m_wMarket))
 												{
 													for (i = 0; i < pHeader->m_nPacketNum; i++)
 													{
@@ -106,10 +93,10 @@ CMdUserApi::CMdUserApi(void)
 
 	// 自己维护两个消息队列
 	m_msgQueue = new CMsgQueue();
-	m_msgQueue_Query = new CMsgQueue();
+	//m_msgQueue_Query = new CMsgQueue();
 
-	m_msgQueue_Query->Register((void*)Query, this);
-	m_msgQueue_Query->StartThread();
+	//m_msgQueue_Query->Register((void*)Query, this);
+	//m_msgQueue_Query->StartThread();
 
 	//m_msgQueue->m_bDirectOutput = true;
 
@@ -120,7 +107,7 @@ CMdUserApi::CMdUserApi(void)
 	m_pfnStock_Init = nullptr;
 	m_pfnStock_Quit = nullptr;
 
-	pThis = this;
+	m_nInited = 0;
 }
 
 CMdUserApi::~CMdUserApi(void)
@@ -130,32 +117,32 @@ CMdUserApi::~CMdUserApi(void)
 
 void CMdUserApi::QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	int iRet = 0;
-	switch (type)
-	{
-	case E_Init:
-		iRet = _Init();
-		break;
-	//case E_ReqUserLoginField:
-	//	iRet = _ReqUserLogin(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+	//int iRet = 0;
+	//switch (type)
+	//{
+	//case E_Init:
+	//	iRet = _Init();
 	//	break;
-	default:
-		break;
-	}
+	////case E_ReqUserLoginField:
+	////	iRet = _ReqUserLogin(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+	////	break;
+	//default:
+	//	break;
+	//}
 
-	if (0 == iRet)
-	{
-		//返回成功，填加到已发送池
-		m_nSleep = 1;
-	}
-	else
-	{
-		m_msgQueue_Query->Input_Copy(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
-		//失败，按4的幂进行延时，但不超过1s
-		m_nSleep *= 4;
-		m_nSleep %= 1023;
-	}
-	this_thread::sleep_for(chrono::milliseconds(m_nSleep));
+	//if (0 == iRet)
+	//{
+	//	//返回成功，填加到已发送池
+	//	m_nSleep = 1;
+	//}
+	//else
+	//{
+	//	m_msgQueue_Query->Input_Copy(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+	//	//失败，按4的幂进行延时，但不超过1s
+	//	m_nSleep *= 4;
+	//	m_nSleep %= 1023;
+	//}
+	//this_thread::sleep_for(chrono::milliseconds(m_nSleep));
 }
 
 void CMdUserApi::Register(void* pCallback,void* pClass)
@@ -164,16 +151,16 @@ void CMdUserApi::Register(void* pCallback,void* pClass)
 	if (m_msgQueue == nullptr)
 		return;
 
-	m_msgQueue_Query->Register((void*)Query,this);
+	//m_msgQueue_Query->Register((void*)Query,this);
 	m_msgQueue->Register(pCallback,this);
 	if (pCallback)
 	{
-		m_msgQueue_Query->StartThread();
+		//m_msgQueue_Query->StartThread();
 		m_msgQueue->StartThread();
 	}
 	else
 	{
-		m_msgQueue_Query->StopThread();
+		//m_msgQueue_Query->StopThread();
 		m_msgQueue->StopThread();
 	}
 }
@@ -191,31 +178,87 @@ void CMdUserApi::Connect(const string& szPath,
 	m_szPath = szPath;
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
-	
-	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, m_msgQueue_Query, this, 0, 0,
-		nullptr, 0, nullptr, 0, nullptr, 0);
+
+	StartThread();
 }
 
-int CMdUserApi::_Init()
+void CMdUserApi::InitDriver(HWND hWnd, UINT Msg)
 {
-	StartThread();
+	m_pfnChangeWindowMessageFilter =
+		(ChangeWindowMessageFilter_PROC)::GetProcAddress(::GetModuleHandle(_T("USER32")), "ChangeWindowMessageFilter");
+	if (m_pfnChangeWindowMessageFilter)
+	{
+		m_pfnChangeWindowMessageFilter(WM_USER_STOCK, MSGFLT_ADD);
+	}
 
-	return 0;
+	m_hModule = X_LoadLib(m_ServerInfo.Address);
+	if (m_hModule == nullptr)
+	{
+		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+
+		pField->ErrorID = GetLastError();
+		strncpy(pField->ErrorMsg, X_GetLastError(), sizeof(ErrorMsgType));
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		return;
+	}
+
+	m_pfnStock_Init = (Stock_Init_PROC)X_GetFunction(m_hModule, "Stock_Init");
+	m_pfnStock_Quit = (Stock_Quit_PROC)X_GetFunction(m_hModule, "Stock_Quit");
+	if (m_pfnStock_Init == nullptr)
+	{
+		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+
+		pField->ErrorID = GetLastError();
+		strncpy(pField->ErrorMsg, X_GetLastError(), sizeof(ErrorMsgType));
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		return;
+	}
+
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+
+	m_nInited = m_pfnStock_Init(hWnd, Msg, RCV_WORK_SENDMSG);
+	m_hWnd = hWnd;
+}
+
+void CMdUserApi::QuitDriver()
+{
+	if (m_hWnd)
+	{
+		if (m_nInited)
+		{
+			m_pfnStock_Quit(m_hWnd);
+			m_nInited = 0;
+		}
+		
+		//DestroyWindow(m_hWnd);
+		m_hWnd = nullptr;
+	}
+
+	if (m_hModule)
+	{
+		X_FreeLib(m_hModule);
+		m_hModule = nullptr;
+	}
 }
 
 void CMdUserApi::Disconnect()
 {
 	StopThread();
 
+	QuitDriver();
+
 	// 清理查询队列
-	if (m_msgQueue_Query)
-	{
-		m_msgQueue_Query->StopThread();
-		m_msgQueue_Query->Register(nullptr,nullptr);
-		m_msgQueue_Query->Clear();
-		delete m_msgQueue_Query;
-		m_msgQueue_Query = nullptr;
-	}
+	//if (m_msgQueue_Query)
+	//{
+	//	m_msgQueue_Query->StopThread();
+	//	m_msgQueue_Query->Register(nullptr,nullptr);
+	//	m_msgQueue_Query->Clear();
+	//	delete m_msgQueue_Query;
+	//	m_msgQueue_Query = nullptr;
+	//}
 
 	//if(m_pApi)
 	//{
@@ -305,16 +348,16 @@ bool CMdUserApi::FilterInstrument(WORD wMarket, int instrument)
 void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count)
 {
 	// 把不想要的过滤了，加快速度
-	if (
-		FilterExchange(pDepthMarketData->m_wMarket)
-		&&FilterInstrument(pDepthMarketData->m_wMarket, atoi(pDepthMarketData->m_szLabel))
-		)
-	{
-	}
-	else
-	{
-		return;
-	}
+	//if (
+	//	FilterExchange(pDepthMarketData->m_wMarket)
+	//	&&FilterInstrument(pDepthMarketData->m_wMarket, atoi(pDepthMarketData->m_szLabel))
+	//	)
+	//{
+	//}
+	//else
+	//{
+	//	return;
+	//}
 
 	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
 
@@ -402,7 +445,6 @@ void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int
 	} while (false);
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
-	//m_msgQueue->delete_block(pField);
 }
 
 void CMdUserApi::StartThread()
@@ -418,6 +460,12 @@ void CMdUserApi::StopThread()
 {
 	m_bRunning = false;
 
+	if (m_pDlg)
+	{
+		m_pDlg->SendMessage(WM_CLOSE);
+		m_pDlg = nullptr;
+	}
+
 	//m_cv.notify_all();
 	lock_guard<mutex> cl(m_mtx_del);
 	if (m_hThread)
@@ -431,86 +479,14 @@ void CMdUserApi::StopThread()
 
 void CMdUserApi::RunInThread()
 {
+	// 调用DLL中的资源，一定要切换
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	m_setInstrumentIDsReceived.clear();
 
-	// 银江要设置成 WS_VISIBLE 不然不调用银江接口
-	m_hWnd = CreateWindowA(
-		"static",
-		"请不要关闭我！否则收不到行情",
-		WS_OVERLAPPEDWINDOW | WS_VISIBLE,// | WS_MINIMIZE,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		400,//CW_USEDEFAULT,
-		5,//CW_USEDEFAULT,
-		NULL,
-		NULL,
-		NULL,
-		NULL);
-
-	m_hModule = X_LoadLib(m_ServerInfo.Address);
-	if (m_hModule == nullptr)
-	{
-		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
-
-		pField->ErrorID = GetLastError();
-		strncpy(pField->ErrorMsg, X_GetLastError(), sizeof(ErrorMsgType));
-
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		return;
-	}
-
-	m_pfnStock_Init = (Stock_Init_PROC)X_GetFunction(m_hModule, "Stock_Init");
-	m_pfnStock_Quit = (Stock_Quit_PROC)X_GetFunction(m_hModule, "Stock_Quit");
-	if (m_pfnStock_Init == nullptr)
-	{
-		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
-
-		pField->ErrorID = GetLastError();
-		strncpy(pField->ErrorMsg, X_GetLastError(), sizeof(ErrorMsgType));
-
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		return;
-	}
-
-	m_pfnChangeWindowMessageFilter =
-		(ChangeWindowMessageFilter_PROC)::GetProcAddress(::GetModuleHandle(_T("USER32")), "ChangeWindowMessageFilter");
-	if (m_pfnChangeWindowMessageFilter)
-	{
-		m_pfnChangeWindowMessageFilter(WM_USER_STOCK, MSGFLT_ADD);
-	}
-
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Initialized, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-
-	if (m_hWnd != NULL && IsWindow(m_hWnd))
-	{
-		SetWindowLong(m_hWnd, GWL_WNDPROC, (LONG)WndProc);
-	}
-	m_pfnStock_Init(m_hWnd, WM_USER_STOCK, RCV_WORK_SENDMSG);
-	ShowWindow(m_hWnd, SW_HIDE);
-
-	MSG msg;
-	while (m_bRunning)
-	{
-		if (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
-		{
-			if (GetMessage(&msg, NULL, 0, 0))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
-		else
-		{
-			Sleep(1);
-		}
-	}
-	m_pfnStock_Quit(m_hWnd);
-	DestroyWindow(m_hWnd);
-
-	X_FreeLib(m_hModule);
-	m_hModule = nullptr;
-	m_hWnd = nullptr;
+	m_pDlg = new CDialogStockDrv();
+	m_pDlg->m_pUserApi = this;
+	m_pDlg->DoModal();
 
 	// 清理线程
 	m_hThread = nullptr;
