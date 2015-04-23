@@ -48,7 +48,7 @@ public:
 
 	virtual void OnRtnDepthMarketData(DepthMarketDataField* pMarketData)
 	{
-		printf("%s,%f\r\n", pMarketData->Symbol,pMarketData->LastPrice);
+		printf("%s,%f,%d\r\n", pMarketData->Symbol, pMarketData->LastPrice, ++count);
 	}
 
 	virtual void OnRtnQuoteRequest(QuoteRequestField* pQuoteRequest){};
@@ -68,8 +68,34 @@ public:
 	virtual void OnRspQryHistoricalTicks(TickField* pTicks, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
 	virtual void OnRspQryHistoricalBars(BarField* pBars, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
 
+	virtual bool OnFilterSubscribe(ExchangeType exchange, int instrument_part1, int instrument_part2, int instrument_part3, char* pInstrument)
+	{
+		// 当数字为0时，只判断交易所
+		// 当交易所为
+		if (instrument_part1 == 0)
+			// 只要上海与深圳，不处理三板
+			return exchange != ExchangeType::NEEQ;
+
+		//type = ExchangeType::SZE;
+		//double1 = 399300;
+
+		int prefix1 = instrument_part1 / 100000;
+		int prefix3 = instrument_part1 / 1000;
+		switch (exchange)
+		{
+		case ExchangeType::SSE:
+			return (prefix1 == 6);
+		case ExchangeType::SZE:
+			return (prefix1 == 0) || (prefix3 == 300);
+		default:
+			break;
+		}
+
+		return true;
+	}
 public:
 	CXApi* m_pApi;
+	int count;
 };
 
 int main_1(int argc, char* argv[])
@@ -159,6 +185,7 @@ int main_1(int argc, char* argv[])
 }
 
 
+
 int main(int argc, char* argv[])
 {
 	CXSpiImpl* p = new CXSpiImpl();
@@ -182,8 +209,8 @@ int main(int argc, char* argv[])
 		}
 
 		pApi1->RegisterSpi(p);
-
 		pApi1->Connect("D:\\", &m_ServerInfo1, &m_UserInfo, 1);
+		
 
 		getchar();
 

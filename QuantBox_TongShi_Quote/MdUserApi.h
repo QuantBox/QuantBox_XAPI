@@ -5,6 +5,7 @@
 #include "../include/ApiStruct.h"
 #include <stdlib.h>
 #include "Stockdrv.h"
+#include "../include/QueueHeader.h"
 
 
 #ifdef _WIN64
@@ -51,8 +52,7 @@ public:
 		int count);
 	void Disconnect();
 
-	bool FilterExchange(WORD wMarket);
-	bool FilterInstrument(WORD wMarket,int instrument);
+	
 
 	void InitDriver(HWND hWnd, UINT Msg);
 	void QuitDriver();
@@ -62,10 +62,10 @@ public:
 	//void SubscribeQuote(const string& szInstrumentIDs, const string& szExchageID);
 	//void UnsubscribeQuote(const string& szInstrumentIDs, const string& szExchageID);
 private:
+	bool FilterExchangeInstrument(WORD wMarket, int instrument);
+
 	void StartThread();
 	void StopThread();
-
-
 
 	static void ProcessThread(CMdUserApi* lpParam)
 	{

@@ -69,7 +69,8 @@ void* CXApiImpl::_OnRespone(char type, void* pApi1, void* pApi2, double double1,
 	case OnRspQryInvestor:
 		m_pSpi->OnRspQryInvestor((InvestorField*)ptr1, size1, double1 != 0);
 		break;
-
+	case OnFilterSubscribe:
+		return (void*)m_pSpi->OnFilterSubscribe((ExchangeType)(char)double1, (int)size1, (int)size1, (int)size3, (char*)ptr1);
 	default:
 		break;
 	}

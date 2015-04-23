@@ -64,6 +64,8 @@ enum ResponeType :char
 	OnRspQryHistoricalTicks,
 	OnRspQryHistoricalBars,
 	OnRspQryInvestor,
+
+	OnFilterSubscribe,
 };
 
 #endif

@@ -60,11 +60,37 @@ namespace QuantBox.XAPI
             Console.WriteLine("CC " + trade.Time + "CC " + trade.ID + "CC " + trade.TradeID);
         }
 
+        static bool OnFilterSubscribe(object sender, ExchangeType exchange, int instrument_part1, int instrument_part2, int instrument_part3, IntPtr pInstrument)
+        {
+            // 当数字为0时，只判断交易所
+            // 当交易所为
+            if (instrument_part1 == 0)
+                // 只要上海与深圳，不处理三板
+                return exchange != ExchangeType.NEEQ;
+
+            //type = ExchangeType::SZE;
+            //double1 = 399300;
+
+            int prefix1 = instrument_part1 / 100000;
+            int prefix3 = instrument_part1 / 1000;
+            switch (exchange)
+            {
+                case ExchangeType.SSE:
+                    return (prefix1 == 6);
+                case ExchangeType.SZE:
+                    return (prefix1 == 0) || (prefix3 == 300);
+                default:
+                    break;
+		    }
+
+		    return true;
+        }
+
         static void Main(string[] args)
         {
             //for (int i = 0; i < 10000; ++i)
             {
-                test_CTP_Main(args);
+                test_TongShi_Main(args);
             }
             Console.ReadKey();
         }
@@ -157,6 +183,28 @@ namespace QuantBox.XAPI
 		#endregion
 
         static XApi api;
+
+        static void test_TongShi_Main(string[] args)
+        {
+
+            api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\TongShi\x86\QuantBox_TongShi_Quote.dll");
+
+            api.Server.Address = "D:\\Scengine\\Stock.dll";
+
+            api.OnConnectionStatus = OnConnectionStatus;
+            api.OnRtnDepthMarketData = OnRtnDepthMarketData;
+            api.OnFilterSubscribe = OnFilterSubscribe;
+
+            api.Connect();
+            Thread.Sleep(10 * 1000);
+            api.ReqQryInstrument("", "");
+
+            Thread.Sleep(300 * 1000);
+
+            api.Dispose();
+
+            Thread.Sleep(5 * 1000);
+        }
 
         static void test_CTP_Main(string[] args)
         {

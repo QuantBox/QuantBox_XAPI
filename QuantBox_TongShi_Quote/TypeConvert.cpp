@@ -1,6 +1,23 @@
 #include "stdafx.h"
 #include "TypeConvert.h"
 
+ExchangeType Market_2_ExchangeType(WORD In)
+{
+	switch (In)
+	{
+	case SH_MARKET_EX:
+		return ExchangeType::SSE;
+	case SZ_MARKET_EX:
+		return ExchangeType::SZE;
+	case HK_MARKET_EX:
+		return ExchangeType::HKEx;
+	case SB_MARKET_EX:
+		return ExchangeType::NEEQ;
+	default:
+		return ExchangeType::Undefined_;
+	}
+}
+
 char* Market_2_Exchange(WORD In)
 {
 	switch (In)
@@ -10,7 +27,7 @@ char* Market_2_Exchange(WORD In)
 	case SZ_MARKET_EX:
 		return "SZE";
 	case HK_MARKET_EX:
-		return "HK";
+		return "HKEx";
 	case EB_MARKET_EX:
 		return "EB";
 	case SB_MARKET_EX:

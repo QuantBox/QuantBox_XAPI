@@ -31,6 +31,8 @@ public:
 
 	virtual void OnRspQryHistoricalTicks(TickField* pTicks, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
 	virtual void OnRspQryHistoricalBars(BarField* pBars, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
+
+	virtual bool OnFilterSubscribe(ExchangeType exchange, int instrument_part1, int instrument_part2, int instrument_part3, char* pInstrument){ return true; };
 };
 
 class DLL_PUBLIC CXApi

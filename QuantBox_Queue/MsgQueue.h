@@ -71,17 +71,18 @@ public:
 	}
 
 	// 直接发送，不入队列
-	void Input_Output(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+	void* Input_Output(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 	{
 		try
 		{
 			if (m_fnOnRespone)
-				(*m_fnOnRespone)(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+				return (*m_fnOnRespone)(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 		}
 		catch (...)
 		{
 			m_fnOnRespone = nullptr;
 		}
+		return nullptr;
 	}
 
 	// 对输入的数据做了一次复制，主要是为了解决转过来的指针可能失效的问题。

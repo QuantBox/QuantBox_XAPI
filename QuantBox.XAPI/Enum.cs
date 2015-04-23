@@ -256,4 +256,18 @@ namespace QuantBox
         AccountsPermits,
         OtherCard,
     };
+
+    public enum ExchangeType : byte
+    {
+        Undefined,
+        SHFE, // 上期所
+        DCE, // 大商所
+        CZCE, // 郑商所
+        CFFEX, // 中金所
+        INE, // 能源中心
+        SSE, // 上交所
+        SZE, // 深交所
+        NEEQ, // 全国中小企业股份转让系统
+        HKEx,
+    };
 }

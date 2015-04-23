@@ -1,23 +1,23 @@
-#ifndef _API_ENUM_H_
+ï»¿#ifndef _API_ENUM_H_
 #define _API_ENUM_H_
 
-//Á¬½Ó×´Ì¬Ã¶¾Ù
+//è¿æ¥çŠ¶æ€æšä¸¾
 enum ConnectionStatus :char
 {
-	Uninitialized, //Î´³õÊ¼»¯
-	Initialized, //ÒÑ¾­³õÊ¼»¯
-	Disconnected, //Á¬½ÓÒÑ¾­¶Ï¿ª
-	Connecting, //Á¬½ÓÖĞ
-	Connected, //Á¬½Ó³É¹¦
-	Authorizing, //ÊÚÈ¨ÖĞ
-	Authorized, //ÊÚÈ¨³É¹¦
-	Logining, //µÇÂ¼ÖĞ
-	Logined, //µÇÂ¼³É¹¦
-	Confirming, //½áËãµ¥È·ÈÏÖĞ
-	Confirmed, //ÒÑ¾­È·ÈÏ
+	Uninitialized, //æœªåˆå§‹åŒ–
+	Initialized, //å·²ç»åˆå§‹åŒ–
+	Disconnected, //è¿æ¥å·²ç»æ–­å¼€
+	Connecting, //è¿æ¥ä¸­
+	Connected, //è¿æ¥æˆåŠŸ
+	Authorizing, //æˆæƒä¸­
+	Authorized, //æˆæƒæˆåŠŸ
+	Logining, //ç™»å½•ä¸­
+	Logined, //ç™»å½•æˆåŠŸ
+	Confirming, //ç»“ç®—å•ç¡®è®¤ä¸­
+	Confirmed, //å·²ç»ç¡®è®¤
 	Doing,
-	Done, //Íê³É
-	Unknown_, //Î´Öª
+	Done, //å®Œæˆ
+	Unknown_, //æœªçŸ¥
 };
 
 enum ApiType :char
@@ -193,6 +193,20 @@ enum IdCardType:char
 	HKMCIDCard,
 	AccountsPermits,
 	OtherCard,
+};
+
+enum ExchangeType :char
+{
+	Undefined_,
+	SHFE, // ä¸ŠæœŸæ‰€
+	DCE, // å¤§å•†æ‰€
+	CZCE, // éƒ‘å•†æ‰€
+	CFFEX, // ä¸­é‡‘æ‰€
+	INE, // èƒ½æºä¸­å¿ƒ
+	SSE, // ä¸Šäº¤æ‰€
+	SZE, // æ·±äº¤æ‰€
+	NEEQ, // å…¨å›½ä¸­å°ä¼ä¸šè‚¡ä»½è½¬è®©ç³»ç»Ÿ
+	HKEx,
 };
 
 #endif

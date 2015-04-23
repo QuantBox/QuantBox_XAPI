@@ -48,6 +48,5 @@ namespace QuantBox.XAPI
         ReqQryHistoricalTicks,
         ReqQryHistoricalBars,
         ReqQryInvestor,
-
     }
 }

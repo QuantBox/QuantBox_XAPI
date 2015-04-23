@@ -18,6 +18,14 @@ namespace QuantBox.XAPI.Callback
         }
         // 这种写法的主要目的是求快
         private DelegateOnRtnDepthMarketData OnRtnDepthMarketData_;
+
+        public DelegateOnFilterSubscribe OnFilterSubscribe
+        {
+            get { return OnFilterSubscribe_; }
+            set { OnFilterSubscribe_ = value; }
+        }
+        // 这种写法的主要目的是求快
+        private DelegateOnFilterSubscribe OnFilterSubscribe_;
         
 
         #region 已经订阅的行情
@@ -129,6 +137,14 @@ namespace QuantBox.XAPI.Callback
             DepthMarketDataField obj = (DepthMarketDataField)Marshal.PtrToStructure(ptr1, typeof(DepthMarketDataField));
 
             OnRtnDepthMarketData_(this, ref obj);
+        }
+
+        private bool _OnFilterSubscribe(double double1, int size1, int size2, int size3, IntPtr ptr1)
+        {
+            if (OnFilterSubscribe_ == null)
+                return true;
+
+            return OnFilterSubscribe_(this, (ExchangeType)double1, size1, size2, size3, ptr1);
         }
     }
 }
