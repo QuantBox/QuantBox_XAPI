@@ -24,53 +24,53 @@ void* CXApiImpl::_OnRespone(char type, void* pApi1, void* pApi2, double double1,
 	switch (rt)
 	{
 	case OnConnectionStatus:
-		m_pSpi->OnConnectionStatus((ConnectionStatus)(char)double1, (RspUserLoginField*)ptr1, size1);
+		m_pSpi->OnConnectionStatus(this, (ConnectionStatus)(char)double1, (RspUserLoginField*)ptr1, size1);
 		break;
 	case OnRtnError:
-		m_pSpi->OnRtnError((ErrorField*)ptr1);
+		m_pSpi->OnRtnError(this, (ErrorField*)ptr1);
 		break;
 	case OnRtnDepthMarketData:
-		m_pSpi->OnRtnDepthMarketData((DepthMarketDataField*)ptr1);
+		m_pSpi->OnRtnDepthMarketData(this, (DepthMarketDataField*)ptr1);
 		break;
 	case OnRspQryInstrument:
-		m_pSpi->OnRspQryInstrument((InstrumentField*)ptr1, size1, double1 != 0);
+		m_pSpi->OnRspQryInstrument(this, (InstrumentField*)ptr1, size1, double1 != 0);
 		break;
 	case OnRspQryTradingAccount:
-		m_pSpi->OnRspQryTradingAccount((AccountField*)ptr1, size1, double1 != 0);
+		m_pSpi->OnRspQryTradingAccount(this, (AccountField*)ptr1, size1, double1 != 0);
 		break;
 	case OnRspQryInvestorPosition:
-		m_pSpi->OnRspQryInvestorPosition((PositionField*)ptr1, size1, double1 != 0);
+		m_pSpi->OnRspQryInvestorPosition(this, (PositionField*)ptr1, size1, double1 != 0);
 		break;
 	case OnRspQrySettlementInfo:
-		m_pSpi->OnRspQrySettlementInfo((SettlementInfoField*)ptr1, size1, double1 != 0);
+		m_pSpi->OnRspQrySettlementInfo(this, (SettlementInfoField*)ptr1, size1, double1 != 0);
 		break;
 
 	case OnRtnOrder:
-		m_pSpi->OnRtnOrder((OrderField*)ptr1);
+		m_pSpi->OnRtnOrder(this, (OrderField*)ptr1);
 		break;
 	case OnRtnTrade:
-		m_pSpi->OnRtnTrade((TradeField*)ptr1);
+		m_pSpi->OnRtnTrade(this, (TradeField*)ptr1);
 		break;
 
 	case OnRtnQuote:
-		m_pSpi->OnRtnQuote((QuoteField*)ptr1);
+		m_pSpi->OnRtnQuote(this, (QuoteField*)ptr1);
 		break;
 	case OnRtnQuoteRequest:
-		m_pSpi->OnRtnQuoteRequest((QuoteRequestField*)ptr1);
+		m_pSpi->OnRtnQuoteRequest(this, (QuoteRequestField*)ptr1);
 		break;
 
 	case OnRspQryHistoricalTicks:
-		m_pSpi->OnRspQryHistoricalTicks((TickField*)ptr1, size1, (HistoricalDataRequestField*)ptr2, size2, double1 != 0);
+		m_pSpi->OnRspQryHistoricalTicks(this, (TickField*)ptr1, size1, (HistoricalDataRequestField*)ptr2, size2, double1 != 0);
 		break;
 	case OnRspQryHistoricalBars:
-		m_pSpi->OnRspQryHistoricalBars((BarField*)ptr1, size1, (HistoricalDataRequestField*)ptr2, size2, double1 != 0);
+		m_pSpi->OnRspQryHistoricalBars(this, (BarField*)ptr1, size1, (HistoricalDataRequestField*)ptr2, size2, double1 != 0);
 		break;
 
 	case OnRspQryInvestor:
-		m_pSpi->OnRspQryInvestor((InvestorField*)ptr1, size1, double1 != 0);
+		m_pSpi->OnRspQryInvestor(this, (InvestorField*)ptr1, size1, double1 != 0);
 		break;
 	case OnFilterSubscribe:
-		return (void*)m_pSpi->OnFilterSubscribe((ExchangeType)(char)double1, (int)size1, (int)size1, (int)size3, (char*)ptr1);
+		return (void*)m_pSpi->OnFilterSubscribe(this, (ExchangeType)(char)double1, (int)size1, (int)size1, (int)size3, (char*)ptr1);
 	default:
 		break;
 	}
