@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "MsgQueue.h"
 
-CMsgQueue::CMsgQueue():m_queue(1024)
+//CMsgQueue::CMsgQueue():m_queue(1024)
+CMsgQueue::CMsgQueue()
 {
 	m_hThread = nullptr;
 	m_bRunning = false;

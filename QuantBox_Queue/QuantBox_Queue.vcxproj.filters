@@ -48,6 +48,15 @@
     <ClInclude Include="RemoteQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ArrayLockFreeQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayLockFreeQueueImp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="atom_opt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

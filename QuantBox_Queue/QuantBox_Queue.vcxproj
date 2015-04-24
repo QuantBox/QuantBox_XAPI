@@ -94,7 +94,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\x86</OutDir>
+    <OutDir>..\bin</OutDir>
     <TargetName>QuantBox_Queue_x86</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -226,6 +226,9 @@
     <ClInclude Include="..\include\QueueEnum.h" />
     <ClInclude Include="..\include\QueueHeader.h" />
     <ClInclude Include="..\include\QueueStruct.h" />
+    <ClInclude Include="ArrayLockFreeQueue.h" />
+    <ClInclude Include="ArrayLockFreeQueueImp.h" />
+    <ClInclude Include="atom_opt.h" />
     <ClInclude Include="MsgQueue.h" />
     <ClInclude Include="RemoteQueue.h" />
     <ClInclude Include="stdafx.h" />
