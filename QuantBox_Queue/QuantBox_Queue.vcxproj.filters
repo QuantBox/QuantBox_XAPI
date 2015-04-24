@@ -45,6 +45,9 @@
     <ClInclude Include="..\include\QueueEnum.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="RemoteQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -57,6 +60,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MsgQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoteQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
