@@ -5,12 +5,15 @@
 #ifdef _REMOTE
 #include "zmq.h"
 #include "czmq.h"
-#endif
 
 #ifdef _WIN64
 #else
 #pragma comment(lib, "../include/ZeroMQ/x86/czmq.lib")
 #endif
+
+#endif
+
+
 
 class DLL_PUBLIC CRemoteQueue :
 	public CMsgQueue
