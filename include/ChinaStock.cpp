@@ -17,6 +17,8 @@ InstrumentType InstrumentID_2_InstrumentType_SSE(int In)
 			return InstrumentType::Index;
 		case 9:
 		case 10:
+		case 18:
+		case 19:
 		case 90:
 		case 99:
 			return InstrumentType::Bond;
