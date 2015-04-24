@@ -51,17 +51,40 @@ namespace QuantBox.XAPI
         }
     }
 
+    /*
+SHFE
+	TradeDay: 交易日
+	ActionDay: 行情日
+
+DCE
+	TradeDay: 交易日
+	ActionDay: 交易日
+
+CZC
+	TradeDay: 行情日
+	ActionDay:行情日
+     */
     public static class Extensions_Misc
     {
         public static DateTime ExchangeDateTime([In]this DepthMarketDataField field)
         {
+            // 大商所夜盘时，ActionDay可能已经是指向的第二天
+            int HH = field.UpdateTime / 10000;
+
+            if (HH > 20)
+            {
+                if (field.ExchangeID.CompareTo("DCE") == 0)
+                {
+                    return field.ExchangeDateTime_();
+                }
+            }
+
+            int mm = field.UpdateTime % 10000 / 100;
+            int ss = field.UpdateTime % 100;
+
             int yyyy = field.ActionDay / 10000;
             int MM = field.ActionDay % 10000 / 100;
             int dd = field.ActionDay % 100;
-
-            int HH = field.UpdateTime / 10000;
-            int mm = field.UpdateTime % 10000 / 100;
-            int ss = field.UpdateTime % 100;
 
             return new DateTime(yyyy, MM, dd, HH, mm, ss, field.UpdateMillisec);
         }
