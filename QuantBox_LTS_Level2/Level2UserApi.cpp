@@ -7,12 +7,26 @@
 #include "../include/ApiStruct.h"
 
 #include "../include/toolkit.h"
+//#include "../QuantBox_LTS_Trade/TypeConvert.h"
 
 #include "../QuantBox_Queue/MsgQueue.h"
 
 #include <mutex>
 #include <vector>
 #include <cstring>
+
+ExchangeType TSecurityFtdcExchangeIDType_2_ExchangeType(TSecurityFtdcExchangeIDType In)
+{
+	switch (In[1])
+	{
+	case 'S':
+		return ExchangeType::SSE;
+	case 'Z':
+		return ExchangeType::SZE;
+	default:
+		return ExchangeType::Undefined_;
+	}
+}
 
 using namespace std;
 
@@ -418,9 +432,10 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 {
 	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
 	strncpy(pField->InstrumentID, pL2MarketData->InstrumentID, sizeof(InstrumentIDType));
-	strncpy(pField->ExchangeID, pL2MarketData->ExchangeID, sizeof(ExchangeIDType));
+	
+	pField->Exchange = TSecurityFtdcExchangeIDType_2_ExchangeType(pL2MarketData->ExchangeID);
 
-	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
+	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pL2MarketData->ExchangeID);
 
 	GetExchangeTime(pL2MarketData->TradingDay, pL2MarketData->TradingDay, pL2MarketData->TimeStamp
 		, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
@@ -637,9 +652,11 @@ void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 {
 	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
 	strncpy(pField->InstrumentID, pL2Index->InstrumentID, sizeof(InstrumentIDType));
-	strncpy(pField->ExchangeID, pL2Index->ExchangeID, sizeof(ExchangeIDType));
 
-	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
+	pField->Exchange = TSecurityFtdcExchangeIDType_2_ExchangeType(pL2Index->ExchangeID);
+
+	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pL2Index->ExchangeID);
+
 	GetExchangeTime(pL2Index->TradingDay, pL2Index->TradingDay, pL2Index->TimeStamp
 		, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
 

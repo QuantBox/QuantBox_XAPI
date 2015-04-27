@@ -27,9 +27,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\XApiHeader.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="XApiImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>

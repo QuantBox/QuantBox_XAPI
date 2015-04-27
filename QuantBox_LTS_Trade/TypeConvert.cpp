@@ -306,3 +306,16 @@ IdCardType TSecurityFtdcIdCardTypeType_2_IdCardType(TSecurityFtdcIdCardTypeType 
 		return IdCardType::OtherCard;
 	}
 }
+
+ExchangeType TSecurityFtdcExchangeIDType_2_ExchangeType(TSecurityFtdcExchangeIDType In)
+{
+	switch (In[1])
+	{
+	case 'S':
+		return ExchangeType::SSE;
+	case 'Z':
+		return ExchangeType::SZE;
+	default:
+		return ExchangeType::Undefined_;
+	}
+}

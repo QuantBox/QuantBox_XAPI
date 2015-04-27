@@ -33,6 +33,7 @@ class CMdUserApi :
 	{
 		E_Init,
 		E_UserLoginField,
+		E_TradingDayField,
 	};
 
 public:
@@ -62,6 +63,8 @@ private:
 	void ReqUserLogin();
 	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
+	void ReqTradingDay();
+	int _ReqTradingDay(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
 
 	//订阅行情
@@ -80,6 +83,8 @@ private:
 	//virtual void OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspUnSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRtnForQuoteRsp(CThostFtdcForQuoteRspField *pForQuoteRsp);
+
+	virtual void OnRspTradingDay(struct DFITCTradingDayRtnField * pTradingDayRtnData);
 
 	//检查是否出错
 	bool IsErrorRspInfo_Output(struct DFITCErrorRtnField *pRspInfo);//将出错消息送到消息队列
@@ -105,5 +110,7 @@ private:
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;
 	void*						m_pClass;
+
+	int							m_TradingDay;
 };
 

@@ -1,4 +1,4 @@
-#ifndef _API_STRUCT_H_
+ï»¿#ifndef _API_STRUCT_H_
 #define _API_STRUCT_H_
 
 #include "ApiDataType.h"
@@ -12,12 +12,12 @@ struct PositionField
 	QtyType TdPosition;
 	QtyType YdPosition;
 	HedgeFlagType HedgeFlag;
-	//TThostFtdcPositionDateType »¹Ã»´¦Àí
-	///Î¨Ò»·ûºÅ
+	//TThostFtdcPositionDateType è¿˜æ²¡å¤„ç†
+	///å”¯ä¸€ç¬¦å·
 	SymbolType			Symbol;
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	InstrumentIDType	InstrumentID;
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	ExchangeIDType	ExchangeID;
 };
 
@@ -41,7 +41,7 @@ struct QuoteField
 	InstrumentIDType InstrumentID;
 	ExchangeIDType	ExchangeID;
 
-	///Ñ¯¼Û±àºÅ
+	///è¯¢ä»·ç¼–å·
 	OrderIDType	QuoteReqID;
 
 	OrderIDType ID;
@@ -122,150 +122,150 @@ struct ConfigInfoField
 	bool DirectOutput;
 };
 
-// ÓÃ»§ĞÅÏ¢
+// ç”¨æˆ·ä¿¡æ¯
 struct UserInfoField
 {
-	///ÓÃ»§´úÂë
+	///ç”¨æˆ·ä»£ç 
 	UserIDType	UserID;
-	///ÃÜÂë
+	///å¯†ç 
 	PasswordType	Password;
 };
 
 
-// ´íÎóĞÅÏ¢
+// é”™è¯¯ä¿¡æ¯
 struct ErrorField
 {
-	// ´íÎó´úÂë
+	// é”™è¯¯ä»£ç 
 	ErrorIDType	ErrorID;
-	// ´íÎóĞÅÏ¢
+	// é”™è¯¯ä¿¡æ¯
 	ErrorMsgType	ErrorMsg;
 };
 
 
-// µÇÂ¼»Ø±¨
+// ç™»å½•å›æŠ¥
 struct RspUserLoginField
 {
-	///½»Ò×ÈÕ
+	///äº¤æ˜“æ—¥
 	DateIntType	TradingDay;
-	// Ê±¼ä
+	// æ—¶é—´
 	TimeIntType	LoginTime;
-	// ´íÎó´úÂë
+	// é”™è¯¯ä»£ç 
 	ErrorIDType	ErrorID;
-	// »á»°ID
+	// ä¼šè¯ID
 	SessionIDType	SessionID;
-	// ´íÎóĞÅÏ¢
+	// é”™è¯¯ä¿¡æ¯
 	ErrorMsgType	ErrorMsg;
-	///Í¶×ÊÕßÃû³Æ
+	///æŠ•èµ„è€…åç§°
 	PartyNameType	InvestorName;
 };
 
 
 
-///Éî¶ÈĞĞÇé
+///æ·±åº¦è¡Œæƒ…
 struct DepthMarketDataField
 {
-	///½»Ò×ËùÊ±¼ä
-	DateIntType			TradingDay; // ½»Ò×ÈÕ£¬ÓÃÓÚ¸øÊı¾İ½ÓÊÕÆ÷»®·Öµ½Í¬Ò»ÎÄ¼şÊ¹ÓÃ£¬»ù±¾Ã»É¶±ğµÄÓÃ´¦
+	///äº¤æ˜“æ‰€æ—¶é—´
+	DateIntType			TradingDay; // äº¤æ˜“æ—¥ï¼Œç”¨äºç»™æ•°æ®æ¥æ”¶å™¨åˆ’åˆ†åˆ°åŒä¸€æ–‡ä»¶ä½¿ç”¨ï¼ŒåŸºæœ¬æ²¡å•¥åˆ«çš„ç”¨å¤„
 	DateIntType			ActionDay;
 	TimeIntType			UpdateTime;
 	TimeIntType			UpdateMillisec;
 
-	///×îĞÂ¼Û
+	///æœ€æ–°ä»·
 	PriceType	LastPrice;
-	///ÊıÁ¿
+	///æ•°é‡
 	LargeVolumeType	Volume;
-	///³É½»½ğ¶î
+	///æˆäº¤é‡‘é¢
 	MoneyType	Turnover;
-	///³Ö²ÖÁ¿
+	///æŒä»“é‡
 	LargeVolumeType	OpenInterest;
-	///µ±ÈÕ¾ù¼Û
+	///å½“æ—¥å‡ä»·
 	PriceType	AveragePrice;
 
 
-	///½ñ¿ªÅÌ
+	///ä»Šå¼€ç›˜
 	PriceType	OpenPrice;
-	///×î¸ß¼Û
+	///æœ€é«˜ä»·
 	PriceType	HighestPrice;
-	///×îµÍ¼Û
+	///æœ€ä½ä»·
 	PriceType	LowestPrice;
-	///½ñÊÕÅÌ
+	///ä»Šæ”¶ç›˜
 	PriceType	ClosePrice;
-	///±¾´Î½áËã¼Û
+	///æœ¬æ¬¡ç»“ç®—ä»·
 	PriceType	SettlementPrice;
 
-	///ÕÇÍ£°å¼Û
+	///æ¶¨åœæ¿ä»·
 	PriceType	UpperLimitPrice;
-	///µøÍ£°å¼Û
+	///è·Œåœæ¿ä»·
 	PriceType	LowerLimitPrice;
-	///×òÊÕÅÌ
+	///æ˜¨æ”¶ç›˜
 	PriceType	PreClosePrice;
-	///ÉÏ´Î½áËã¼Û
+	///ä¸Šæ¬¡ç»“ç®—ä»·
 	PriceType	PreSettlementPrice;
-	///×ò³Ö²ÖÁ¿
+	///æ˜¨æŒä»“é‡
 	LargeVolumeType	PreOpenInterest;
 
 
-	///ÉêÂò¼ÛÒ»
+	///ç”³ä¹°ä»·ä¸€
 	PriceType	BidPrice1;
-	///ÉêÂòÁ¿Ò»
+	///ç”³ä¹°é‡ä¸€
 	VolumeType	BidVolume1;
-	///ÉêÂô¼ÛÒ»
+	///ç”³å–ä»·ä¸€
 	PriceType	AskPrice1;
-	///ÉêÂôÁ¿Ò»
+	///ç”³å–é‡ä¸€
 	VolumeType	AskVolume1;
-	///ÉêÂò¼Û¶ş
+	///ç”³ä¹°ä»·äºŒ
 	PriceType	BidPrice2;
-	///ÉêÂòÁ¿¶ş
+	///ç”³ä¹°é‡äºŒ
 	VolumeType	BidVolume2;
-	///ÉêÂô¼Û¶ş
+	///ç”³å–ä»·äºŒ
 	PriceType	AskPrice2;
-	///ÉêÂôÁ¿¶ş
+	///ç”³å–é‡äºŒ
 	VolumeType	AskVolume2;
-	///ÉêÂò¼ÛÈı
+	///ç”³ä¹°ä»·ä¸‰
 	PriceType	BidPrice3;
-	///ÉêÂòÁ¿Èı
+	///ç”³ä¹°é‡ä¸‰
 	VolumeType	BidVolume3;
-	///ÉêÂô¼ÛÈı
+	///ç”³å–ä»·ä¸‰
 	PriceType	AskPrice3;
-	///ÉêÂôÁ¿Èı
+	///ç”³å–é‡ä¸‰
 	VolumeType	AskVolume3;
-	///ÉêÂò¼ÛËÄ
+	///ç”³ä¹°ä»·å››
 	PriceType	BidPrice4;
-	///ÉêÂòÁ¿ËÄ
+	///ç”³ä¹°é‡å››
 	VolumeType	BidVolume4;
-	///ÉêÂô¼ÛËÄ
+	///ç”³å–ä»·å››
 	PriceType	AskPrice4;
-	///ÉêÂôÁ¿ËÄ
+	///ç”³å–é‡å››
 	VolumeType	AskVolume4;
-	///ÉêÂò¼ÛÎå
+	///ç”³ä¹°ä»·äº”
 	PriceType	BidPrice5;
-	///ÉêÂòÁ¿Îå
+	///ç”³ä¹°é‡äº”
 	VolumeType	BidVolume5;
-	///ÉêÂô¼ÛÎå
+	///ç”³å–ä»·äº”
 	PriceType	AskPrice5;
-	///ÉêÂôÁ¿Îå
+	///ç”³å–é‡äº”
 	VolumeType	AskVolume5;
 
-	///Î¨Ò»·ûºÅ
+	///äº¤æ˜“æ‰€ä»£ç 
+	ExchangeType	Exchange;
+	///å”¯ä¸€ç¬¦å·
 	SymbolType			Symbol;
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	InstrumentIDType	InstrumentID;
-	///½»Ò×Ëù´úÂë
-	ExchangeIDType	ExchangeID;
 };
 
-///TickĞĞÇé
+///Tickè¡Œæƒ…
 struct TickField
 {
-	///½»Ò×ËùÊ±¼ä
+	///äº¤æ˜“æ‰€æ—¶é—´
 	DateIntType			Date;
 	TimeIntType			Time;
 	TimeIntType			Millisecond;
 
 	PriceType	LastPrice;
-	///ÊıÁ¿
+	///æ•°é‡
 	LargeVolumeType	Volume;
-	///³Ö²ÖÁ¿
+	///æŒä»“é‡
 	LargeVolumeType	OpenInterest;
 	PriceType	BidPrice1;
 	PriceType	AskPrice1;
@@ -274,137 +274,137 @@ struct TickField
 };
 
 
-///BarĞĞÇé
+///Barè¡Œæƒ…
 struct BarField
 {
-	///½»Ò×ËùÊ±¼ä
+	///äº¤æ˜“æ‰€æ—¶é—´
 	DateIntType			Date;
 	TimeIntType			Time;
 
-	///¿ª
+	///å¼€
 	PriceType	Open;
-	///¸ß
+	///é«˜
 	PriceType	High;
-	///µÍ
+	///ä½
 	PriceType	Low;
-	///ÊÕ
+	///æ”¶
 	PriceType	Close;
-	///ÊıÁ¿
+	///æ•°é‡
 	LargeVolumeType	Volume;
-	///³Ö²ÖÁ¿
+	///æŒä»“é‡
 	LargeVolumeType	OpenInterest;
-	///³É½»½ğ¶î
+	///æˆäº¤é‡‘é¢
 	MoneyType	Turnover;
 };
 
-///·¢¸ø×öÊĞÉÌµÄÑ¯¼ÛÇëÇó
+///å‘ç»™åšå¸‚å•†çš„è¯¢ä»·è¯·æ±‚
 struct QuoteRequestField
 {
-	///½»Ò×ÈÕ
+	///äº¤æ˜“æ—¥
 	DateIntType	TradingDay;
-	///Ñ¯¼ÛÊ±¼ä
+	///è¯¢ä»·æ—¶é—´
 	TimeIntType	QuoteTime;
-	///Î¨Ò»·ûºÅ
+	///å”¯ä¸€ç¬¦å·
 	SymbolType			Symbol;
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	InstrumentIDType	InstrumentID;
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	ExchangeIDType	ExchangeID;
-	///Ñ¯¼Û±àºÅ
+	///è¯¢ä»·ç¼–å·
 	OrderIDType	QuoteID;
 };
 
-///ºÏÔ¼
+///åˆçº¦
 struct InstrumentField
 {
-	///ºÏÔ¼Ãû³Æ
+	///åˆçº¦åç§°
 	InstrumentType		Type;
-	///ºÏÔ¼ÊıÁ¿³ËÊı
+	///åˆçº¦æ•°é‡ä¹˜æ•°
 	VolumeMultipleType	VolumeMultiple;
-	///×îĞ¡±ä¶¯¼ÛÎ»
+	///æœ€å°å˜åŠ¨ä»·ä½
 	PriceType	PriceTick;
-	///µ½ÆÚÈÕ
+	///åˆ°æœŸæ—¥
 	DateIntType	ExpireDate;
 
-	///Ö´ĞĞ¼Û
+	///æ‰§è¡Œä»·
 	PriceType	StrikePrice;
-	///ÆÚÈ¨ÀàĞÍ
+	///æœŸæƒç±»å‹
 	PutCall	OptionsType;
 
-	///Î¨Ò»·ûºÅ
+	///å”¯ä¸€ç¬¦å·
 	SymbolType			Symbol;
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	InstrumentIDType	InstrumentID;
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	ExchangeIDType	ExchangeID;
-	///ºÏÔ¼Ãû³Æ
+	///åˆçº¦åç§°
 	InstrumentNameType InstrumentName;
-	///»ù´¡ÉÌÆ·´úÂë
+	///åŸºç¡€å•†å“ä»£ç 
 	InstrumentIDType	UnderlyingInstrID;
 };
 
-///ÕËºÅ
+///è´¦å·
 struct AccountField
 {
-	///ÉÏ´Î½áËã×¼±¸½ğ
+	///ä¸Šæ¬¡ç»“ç®—å‡†å¤‡é‡‘
 	MoneyType	PreBalance;
-	///µ±Ç°±£Ö¤½ğ×Ü¶î
+	///å½“å‰ä¿è¯é‡‘æ€»é¢
 	MoneyType	CurrMargin;
-	///Æ½²ÖÓ¯¿÷
+	///å¹³ä»“ç›ˆäº
 	MoneyType	CloseProfit;
-	///³Ö²ÖÓ¯¿÷
+	///æŒä»“ç›ˆäº
 	MoneyType	PositionProfit;
-	///ÆÚ»õ½áËã×¼±¸½ğ
+	///æœŸè´§ç»“ç®—å‡†å¤‡é‡‘
 	MoneyType	Balance;
-	///¿ÉÓÃ×Ê½ğ
+	///å¯ç”¨èµ„é‡‘
 	MoneyType	Available;
 
-	///Èë½ğ½ğ¶î
+	///å…¥é‡‘é‡‘é¢
 	MoneyType	Deposit;
-	///³ö½ğ½ğ¶î
+	///å‡ºé‡‘é‡‘é¢
 	MoneyType	Withdraw;
 
-	///¶³½áµÄ¹ı»§·Ñ
+	///å†»ç»“çš„è¿‡æˆ·è´¹
 	MoneyType	FrozenTransferFee;
-	///¶³½áµÄÓ¡»¨Ë°
+	///å†»ç»“çš„å°èŠ±ç¨
 	MoneyType	FrozenStampTax;
-	///¶³½áµÄÊÖĞø·Ñ
+	///å†»ç»“çš„æ‰‹ç»­è´¹
 	MoneyType	FrozenCommission;
-	///¶³½áµÄ×Ê½ğ
+	///å†»ç»“çš„èµ„é‡‘
 	MoneyType	FrozenCash;
 
-	///¹ı»§·Ñ
+	///è¿‡æˆ·è´¹
 	MoneyType	TransferFee;
-	///Ó¡»¨Ë°
+	///å°èŠ±ç¨
 	MoneyType	StampTax;
-	///ÊÖĞø·Ñ
+	///æ‰‹ç»­è´¹
 	MoneyType	Commission;
-	///×Ê½ğ²î¶î
+	///èµ„é‡‘å·®é¢
 	MoneyType	CashIn;
 
 };
 
-///ÕËºÅ
+///è´¦å·
 struct SettlementInfoField
 {
-	///½»Ò×ÈÕ
+	///äº¤æ˜“æ—¥
 	DateIntType	TradingDay;
-	///ÏûÏ¢ÕıÎÄ
+	///æ¶ˆæ¯æ­£æ–‡
 	ContentType	Content;
 };
 
-///Í¶×ÊÕß
+///æŠ•èµ„è€…
 struct InvestorField
 {
 	IdCardType		IdentifiedCardType;
-	///ÓÃ»§´úÂë
+	///ç”¨æˆ·ä»£ç 
 	UserIDType	InvestorID;
 
 	BrokerIDType	BrokerID;
 
-	///Ö¤¼şºÅÂë
+	///è¯ä»¶å·ç 
 	IdentifiedCardNoType	IdentifiedCardNo;
-	///Í¶×ÊÕßÃû³Æ
+	///æŠ•èµ„è€…åç§°
 	PartyNameType	InvestorName;
 
 };
@@ -424,11 +424,11 @@ struct HistoricalDataRequestField
 	int CurrentDate;
 	int lRequest;
 
-	///Î¨Ò»·ûºÅ
+	///å”¯ä¸€ç¬¦å·
 	SymbolType			Symbol;
-	///ºÏÔ¼´úÂë
+	///åˆçº¦ä»£ç 
 	InstrumentIDType	InstrumentID;
-	///½»Ò×Ëù´úÂë
+	///äº¤æ˜“æ‰€ä»£ç 
 	ExchangeIDType	ExchangeID;
 };
 #endif

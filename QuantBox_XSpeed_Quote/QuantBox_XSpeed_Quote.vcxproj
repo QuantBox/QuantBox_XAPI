@@ -209,12 +209,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\toolkit.h" />
+    <ClInclude Include="..\QuantBox_XSpeed_Trade\TypeConvert.h" />
     <ClInclude Include="MdUserApi.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\include\toolkit.cpp" />
+    <ClCompile Include="..\QuantBox_XSpeed_Trade\TypeConvert.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</CompileAsManaged>

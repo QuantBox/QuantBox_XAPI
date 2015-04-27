@@ -1,16 +1,16 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "TypeConvert.h"
 
 
-/// ÀàËÆÓÚOpenQuant FIXÒ»ÑùµÄÐ§¹û£¬²å¼þ²ã¼òµ¥£¬»ù±¾²»Òª×öÔõÃ´¼ÆËã»ò´¦Àí
-/// ¶ÔÓÚÒ»¸öµ¥×ÓµÄÄ³¸ö×´Ì¬¿ÉÄÜÊÇÕâÑùµÄ£¬ÐÂµ¥£¬²¿·Ö³É½»£¬ÍêÈ«³É½»
+/// ç±»ä¼¼äºŽOpenQuant FIXä¸€æ ·çš„æ•ˆæžœï¼Œæ’ä»¶å±‚ç®€å•ï¼ŒåŸºæœ¬ä¸è¦åšæ€Žä¹ˆè®¡ç®—æˆ–å¤„ç†
+/// å¯¹äºŽä¸€ä¸ªå•å­çš„æŸä¸ªçŠ¶æ€å¯èƒ½æ˜¯è¿™æ ·çš„ï¼Œæ–°å•ï¼Œéƒ¨åˆ†æˆäº¤ï¼Œå®Œå…¨æˆäº¤
 /// EmitAccept,EmitFill
-/// OnRtnOrder,OnRtnTrade,ÈçºÎ×ª³ÉEmit
-/// EmitAcceptÊÇÊ²Ã´
+/// OnRtnOrder,OnRtnTrade,å¦‚ä½•è½¬æˆEmit
+/// EmitAcceptæ˜¯ä»€ä¹ˆ
 /// 
-/// ½Ó¿ÚÏòÍâÌá¹©µÄ»Ø±¨¿ÉÒÔ·ÖÁ½ÖÖ·½°¸£¬ExecutionReport»òÎ¯ÍÐ»Ø±¨Óë³É½»»Ø±¨
-/// OpenQuantÖÐÊ¹ÓÃExecutionReportÎÊÌâÊÇÒòÎªOQ×Ô¼ºÓÐOrderManager£¬Èç¹ûÆäËüÈí¼þÒª¿´µ½Î¯ÍÐºÍ³É½»ÁÐ±íÊÇÃ»·¨µÃµ½µÄ
-/// ËùÒÔ½Ó¿ÚÓ¦µ±·µ»ØÎ¯ÍÐÓë³É½»»Ø±¨
+/// æŽ¥å£å‘å¤–æä¾›çš„å›žæŠ¥å¯ä»¥åˆ†ä¸¤ç§æ–¹æ¡ˆï¼ŒExecutionReportæˆ–å§”æ‰˜å›žæŠ¥ä¸Žæˆäº¤å›žæŠ¥
+/// OpenQuantä¸­ä½¿ç”¨ExecutionReporté—®é¢˜æ˜¯å› ä¸ºOQè‡ªå·±æœ‰OrderManagerï¼Œå¦‚æžœå…¶å®ƒè½¯ä»¶è¦çœ‹åˆ°å§”æ‰˜å’Œæˆäº¤åˆ—è¡¨æ˜¯æ²¡æ³•å¾—åˆ°çš„
+/// æ‰€ä»¥æŽ¥å£åº”å½“è¿”å›žå§”æ‰˜ä¸Žæˆäº¤å›žæŠ¥
 
 //PutCall TThostFtdcOptionsTypeType_2_PutCall(TThostFtdcOptionsTypeType In)
 //{
@@ -143,7 +143,7 @@ OrderStatus DFITCOrderRtnField_2_OrderStatus(DFITCOrderRtnField* pIn)
 {
 	//switch (In)
 	//{
-	//case DFITC_SPD_CANCELED:	// ÈçºÎÇø·ÖÊÇ±»¾Ü¾øÁË£¿
+	//case DFITC_SPD_CANCELED:	// å¦‚ä½•åŒºåˆ†æ˜¯è¢«æ‹’ç»äº†ï¼Ÿ
 	//	return OrderStatus::Cancelled;
 	//case DFITC_SPD_FILLED:
 	//	return OrderStatus::Filled;
@@ -188,7 +188,7 @@ ExecType DFITCOrderRtnField_2_ExecType(DFITCOrderRtnField* pIn)
 //			return OrderStatus::Rejected;
 //		return OrderStatus::Cancelled;
 //	case THOST_FTDC_OST_Unknown:
-//		// Èç¹ûÊÇ³·µ¥£¬Ò²ÓÐ¿ÉÄÜ³öÏÖÕâÒ»Ìõ£¬ÈçºÎ¹ýÂË£¿
+//		// å¦‚æžœæ˜¯æ’¤å•ï¼Œä¹Ÿæœ‰å¯èƒ½å‡ºçŽ°è¿™ä¸€æ¡ï¼Œå¦‚ä½•è¿‡æ»¤ï¼Ÿ
 //		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertSubmitted)
 //			return OrderStatus::New;
 //	default:
@@ -244,7 +244,7 @@ ExecType DFITCOrderRtnField_2_ExecType(DFITCOrderRtnField* pIn)
 //			return ExecType::ExecRejected;
 //		return ExecType::ExecCancelled;
 //	case THOST_FTDC_OST_Unknown:
-//		// Èç¹ûÊÇ³·µ¥£¬Ò²ÓÐ¿ÉÄÜ³öÏÖÕâÒ»Ìõ£¬ÈçºÎ¹ýÂË£¿
+//		// å¦‚æžœæ˜¯æ’¤å•ï¼Œä¹Ÿæœ‰å¯èƒ½å‡ºçŽ°è¿™ä¸€æ¡ï¼Œå¦‚ä½•è¿‡æ»¤ï¼Ÿ
 //		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertSubmitted)
 //			return ExecType::ExecNew;
 //	case THOST_FTDC_OST_AllTraded:
@@ -265,5 +265,24 @@ InstrumentType DFITCInstrumentTypeType_2_InstrumentType(DFITCInstrumentTypeType 
 		return InstrumentType::Option;
 	default:
 		return InstrumentType::Future;
+	}
+}
+
+ExchangeType DFITCExchangeIDType_2_ExchangeType(DFITCExchangeIDType In)
+{
+	switch (In[1])
+	{
+	case 'H':
+		return ExchangeType::SHFE;
+	case 'C':
+		return ExchangeType::DCE;
+	case 'Z':
+		return ExchangeType::CZCE;
+	case 'F':
+		return ExchangeType::CFFEX;
+	case 'N':
+		return ExchangeType::INE;
+	default:
+		return ExchangeType::Undefined_;
 	}
 }
