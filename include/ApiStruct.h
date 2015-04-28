@@ -431,4 +431,5 @@ struct HistoricalDataRequestField
 	///交易所代码
 	ExchangeIDType	ExchangeID;
 };
+
 #endif
