@@ -7,6 +7,7 @@
 #include "../include/ApiStruct.h"
 
 #include "../include/toolkit.h"
+#include "../QuantBox_XSpeedStock_Trade/TypeConvert.h"
 
 #include "../QuantBox_Queue/MsgQueue.h"
 
@@ -462,9 +463,9 @@ void CMdUserApi::OnStockMarketData(struct DFITCStockDepthMarketDataField *pMarke
 	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
 
 	strcpy(pField->InstrumentID, pMarketDataField->staticDataField.securityID);
-	strcpy(pField->ExchangeID, pMarketDataField->staticDataField.exchangeID);
+	pField->Exchange = DFITCSECExchangeIDType_2_ExchangeType(pMarketDataField->staticDataField.exchangeID);
 
-	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
+	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pMarketDataField->staticDataField.exchangeID);
 
 	pField->TradingDay = pMarketDataField->staticDataField.tradingDay;
 	pField->ActionDay = pMarketDataField->staticDataField.tradingDay;

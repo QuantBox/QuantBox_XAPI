@@ -99,5 +99,7 @@ private:
 	void*						m_pClass;
 
 	CMsgQueue*					m_remoteQueue;
+
+	int							m_TradingDay;
 };
 

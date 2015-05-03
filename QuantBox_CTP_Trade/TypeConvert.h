@@ -32,3 +32,5 @@ ExecType CThostFtdcQuoteField_2_ExecType(CThostFtdcQuoteField* pIn);
 InstrumentType CThostFtdcInstrumentField_2_InstrumentType(CThostFtdcInstrumentField* pIn);
 
 IdCardType TThostFtdcIdCardTypeType_2_IdCardType(TThostFtdcIdCardTypeType In);
+
+ExchangeType TThostFtdcExchangeIDType_2_ExchangeType(TThostFtdcExchangeIDType In);

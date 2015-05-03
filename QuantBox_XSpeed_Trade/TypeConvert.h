@@ -27,3 +27,5 @@ TimeInForce DFITCOrderRtnField_2_TimeInForce(DFITCOrderRtnField* pIn);
 ExecType DFITCOrderRtnField_2_ExecType(DFITCOrderRtnField* pIn);
 
 InstrumentType DFITCInstrumentTypeType_2_InstrumentType(DFITCInstrumentTypeType In);
+
+ExchangeType DFITCExchangeIDType_2_ExchangeType(DFITCExchangeIDType In);

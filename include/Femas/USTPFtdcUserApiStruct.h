@@ -1081,6 +1081,12 @@ struct CUstpFtdcSpecificInstrumentField
 	///合约代码
 	TUstpFtdcInstrumentIDType	InstrumentID;
 };
+///多播通道心跳
+struct CUstpFtdcMultiChannelHeartBeatField
+{
+	///心跳超时时间（秒）
+	TUstpFtdcVolumeType	UstpMultiChannelHeartBeatTimeOut;
+};
 
 
 #endif

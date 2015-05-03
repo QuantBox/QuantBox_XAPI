@@ -293,7 +293,7 @@ void CMdUserApi::OnRspQryInstrument(DepthMarketDataField* _pField,RCV_REPORT_STR
 	InstrumentField* pField = (InstrumentField*)m_msgQueue->new_block(sizeof(InstrumentField));
 
 	strcpy(pField->InstrumentID, _pField->InstrumentID);
-	strcpy(pField->ExchangeID, _pField->ExchangeID);
+	strcpy(pField->ExchangeID, Market_2_ExchangeID(pDepthMarketData->m_wMarket));
 	strcpy(pField->Symbol, _pField->Symbol);
 
 	strncpy(pField->InstrumentName, pDepthMarketData->m_szName, sizeof(InstrumentNameType));
@@ -342,9 +342,9 @@ void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int
 	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
 
 	strcpy(pField->InstrumentID, OldSymbol_2_NewSymbol(pDepthMarketData->m_szLabel, pDepthMarketData->m_wMarket));
-	strcpy(pField->ExchangeID, Market_2_Exchange(pDepthMarketData->m_wMarket));
+	pField->Exchange = Market_2_ExchangeType(pDepthMarketData->m_wMarket);
 
-	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
+	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, Market_2_ExchangeID(pDepthMarketData->m_wMarket));
 
 	// 为合约导入功能所加，如果合约不需要再导入，还是注释了比较好
 	set<string>::iterator it = m_setInstrumentIDsReceived.find(pField->Symbol);

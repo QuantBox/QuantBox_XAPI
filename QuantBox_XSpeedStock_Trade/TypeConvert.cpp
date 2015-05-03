@@ -1,16 +1,16 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "TypeConvert.h"
 
 
-/// ÀàËÆÓÚOpenQuant FIXÒ»ÑùµÄÐ§¹û£¬²å¼þ²ã¼òµ¥£¬»ù±¾²»Òª×öÔõÃ´¼ÆËã»ò´¦Àí
-/// ¶ÔÓÚÒ»¸öµ¥×ÓµÄÄ³¸ö×´Ì¬¿ÉÄÜÊÇÕâÑùµÄ£¬ÐÂµ¥£¬²¿·Ö³É½»£¬ÍêÈ«³É½»
+/// ç±»ä¼¼äºŽOpenQuant FIXä¸€æ ·çš„æ•ˆæžœï¼Œæ’ä»¶å±‚ç®€å•ï¼ŒåŸºæœ¬ä¸è¦åšæ€Žä¹ˆè®¡ç®—æˆ–å¤„ç†
+/// å¯¹äºŽä¸€ä¸ªå•å­çš„æŸä¸ªçŠ¶æ€å¯èƒ½æ˜¯è¿™æ ·çš„ï¼Œæ–°å•ï¼Œéƒ¨åˆ†æˆäº¤ï¼Œå®Œå…¨æˆäº¤
 /// EmitAccept,EmitFill
-/// OnRtnOrder,OnRtnTrade,ÈçºÎ×ª³ÉEmit
-/// EmitAcceptÊÇÊ²Ã´
+/// OnRtnOrder,OnRtnTrade,å¦‚ä½•è½¬æˆEmit
+/// EmitAcceptæ˜¯ä»€ä¹ˆ
 /// 
-/// ½Ó¿ÚÏòÍâÌá¹©µÄ»Ø±¨¿ÉÒÔ·ÖÁ½ÖÖ·½°¸£¬ExecutionReport»òÎ¯ÍÐ»Ø±¨Óë³É½»»Ø±¨
-/// OpenQuantÖÐÊ¹ÓÃExecutionReportÎÊÌâÊÇÒòÎªOQ×Ô¼ºÓÐOrderManager£¬Èç¹ûÆäËüÈí¼þÒª¿´µ½Î¯ÍÐºÍ³É½»ÁÐ±íÊÇÃ»·¨µÃµ½µÄ
-/// ËùÒÔ½Ó¿ÚÓ¦µ±·µ»ØÎ¯ÍÐÓë³É½»»Ø±¨
+/// æŽ¥å£å‘å¤–æä¾›çš„å›žæŠ¥å¯ä»¥åˆ†ä¸¤ç§æ–¹æ¡ˆï¼ŒExecutionReportæˆ–å§”æ‰˜å›žæŠ¥ä¸Žæˆäº¤å›žæŠ¥
+/// OpenQuantä¸­ä½¿ç”¨ExecutionReporté—®é¢˜æ˜¯å› ä¸ºOQè‡ªå·±æœ‰OrderManagerï¼Œå¦‚æžœå…¶å®ƒè½¯ä»¶è¦çœ‹åˆ°å§”æ‰˜å’Œæˆäº¤åˆ—è¡¨æ˜¯æ²¡æ³•å¾—åˆ°çš„
+/// æ‰€ä»¥æŽ¥å£åº”å½“è¿”å›žå§”æ‰˜ä¸Žæˆäº¤å›žæŠ¥
 
 //PutCall TThostFtdcOptionsTypeType_2_PutCall(TThostFtdcOptionsTypeType In)
 //{
@@ -19,251 +19,264 @@
 //	return PutCall::Put;
 //}
 
-HedgeFlagType DFITCSpeculatorType_2_HedgeFlagType(DFITCSpeculatorType In)
-{
-	switch (In)
-	{
-	case DFITC_SPD_ARBITRAGE:
-		return HedgeFlagType::Arbitrage;
-	case DFITC_SPD_HEDGE:
-		return HedgeFlagType::Hedge;
-	case DFITC_SPD_SPECULATOR:
-	default:
-		return HedgeFlagType::Speculation;
-	}
-}
-
-DFITCSpeculatorType HedgeFlagType_2_DFITCSpeculatorType(HedgeFlagType In)
-{
-	switch (In)
-	{
-	case HedgeFlagType::Arbitrage:
-		return DFITC_SPD_ARBITRAGE;
-	case HedgeFlagType::Hedge:
-		return DFITC_SPD_HEDGE;
-	case HedgeFlagType::Speculation:
-	default:
-		return DFITC_SPD_SPECULATOR;
-	}
-}
-
-OpenCloseType DFITCOpenCloseTypeType_2_OpenCloseType(DFITCOpenCloseTypeType In)
-{
-	switch (In)
-	{
-	case DFITC_SPD_CLOSETODAY:
-		return OpenCloseType::CloseToday;
-	case DFITC_SPD_CLOSE:
-		return OpenCloseType::Close;
-	case DFITC_SPD_OPEN:
-	default:
-		return OpenCloseType::Open;
-	}
-}
-
-DFITCOpenCloseTypeType OpenCloseType_2_DFITCOpenCloseTypeType(OpenCloseType In)
-{
-	switch (In)
-	{
-	case OpenCloseType::CloseToday:
-		return DFITC_SPD_CLOSETODAY;
-	case OpenCloseType::Close:
-		return DFITC_SPD_CLOSE;
-	case OpenCloseType::Open:
-	default:
-		return DFITC_SPD_OPEN;
-	}
-}
-
-DFITCBuySellTypeType OrderSide_2_DFITCBuySellTypeType(OrderSide In)
-{
-	if (In == OrderSide::Sell)
-		return DFITC_SPD_SELL;
-	return DFITC_SPD_BUY;
-}
-
-OrderSide DFITCBuySellTypeType_2_OrderSide(DFITCBuySellTypeType In)
-{
-	if (In == DFITC_SPD_SELL)
-		return OrderSide::Sell;
-	return OrderSide::Buy;
-}
-
-DFITCOrderTypeType OrderType_2_DFITCOrderTypeType(OrderType In)
-{
-	switch (In)
-	{
-	case Market:
-		return DFITC_MKORDER;
-	case Stop:
-		return DFITC_MKORDER;
-	case Limit:
-		return DFITC_LIMITORDER;
-	case StopLimit:
-		return DFITC_LIMITORDER;
-	case MarketOnClose:
-		return DFITC_MKORDER;
-	case TrailingStop:
-		return DFITC_MKORDER;
-	case TrailingStopLimit:
-		return DFITC_LIMITORDER;
-	default:
-		return DFITC_LIMITORDER;
-	}
-}
-
-TimeInForce DFITCOrderPropertyType_2_TimeInForce(DFITCOrderPropertyType In)
-{
-	switch (In)
-	{
-	case DFITC_SP_FAK:
-		return TimeInForce::IOC;
-	case DFITC_SP_FOK:
-		return TimeInForce::FOK;
-	case DFITC_SP_NON:
-	default:
-		return TimeInForce::Day;
-	}
-}
-
-DFITCOrderPropertyType TimeInForce_2_DFITCOrderPropertyType(TimeInForce In)
-{
-	switch (In)
-	{
-	case TimeInForce::IOC:
-		return DFITC_SP_FAK;
-	case TimeInForce::FOK:
-		return DFITC_SP_FOK;
-	default:
-		return DFITC_SP_NON;
-	}
-}
-
-OrderStatus DFITCOrderRtnField_2_OrderStatus(DFITCOrderRtnField* pIn)
-{
-	//switch (In)
-	//{
-	//case DFITC_SPD_CANCELED:	// ÈçºÎÇø·ÖÊÇ±»¾Ü¾øÁË£¿
-	//	return OrderStatus::Cancelled;
-	//case DFITC_SPD_FILLED:
-	//	return OrderStatus::Filled;
-	//case DFITC_SPD_IN_QUEUE:
-	//	return OrderStatus::Filled;
-	//case DFITC_SPD_FILLED:
-	//	return OrderStatus::Filled;
-	//case DFITC_SPD_FILLED:
-	//	return OrderStatus::Filled;
-	//case DFITC_SPD_FILLED:
-	//	return OrderStatus::Filled;
-	//case DFITC_SPD_FILLED:
-	//	return OrderStatus::Filled;
-	//case DFITC_SPD_FILLED:
-	//	return OrderStatus::Filled;
-	//default:
-	//	break;
-	//}
-	return OrderStatus::Filled;
-}
-
-OrderType DFITCOrderRtnField_2_OrderType(DFITCOrderRtnField* pIn)
-{
-	return OrderType::Limit;
-}
-
-TimeInForce DFITCOrderRtnField_2_TimeInForce(DFITCOrderRtnField* pIn)
-{
-	return TimeInForce::Day;
-}
-
-ExecType DFITCOrderRtnField_2_ExecType(DFITCOrderRtnField* pIn)
-{
-	return ExecType::ExecNew;
-}
+//HedgeFlagType DFITCSpeculatorType_2_HedgeFlagType(DFITCSpeculatorType In)
+//{
+//	switch (In)
+//	{
+//	case DFITC_SPD_ARBITRAGE:
+//		return HedgeFlagType::Arbitrage;
+//	case DFITC_SPD_HEDGE:
+//		return HedgeFlagType::Hedge;
+//	case DFITC_SPD_SPECULATOR:
+//	default:
+//		return HedgeFlagType::Speculation;
+//	}
+//}
+//
+//DFITCSpeculatorType HedgeFlagType_2_DFITCSpeculatorType(HedgeFlagType In)
+//{
+//	switch (In)
+//	{
+//	case HedgeFlagType::Arbitrage:
+//		return DFITC_SPD_ARBITRAGE;
+//	case HedgeFlagType::Hedge:
+//		return DFITC_SPD_HEDGE;
+//	case HedgeFlagType::Speculation:
+//	default:
+//		return DFITC_SPD_SPECULATOR;
+//	}
+//}
+//
+//OpenCloseType DFITCOpenCloseTypeType_2_OpenCloseType(DFITCOpenCloseTypeType In)
+//{
+//	switch (In)
+//	{
+//	case DFITC_SPD_CLOSETODAY:
+//		return OpenCloseType::CloseToday;
+//	case DFITC_SPD_CLOSE:
+//		return OpenCloseType::Close;
+//	case DFITC_SPD_OPEN:
+//	default:
+//		return OpenCloseType::Open;
+//	}
+//}
+//
+//DFITCOpenCloseTypeType OpenCloseType_2_DFITCOpenCloseTypeType(OpenCloseType In)
+//{
+//	switch (In)
+//	{
+//	case OpenCloseType::CloseToday:
+//		return DFITC_SPD_CLOSETODAY;
+//	case OpenCloseType::Close:
+//		return DFITC_SPD_CLOSE;
+//	case OpenCloseType::Open:
+//	default:
+//		return DFITC_SPD_OPEN;
+//	}
+//}
+//
+//DFITCBuySellTypeType OrderSide_2_DFITCBuySellTypeType(OrderSide In)
+//{
+//	if (In == OrderSide::Sell)
+//		return DFITC_SPD_SELL;
+//	return DFITC_SPD_BUY;
+//}
+//
+//OrderSide DFITCBuySellTypeType_2_OrderSide(DFITCBuySellTypeType In)
+//{
+//	if (In == DFITC_SPD_SELL)
+//		return OrderSide::Sell;
+//	return OrderSide::Buy;
+//}
+//
+//DFITCOrderTypeType OrderType_2_DFITCOrderTypeType(OrderType In)
+//{
+//	switch (In)
+//	{
+//	case Market:
+//		return DFITC_MKORDER;
+//	case Stop:
+//		return DFITC_MKORDER;
+//	case Limit:
+//		return DFITC_LIMITORDER;
+//	case StopLimit:
+//		return DFITC_LIMITORDER;
+//	case MarketOnClose:
+//		return DFITC_MKORDER;
+//	case TrailingStop:
+//		return DFITC_MKORDER;
+//	case TrailingStopLimit:
+//		return DFITC_LIMITORDER;
+//	default:
+//		return DFITC_LIMITORDER;
+//	}
+//}
+//
+//TimeInForce DFITCOrderPropertyType_2_TimeInForce(DFITCOrderPropertyType In)
+//{
+//	switch (In)
+//	{
+//	case DFITC_SP_FAK:
+//		return TimeInForce::IOC;
+//	case DFITC_SP_FOK:
+//		return TimeInForce::FOK;
+//	case DFITC_SP_NON:
+//	default:
+//		return TimeInForce::Day;
+//	}
+//}
+//
+//DFITCOrderPropertyType TimeInForce_2_DFITCOrderPropertyType(TimeInForce In)
+//{
+//	switch (In)
+//	{
+//	case TimeInForce::IOC:
+//		return DFITC_SP_FAK;
+//	case TimeInForce::FOK:
+//		return DFITC_SP_FOK;
+//	default:
+//		return DFITC_SP_NON;
+//	}
+//}
+//
 //OrderStatus DFITCOrderRtnField_2_OrderStatus(DFITCOrderRtnField* pIn)
 //{
-//	switch (pIn->OrderStatus)
-//	{
-//	case THOST_FTDC_OST_Canceled:
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertRejected)
-//			return OrderStatus::Rejected;
-//		return OrderStatus::Cancelled;
-//	case THOST_FTDC_OST_Unknown:
-//		// Èç¹ûÊÇ³·µ¥£¬Ò²ÓÐ¿ÉÄÜ³öÏÖÕâÒ»Ìõ£¬ÈçºÎ¹ýÂË£¿
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertSubmitted)
-//			return OrderStatus::New;
-//	default:
-//		if (pIn->VolumeTotal == 0)
-//			return OrderStatus::Filled;
-//		else if (pIn->VolumeTotal == pIn->VolumeTotalOriginal)
-//			return OrderStatus::New;
-//		else
-//			return OrderStatus::PartiallyFilled;
-//	}
+//	//switch (In)
+//	//{
+//	//case DFITC_SPD_CANCELED:	// å¦‚ä½•åŒºåˆ†æ˜¯è¢«æ‹’ç»äº†ï¼Ÿ
+//	//	return OrderStatus::Cancelled;
+//	//case DFITC_SPD_FILLED:
+//	//	return OrderStatus::Filled;
+//	//case DFITC_SPD_IN_QUEUE:
+//	//	return OrderStatus::Filled;
+//	//case DFITC_SPD_FILLED:
+//	//	return OrderStatus::Filled;
+//	//case DFITC_SPD_FILLED:
+//	//	return OrderStatus::Filled;
+//	//case DFITC_SPD_FILLED:
+//	//	return OrderStatus::Filled;
+//	//case DFITC_SPD_FILLED:
+//	//	return OrderStatus::Filled;
+//	//case DFITC_SPD_FILLED:
+//	//	return OrderStatus::Filled;
+//	//default:
+//	//	break;
+//	//}
+//	return OrderStatus::Filled;
 //}
 //
 //OrderType DFITCOrderRtnField_2_OrderType(DFITCOrderRtnField* pIn)
 //{
-//	switch (pIn->OrderPriceType)
-//	{
-//	case THOST_FTDC_OPT_AnyPrice:
-//		return OrderType::Market;
-//	case THOST_FTDC_OPT_LimitPrice:
-//		return OrderType::Limit;
-//	default:
-//		return OrderType::Limit;
-//	}
+//	return OrderType::Limit;
 //}
 //
 //TimeInForce DFITCOrderRtnField_2_TimeInForce(DFITCOrderRtnField* pIn)
 //{
-//	switch (pIn->TimeCondition)
-//	{
-//	case THOST_FTDC_TC_GFD:
-//		return TimeInForce::Day;
-//	case THOST_FTDC_TC_IOC:
-//		switch (pIn->VolumeCondition)
-//		{
-//		case THOST_FTDC_VC_AV:
-//			return TimeInForce::IOC;
-//		case THOST_FTDC_VC_CV:
-//			return TimeInForce::FOK;
-//		default:
-//			return TimeInForce::IOC;
-//		}
-//	default:
-//		return TimeInForce::Day;
-//	}
+//	return TimeInForce::Day;
 //}
 //
 //ExecType DFITCOrderRtnField_2_ExecType(DFITCOrderRtnField* pIn)
 //{
-//	switch (pIn->OrderStatus)
+//	return ExecType::ExecNew;
+//}
+////OrderStatus DFITCOrderRtnField_2_OrderStatus(DFITCOrderRtnField* pIn)
+////{
+////	switch (pIn->OrderStatus)
+////	{
+////	case THOST_FTDC_OST_Canceled:
+////		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertRejected)
+////			return OrderStatus::Rejected;
+////		return OrderStatus::Cancelled;
+////	case THOST_FTDC_OST_Unknown:
+////		// å¦‚æžœæ˜¯æ’¤å•ï¼Œä¹Ÿæœ‰å¯èƒ½å‡ºçŽ°è¿™ä¸€æ¡ï¼Œå¦‚ä½•è¿‡æ»¤ï¼Ÿ
+////		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertSubmitted)
+////			return OrderStatus::New;
+////	default:
+////		if (pIn->VolumeTotal == 0)
+////			return OrderStatus::Filled;
+////		else if (pIn->VolumeTotal == pIn->VolumeTotalOriginal)
+////			return OrderStatus::New;
+////		else
+////			return OrderStatus::PartiallyFilled;
+////	}
+////}
+////
+////OrderType DFITCOrderRtnField_2_OrderType(DFITCOrderRtnField* pIn)
+////{
+////	switch (pIn->OrderPriceType)
+////	{
+////	case THOST_FTDC_OPT_AnyPrice:
+////		return OrderType::Market;
+////	case THOST_FTDC_OPT_LimitPrice:
+////		return OrderType::Limit;
+////	default:
+////		return OrderType::Limit;
+////	}
+////}
+////
+////TimeInForce DFITCOrderRtnField_2_TimeInForce(DFITCOrderRtnField* pIn)
+////{
+////	switch (pIn->TimeCondition)
+////	{
+////	case THOST_FTDC_TC_GFD:
+////		return TimeInForce::Day;
+////	case THOST_FTDC_TC_IOC:
+////		switch (pIn->VolumeCondition)
+////		{
+////		case THOST_FTDC_VC_AV:
+////			return TimeInForce::IOC;
+////		case THOST_FTDC_VC_CV:
+////			return TimeInForce::FOK;
+////		default:
+////			return TimeInForce::IOC;
+////		}
+////	default:
+////		return TimeInForce::Day;
+////	}
+////}
+////
+////ExecType DFITCOrderRtnField_2_ExecType(DFITCOrderRtnField* pIn)
+////{
+////	switch (pIn->OrderStatus)
+////	{
+////	case THOST_FTDC_OST_Canceled:
+////		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertRejected)
+////			return ExecType::ExecRejected;
+////		return ExecType::ExecCancelled;
+////	case THOST_FTDC_OST_Unknown:
+////		// å¦‚æžœæ˜¯æ’¤å•ï¼Œä¹Ÿæœ‰å¯èƒ½å‡ºçŽ°è¿™ä¸€æ¡ï¼Œå¦‚ä½•è¿‡æ»¤ï¼Ÿ
+////		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertSubmitted)
+////			return ExecType::ExecNew;
+////	case THOST_FTDC_OST_AllTraded:
+////	case THOST_FTDC_OST_PartTradedQueueing:
+////		return ExecType::ExecTrade;
+////	default:
+////		return ExecType::ExecNew;
+////	}
+////}
+////
+//InstrumentType DFITCInstrumentTypeType_2_InstrumentType(DFITCInstrumentTypeType In)
+//{
+//	switch (In)
 //	{
-//	case THOST_FTDC_OST_Canceled:
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertRejected)
-//			return ExecType::ExecRejected;
-//		return ExecType::ExecCancelled;
-//	case THOST_FTDC_OST_Unknown:
-//		// Èç¹ûÊÇ³·µ¥£¬Ò²ÓÐ¿ÉÄÜ³öÏÖÕâÒ»Ìõ£¬ÈçºÎ¹ýÂË£¿
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertSubmitted)
-//			return ExecType::ExecNew;
-//	case THOST_FTDC_OST_AllTraded:
-//	case THOST_FTDC_OST_PartTradedQueueing:
-//		return ExecType::ExecTrade;
+//	case DFITC_COMM_TYPE:
+//		return InstrumentType::Future;
+//	case DFITC_OPT_TYPE:
+//		return InstrumentType::Option;
 //	default:
-//		return ExecType::ExecNew;
+//		return InstrumentType::Future;
 //	}
 //}
-//
-InstrumentType DFITCInstrumentTypeType_2_InstrumentType(DFITCInstrumentTypeType In)
+
+ExchangeType DFITCSECExchangeIDType_2_ExchangeType(DFITCSECExchangeIDType In)
 {
-	switch (In)
+	switch (In[1])
 	{
-	case DFITC_COMM_TYPE:
-		return InstrumentType::Future;
-	case DFITC_OPT_TYPE:
-		return InstrumentType::Option;
+	case 'H':
+		return ExchangeType::SSE;
+	case 'Z':
+		return ExchangeType::SZE;
 	default:
-		return InstrumentType::Future;
+		return ExchangeType::Undefined_;
 	}
 }

@@ -26,7 +26,7 @@ namespace QuantBox.XAPI
         {
             Debugger.Log(0, null, "CTP:C#");
             Console.WriteLine(marketData.InstrumentID);
-            Console.WriteLine(marketData.ExchangeID);
+            Console.WriteLine(marketData.Exchange);
             Console.WriteLine(marketData.LastPrice);
         }
 

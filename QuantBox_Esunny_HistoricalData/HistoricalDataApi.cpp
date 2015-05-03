@@ -287,8 +287,7 @@ int __cdecl CHistoricalDataApi::OnRspHistoryQuot(struct STKHISDATA *pHisData)
 
 	m_msgQueue->Input_Copy(ResponeType::OnRspQryHistoricalBars, m_msgQueue, m_pClass, true, 0, pFields, sizeof(BarField)*pHisData->nCount, &m_RequestBar, sizeof(HistoricalDataRequestField), nullptr, 0);
 
-	if (pFields)
-		delete[] pFields;
+	m_msgQueue->delete_block(pFields);
 
 	return 0;
 }
@@ -398,8 +397,7 @@ int __cdecl CHistoricalDataApi::OnRspTraceData(struct STKTRACEDATA *pTraceData)
 
 	m_msgQueue->Input_Copy(ResponeType::OnRspQryHistoricalTicks, m_msgQueue, m_pClass, bIsLast, 0, pFields, sizeof(TickField)*pTraceData->nCount, &m_RequestTick, sizeof(HistoricalDataRequestField), nullptr, 0);
 
-	if (pFields)
-		delete[] pFields;
+	m_msgQueue->delete_block(pFields);
 
 	if (!bIsLast)
 	{

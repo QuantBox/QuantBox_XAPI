@@ -404,6 +404,7 @@ void CMdUserApi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CTho
 	{
 		pField->TradingDay = GetDate(pRspUserLogin->TradingDay);
 		pField->LoginTime = GetTime(pRspUserLogin->LoginTime);
+		m_TradingDay = pField->TradingDay;
 
 		sprintf(pField->SessionID, "%d:%d", pRspUserLogin->FrontID, pRspUserLogin->SessionID);
 
@@ -468,17 +469,30 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
 
 	strcpy(pField->InstrumentID, pDepthMarketData->InstrumentID);
-	strcpy(pField->ExchangeID, pDepthMarketData->ExchangeID);
+	pField->Exchange = TThostFtdcExchangeIDType_2_ExchangeType(pDepthMarketData->ExchangeID);
 
-	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
+	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pDepthMarketData->ExchangeID);
 
-	//TODO:CTP大连没有ActionDay，所以API中是将TradingDay填到了这里，所以这里这种用法可能会出错，要测
-	GetExchangeTime(pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
-		, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+	//m_TradingDay
+	switch (pField->Exchange)
+	{
+	case ExchangeType::DCE:
+		GetExchangeTime_DCE(pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
+			, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+		break;
+	case ExchangeType::CZCE:
+		GetExchangeTime_CZC(m_TradingDay, pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
+			, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+		break;
+	default:
+		GetExchangeTime(pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
+			, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+		break;
+	}
 
 	pField->UpdateMillisec = pDepthMarketData->UpdateMillisec;
 
-	pField->LastPrice = pDepthMarketData->LastPrice != DBL_MAX ? pDepthMarketData->LastPrice : 0;
+	pField->LastPrice = pDepthMarketData->LastPrice == DBL_MAX ? 0 : pDepthMarketData->LastPrice;
 	pField->Volume = pDepthMarketData->Volume;
 	pField->Turnover = pDepthMarketData->Turnover;
 	pField->OpenInterest = pDepthMarketData->OpenInterest;

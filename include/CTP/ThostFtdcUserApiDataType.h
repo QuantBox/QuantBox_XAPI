@@ -78,6 +78,11 @@ typedef char TThostFtdcClientIDType[11];
 typedef char TThostFtdcInstrumentIDType[31];
 
 /////////////////////////////////////////////////////////////////////////
+///TFtdcInstrumentCodeType是一个合约标识码类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TThostFtdcInstrumentCodeType[31];
+
+/////////////////////////////////////////////////////////////////////////
 ///TFtdcMarketIDType是一个市场代码类型
 /////////////////////////////////////////////////////////////////////////
 typedef char TThostFtdcMarketIDType[31];
@@ -393,6 +398,8 @@ typedef char TThostFtdcTraderConnectStatusType;
 #define THOST_FTDC_FC_SyncOTP 'E'
 ///删除未知单
 #define THOST_FTDC_FC_DeleteOrder 'F'
+///锁定与解锁权限
+#define THOST_FTDC_FC_LockInsert 'G'
 
 typedef char TThostFtdcFunctionCodeType;
 
@@ -487,6 +494,8 @@ typedef char TThostFtdcFunctionCodeType;
 #define THOST_FTDC_BFC_ParkedOrderInsert 'K'
 ///预埋报单操作
 #define THOST_FTDC_BFC_ParkedOrderAction 'L'
+///锁定与解锁权限
+#define THOST_FTDC_BFC_LockInsert 'M'
 
 typedef char TThostFtdcBrokerFunctionCodeType;
 
@@ -593,6 +602,10 @@ typedef char TThostFtdcTradingRoleType;
 #define THOST_FTDC_PC_EFP '5'
 ///现货期权
 #define THOST_FTDC_PC_SpotOption '6'
+///个股期权
+#define THOST_FTDC_PC_ETFOption '7'
+///证券
+#define THOST_FTDC_PC_Stock '8'
 
 typedef char TThostFtdcProductClassType;
 
@@ -677,6 +690,8 @@ typedef char TThostFtdcRatioAttrType;
 #define THOST_FTDC_HF_Arbitrage '2'
 ///套保
 #define THOST_FTDC_HF_Hedge '3'
+///备兑
+#define THOST_FTDC_HF_Covered '4'
 
 typedef char TThostFtdcHedgeFlagType;
 
@@ -1396,6 +1411,10 @@ typedef char TThostFtdcSystemParamIDType;
 #define THOST_FTDC_TPID_LoginFailMaxNum 'L'
 ///是否强制认证
 #define THOST_FTDC_TPID_IsAuthForce 'A'
+///是否冻结证券持仓
+#define THOST_FTDC_TPID_IsPosiFreeze 'F'
+///是否限仓
+#define THOST_FTDC_TPID_IsPosiLimit 'M'
 
 typedef char TThostFtdcTradeParamIDType;
 
@@ -2182,6 +2201,11 @@ typedef char TThostFtdcCapitalCurrencyType[4];
 typedef char TThostFtdcUserTypeType;
 
 /////////////////////////////////////////////////////////////////////////
+///TFtdcBranchIDType是一个营业部编号类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TThostFtdcBranchIDType[9];
+
+/////////////////////////////////////////////////////////////////////////
 ///TFtdcRateTypeType是一个费率类型类型
 /////////////////////////////////////////////////////////////////////////
 ///保证金率
@@ -2774,6 +2798,31 @@ typedef char TThostFtdcCFMMCKeyKindType;
 ///TFtdcAMLReportNameType是一个报文名称类型
 /////////////////////////////////////////////////////////////////////////
 typedef char TThostFtdcAMLReportNameType[81];
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcDBFComdTypeType是一个DBF命令类型类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TThostFtdcDBFComdTypeType[65];
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcDBFComTimeType是一个DBF时间类型类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TThostFtdcDBFComTimeType[65];
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcDBFComNoType是一个DBF流水号类型类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TThostFtdcDBFComNoType[17];
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcDBFFdNameType是一个DBF字段类型类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TThostFtdcDBFFdNameType[256];
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcDBFFdContentType是一个DBF字段内容类型类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TThostFtdcDBFFdContentType[256];
 
 /////////////////////////////////////////////////////////////////////////
 ///TFtdcIndividualNameType是一个个人姓名类型
@@ -6272,5 +6321,100 @@ typedef char TThostFtdcCFFEXUploadFileNameType;
 #define THOST_FTDC_CMDR_UnComb '1'
 
 typedef char TThostFtdcCombDirectionType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcLockTypeType是一个锁定方向类型
+/////////////////////////////////////////////////////////////////////////
+///锁定
+#define THOST_FTDC_LCKT_Lock '1'
+///解锁
+#define THOST_FTDC_LCKT_Unlock '2'
+
+typedef char TThostFtdcLockTypeType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcBizTypeType是一个业务类型类型
+/////////////////////////////////////////////////////////////////////////
+///期货
+#define THOST_FTDC_BZTP_Future '1'
+///证券
+#define THOST_FTDC_BZTP_Stock '2'
+
+typedef char TThostFtdcBizTypeType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcDesignateTypeType是一个指定类型类型
+/////////////////////////////////////////////////////////////////////////
+///指定登记
+#define THOST_FTDC_DSTP_Register '1'
+///指定撤销
+#define THOST_FTDC_DSTP_Cancel '2'
+
+typedef char TThostFtdcDesignateTypeType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcFreezeReasonTypeType是一个冻结原因类型
+/////////////////////////////////////////////////////////////////////////
+///初始化
+#define THOST_FTDC_FRTP_Init '1'
+///锁定
+#define THOST_FTDC_FRTP_Lock '2'
+///执行
+#define THOST_FTDC_FRTP_Exec '3'
+
+typedef char TThostFtdcFreezeReasonTypeType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcFreezeTypeType是一个冻结类型类型
+/////////////////////////////////////////////////////////////////////////
+///冻结
+#define THOST_FTDC_FZTP_Freeze '1'
+///解冻
+#define THOST_FTDC_FZTP_Unfreeze '2'
+///强制执行
+#define THOST_FTDC_FZTP_Force '3'
+
+typedef char TThostFtdcFreezeTypeType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcTradeSystemTypeType是一个交易系统类型类型
+/////////////////////////////////////////////////////////////////////////
+///未知系统
+#define THOST_FTDC_TSTP_Unknow '0'
+///期货系统
+#define THOST_FTDC_TSTP_Future '1'
+///个股系统
+#define THOST_FTDC_TSTP_IShare '2'
+
+typedef char TThostFtdcTradeSystemTypeType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcStockDisposalTypeType是一个证券处置方向类型
+/////////////////////////////////////////////////////////////////////////
+///划入经纪公司账户
+#define THOST_FTDC_STPT_ToBroker '1'
+///划入投资者账户
+#define THOST_FTDC_STPT_ToInvestor '2'
+
+typedef char TThostFtdcStockDisposalTypeType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcStockDisposalSysIDType是一个证券处置编号类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TThostFtdcStockDisposalSysIDType[21];
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcStockDisposalStatusType是一个报单操作状态类型
+/////////////////////////////////////////////////////////////////////////
+///已经提交
+#define THOST_FTDC_SDPS_Submitted 'a'
+///已经接受
+#define THOST_FTDC_SDPS_Accepted 'b'
+///已经被拒绝
+#define THOST_FTDC_SDPS_Rejected 'c'
+///已经被撤销
+#define THOST_FTDC_SDPS_Cancelled 'd'
+
+typedef char TThostFtdcStockDisposalStatusType;
 
 #endif

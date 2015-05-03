@@ -9,6 +9,7 @@
 #include "../include/toolkit.h"
 
 #include "../QuantBox_Queue/MsgQueue.h"
+#include "../QuantBox_XSpeed_Trade/TypeConvert.h"
 
 #include <string.h>
 #include <cfloat>
@@ -37,6 +38,9 @@ void CMdUserApi::QueryInThread(char type, void* pApi1, void* pApi2, double doubl
 		break;
 	case E_UserLoginField:
 		iRet = _ReqUserLogin(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		break;
+	case E_TradingDayField:
+		iRet = _ReqTradingDay(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 	default:
 		break;
 	}
@@ -176,6 +180,37 @@ int CMdUserApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 	DFITCUserLoginField* pBody = (DFITCUserLoginField*)ptr1;
 	pBody->lRequestID = ++m_lRequestID;
 	return m_pApi->ReqUserLogin(pBody);
+}
+
+void CMdUserApi::ReqTradingDay()
+{
+	DFITCTradingDayField* pBody = (DFITCTradingDayField*)m_msgQueue_Query->new_block(sizeof(DFITCTradingDayField));
+
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_TradingDayField, m_msgQueue_Query, this, 0, 0,
+		pBody, sizeof(DFITCTradingDayField), nullptr, 0, nullptr, 0);
+}
+
+int CMdUserApi::_ReqTradingDay(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	DFITCTradingDayField* pBody = (DFITCTradingDayField*)ptr1;
+	pBody->lRequestID = ++m_lRequestID;
+	return m_pApi->ReqTradingDay(pBody);
+}
+
+void CMdUserApi::OnRspTradingDay(struct DFITCTradingDayRtnField * pTradingDayRtnData)
+{
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+
+	m_TradingDay = GetDate(pTradingDayRtnData->date);
+
+	//有可能断线了，本处是断线重连后重新订阅
+	set<string> mapOld = m_setInstrumentIDs;//记下上次订阅的合约
+	//Unsubscribe(mapOld);//由于已经断线了，没有必要再取消订阅
+	Subscribe(mapOld, "");//订阅
+
+	////有可能断线了，本处是断线重连后重新订阅
+	//mapOld = m_setQuoteInstrumentIDs;//记下上次订阅的合约
+	//SubscribeQuote(mapOld, "");//订阅
 }
 
 void CMdUserApi::Disconnect()
@@ -396,19 +431,10 @@ void CMdUserApi::OnRspUserLogin(struct DFITCUserLoginInfoRtnField * pRspUserLogi
 		//strncpy(field.LoginTime, pRspUserLogin->LoginTime, sizeof(TimeType));
 		//GetExchangeTime(pRspUserLogin->TradingDay, nullptr, pRspUserLogin->LoginTime,
 		//	&field.TradingDay, nullptr, &field.LoginTime, nullptr);
+
 		sprintf(pField->SessionID, "%d", pRspUserLogin->sessionID);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-
-		//有可能断线了，本处是断线重连后重新订阅
-		set<string> mapOld = m_setInstrumentIDs;//记下上次订阅的合约
-		//Unsubscribe(mapOld);//由于已经断线了，没有必要再取消订阅
-		Subscribe(mapOld,"");//订阅
-
-		////有可能断线了，本处是断线重连后重新订阅
-		//mapOld = m_setQuoteInstrumentIDs;//记下上次订阅的合约
-		//SubscribeQuote(mapOld, "");//订阅
 	}
 	else
 	{
@@ -454,11 +480,22 @@ void CMdUserApi::OnMarketData(struct DFITCDepthMarketDataField *pMarketDataField
 	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
 
 	strcpy(pField->InstrumentID, pMarketDataField->instrumentID);
-	strcpy(pField->ExchangeID, pMarketDataField->exchangeID);
+	pField->Exchange = DFITCExchangeIDType_2_ExchangeType(pMarketDataField->exchangeID);
 
-	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
-	GetExchangeTime(pMarketDataField->tradingDay, nullptr, pMarketDataField->UpdateTime
-		, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pMarketDataField->exchangeID);
+
+	switch (pField->Exchange)
+	{
+	case ExchangeType::CZCE:
+		GetExchangeTime_CZCE(m_TradingDay, pMarketDataField->tradingDay, nullptr, pMarketDataField->UpdateTime
+			, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+		break;
+	default:
+		GetExchangeTime(pMarketDataField->tradingDay, nullptr, pMarketDataField->UpdateTime
+			, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+		break;
+	}
+
 	pField->UpdateMillisec = pMarketDataField->UpdateMillisec;
 
 	pField->LastPrice = pMarketDataField->lastPrice;

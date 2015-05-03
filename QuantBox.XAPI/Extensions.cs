@@ -71,13 +71,14 @@ CZC
             // 大商所夜盘时，ActionDay可能已经是指向的第二天
             int HH = field.UpdateTime / 10000;
 
-            if (HH > 20)
-            {
-                if (field.ExchangeID.CompareTo("DCE") == 0)
-                {
-                    return field.ExchangeDateTime_();
-                }
-            }
+            // 这个功能写入到C层中
+            //if (HH > 20)
+            //{
+            //    if (field.ExchangeID.CompareTo("DCE") == 0)
+            //    {
+            //        return field.ExchangeDateTime_();
+            //    }
+            //}
 
             int mm = field.UpdateTime % 10000 / 100;
             int ss = field.UpdateTime % 100;

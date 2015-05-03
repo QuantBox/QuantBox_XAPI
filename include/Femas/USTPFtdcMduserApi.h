@@ -106,6 +106,19 @@ public:
 	///等待接口线程结束运行
 	///@return 线程退出代码
 	virtual int Join() = 0;
+
+	/// 是否使用多播方式接收行情
+	/// @param bUseMulti 默认为false，表示不使用多播接收行情
+	/// @remark 如果使用多播，则无需登录，也使用不了需要登录才能使用的接口
+	virtual void SetUseMultiChannel(bool bUseMulti = false) = 0;
+	
+	///注册多播通道
+	///@param pMultiChannel 多播通道地址地址，
+	///@remark 网络地址的例子：”multi://172.25.125@232.0.0.1:5131”。 
+	///@remark “multi”代表使用多播传输；“172.25.125”用来确定接收多播的网卡；”232.0.0.1:5131”代表多播通道及端口。
+	///@remark 可以多次调用，注册多个通道，接收多个通道中速度最优的行情
+	virtual void RegisterMultiChannel(const char *pMultiChannel) = 0;
+
 	
 	///获取当前交易日
 	///@retrun 获取到的交易日

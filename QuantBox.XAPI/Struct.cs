@@ -292,6 +292,11 @@ namespace QuantBox.XAPI
         public int AskVolume5;
 
         /// <summary>
+        /// 交易所代码
+        /// </summary>
+        public ExchangeType Exchange;
+
+        /// <summary>
         /// 合约代码
         /// </summary>
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
@@ -301,11 +306,7 @@ namespace QuantBox.XAPI
         /// </summary>
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 31)]
         public string InstrumentID;
-        /// <summary>
-        /// 交易所代码
-        /// </summary>
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
-        public string ExchangeID;
+
     }
 
     /// <summary>
