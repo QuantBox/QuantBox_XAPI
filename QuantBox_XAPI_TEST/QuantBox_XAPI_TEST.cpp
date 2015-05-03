@@ -1,4 +1,4 @@
-// QuantBox_XAPI_TEST.cpp : Defines the entry point for the console application.
+﻿// QuantBox_XAPI_TEST.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -20,56 +20,90 @@
 class CXSpiImpl :public CXSpi
 {
 public:
-	virtual void OnConnectionStatus(ConnectionStatus status, RspUserLoginField* pUserLogin, int size1)
+	CXSpiImpl() :CXSpi()
+	{
+		count = 0;
+	}
+
+	virtual void OnConnectionStatus(CXApi* pApi, ConnectionStatus status, RspUserLoginField* pUserLogin, int size1)
 	{
 		printf("%d\r\n", status);
 		if (status == ConnectionStatus::Done)
 		{
-			// �õ���ǰ��ʱ��
-			time_t rawtime;
-			struct tm * timeinfo;
-			time(&rawtime);
-			timeinfo = localtime(&rawtime);
-			int mon = timeinfo->tm_mon;
-			char buf[64] = { 0 };
-			for (int i = 0; i < 12; ++i)
+			if ((pApi->GetApiType() & ApiType::MarketData) == ApiType::MarketData)
 			{
-				int x = mon + i;
-				int a = x / 12;
-				int b = x % 12;
-				sprintf(buf, "IF%d%02d", (1900 + timeinfo->tm_year + a) % 100, b + 1);
-				m_pApi->Subscribe(buf, "");
-				sprintf(buf, "TF%d%02d", (1900 + timeinfo->tm_year + a) % 100, b + 1);
-				m_pApi->Subscribe(buf, "");
+				// 得到当前的时间
+				time_t rawtime;
+				struct tm * timeinfo;
+				time(&rawtime);
+				timeinfo = localtime(&rawtime);
+				int mon = timeinfo->tm_mon;
+				char buf[64] = { 0 };
+				for (int i = 0; i < 12; ++i)
+				{
+					int x = mon + i;
+					int a = x / 12;
+					int b = x % 12;
+					sprintf(buf, "IF%d%02d", (1900 + timeinfo->tm_year + a) % 100, b + 1);
+					pApi->Subscribe(buf, "");
+					sprintf(buf, "TF%d%02d", (1900 + timeinfo->tm_year + a) % 100, b + 1);
+					pApi->Subscribe(buf, "");
+				}
 			}
 		}
 	}
-	virtual void OnRtnError(ErrorField* pError){};
+	virtual void OnRtnError(CXApi* pApi, ErrorField* pError){};
 
-	virtual void OnRtnDepthMarketData(DepthMarketDataField* pMarketData)
+	virtual void OnRtnDepthMarketData(CXApi* pApi, DepthMarketDataField* pMarketData)
 	{
-		printf("%s,%f\r\n", pMarketData->Symbol,pMarketData->LastPrice);
+		printf("%s,%f,%d\r\n", pMarketData->Symbol, pMarketData->LastPrice, ++count);
 	}
 
-	virtual void OnRtnQuoteRequest(QuoteRequestField* pQuoteRequest){};
+	virtual void OnRtnQuoteRequest(CXApi* pApi, QuoteRequestField* pQuoteRequest){};
 
-	virtual void OnRspQryInstrument(InstrumentField* pInstrument, int size1, bool bIsLast){};
-	virtual void OnRspQryTradingAccount(AccountField* pAccount, int size1, bool bIsLast){};
-	virtual void OnRspQryInvestorPosition(PositionField* pPosition, int size1, bool bIsLast){};
-	virtual void OnRspQrySettlementInfo(SettlementInfoField* pSettlementInfo, int size1, bool bIsLast){};
-	virtual void OnRspQryInvestor(InvestorField* pInvestor, int size1, bool bIsLast){};
-	virtual void OnRtnOrder(OrderField* pOrder)
+	virtual void OnRspQryInstrument(CXApi* pApi, InstrumentField* pInstrument, int size1, bool bIsLast){};
+	virtual void OnRspQryTradingAccount(CXApi* pApi, AccountField* pAccount, int size1, bool bIsLast){};
+	virtual void OnRspQryInvestorPosition(CXApi* pApi, PositionField* pPosition, int size1, bool bIsLast){};
+	virtual void OnRspQrySettlementInfo(CXApi* pApi, SettlementInfoField* pSettlementInfo, int size1, bool bIsLast){};
+	virtual void OnRspQryInvestor(CXApi* pApi, InvestorField* pInvestor, int size1, bool bIsLast){};
+	virtual void OnRtnOrder(CXApi* pApi, OrderField* pOrder)
 	{
 		printf("%d,%s\r\n", pOrder->ErrorID,pOrder->Text);
 	}
-	virtual void OnRtnTrade(TradeField* pTrade){};
-	virtual void OnRtnQuote(QuoteField* pQuote){};
+	virtual void OnRtnTrade(CXApi* pApi, TradeField* pTrade){};
+	virtual void OnRtnQuote(CXApi* pApi, QuoteField* pQuote){};
 
-	virtual void OnRspQryHistoricalTicks(TickField* pTicks, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
-	virtual void OnRspQryHistoricalBars(BarField* pBars, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
+	virtual void OnRspQryHistoricalTicks(CXApi* pApi, TickField* pTicks, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
+	virtual void OnRspQryHistoricalBars(CXApi* pApi, BarField* pBars, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
 
+	virtual bool OnFilterSubscribe(CXApi* pApi, ExchangeType exchange, int instrument_part1, int instrument_part2, int instrument_part3, char* pInstrument)
+	{
+		// 当数字为0时，只判断交易所
+		// 当交易所为
+		if (instrument_part1 == 0)
+			// 只要上海与深圳，不处理三板
+			return exchange != ExchangeType::NEEQ;
+
+		//type = ExchangeType::SZE;
+		//double1 = 399300;
+
+		int prefix1 = instrument_part1 / 100000;
+		int prefix3 = instrument_part1 / 1000;
+		switch (exchange)
+		{
+		case ExchangeType::SSE:
+			return (prefix1 == 6);
+		case ExchangeType::SZE:
+			return (prefix1 == 0) || (prefix3 == 300);
+		default:
+			break;
+		}
+
+		return true;
+	}
 public:
-	CXApi* m_pApi;
+	//CXApi* m_pApi;
+	int count;
 };
 
 int main_1(int argc, char* argv[])
@@ -158,20 +192,19 @@ int main_1(int argc, char* argv[])
 	return 0;
 }
 
+
+
 int main_2(int argc, char* argv[])
 {
 	CXSpiImpl* p = new CXSpiImpl();
-#if defined WINDOWS || _WIN32
-	char DLLPath1[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\ZeroMQ\\x86\\QuantBox_ZeroMQ_Quote.dll";
-#else
-	char DLLPath1[250] = "libQuantBox_ZeroMQ_Quote.so";
-#endif
+
+	char DLLPath1[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\TongShi\\x86\\QuantBox_TongShi_Quote.dll";
 
 	ServerInfoField				m_ServerInfo1 = { 0 };
 	UserInfoField				m_UserInfo = { 0 };
 
-	strcpy(m_ServerInfo1.Address, "tcp://127.0.0.1:5555");
-	//strcpy(m_ServerInfo1.Address, "pgm://10.10.9.95;239.192.1.1:5555");
+	strcpy(m_ServerInfo1.Address, "D:\\Scengine\\Stock.dll");
+	//strcpy(m_ServerInfo1.Address, "D:\\YjStock\\Stock.dll");
 
 	CXApi* pApi1 = CXApi::CreateApi(DLLPath1);
 	if (pApi1)
@@ -184,22 +217,16 @@ int main_2(int argc, char* argv[])
 		}
 
 		pApi1->RegisterSpi(p);
-
-#if defined WINDOWS || _WIN32
 		pApi1->Connect("D:\\", &m_ServerInfo1, &m_UserInfo, 1);
-#else
-		pApi1->Connect("./", &m_ServerInfo1, &m_UserInfo, 1);
-#endif
+		
 
 		getchar();
 
-		pApi1->Subscribe("IF1504", "");
-
-		getchar();
-
-		getchar();
-
+		printf("退出");
+		
 		pApi1->Disconnect();
+
+		printf("退出成功");
 	}
 
 	return 0;
@@ -220,8 +247,8 @@ int main(int argc, char* argv[])
 
 	strcpy(m_ServerInfo1.BrokerID, "0272");
 	strcpy(m_ServerInfo1.Address, "tcp://180.168.146.181:10210");
-	m_ServerInfo1.TopicId = 100;// femas����ط�һ������ʡ
-	strcpy(m_ServerInfo1.ExtendInformation, "tcp://*:5555");//����Ҫ��Femas���и���
+	m_ServerInfo1.TopicId = 100;// femas这个地方一定不能省
+	strcpy(m_ServerInfo1.ExtendInformation, "tcp://*:5555");//这需要对Femas进行改造
 	
 	strcpy(m_UserInfo.UserID, "00049");
 	strcpy(m_UserInfo.Password, "123456");
@@ -236,7 +263,7 @@ int main(int argc, char* argv[])
 			return -1;
 		}
 
-		p->m_pApi = pApi1;
+		//p->m_pApi = pApi1;
 		pApi1->RegisterSpi(p);
 
 #if defined WINDOWS || _WIN32
@@ -257,5 +284,4 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
 

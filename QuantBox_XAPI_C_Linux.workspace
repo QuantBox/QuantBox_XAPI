@@ -14,6 +14,5 @@
 		<Project filename="QuantBox_Femas_Trade/QuantBox_Femas_Trade.cbp" />
 		<Project filename="QuantBox_XAPI/QuantBox_XAPI.cbp" />
 		<Project filename="QuantBox_XAPI_TEST/QuantBox_XAPI_TEST.cbp" />
-		<Project filename="QuantBox_ZeroMQ_Quote/QuantBox_ZeroMQ_Quote.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

@@ -9,28 +9,30 @@
 
 #include "../include/ApiStruct.h"
 
-
+class CXApi;
 
 class CXSpi
 {
 public:
-	virtual void OnConnectionStatus(ConnectionStatus status, RspUserLoginField* pUserLogin, int size1){};
-	virtual void OnRtnError(ErrorField* pError){};
+	virtual void OnConnectionStatus(CXApi* pApi, ConnectionStatus status, RspUserLoginField* pUserLogin, int size1){};
+	virtual void OnRtnError(CXApi* pApi, ErrorField* pError){};
 
-	virtual void OnRtnDepthMarketData(DepthMarketDataField* pMarketData){};
-	virtual void OnRtnQuoteRequest(QuoteRequestField* pQuoteRequest){};
+	virtual void OnRtnDepthMarketData(CXApi* pApi, DepthMarketDataField* pMarketData){};
+	virtual void OnRtnQuoteRequest(CXApi* pApi, QuoteRequestField* pQuoteRequest){};
 
-	virtual void OnRspQryInstrument(InstrumentField* pInstrument, int size1, bool bIsLast){};
-	virtual void OnRspQryTradingAccount(AccountField* pAccount, int size1, bool bIsLast){};
-	virtual void OnRspQryInvestorPosition(PositionField* pPosition, int size1, bool bIsLast){};
-	virtual void OnRspQrySettlementInfo(SettlementInfoField* pSettlementInfo, int size1, bool bIsLast){};
-	virtual void OnRspQryInvestor(InvestorField* pInvestor, int size1, bool bIsLast){};
-	virtual void OnRtnOrder(OrderField* pOrder){};
-	virtual void OnRtnTrade(TradeField* pTrade){};
-	virtual void OnRtnQuote(QuoteField* pQuote){};
+	virtual void OnRspQryInstrument(CXApi* pApi, InstrumentField* pInstrument, int size1, bool bIsLast){};
+	virtual void OnRspQryTradingAccount(CXApi* pApi, AccountField* pAccount, int size1, bool bIsLast){};
+	virtual void OnRspQryInvestorPosition(CXApi* pApi, PositionField* pPosition, int size1, bool bIsLast){};
+	virtual void OnRspQrySettlementInfo(CXApi* pApi, SettlementInfoField* pSettlementInfo, int size1, bool bIsLast){};
+	virtual void OnRspQryInvestor(CXApi* pApi, InvestorField* pInvestor, int size1, bool bIsLast){};
+	virtual void OnRtnOrder(CXApi* pApi, OrderField* pOrder){};
+	virtual void OnRtnTrade(CXApi* pApi, TradeField* pTrade){};
+	virtual void OnRtnQuote(CXApi* pApi, QuoteField* pQuote){};
 
-	virtual void OnRspQryHistoricalTicks(TickField* pTicks, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
-	virtual void OnRspQryHistoricalBars(BarField* pBars, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
+	virtual void OnRspQryHistoricalTicks(CXApi* pApi, TickField* pTicks, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
+	virtual void OnRspQryHistoricalBars(CXApi* pApi, BarField* pBars, int size1, HistoricalDataRequestField* pRequest, int size2, bool bIsLast){};
+
+	virtual bool OnFilterSubscribe(CXApi* pApi, ExchangeType exchange, int instrument_part1, int instrument_part2, int instrument_part3, char* pInstrument){ return true; };
 };
 
 class DLL_PUBLIC CXApi

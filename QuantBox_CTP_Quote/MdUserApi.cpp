@@ -503,7 +503,7 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 
 		pField->UpdateMillisec = pDepthMarketData->UpdateMillisec;
 
-		pField->LastPrice = pDepthMarketData->LastPrice;
+		pField->LastPrice = pDepthMarketData->LastPrice == DBL_MAX ? 0 : pDepthMarketData->LastPrice;
 		pField->Volume = pDepthMarketData->Volume;
 		pField->Turnover = pDepthMarketData->Turnover;
 		pField->OpenInterest = pDepthMarketData->OpenInterest;

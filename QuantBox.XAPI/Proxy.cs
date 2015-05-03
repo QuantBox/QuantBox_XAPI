@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 namespace QuantBox.XAPI
 {
     public delegate IntPtr XCall(byte type, IntPtr pApi1, IntPtr pApi2, double double1, double double2, IntPtr ptr1, int size1, IntPtr ptr2, int size2, IntPtr ptr3, int size3);
-
     public class Proxy
     {
         private InvokeBase _Invoke;
