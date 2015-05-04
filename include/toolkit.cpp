@@ -256,7 +256,7 @@ void GetExchangeTime_CZCE(int iTradingDay, char* TradingDay, char* ActionDay, ch
 	// TradingDay处理
 	if (_TradingDay)
 	{
-		if ((HH > 18 || HH < 4))
+		if ((HH > 18 || HH < 6))
 		{
 			*_TradingDay = iTradingDay;
 		}
@@ -278,6 +278,67 @@ void GetExchangeTime_CZCE(int iTradingDay, char* TradingDay, char* ActionDay, ch
 
 	// ActionDay处理
 	if ((ActionDay != nullptr) && (strlen(ActionDay) == 8))
+	{
+		*_ActionDay = atoi(ActionDay);
+	}
+	else
+	{
+		time_t now = time(0);
+		struct tm *ptmNow = localtime(&now);
+		if (HH >= 23)
+		{
+			if (ptmNow->tm_hour<1)
+			{
+				now -= 86400;
+				ptmNow = localtime(&now);
+			}
+		}
+		else if (HH<1)
+		{
+			if (ptmNow->tm_hour >= 23)
+			{
+				now += 86400;
+				ptmNow = localtime(&now);
+			}
+		}
+
+		*_ActionDay = (1900 + ptmNow->tm_year) * 10000 + (1 + ptmNow->tm_mon) * 100 + ptmNow->tm_mday;
+	}
+}
+
+void GetExchangeTime_Undefined(int iTradingDay, char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime, int* UpdateMillisec)
+{
+	// 由于CTP期货中行情没有提供交易所，所以一开始就无法按交易所来分类
+
+	// UpdateTime处理
+	int HH = GetUpdateTime(UpdateTime, _UpdateTime, UpdateMillisec);
+
+	// TradingDay处理
+	if (_TradingDay)
+	{
+		int tradingday = 0;
+		if ((HH > 18 || HH < 6))
+		{
+			*_TradingDay = iTradingDay;
+		}
+		else
+		{
+			tradingday = atoi(TradingDay);
+		}
+		if (tradingday == 0)
+		{
+			time_t now = time(0);
+			struct tm *ptmNow = localtime(&now);
+			tradingday = (ptmNow->tm_year + 1900) * 10000 + (ptmNow->tm_mon + 1) * 100 + ptmNow->tm_mday;
+		}
+		*_TradingDay = tradingday;
+	}
+
+	if (_ActionDay == nullptr)
+		return;
+
+	// ActionDay处理
+	if ((HH>6 && HH<18) && (ActionDay != nullptr) && (strlen(ActionDay) == 8))
 	{
 		*_ActionDay = atoi(ActionDay);
 	}
