@@ -18,6 +18,7 @@ char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vc
 
 int GetUpdateTime(char* UpdateTime, int* _UpdateTime, int* UpdateMillisec);
 void GetExchangeTime_CZCE(int iTradingDay, char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime, int* UpdateMillisec);
+void GetExchangeTime_Undefined(int iTradingDay, char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime, int* UpdateMillisec);
 void GetExchangeTime_DCE(char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime, int* UpdateMillisec);
 void GetExchangeTime(char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime, int* UpdateMillisec);
 void GetExchangeTime(time_t Time, int* _TradingDay, int* _ActionDay, int* _UpdateTime);
