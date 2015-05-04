@@ -363,8 +363,7 @@
 	<thread>
 	"internal/concurrentqueue_internal_debug.h"
 
-1427744517 source:/home/mep/dev/broker/QuantBox_XAPI/include/toolkit.cpp
-	"stdafx.h"
+1430747075 source:/home/mep/dev/broker/QuantBox_XAPI/include/toolkit.cpp
 	"toolkit.h"
 	<string.h>
 	<time.h>
@@ -375,7 +374,7 @@
 	"targetver.h"
 	<windows.h>
 
-1427744517 /home/mep/dev/broker/QuantBox_XAPI/include/toolkit.h
+1430747075 /home/mep/dev/broker/QuantBox_XAPI/include/toolkit.h
 	<vector>
 	<set>
 	<string>
@@ -398,9 +397,9 @@
 
 1427744516 /home/mep/dev/broker/QuantBox_XAPI/include/CrossPlatform.h
 
-1427744517 /home/mep/dev/broker/QuantBox_XAPI/include/QueueEnum.h
+1430046462 /home/mep/dev/broker/QuantBox_XAPI/include/QueueEnum.h
 
-1428847651 /home/mep/dev/broker/QuantBox_XAPI/QuantBox_CTP_Quote/MdUserApi.h
+1430664196 /home/mep/dev/broker/QuantBox_XAPI/QuantBox_CTP_Quote/MdUserApi.h
 	"../include/ApiStruct.h"
 	"../include/CTP/ThostFtdcMdApi.h"
 	<set>
@@ -408,19 +407,19 @@
 	<atomic>
 	<mutex>
 
-1428847651 /home/mep/dev/broker/QuantBox_XAPI/include/ApiStruct.h
+1430664196 /home/mep/dev/broker/QuantBox_XAPI/include/ApiStruct.h
 	"ApiDataType.h"
 	"ApiEnum.h"
 
 1428847651 /home/mep/dev/broker/QuantBox_XAPI/include/ApiDataType.h
 
-1427845007 /home/mep/dev/broker/QuantBox_XAPI/include/ApiEnum.h
+1430664196 /home/mep/dev/broker/QuantBox_XAPI/include/ApiEnum.h
 
 1427744516 /home/mep/dev/broker/QuantBox_XAPI/include/CTP/ThostFtdcMdApi.h
 	"ThostFtdcUserApiStruct.h"
 
-1427744516 /home/mep/dev/broker/QuantBox_XAPI/include/CTP/ThostFtdcUserApiStruct.h
+1430664196 /home/mep/dev/broker/QuantBox_XAPI/include/CTP/ThostFtdcUserApiStruct.h
 	"ThostFtdcUserApiDataType.h"
 
-1427744516 /home/mep/dev/broker/QuantBox_XAPI/include/CTP/ThostFtdcUserApiDataType.h
+1430664196 /home/mep/dev/broker/QuantBox_XAPI/include/CTP/ThostFtdcUserApiDataType.h
 
