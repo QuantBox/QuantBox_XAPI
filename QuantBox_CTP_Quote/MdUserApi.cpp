@@ -20,26 +20,6 @@
 #include <vector>
 using namespace std;
 
-#ifndef  _WINDOWS
-ExchangeType TThostFtdcExchangeIDType_2_ExchangeType(TThostFtdcExchangeIDType In)
-{
-	switch (In[1])
-	{
-	case 'H':
-		return ExchangeType::SHFE;
-	case 'C':
-		return ExchangeType::DCE;
-	case 'Z':
-		return ExchangeType::CZCE;
-	case 'F':
-		return ExchangeType::CFFEX;
-	case 'N':
-		return ExchangeType::INE;
-	default:
-		return ExchangeType::Undefined_;
-	}
-}
-#endif
 void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	// 由内部调用，不用检查是否为空

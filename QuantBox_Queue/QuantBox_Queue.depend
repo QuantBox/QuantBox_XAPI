@@ -153,13 +153,14 @@
 	"stdafx.h"
 	"MsgQueue.h"
 
-1427789621 source:/home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_Queue/main.cpp
+1428715466 source:/home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_Queue/main.cpp
 	"stdafx.h"
 	"MsgQueue.h"
 	"../include/QueueHeader.h"
 	"../include/QueueEnum.h"
 	"../include/QueueStruct.h"
 	"../include/ApiHeader.h"
+	"../include/ApiStruct.h"
 
 1426762120 /home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_Queue/stdafx.h
 	"targetver.h"
@@ -168,7 +169,7 @@
 1426762120 /home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_Queue/targetver.h
 	<SDKDDKVer.h>
 
-1427789621 /home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_Queue/MsgQueue.h
+1430095642 /home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_Queue/MsgQueue.h
 	<thread>
 	<mutex>
 	<cstring>
@@ -176,7 +177,7 @@
 	"../include/CrossPlatform.h"
 	"../include/QueueHeader.h"
 	"../include/QueueStruct.h"
-	"readerwriterqueue.h"
+	"../include/ApiStruct.h"
 	"concurrentqueue.h"
 
 1426762121 /home/mep/dev/broker/oss/QuantBox_XAPI/include/CrossPlatform.h
@@ -219,12 +220,12 @@
 	<thread>
 	"internal/concurrentqueue_internal_debug.h"
 
-1426762122 /home/mep/dev/broker/oss/QuantBox_XAPI/include/QueueEnum.h
+1430095642 /home/mep/dev/broker/oss/QuantBox_XAPI/include/QueueEnum.h
 
 1426762120 /home/mep/dev/broker/oss/QuantBox_XAPI/include/ApiHeader.h
 	"../include/CrossPlatform.h"
 
-1427789621 source:/home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_Queue/MsgQueue.cpp
+1428715466 source:/home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_Queue/MsgQueue.cpp
 	"stdafx.h"
 	"MsgQueue.h"
 
@@ -294,4 +295,12 @@
 1428847651 source:/home/mep/dev/broker/QuantBox_XAPI/QuantBox_Queue/MsgQueue.cpp
 	"stdafx.h"
 	"MsgQueue.h"
+
+1430808448 /home/mep/dev/broker/oss/QuantBox_XAPI/include/ApiStruct.h
+	"ApiDataType.h"
+	"ApiEnum.h"
+
+1428715466 /home/mep/dev/broker/oss/QuantBox_XAPI/include/ApiDataType.h
+
+1430808448 /home/mep/dev/broker/oss/QuantBox_XAPI/include/ApiEnum.h
 

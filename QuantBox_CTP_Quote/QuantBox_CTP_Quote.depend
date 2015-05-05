@@ -240,8 +240,7 @@
 	<atomic>
 	<utility>
 
-1426762122 source:/home/mep/dev/broker/oss/QuantBox_XAPI/include/toolkit.cpp
-	"stdafx.h"
+1430808448 source:/home/mep/dev/broker/oss/QuantBox_XAPI/include/toolkit.cpp
 	"toolkit.h"
 	<string.h>
 	<time.h>
@@ -252,12 +251,12 @@
 	"targetver.h"
 	<windows.h>
 
-1426762122 /home/mep/dev/broker/oss/QuantBox_XAPI/include/toolkit.h
+1430808448 /home/mep/dev/broker/oss/QuantBox_XAPI/include/toolkit.h
 	<vector>
 	<set>
 	<string>
 
-1427872161 source:/home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_CTP_Quote/main.cpp
+1428715466 source:/home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_CTP_Quote/main.cpp
 	"stdafx.h"
 	"../include/ApiHeader.h"
 	"../include/QueueEnum.h"
@@ -275,9 +274,9 @@
 
 1426762121 /home/mep/dev/broker/oss/QuantBox_XAPI/include/CrossPlatform.h
 
-1426762122 /home/mep/dev/broker/oss/QuantBox_XAPI/include/QueueEnum.h
+1430095642 /home/mep/dev/broker/oss/QuantBox_XAPI/include/QueueEnum.h
 
-1427789621 /home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_CTP_Quote/MdUserApi.h
+1430808448 /home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_CTP_Quote/MdUserApi.h
 	"../include/ApiStruct.h"
 	"../include/CTP/ThostFtdcMdApi.h"
 	<set>
@@ -285,21 +284,21 @@
 	<atomic>
 	<mutex>
 
-1427789621 /home/mep/dev/broker/oss/QuantBox_XAPI/include/ApiStruct.h
+1430808448 /home/mep/dev/broker/oss/QuantBox_XAPI/include/ApiStruct.h
 	"ApiDataType.h"
 	"ApiEnum.h"
 
-1426762120 /home/mep/dev/broker/oss/QuantBox_XAPI/include/ApiDataType.h
+1428715466 /home/mep/dev/broker/oss/QuantBox_XAPI/include/ApiDataType.h
 
-1427789621 /home/mep/dev/broker/oss/QuantBox_XAPI/include/ApiEnum.h
+1430808448 /home/mep/dev/broker/oss/QuantBox_XAPI/include/ApiEnum.h
 
 1426762120 /home/mep/dev/broker/oss/QuantBox_XAPI/include/CTP/ThostFtdcMdApi.h
 	"ThostFtdcUserApiStruct.h"
 
-1426762120 /home/mep/dev/broker/oss/QuantBox_XAPI/include/CTP/ThostFtdcUserApiStruct.h
+1430808448 /home/mep/dev/broker/oss/QuantBox_XAPI/include/CTP/ThostFtdcUserApiStruct.h
 	"ThostFtdcUserApiDataType.h"
 
-1426762120 /home/mep/dev/broker/oss/QuantBox_XAPI/include/CTP/ThostFtdcUserApiDataType.h
+1430808448 /home/mep/dev/broker/oss/QuantBox_XAPI/include/CTP/ThostFtdcUserApiDataType.h
 
 1427789621 source:/home/mep/dev/broker/oss/QuantBox_XAPI/QuantBox_CTP_Quote/MdUserApi.cpp
 	"stdafx.h"
