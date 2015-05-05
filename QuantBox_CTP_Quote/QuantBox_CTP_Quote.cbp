@@ -59,6 +59,7 @@
 			<Add directory="../include/CTP/linux64" />
 			<Add directory="../QuantBox.TAPI/bin" />
 		</Linker>
+		<Unit filename="../QuantBox_CTP_Trade/TypeConvert.cpp" />
 		<Unit filename="../include/toolkit.cpp" />
 		<Unit filename="../include/toolkit.h" />
 		<Unit filename="MdUserApi.cpp" />
