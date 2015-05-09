@@ -4,6 +4,7 @@
 #include <mutex>
 #include <cstring>
 #include <condition_variable>
+#include <atomic>
 
 #include "../include/CrossPlatform.h"
 
@@ -213,7 +214,8 @@ private:
 			lpParam->RunInThread();
 	}
 protected:
-	volatile bool						m_bRunning;
+	//volatile bool						m_bRunning;
+	atomic_bool							m_bRunning;
 	mutex								m_mtx;
 	mutex								m_mtx_del;
 	condition_variable					m_cv;
