@@ -245,11 +245,12 @@
 1427744516 /home/mep/dev/broker/QuantBox_XAPI/QuantBox_Queue/targetver.h
 	<SDKDDKVer.h>
 
-1430046462 /home/mep/dev/broker/QuantBox_XAPI/QuantBox_Queue/MsgQueue.h
+1431172315 /home/mep/dev/broker/QuantBox_XAPI/QuantBox_Queue/MsgQueue.h
 	<thread>
 	<mutex>
 	<cstring>
 	<condition_variable>
+	<atomic>
 	"../include/CrossPlatform.h"
 	"../include/QueueHeader.h"
 	"../include/QueueStruct.h"
