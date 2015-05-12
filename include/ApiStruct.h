@@ -337,6 +337,8 @@ struct InstrumentField
 	InstrumentIDType	InstrumentID;
 	///交易所代码
 	ExchangeIDType	ExchangeID;
+	///产品代码
+	InstrumentIDType	ProductID;
 	///合约名称
 	InstrumentNameType InstrumentName;
 	///基础商品代码

@@ -432,6 +432,11 @@ namespace QuantBox.XAPI
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
         public string ExchangeID;
         /// <summary>
+        /// 产品代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 31)]
+        public string ProductID;
+        /// <summary>
         /// 合约名称
         /// </summary>
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]

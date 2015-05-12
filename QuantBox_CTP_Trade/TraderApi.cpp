@@ -1174,6 +1174,7 @@ void CTraderApi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CTho
 			strncpy(pField->ExchangeID, pInstrument->ExchangeID, sizeof(ExchangeIDType));
 
 			strncpy(pField->Symbol, pInstrument->InstrumentID, sizeof(SymbolType));
+			strncpy(pField->ProductID, pInstrument->ProductID, sizeof(InstrumentIDType));
 
 			strncpy(pField->InstrumentName, pInstrument->InstrumentName, sizeof(InstrumentNameType));
 			pField->Type = CThostFtdcInstrumentField_2_InstrumentType(pInstrument);

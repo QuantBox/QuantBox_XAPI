@@ -1120,6 +1120,7 @@ void CTraderApi::OnRspQryInstrument(CUstpFtdcRspInstrumentField *pRspInstrument,
 			strcpy(pField->ExchangeID, pRspInstrument->ExchangeID);
 
 			strcpy(pField->Symbol, pRspInstrument->InstrumentID);
+			strncpy(pField->ProductID, pRspInstrument->ProductID, sizeof(InstrumentIDType));
 
 			strcpy(pField->InstrumentName, pRspInstrument->InstrumentName);
 			pField->Type = CUstpFtdcRspInstrumentField_2_InstrumentType(pRspInstrument);
