@@ -542,6 +542,10 @@ typedef char TSecurityFtdcHedgeFlagType;
 #define SECURITY_FTDC_D_Freeze 'Q'
 ///行权
 #define SECURITY_FTDC_D_Execute 'R'
+///CB回售
+#define SECURITY_FTDC_D_CBRed 'S'
+///CB转股
+#define SECURITY_FTDC_D_CBConv 'T'
 
 typedef char TSecurityFtdcDirectionType;
 
@@ -593,6 +597,10 @@ typedef char TSecurityFtdcCreationredemptionStatusType;
 #define SECURITY_FTDC_ETFCRS_Allow '1'
 ///必须现金替代
 #define SECURITY_FTDC_ETFCRS_Force '2'
+///跨市场股票退补现金替代
+#define SECURITY_FTDC_ETFCRS_CrossMarketComp '3'
+///跨市场必须现金替代
+#define SECURITY_FTDC_ETFCRS_CrossMarketFroce '4'
 
 typedef char TSecurityFtdcETFCurrenceReplaceStatusType;
 
@@ -695,6 +703,8 @@ typedef char TSecurityFtdcHandlePositionAlgoIDType;
 #define SECURITY_FTDC_TPID_StartOrderLocalID 'O'
 ///融资融券买券还券算法
 #define SECURITY_FTDC_TPID_RepayStockAlgo 'R'
+///衍生品账户资金提取线
+#define SECURITY_FTDC_TPID_DeriveWithdrawRatio 'D'
 
 typedef char TSecurityFtdcTradeParamIDType;
 
@@ -1444,6 +1454,11 @@ typedef char TSecurityFtdcCHAR8Type[9];
 typedef char TSecurityFtdcCHAR10Type[11];
 
 /////////////////////////////////////////////////////////////////////////
+///TFtdcCHAR11Type是一个十一字节CHAR类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TSecurityFtdcCHAR11Type[12];
+
+/////////////////////////////////////////////////////////////////////////
 ///TFtdcCHAR12Type是一个十二字节CHAR类型
 /////////////////////////////////////////////////////////////////////////
 typedef char TSecurityFtdcCHAR12Type[13];
@@ -1464,14 +1479,29 @@ typedef char TSecurityFtdcCHAR14Type[15];
 typedef char TSecurityFtdcCHAR16Type[17];
 
 /////////////////////////////////////////////////////////////////////////
+///TFtdcCHAR19Type是一个十九字节CHAR类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TSecurityFtdcCHAR19Type[20];
+
+/////////////////////////////////////////////////////////////////////////
 ///TFtdcCHAR20Type是一个二十字节CHAR类型
 /////////////////////////////////////////////////////////////////////////
 typedef char TSecurityFtdcCHAR20Type[21];
 
 /////////////////////////////////////////////////////////////////////////
+///TFtdcCHAR21Type是一个二十一字节CHAR类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TSecurityFtdcCHAR21Type[22];
+
+/////////////////////////////////////////////////////////////////////////
 ///TFtdcCHAR23Type是一个二十三字节CHAR类型
 /////////////////////////////////////////////////////////////////////////
 typedef char TSecurityFtdcCHAR23Type[24];
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcCHAR30Type是一个三十字节CHAR类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TSecurityFtdcCHAR30Type[31];
 
 /////////////////////////////////////////////////////////////////////////
 ///TFtdcCHAR32Type是一个三十二字节CHAR类型
@@ -1487,6 +1517,11 @@ typedef char TSecurityFtdcCHAR50Type[51];
 ///TFtdcCHAR64Type是一个六十四字节CHAR类型
 /////////////////////////////////////////////////////////////////////////
 typedef char TSecurityFtdcCHAR64Type[65];
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcCHAR65Type是一个六十五字节CHAR类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TSecurityFtdcCHAR65Type[66];
 
 /////////////////////////////////////////////////////////////////////////
 ///TFtdcVCHAR4Type是一个四字节VCHAR类型
@@ -1557,6 +1592,11 @@ typedef char TSecurityFtdcVCHAR84Type[85];
 ///TFtdcVCHAR255Type是一个二五五字节VCHAR类型
 /////////////////////////////////////////////////////////////////////////
 typedef char TSecurityFtdcVCHAR255Type[256];
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcVCHAR1024Type是一个一零二四字节VCHAR类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TSecurityFtdcVCHAR1024Type[1025];
 
 /////////////////////////////////////////////////////////////////////////
 ///TFtdcREAL8P3Type是一个八点三实型类型
@@ -2018,6 +2058,8 @@ typedef char TSecurityFtdcFundInterTransferTypeType;
 #define SECURITY_FTDC_IT_CallOptions '1'
 ///看跌期权
 #define SECURITY_FTDC_IT_PutOptions '2'
+///普通(STEP)
+#define SECURITY_FTDC_IT_Normal_STEP '3'
 
 typedef char TSecurityFtdcInstrumentTypeType;
 
@@ -2032,5 +2074,29 @@ typedef char TSecurityFtdcInstrumentTypeType;
 #define SECURITY_FTDC_IL_Level_3 '2'
 
 typedef char TSecurityFtdcInvestorLevelType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcCloseDirectionType是一个平仓方向类型
+/////////////////////////////////////////////////////////////////////////
+///买平仓
+#define SECURITY_FTDC_CD_CloseBuy '!'
+///卖平仓
+#define SECURITY_FTDC_CD_CloseSell '@'
+///备兑平仓
+#define SECURITY_FTDC_CD_CloseCover '#'
+
+typedef char TSecurityFtdcCloseDirectionType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcDelivTypeType是一个交割类型类型
+/////////////////////////////////////////////////////////////////////////
+///看涨期权执行
+#define SECURITY_FTDC_DT_ExecCallOptions '0'
+///看跌期权执行
+#define SECURITY_FTDC_DT_ExecPutOptions '1'
+///在途证券
+#define SECURITY_FTDC_DT_UnavailStock '2'
+
+typedef char TSecurityFtdcDelivTypeType;
 
 #endif

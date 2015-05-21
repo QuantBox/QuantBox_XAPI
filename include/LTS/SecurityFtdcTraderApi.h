@@ -102,6 +102,24 @@ public:
 	///请求查询SF合约响应
 	virtual void OnRspQrySFInstrument(CSecurityFtdcSFInstrumentField *pSFInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
+	///请求查询合约单手保证金响应
+	virtual void OnRspQryInstrumentUnitMargin(CSecurityFtdcInstrumentUnitMarginField *pInstrumentUnitMargin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+
+	///请求查询预交割信息响应
+	virtual void OnRspQryPreDelivInfo(CSecurityFtdcPreDelivInfoField *pPreDelivInfo, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+
+	///请求查询可融券分配信息响应
+	virtual void OnRspQryCreditStockAssignInfo(CSecurityFtdcCreditStockAssignInfoField *pCreditStockAssignInfo, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+
+	///请求查询可融资分配信息响应
+	virtual void OnRspQryCreditCashAssignInfo(CSecurityFtdcCreditCashAssignInfoField *pCreditCashAssignInfo, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+
+	///请求查询证券折算率响应
+	virtual void OnRspQryConversionRate(CSecurityFtdcConversionRateField *pConversionRate, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+
+	///请求查询历史信用负债信息响应
+	virtual void OnRspQryHisCreditDebtInfo(CSecurityFtdcHisCreditDebtInfoField *pHisCreditDebtInfo, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+
 	///请求查询报单响应
 	virtual void OnRspQryOrder(CSecurityFtdcOrderField *pOrder, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
@@ -265,6 +283,24 @@ public:
 
 	///请求查询SF合约
 	virtual int ReqQrySFInstrument(CSecurityFtdcQrySFInstrumentField *pQrySFInstrument, int nRequestID) = 0;
+
+	///请求查询合约单手保证金
+	virtual int ReqQryInstrumentUnitMargin(CSecurityFtdcQryInstrumentUnitMarginField *pQryInstrumentUnitMargin, int nRequestID) = 0;
+
+	///请求查询预交割信息
+	virtual int ReqQryPreDelivInfo(CSecurityFtdcQryPreDelivInfoField *pQryPreDelivInfo, int nRequestID) = 0;
+
+	///请求查询可融券分配信息
+	virtual int ReqQryCreditStockAssignInfo(CSecurityFtdcQryCreditStockAssignInfoField *pQryCreditStockAssignInfo, int nRequestID) = 0;
+
+	///请求查询可融资分配信息
+	virtual int ReqQryCreditCashAssignInfo(CSecurityFtdcQryCreditCashAssignInfoField *pQryCreditCashAssignInfo, int nRequestID) = 0;
+
+	///请求查询证券折算率
+	virtual int ReqQryConversionRate(CSecurityFtdcQryConversionRateField *pQryConversionRate, int nRequestID) = 0;
+
+	///请求查询历史信用负债信息
+	virtual int ReqQryHisCreditDebtInfo(CSecurityFtdcQryHisCreditDebtInfoField *pQryHisCreditDebtInfo, int nRequestID) = 0;
 
 	///请求查询报单
 	virtual int ReqQryOrder(CSecurityFtdcQryOrderField *pQryOrder, int nRequestID) = 0;
