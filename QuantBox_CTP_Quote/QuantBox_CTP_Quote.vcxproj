@@ -94,6 +94,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\CTP\x86</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -214,6 +215,7 @@ xcopy "$(SolutionDir)include\CTP\win32\*.dll"  "$(SolutionDir)XAPI\CTP\x86\" /Y<
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\ApiProcess.h" />
     <ClInclude Include="..\include\toolkit.h" />
     <ClInclude Include="..\QuantBox_CTP_Trade\TypeConvert.h" />
     <ClInclude Include="MdUserApi.h" />
@@ -221,6 +223,7 @@ xcopy "$(SolutionDir)include\CTP\win32\*.dll"  "$(SolutionDir)XAPI\CTP\x86\" /Y<
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\ApiProcess.cpp" />
     <ClCompile Include="..\include\toolkit.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>

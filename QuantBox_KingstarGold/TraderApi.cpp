@@ -8,6 +8,7 @@
 #include "../include/ApiStruct.h"
 
 #include "../include/toolkit.h"
+#include "../include/ApiProcess.h"
 
 #include "../QuantBox_Queue/MsgQueue.h"
 
@@ -1397,7 +1398,7 @@ void CTraderApi::Unsubscribe(const string& szInstrumentIDs, const string& szExch
 
 void CTraderApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
+	DepthMarketDataNField* pField = (DepthMarketDataNField*)m_msgQueue->new_block(sizeof(DepthMarketDataNField)+sizeof(DepthField)* 10);
 
 	strcpy(pField->InstrumentID, pDepthMarketData->InstID);
 	//strcpy(pField->ExchangeID, pDepthMarketData->e);
@@ -1425,61 +1426,53 @@ void CTraderApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	pField->PreSettlementPrice = pDepthMarketData->PreSettle;
 	//pField->PreOpenInterest = pDepthMarketData->PreOpenInterest;
 
+	InitBidAsk(pField);
+
 	do
 	{
 		if (pDepthMarketData->BidLot1 == 0)
 			break;
-		pField->BidPrice1 = pDepthMarketData->Bid1;
-		pField->BidVolume1 = pDepthMarketData->BidLot1;
+		AddBid(pField, pDepthMarketData->Bid1, pDepthMarketData->BidLot1, 0);
 
 		if (pDepthMarketData->BidLot2 == 0)
 			break;
-		pField->BidPrice2 = pDepthMarketData->Bid2;
-		pField->BidVolume2 = pDepthMarketData->BidLot2;
+		AddBid(pField, pDepthMarketData->Bid2, pDepthMarketData->BidLot2, 0);
 
 		if (pDepthMarketData->BidLot3 == 0)
 			break;
-		pField->BidPrice3 = pDepthMarketData->Bid3;
-		pField->BidVolume3 = pDepthMarketData->BidLot3;
+		AddBid(pField, pDepthMarketData->Bid3, pDepthMarketData->BidLot3, 0);
 
 		if (pDepthMarketData->BidLot4 == 0)
 			break;
-		pField->BidPrice4 = pDepthMarketData->Bid4;
-		pField->BidVolume4 = pDepthMarketData->BidLot4;
+		AddBid(pField, pDepthMarketData->Bid4, pDepthMarketData->BidLot4, 0);
 
 		if (pDepthMarketData->BidLot5 == 0)
 			break;
-		pField->BidPrice5 = pDepthMarketData->Bid5;
-		pField->BidVolume5 = pDepthMarketData->BidLot5;
+		AddBid(pField, pDepthMarketData->Bid5, pDepthMarketData->BidLot5, 0);
 	} while (false);
 
 	do
 	{
 		if (pDepthMarketData->AskLot1 == 0)
 			break;
-		pField->AskPrice1 = pDepthMarketData->Ask1;
-		pField->AskVolume1 = pDepthMarketData->AskLot1;
+		AddAsk(pField, pDepthMarketData->Ask1, pDepthMarketData->AskLot1, 0);
 
 		if (pDepthMarketData->AskLot2 == 0)
 			break;
-		pField->AskPrice2 = pDepthMarketData->Ask2;
-		pField->AskVolume2 = pDepthMarketData->AskLot2;
+		AddAsk(pField, pDepthMarketData->Ask2, pDepthMarketData->AskLot2, 0);
 
 		if (pDepthMarketData->AskLot3 == 0)
 			break;
-		pField->AskPrice3 = pDepthMarketData->Ask3;
-		pField->AskVolume3 = pDepthMarketData->AskLot3;
+		AddAsk(pField, pDepthMarketData->Ask3, pDepthMarketData->AskLot3, 0);
 
 		if (pDepthMarketData->AskLot4 == 0)
 			break;
-		pField->AskPrice4 = pDepthMarketData->Ask4;
-		pField->AskVolume4 = pDepthMarketData->AskLot4;
+		AddAsk(pField, pDepthMarketData->Ask4, pDepthMarketData->AskLot4, 0);
 
 		if (pDepthMarketData->AskLot5 == 0)
 			break;
-		pField->AskPrice5 = pDepthMarketData->Ask5;
-		pField->AskVolume5 = pDepthMarketData->AskLot5;
+		AddAsk(pField, pDepthMarketData->Ask5, pDepthMarketData->AskLot5, 0);
 	} while (false);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
 }

@@ -153,4 +153,6 @@ typedef char PositionIDType[64];
 ///BarSizeType是一个BarSize类型
 /////////////////////////////////////////////////////////////////////////
 typedef long BarSizeType;
+
+typedef int SizeType;
 #endif

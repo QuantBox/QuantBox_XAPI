@@ -11,13 +11,22 @@ namespace QuantBox.XAPI.Callback
     public partial class XApi : IXMarketData
     {
         
-        public DelegateOnRtnDepthMarketData OnRtnDepthMarketData
+        //public DelegateOnRtnDepthMarketData OnRtnDepthMarketData
+        //{
+        //    get { return OnRtnDepthMarketData_; }
+        //    set { OnRtnDepthMarketData_ = value; }
+        //}
+        //// 这种写法的主要目的是求快
+        //private DelegateOnRtnDepthMarketData OnRtnDepthMarketData_;
+
+
+        public DelegateOnRtnDepthMarketDataN OnRtnDepthMarketDataN
         {
-            get { return OnRtnDepthMarketData_; }
-            set { OnRtnDepthMarketData_ = value; }
+            get { return OnRtnDepthMarketDataN_; }
+            set { OnRtnDepthMarketDataN_ = value; }
         }
         // 这种写法的主要目的是求快
-        private DelegateOnRtnDepthMarketData OnRtnDepthMarketData_;
+        private DelegateOnRtnDepthMarketDataN OnRtnDepthMarketDataN_;
 
         public DelegateOnFilterSubscribe OnFilterSubscribe
         {
@@ -128,15 +137,23 @@ namespace QuantBox.XAPI.Callback
         }
         #endregion
 
-        private void _OnRtnDepthMarketData(IntPtr ptr1)
+        private void _OnRtnDepthMarketData(IntPtr ptr1,int size1,double double1)
         {
             // 求快，这个地方不判断
             //if (OnRtnDepthMarketData_ == null)
             //    return;
+            //DepthLevelType depthLevelType = (DepthLevelType)double1;
+            //if(depthLevelType == DepthLevelType.FULL)
+            //{
+                DepthMarketDataNClass cls = PInvokeUtility.GetDepthMarketDataNClass(ptr1);
+                OnRtnDepthMarketDataN_(this, ref cls);
+            //}
+            //else
+            //{
+            //    DepthMarketDataField obj = (DepthMarketDataField)Marshal.PtrToStructure(ptr1, typeof(DepthMarketDataField));
 
-            DepthMarketDataField obj = (DepthMarketDataField)Marshal.PtrToStructure(ptr1, typeof(DepthMarketDataField));
-
-            OnRtnDepthMarketData_(this, ref obj);
+            //    OnRtnDepthMarketData_(this, ref obj);
+            //}
         }
 
         private bool _OnFilterSubscribe(double double1, int size1, int size2, int size3, IntPtr ptr1)

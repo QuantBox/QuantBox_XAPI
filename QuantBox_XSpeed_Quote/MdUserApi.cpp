@@ -7,6 +7,7 @@
 #include "../include/ApiStruct.h"
 
 #include "../include/toolkit.h"
+#include "../include/ApiProcess.h"
 
 #include "../QuantBox_Queue/MsgQueue.h"
 #include "../QuantBox_XSpeed_Trade/TypeConvert.h"
@@ -477,7 +478,8 @@ void CMdUserApi::OnRspUnSubMarketData(struct DFITCSpecificInstrumentField * pSpe
 //行情回调，得保证此函数尽快返回
 void CMdUserApi::OnMarketData(struct DFITCDepthMarketDataField *pMarketDataField)
 {
-	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
+	DepthMarketDataNField* pField = (DepthMarketDataNField*)m_msgQueue->new_block(sizeof(DepthMarketDataNField)+sizeof(DepthField)* 10);
+
 
 	strcpy(pField->InstrumentID, pMarketDataField->instrumentID);
 	pField->Exchange = DFITCExchangeIDType_2_ExchangeType(pMarketDataField->exchangeID);
@@ -516,63 +518,55 @@ void CMdUserApi::OnMarketData(struct DFITCDepthMarketDataField *pMarketDataField
 	pField->PreSettlementPrice = pMarketDataField->preSettlementPrice;
 	pField->PreOpenInterest = pMarketDataField->preOpenInterest;
 
+	InitBidAsk(pField);
+
 	do
 	{
 		if (pMarketDataField->BidVolume1 == 0)
 			break;
-		pField->BidPrice1 = pMarketDataField->BidPrice1;
-		pField->BidVolume1 = pMarketDataField->BidVolume1;
+		AddBid(pField, pMarketDataField->BidPrice1, pMarketDataField->BidVolume1, 0);
 
 		if (pMarketDataField->BidVolume2 == 0)
 			break;
-		pField->BidPrice2 = pMarketDataField->BidPrice2;
-		pField->BidVolume2 = pMarketDataField->BidVolume2;
+		AddBid(pField, pMarketDataField->BidPrice2, pMarketDataField->BidVolume2, 0);
 
 		if (pMarketDataField->BidVolume3 == 0)
 			break;
-		pField->BidPrice3 = pMarketDataField->BidPrice3;
-		pField->BidVolume3 = pMarketDataField->BidVolume3;
+		AddBid(pField, pMarketDataField->BidPrice3, pMarketDataField->BidVolume3, 0);
 
 		if (pMarketDataField->BidVolume4 == 0)
 			break;
-		pField->BidPrice4 = pMarketDataField->BidPrice4;
-		pField->BidVolume4 = pMarketDataField->BidVolume4;
+		AddBid(pField, pMarketDataField->BidPrice4, pMarketDataField->BidVolume4, 0);
 
 		if (pMarketDataField->BidVolume5 == 0)
 			break;
-		pField->BidPrice5 = pMarketDataField->BidPrice5;
-		pField->BidVolume5 = pMarketDataField->BidVolume5;
+		AddBid(pField, pMarketDataField->BidPrice5, pMarketDataField->BidVolume5, 0);
 	} while (false);
 
 	do
 	{
 		if (pMarketDataField->AskVolume1 == 0)
 			break;
-		pField->AskPrice1 = pMarketDataField->AskPrice1;
-		pField->AskVolume1 = pMarketDataField->AskVolume1;
+		AddAsk(pField, pMarketDataField->AskPrice1, pMarketDataField->AskVolume1, 0);
 
 		if (pMarketDataField->AskVolume2 == 0)
 			break;
-		pField->AskPrice2 = pMarketDataField->AskPrice2;
-		pField->AskVolume2 = pMarketDataField->AskVolume2;
+		AddAsk(pField, pMarketDataField->AskPrice2, pMarketDataField->AskVolume2, 0);
 
 		if (pMarketDataField->AskVolume3 == 0)
 			break;
-		pField->AskPrice3 = pMarketDataField->AskPrice3;
-		pField->AskVolume3 = pMarketDataField->AskVolume3;
+		AddAsk(pField, pMarketDataField->AskPrice3, pMarketDataField->AskVolume3, 0);
 
 		if (pMarketDataField->AskVolume4 == 0)
 			break;
-		pField->AskPrice4 = pMarketDataField->AskPrice4;
-		pField->AskVolume4 = pMarketDataField->AskVolume4;
+		AddAsk(pField, pMarketDataField->AskPrice4, pMarketDataField->AskVolume4, 0);
 
 		if (pMarketDataField->AskVolume5 == 0)
 			break;
-		pField->AskPrice5 = pMarketDataField->AskPrice5;
-		pField->AskVolume5 = pMarketDataField->AskVolume5;
+		AddAsk(pField, pMarketDataField->AskPrice5, pMarketDataField->AskVolume5, 0);
 	} while (false);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
 }
 
 //void CMdUserApi::OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

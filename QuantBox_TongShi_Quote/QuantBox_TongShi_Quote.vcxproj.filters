@@ -45,6 +45,9 @@
     <ClCompile Include="DialogStockDrv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\include\ApiProcess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="QuantBox_TongShi_Quote.h">
@@ -75,6 +78,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DialogStockDrv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\ApiProcess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

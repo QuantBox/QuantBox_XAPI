@@ -161,14 +161,116 @@ struct RspUserLoginField
 
 
 
-///深度行情
-struct DepthMarketDataField
+/////深度行情
+//struct DepthMarketDataField
+//{
+//	///交易所时间
+//	DateIntType			TradingDay; // 交易日，用于给数据接收器划分到同一文件使用，基本没啥别的用处
+//	DateIntType			ActionDay;
+//	TimeIntType			UpdateTime;
+//	TimeIntType			UpdateMillisec;
+//
+//	///最新价
+//	PriceType	LastPrice;
+//	///数量
+//	LargeVolumeType	Volume;
+//	///成交金额
+//	MoneyType	Turnover;
+//	///持仓量
+//	LargeVolumeType	OpenInterest;
+//	///当日均价
+//	PriceType	AveragePrice;
+//
+//
+//	///今开盘
+//	PriceType	OpenPrice;
+//	///最高价
+//	PriceType	HighestPrice;
+//	///最低价
+//	PriceType	LowestPrice;
+//	///今收盘
+//	PriceType	ClosePrice;
+//	///本次结算价
+//	PriceType	SettlementPrice;
+//
+//	///涨停板价
+//	PriceType	UpperLimitPrice;
+//	///跌停板价
+//	PriceType	LowerLimitPrice;
+//	///昨收盘
+//	PriceType	PreClosePrice;
+//	///上次结算价
+//	PriceType	PreSettlementPrice;
+//	///昨持仓量
+//	LargeVolumeType	PreOpenInterest;
+//
+//
+//	///申买价一
+//	PriceType	BidPrice1;
+//	///申买量一
+//	VolumeType	BidVolume1;
+//	///申卖价一
+//	PriceType	AskPrice1;
+//	///申卖量一
+//	VolumeType	AskVolume1;
+//	///申买价二
+//	PriceType	BidPrice2;
+//	///申买量二
+//	VolumeType	BidVolume2;
+//	///申卖价二
+//	PriceType	AskPrice2;
+//	///申卖量二
+//	VolumeType	AskVolume2;
+//	///申买价三
+//	PriceType	BidPrice3;
+//	///申买量三
+//	VolumeType	BidVolume3;
+//	///申卖价三
+//	PriceType	AskPrice3;
+//	///申卖量三
+//	VolumeType	AskVolume3;
+//	///申买价四
+//	PriceType	BidPrice4;
+//	///申买量四
+//	VolumeType	BidVolume4;
+//	///申卖价四
+//	PriceType	AskPrice4;
+//	///申卖量四
+//	VolumeType	AskVolume4;
+//	///申买价五
+//	PriceType	BidPrice5;
+//	///申买量五
+//	VolumeType	BidVolume5;
+//	///申卖价五
+//	PriceType	AskPrice5;
+//	///申卖量五
+//	VolumeType	AskVolume5;
+//
+//	///交易所代码
+//	ExchangeType	Exchange;
+//	///唯一符号
+//	SymbolType			Symbol;
+//	///合约代码
+//	InstrumentIDType	InstrumentID;
+//};
+
+///深度行情N档
+struct DepthMarketDataNField
 {
+	///占用总字节大小
+	SizeType			Size;
 	///交易所时间
 	DateIntType			TradingDay; // 交易日，用于给数据接收器划分到同一文件使用，基本没啥别的用处
 	DateIntType			ActionDay;
 	TimeIntType			UpdateTime;
 	TimeIntType			UpdateMillisec;
+
+	///交易所代码
+	ExchangeType	Exchange;
+	///唯一符号
+	SymbolType			Symbol;
+	///合约代码
+	InstrumentIDType	InstrumentID;
 
 	///最新价
 	PriceType	LastPrice;
@@ -203,55 +305,16 @@ struct DepthMarketDataField
 	PriceType	PreSettlementPrice;
 	///昨持仓量
 	LargeVolumeType	PreOpenInterest;
+	///买档个数
+	SizeType BidCount;
+};
 
 
-	///申买价一
-	PriceType	BidPrice1;
-	///申买量一
-	VolumeType	BidVolume1;
-	///申卖价一
-	PriceType	AskPrice1;
-	///申卖量一
-	VolumeType	AskVolume1;
-	///申买价二
-	PriceType	BidPrice2;
-	///申买量二
-	VolumeType	BidVolume2;
-	///申卖价二
-	PriceType	AskPrice2;
-	///申卖量二
-	VolumeType	AskVolume2;
-	///申买价三
-	PriceType	BidPrice3;
-	///申买量三
-	VolumeType	BidVolume3;
-	///申卖价三
-	PriceType	AskPrice3;
-	///申卖量三
-	VolumeType	AskVolume3;
-	///申买价四
-	PriceType	BidPrice4;
-	///申买量四
-	VolumeType	BidVolume4;
-	///申卖价四
-	PriceType	AskPrice4;
-	///申卖量四
-	VolumeType	AskVolume4;
-	///申买价五
-	PriceType	BidPrice5;
-	///申买量五
-	VolumeType	BidVolume5;
-	///申卖价五
-	PriceType	AskPrice5;
-	///申卖量五
-	VolumeType	AskVolume5;
-
-	///交易所代码
-	ExchangeType	Exchange;
-	///唯一符号
-	SymbolType			Symbol;
-	///合约代码
-	InstrumentIDType	InstrumentID;
+struct DepthField
+{
+	PriceType	Price;
+	VolumeType	Size;
+	VolumeType	Count;
 };
 
 ///Tick行情

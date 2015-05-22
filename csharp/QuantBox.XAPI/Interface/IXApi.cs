@@ -22,7 +22,7 @@ namespace QuantBox.XAPI.Interface
 
     public interface IXMarketData
     {
-        DelegateOnRtnDepthMarketData OnRtnDepthMarketData { get; set; }
+        DelegateOnRtnDepthMarketDataN OnRtnDepthMarketDataN { get; set; }
         void Subscribe(string szInstrument, string szExchange);
         void Unsubscribe(string szInstrument, string szExchange);
     }

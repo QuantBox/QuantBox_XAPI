@@ -43,6 +43,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\TongShi\x86</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -104,6 +105,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\ApiProcess.cpp" />
     <ClCompile Include="..\include\ChinaStock.cpp" />
     <ClCompile Include="..\include\toolkit.cpp" />
     <ClCompile Include="..\QuantBox_XAPI\XApiC.cpp" />
@@ -118,6 +120,7 @@
     <ClCompile Include="TypeConvert.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\ApiProcess.h" />
     <ClInclude Include="..\include\ChinaStock.h" />
     <ClInclude Include="..\include\toolkit.h" />
     <ClInclude Include="DialogStockDrv.h" />

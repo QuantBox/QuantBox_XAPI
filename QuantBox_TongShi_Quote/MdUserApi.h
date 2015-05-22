@@ -95,7 +95,7 @@ private:
 	//virtual void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	void OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count);
-	void OnRspQryInstrument(DepthMarketDataField* pField,RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count);
+	void OnRspQryInstrument(DepthMarketDataNField* pField, RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count);
 
 
 	//virtual void OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);

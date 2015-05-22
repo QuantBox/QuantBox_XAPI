@@ -85,6 +85,7 @@ xcopy "$(SolutionDir)include\Kingstar\win32\*.dll"  "$(SolutionDir)XAPI\Kingstar
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\ApiProcess.h" />
     <ClInclude Include="..\include\toolkit.h" />
     <ClInclude Include="..\QuantBox_Kingstar_Trade\TypeConvert.h" />
     <ClInclude Include="MdUserApi.h" />
@@ -92,6 +93,7 @@ xcopy "$(SolutionDir)include\Kingstar\win32\*.dll"  "$(SolutionDir)XAPI\Kingstar
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\ApiProcess.cpp" />
     <ClCompile Include="..\include\toolkit.cpp" />
     <ClCompile Include="..\QuantBox_Kingstar_Trade\TypeConvert.cpp" />
     <ClCompile Include="dllmain.cpp">

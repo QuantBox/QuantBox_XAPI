@@ -7,6 +7,7 @@
 #include "../include/ApiStruct.h"
 
 #include "../include/toolkit.h"
+#include "../include/ApiProcess.h"
 //#include "../QuantBox_LTS_Trade/TypeConvert.h"
 
 #include "../QuantBox_Queue/MsgQueue.h"
@@ -430,7 +431,7 @@ void CLevel2UserApi::OnRspUnSubL2MarketData(CSecurityFtdcSpecificInstrumentField
 
 void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2MarketData)
 {
-	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
+	DepthMarketDataNField* pField = (DepthMarketDataNField*)m_msgQueue->new_block(sizeof(DepthMarketDataNField)+sizeof(DepthField)* 20);
 	strncpy(pField->InstrumentID, pL2MarketData->InstrumentID, sizeof(InstrumentIDType));
 	
 	pField->Exchange = TSecurityFtdcExchangeIDType_2_ExchangeType(pL2MarketData->ExchangeID);
@@ -458,63 +459,55 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 	//marketData.PreSettlementPrice = pL2MarketData->PreSettlementPrice;
 	//marketData.PreOpenInterest = pL2MarketData->PreOpenInterest;
 
+	InitBidAsk(pField);
+
 	do
 	{
 		if (pL2MarketData->BidVolume1 == 0)
 			break;
-		pField->BidPrice1 = pL2MarketData->BidPrice1;
-		pField->BidVolume1 = pL2MarketData->BidVolume1;
+		AddBid(pField, pL2MarketData->BidPrice1, pL2MarketData->BidVolume1, pL2MarketData->BidCount1);
 
 		if (pL2MarketData->BidVolume2 == 0)
 			break;
-		pField->BidPrice2 = pL2MarketData->BidPrice2;
-		pField->BidVolume2 = pL2MarketData->BidVolume2;
+		AddBid(pField, pL2MarketData->BidPrice2, pL2MarketData->BidVolume2, pL2MarketData->BidCount2);
 
 		if (pL2MarketData->BidVolume3 == 0)
 			break;
-		pField->BidPrice3 = pL2MarketData->BidPrice3;
-		pField->BidVolume3 = pL2MarketData->BidVolume3;
+		AddBid(pField, pL2MarketData->BidPrice3, pL2MarketData->BidVolume3, pL2MarketData->BidCount3);
 
 		if (pL2MarketData->BidVolume4 == 0)
 			break;
-		pField->BidPrice4 = pL2MarketData->BidPrice4;
-		pField->BidVolume4 = pL2MarketData->BidVolume4;
+		AddBid(pField, pL2MarketData->BidPrice4, pL2MarketData->BidVolume4, pL2MarketData->BidCount4);
 
 		if (pL2MarketData->BidVolume5 == 0)
 			break;
-		pField->BidPrice5 = pL2MarketData->BidPrice5;
-		pField->BidVolume5 = pL2MarketData->BidVolume5;
+		AddBid(pField, pL2MarketData->BidPrice5, pL2MarketData->BidVolume5, pL2MarketData->BidCount5);
 	} while (false);
 
 	do
 	{
 		if (pL2MarketData->OfferVolume1 == 0)
 			break;
-		pField->AskPrice1 = pL2MarketData->OfferPrice1;
-		pField->AskVolume1 = pL2MarketData->OfferVolume1;
+		AddAsk(pField, pL2MarketData->OfferPrice1, pL2MarketData->OfferVolume1, pL2MarketData->OfferCount1);
 
 		if (pL2MarketData->OfferVolume2 == 0)
 			break;
-		pField->AskPrice2 = pL2MarketData->OfferPrice2;
-		pField->AskVolume2 = pL2MarketData->OfferVolume2;
+		AddAsk(pField, pL2MarketData->OfferPrice2, pL2MarketData->OfferVolume2, pL2MarketData->OfferCount2);
 
 		if (pL2MarketData->OfferVolume3 == 0)
 			break;
-		pField->AskPrice3 = pL2MarketData->OfferPrice3;
-		pField->AskVolume3 = pL2MarketData->OfferVolume3;
+		AddAsk(pField, pL2MarketData->OfferPrice3, pL2MarketData->OfferVolume3, pL2MarketData->OfferCount3);
 
 		if (pL2MarketData->OfferVolume4 == 0)
 			break;
-		pField->AskPrice4 = pL2MarketData->OfferPrice4;
-		pField->AskVolume4 = pL2MarketData->OfferVolume4;
+		AddAsk(pField, pL2MarketData->OfferPrice4, pL2MarketData->OfferVolume4, pL2MarketData->OfferCount4);
 
 		if (pL2MarketData->OfferVolume5 == 0)
 			break;
-		pField->AskPrice5 = pL2MarketData->OfferPrice5;
-		pField->AskVolume5 = pL2MarketData->OfferVolume5;
+		AddAsk(pField, pL2MarketData->OfferPrice5, pL2MarketData->OfferVolume5, pL2MarketData->OfferCount5);
 	} while (false);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
 }
 
 void CLevel2UserApi::SubscribeL2Index(const string& szInstrumentIDs, const string& szExchageID)
@@ -650,7 +643,7 @@ void CLevel2UserApi::OnRspUnSubL2Index(CSecurityFtdcSpecificInstrumentField *pSp
 
 void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 {
-	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
+	DepthMarketDataNField* pField = (DepthMarketDataNField*)m_msgQueue->new_block(sizeof(DepthMarketDataNField));
 	strncpy(pField->InstrumentID, pL2Index->InstrumentID, sizeof(InstrumentIDType));
 
 	pField->Exchange = TSecurityFtdcExchangeIDType_2_ExchangeType(pL2Index->ExchangeID);
@@ -677,6 +670,8 @@ void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 	pField->PreClosePrice = pL2Index->PreCloseIndex;
 	//marketData.PreSettlementPrice = pL2Index->PreSettlementPrice;
 	//marketData.PreOpenInterest = pL2Index->PreOpenInterest;
+
+	InitBidAsk(pField);
 
 	//marketData.BidPrice1 = pL2MarketData->BidPrice1;
 	//marketData.BidVolume1 = pL2MarketData->BidVolume1;
@@ -706,5 +701,5 @@ void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 	//	marketData.AskVolume5 = pL2MarketData->OfferVolume5;
 	//}
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::L0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
 }

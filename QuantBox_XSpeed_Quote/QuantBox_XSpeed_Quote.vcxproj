@@ -211,6 +211,7 @@ xcopy "$(SolutionDir)include\XSpeed\win32\*.dll"  "$(SolutionDir)XAPI\XSpeed\x86
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\ApiProcess.h" />
     <ClInclude Include="..\include\toolkit.h" />
     <ClInclude Include="..\QuantBox_XSpeed_Trade\TypeConvert.h" />
     <ClInclude Include="MdUserApi.h" />
@@ -218,6 +219,7 @@ xcopy "$(SolutionDir)include\XSpeed\win32\*.dll"  "$(SolutionDir)XAPI\XSpeed\x86
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\ApiProcess.cpp" />
     <ClCompile Include="..\include\toolkit.cpp" />
     <ClCompile Include="..\QuantBox_XSpeed_Trade\TypeConvert.cpp" />
     <ClCompile Include="dllmain.cpp">
