@@ -10,23 +10,13 @@ namespace QuantBox.XAPI.Callback
 {
     public partial class XApi : IXMarketData
     {
-        
-        //public DelegateOnRtnDepthMarketData OnRtnDepthMarketData
-        //{
-        //    get { return OnRtnDepthMarketData_; }
-        //    set { OnRtnDepthMarketData_ = value; }
-        //}
-        //// 这种写法的主要目的是求快
-        //private DelegateOnRtnDepthMarketData OnRtnDepthMarketData_;
-
-
-        public DelegateOnRtnDepthMarketDataN OnRtnDepthMarketDataN
+        public DelegateOnRtnDepthMarketData OnRtnDepthMarketData
         {
-            get { return OnRtnDepthMarketDataN_; }
-            set { OnRtnDepthMarketDataN_ = value; }
+            get { return OnRtnDepthMarketData_; }
+            set { OnRtnDepthMarketData_ = value; }
         }
         // 这种写法的主要目的是求快
-        private DelegateOnRtnDepthMarketDataN OnRtnDepthMarketDataN_;
+        private DelegateOnRtnDepthMarketData OnRtnDepthMarketData_;
 
         public DelegateOnFilterSubscribe OnFilterSubscribe
         {
@@ -142,18 +132,8 @@ namespace QuantBox.XAPI.Callback
             // 求快，这个地方不判断
             //if (OnRtnDepthMarketData_ == null)
             //    return;
-            //DepthLevelType depthLevelType = (DepthLevelType)double1;
-            //if(depthLevelType == DepthLevelType.FULL)
-            //{
-                DepthMarketDataNClass cls = PInvokeUtility.GetDepthMarketDataNClass(ptr1);
-                OnRtnDepthMarketDataN_(this, ref cls);
-            //}
-            //else
-            //{
-            //    DepthMarketDataField obj = (DepthMarketDataField)Marshal.PtrToStructure(ptr1, typeof(DepthMarketDataField));
-
-            //    OnRtnDepthMarketData_(this, ref obj);
-            //}
+            DepthMarketDataNClass cls = PInvokeUtility.GetDepthMarketDataNClass(ptr1);
+            OnRtnDepthMarketData(this, ref cls);
         }
 
         private bool _OnFilterSubscribe(double double1, int size1, int size2, int size3, IntPtr ptr1)

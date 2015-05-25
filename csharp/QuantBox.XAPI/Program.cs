@@ -22,7 +22,7 @@ namespace QuantBox.XAPI
             Console.WriteLine("22222" + status+userLogin.ErrorMsg());
         }
 
-        static void OnRtnDepthMarketDataN(object sender, ref DepthMarketDataNClass marketData)
+        static void OnRtnDepthMarketData(object sender, ref DepthMarketDataNClass marketData)
         {
             Debugger.Log(0, null, "CTP:C#");
             Console.WriteLine(marketData.InstrumentID);
@@ -107,7 +107,7 @@ namespace QuantBox.XAPI
             api.User.Password = "123456";
 
             api.OnConnectionStatus = OnConnectionStatus;
-            api.OnRtnDepthMarketDataN = OnRtnDepthMarketDataN;
+            api.OnRtnDepthMarketData = OnRtnDepthMarketData;
 
             api2.Server.BrokerID = "1017";
             api2.Server.Address = "tcp://ctpmn1-front1.citicsf.com:51205";
@@ -151,7 +151,7 @@ namespace QuantBox.XAPI
             api.User.Password = "123456";
 
             api.OnConnectionStatus = OnConnectionStatus;
-            api.OnRtnDepthMarketDataN = OnRtnDepthMarketDataN;
+            api.OnRtnDepthMarketData = OnRtnDepthMarketData;
 
             api2.Server.BrokerID = "2010";
             api2.Server.Address = "tcp://211.144.195.163:44505";
@@ -192,7 +192,7 @@ namespace QuantBox.XAPI
             api.Server.Address = "D:\\Scengine\\Stock.dll";
 
             api.OnConnectionStatus = OnConnectionStatus;
-            api.OnRtnDepthMarketDataN = OnRtnDepthMarketDataN;
+            api.OnRtnDepthMarketData = OnRtnDepthMarketData;
             api.OnFilterSubscribe = OnFilterSubscribe;
 
             api.Connect();
@@ -222,7 +222,7 @@ namespace QuantBox.XAPI
             api.User.Password = "123456";
 
             api.OnConnectionStatus = OnConnectionStatus;
-            api.OnRtnDepthMarketDataN = OnRtnDepthMarketDataN;
+            api.OnRtnDepthMarketData = OnRtnDepthMarketData;
             api.OnRspQryInstrument = OnRspQryInstrument;
 
             api.Connect();
@@ -249,7 +249,7 @@ namespace QuantBox.XAPI
             api.User.Password = "1234561";
 
             api.OnConnectionStatus = OnConnectionStatus;
-            api.OnRtnDepthMarketDataN = OnRtnDepthMarketDataN;
+            api.OnRtnDepthMarketData = OnRtnDepthMarketData;
             api.OnRtnError = OnRtnError;
 
             api.Connect();
@@ -271,7 +271,7 @@ namespace QuantBox.XAPI
             api.User.Password = "123456";
 
             api.OnConnectionStatus = OnConnectionStatus;
-            api.OnRtnDepthMarketDataN = OnRtnDepthMarketDataN;
+            api.OnRtnDepthMarketData = OnRtnDepthMarketData;
 
             api.Connect();
 
