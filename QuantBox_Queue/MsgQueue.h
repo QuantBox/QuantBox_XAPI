@@ -13,10 +13,12 @@
 #include "../include/ApiStruct.h"
 
 //#include "readerwriterqueue.h"
-#include "concurrentqueue.h"
+//#include "concurrentqueue.h"
+#include "ArrayLockFreeQueue.h"
+
 
 using namespace std;
-using namespace moodycamel;
+//using namespace moodycamel;
 
 #pragma warning(push)
 #pragma warning(disable:4251)
@@ -222,7 +224,9 @@ protected:
 	thread*								m_hThread;
 
 private:
-	ConcurrentQueue<ResponeItem*>		m_queue;
+	//	ConcurrentQueue<ResponeItem*>		m_queue;
+	ArrayLockFreeQueue<ResponeItem*>	m_queue;
+
 	fnOnRespone							m_fnOnRespone;
 	void*								m_pClass;
 };
