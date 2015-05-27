@@ -8,7 +8,8 @@
 
 #include "../include/toolkit.h"
 #include "../include/ApiProcess.h"
-//#include "../QuantBox_LTS_Trade/TypeConvert.h"
+
+#include "../include/ChinaStock.h"
 
 #include "../QuantBox_Queue/MsgQueue.h"
 
@@ -262,6 +263,9 @@ void CLevel2UserApi::OnRspUserLogin(CSecurityFtdcUserLoginField *pUserLogin, CSe
 		//strncpy(pField->LoginTime, pUserLogin->, sizeof(TimeType));
 		//sprintf(pField->SessionID, "%d:%d", pUserLogin->FrontID, pRspUserLogin->SessionID);
 
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+
 
 		//有可能断线了，本处是断线重连后重新订阅
 		map<string,set<string> > mapOld = m_mapSecurityIDs;//记下上次订阅的合约
@@ -271,7 +275,7 @@ void CLevel2UserApi::OnRspUserLogin(CSecurityFtdcUserLoginField *pUserLogin, CSe
 			string strkey = i->first;
 			set<string> setValue = i->second;
 
-			SubscribeL2MarketData(setValue, strkey);//订阅
+			Subscribe(setValue, strkey); //订阅
 		}
 
 		mapOld = m_mapIndexIDs;//记下上次订阅的合约
@@ -281,7 +285,7 @@ void CLevel2UserApi::OnRspUserLogin(CSecurityFtdcUserLoginField *pUserLogin, CSe
 			string strkey = i->first;
 			set<string> setValue = i->second;
 
-			SubscribeL2Index(setValue, strkey);//订阅
+			Subscribe(setValue, strkey); //订阅
 		}
 	}
 	else
@@ -298,81 +302,252 @@ void CLevel2UserApi::OnRspError(CSecurityFtdcRspInfoField *pRspInfo, int nReques
 	IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
 }
 
-void CLevel2UserApi::SubscribeL2MarketData(const string& szInstrumentIDs, const string& szExchageID)
+char* GetSetFromString_Index_Stock(const char* szString, const char* seps,
+	vector<char*>& vct_I, set<char*>& st_I, set<string>& st2_I,
+	vector<char*>& vct_S, set<char*>& st_S, set<string>& st2_S,
+	int modify, int before, const char* prefix, const char* exchange)
+{
+	vct_I.clear();
+	st_I.clear();
+	vct_S.clear();
+	st_S.clear();
+
+	if (nullptr == szString
+		|| nullptr == seps)
+		return nullptr;
+
+	if (strlen(szString) == 0
+		|| strlen(seps) == 0)
+		return nullptr;
+
+	//这里不知道要添加的字符有多长，很悲剧
+	size_t len = (size_t)(strlen(szString)*1.5 + 1);
+	char* buf = new char[len];
+	strncpy(buf, szString, len);
+
+	char* token = strtok(buf, seps);
+	while (token)
+	{
+		if (strlen(token)>0)
+		{
+			char temp[64] = { 0 };
+			if (prefix)
+			{
+				if (before>0)
+				{
+					sprintf(temp, "%s%s", prefix, token);
+				}
+				else
+				{
+					sprintf(temp, "%s%s", token, prefix);
+				}
+			}
+			else
+			{
+				sprintf(temp, "%s", token);
+			}
+
+			int instrumentId = atoi(token);
+
+			bool bIndex = false;
+			if (strlen(token) == 8)
+			{
+				bIndex = false;
+			}
+			else if (exchange[1] == 'Z')
+			{
+				if (InstrumentType::Index == InstrumentID_2_InstrumentType_SZE(instrumentId))
+					bIndex = true;
+			}
+			else
+			{
+				if (InstrumentType::Index == InstrumentID_2_InstrumentType_SSE(instrumentId))
+					bIndex = true;
+			}		
+
+			if (modify > 0)
+			{
+				if (bIndex)
+				{
+					st2_I.insert(temp);
+				}
+				else
+				{
+					st2_S.insert(temp);
+				}
+			}
+			else if (modify < 0)
+			{
+				if (bIndex)
+				{
+					st2_I.erase(temp);
+				}
+				else
+				{
+					st2_S.erase(temp);
+				}
+			}
+
+			if (bIndex)
+			{
+				vct_I.push_back(token);
+				st_I.insert(token);
+			}
+			else
+			{
+				vct_S.push_back(token);
+				st_S.insert(token);
+			}
+		}
+		token = strtok(nullptr, seps);
+	}
+
+	return buf;
+}
+
+void CLevel2UserApi::Subscribe(const string& szInstrumentIDs, const string& szExchageID)
 {
 	if(nullptr == m_pApi)
 		return;
 
-	vector<char*> vct;
-	set<char*> st;
+	vector<char*> vct_I;
+	set<char*> st_I;
+	vector<char*> vct_S;
+	set<char*> st_S;
 
-	lock_guard<mutex> cl(m_csMapSecurityIDs);
+	lock_guard<mutex> cl(m_csMapIDs);
 
 	set<string> _setInstrumentIDs;
-	map<string, set<string> >::iterator it = m_mapSecurityIDs.find(szExchageID);
-	if (it != m_mapSecurityIDs.end())
+	set<string> _setIndexIDs;
 	{
-		_setInstrumentIDs = it->second;
+		map<string, set<string> >::iterator it = m_mapSecurityIDs.find(szExchageID);
+		if (it != m_mapSecurityIDs.end())
+		{
+			_setInstrumentIDs = it->second;
+		}
 	}
+	{
+		map<string, set<string> >::iterator it = m_mapIndexIDs.find(szExchageID);
+		if (it != m_mapIndexIDs.end())
+		{
+			_setIndexIDs = it->second;
+		}
+	}
+	
+	// 分解
+	char* pBuf = GetSetFromString_Index_Stock(szInstrumentIDs.c_str(), _QUANTBOX_SEPS_,
+		vct_I, st_I, _setIndexIDs,
+		vct_S, st_S, _setInstrumentIDs,
+		1, 1, nullptr, szExchageID.c_str());
 
-	char* pBuf = GetSetFromString(szInstrumentIDs.c_str(), _QUANTBOX_SEPS_, vct, st, 1, _setInstrumentIDs);
 	m_mapSecurityIDs[szExchageID] = _setInstrumentIDs;
+	m_mapIndexIDs[szExchageID] = _setIndexIDs;
 
-	if (vct.size()>0)
+	if (vct_I.size()>0)
 	{
 		//转成字符串数组
-		char** pArray = new char*[vct.size()];
-		for (size_t j = 0; j<vct.size(); ++j)
+		char** pArray = new char*[vct_I.size()];
+		for (size_t j = 0; j<vct_I.size(); ++j)
 		{
-			pArray[j] = vct[j];
+			pArray[j] = vct_I[j];
 		}
 
 		//订阅
-		m_pApi->SubscribeL2MarketData(pArray, (int)vct.size(), (char*)(szExchageID.c_str()));
+		m_pApi->SubscribeL2Index(pArray, (int)vct_I.size(), (char*)(szExchageID.c_str()));
 
 		delete[] pArray;
 	}
+
+	if (vct_S.size()>0)
+	{
+		//转成字符串数组
+		char** pArray = new char*[vct_S.size()];
+		for (size_t j = 0; j<vct_S.size(); ++j)
+		{
+			pArray[j] = vct_S[j];
+		}
+
+		//订阅
+		m_pApi->SubscribeL2MarketData(pArray, (int)vct_S.size(), (char*)(szExchageID.c_str()));
+
+		delete[] pArray;
+	}
+
 	delete[] pBuf;
 }
 
-void CLevel2UserApi::UnSubscribeL2MarketData(const string& szInstrumentIDs, const string& szExchageID)
+void CLevel2UserApi::Unsubscribe(const string& szInstrumentIDs, const string& szExchageID)
 {
 	if (nullptr == m_pApi)
 		return;
 
-	vector<char*> vct;
-	set<char*> st;
+	vector<char*> vct_I;
+	set<char*> st_I;
+	vector<char*> vct_S;
+	set<char*> st_S;
 
-	lock_guard<mutex> cl(m_csMapSecurityIDs);
+	lock_guard<mutex> cl(m_csMapIDs);
 
 	set<string> _setInstrumentIDs;
-	map<string, set<string> >::iterator it = m_mapSecurityIDs.find(szExchageID);
-	if (it != m_mapSecurityIDs.end())
+	set<string> _setIndexIDs;
 	{
-		_setInstrumentIDs = it->second;
+		map<string, set<string> >::iterator it = m_mapSecurityIDs.find(szExchageID);
+		if (it != m_mapSecurityIDs.end())
+		{
+			_setInstrumentIDs = it->second;
+		}
+	}
+	{
+		map<string, set<string> >::iterator it = m_mapIndexIDs.find(szExchageID);
+		if (it != m_mapIndexIDs.end())
+		{
+			_setIndexIDs = it->second;
+		}
 	}
 
-	char* pBuf = GetSetFromString(szInstrumentIDs.c_str(), _QUANTBOX_SEPS_, vct, st, -1, _setInstrumentIDs);
-	m_mapSecurityIDs[szExchageID] = _setInstrumentIDs;
+	// 分解
+	char* pBuf = GetSetFromString_Index_Stock(szInstrumentIDs.c_str(), _QUANTBOX_SEPS_,
+		vct_I, st_I, _setIndexIDs,
+		vct_S, st_S, _setInstrumentIDs,
+		-1, 1, nullptr, szExchageID.c_str());
 
-	if (vct.size()>0)
+	m_mapSecurityIDs[szExchageID] = _setInstrumentIDs;
+	m_mapIndexIDs[szExchageID] = _setIndexIDs;
+
+	if (vct_I.size()>0)
 	{
 		//转成字符串数组
-		char** pArray = new char*[vct.size()];
-		for (size_t j = 0; j<vct.size(); ++j)
+		char** pArray = new char*[vct_I.size()];
+		for (size_t j = 0; j<vct_I.size(); ++j)
 		{
-			pArray[j] = vct[j];
+			pArray[j] = vct_I[j];
 		}
 
 		//订阅
-		m_pApi->UnSubscribeL2MarketData(pArray, (int)vct.size(), (char*)(szExchageID.c_str()));
+		m_pApi->UnSubscribeL2Index(pArray, (int)vct_I.size(), (char*)(szExchageID.c_str()));
 
 		delete[] pArray;
 	}
+
+	if (vct_S.size()>0)
+	{
+		//转成字符串数组
+		char** pArray = new char*[vct_S.size()];
+		for (size_t j = 0; j<vct_S.size(); ++j)
+		{
+			pArray[j] = vct_S[j];
+		}
+
+		//订阅
+		m_pApi->UnSubscribeL2MarketData(pArray, (int)vct_S.size(), (char*)(szExchageID.c_str()));
+
+		delete[] pArray;
+	}
+
 	delete[] pBuf;
 }
 
-void CLevel2UserApi::SubscribeL2MarketData(const set<string>& instrumentIDs, const string& szExchageID)
+void CLevel2UserApi::Subscribe(const set<string>& instrumentIDs, const string& szExchageID)
 {
 	if(nullptr == m_pApi)
 		return;
@@ -380,13 +555,14 @@ void CLevel2UserApi::SubscribeL2MarketData(const set<string>& instrumentIDs, con
 	string szInstrumentIDs;
 	for(set<string>::iterator i=instrumentIDs.begin();i!=instrumentIDs.end();++i)
 	{
+		
 		szInstrumentIDs.append(*i);
 		szInstrumentIDs.append(";");
 	}
 
 	if (szInstrumentIDs.length()>1)
 	{
-		SubscribeL2MarketData(szInstrumentIDs, szExchageID);
+		Subscribe(szInstrumentIDs, szExchageID);
 	}
 }
 
@@ -396,7 +572,7 @@ void CLevel2UserApi::OnRspSubL2MarketData(CSecurityFtdcSpecificInstrumentField *
 	if(!IsErrorRspInfo(pRspInfo,nRequestID,bIsLast)
 		&& pSpecificInstrument)
 	{
-		lock_guard<mutex> cl(m_csMapSecurityIDs);
+		lock_guard<mutex> cl(m_csMapIDs);
 
 		set<string> _setInstrumentIDs;
 		map<string, set<string> >::iterator it = m_mapSecurityIDs.find(pSpecificInstrument->ExchangeID);
@@ -416,7 +592,7 @@ void CLevel2UserApi::OnRspUnSubL2MarketData(CSecurityFtdcSpecificInstrumentField
 	if(!IsErrorRspInfo(pRspInfo,nRequestID,bIsLast)
 		&& pSpecificInstrument)
 	{
-		lock_guard<mutex> cl(m_csMapSecurityIDs);
+		lock_guard<mutex> cl(m_csMapIDs);
 
 		set<string> _setInstrumentIDs;
 		map<string, set<string> >::iterator it = m_mapSecurityIDs.find(pSpecificInstrument->ExchangeID);
@@ -447,10 +623,10 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 	//marketData.OpenInterest = pL2MarketData->OpenInterest;
 	//marketData.AveragePrice = pL2MarketData->AveragePrice;
 
-	pField->OpenPrice = pL2MarketData->OpenPrice;
-	pField->HighestPrice = pL2MarketData->HighPrice;
-	pField->LowestPrice = pL2MarketData->LowPrice;
-	pField->ClosePrice = pL2MarketData->ClosePrice;
+	pField->OpenPrice = pL2MarketData->OpenPrice == DBL_MAX ? 0 : pL2MarketData->OpenPrice;
+	pField->HighestPrice = pL2MarketData->HighPrice == DBL_MAX ? 0 : pL2MarketData->HighPrice;
+	pField->LowestPrice = pL2MarketData->LowPrice == DBL_MAX ? 0 : pL2MarketData->LowPrice;
+	pField->ClosePrice = pL2MarketData->ClosePrice == DBL_MAX ? 0 : pL2MarketData->ClosePrice;
 	//marketData.SettlementPrice = pL2MarketData->SettlementPrice;
 
 	//marketData.UpperLimitPrice = pL2MarketData->UpperLimitPrice;
@@ -482,6 +658,26 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 		if (pL2MarketData->BidVolume5 == 0)
 			break;
 		AddBid(pField, pL2MarketData->BidPrice5, pL2MarketData->BidVolume5, pL2MarketData->BidCount5);
+
+		if (pL2MarketData->BidVolume6 == 0)
+			break;
+		AddBid(pField, pL2MarketData->BidPrice6, pL2MarketData->BidVolume6, pL2MarketData->BidCount6);
+
+		if (pL2MarketData->BidVolume7 == 0)
+			break;
+		AddBid(pField, pL2MarketData->BidPrice7, pL2MarketData->BidVolume7, pL2MarketData->BidCount7);
+
+		if (pL2MarketData->BidVolume8 == 0)
+			break;
+		AddBid(pField, pL2MarketData->BidPrice8, pL2MarketData->BidVolume8, pL2MarketData->BidCount8);
+
+		if (pL2MarketData->BidVolume9 == 0)
+			break;
+		AddBid(pField, pL2MarketData->BidPrice9, pL2MarketData->BidVolume9, pL2MarketData->BidCount9);
+
+		if (pL2MarketData->BidVolumeA == 0)
+			break;
+		AddBid(pField, pL2MarketData->BidPriceA, pL2MarketData->BidVolumeA, pL2MarketData->BidCountA);
 	} while (false);
 
 	do
@@ -505,102 +701,122 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 		if (pL2MarketData->OfferVolume5 == 0)
 			break;
 		AddAsk(pField, pL2MarketData->OfferPrice5, pL2MarketData->OfferVolume5, pL2MarketData->OfferCount5);
+
+		if (pL2MarketData->OfferVolume6 == 0)
+			break;
+		AddAsk(pField, pL2MarketData->OfferPrice6, pL2MarketData->OfferVolume6, pL2MarketData->OfferCount6);
+
+		if (pL2MarketData->OfferVolume7 == 0)
+			break;
+		AddAsk(pField, pL2MarketData->OfferPrice7, pL2MarketData->OfferVolume7, pL2MarketData->OfferCount7);
+
+		if (pL2MarketData->OfferVolume8 == 0)
+			break;
+		AddAsk(pField, pL2MarketData->OfferPrice8, pL2MarketData->OfferVolume8, pL2MarketData->OfferCount8);
+
+		if (pL2MarketData->OfferVolume9 == 0)
+			break;
+		AddAsk(pField, pL2MarketData->OfferPrice9, pL2MarketData->OfferVolume9, pL2MarketData->OfferCount9);
+
+		if (pL2MarketData->OfferVolumeA == 0)
+			break;
+		AddAsk(pField, pL2MarketData->OfferPriceA, pL2MarketData->OfferVolumeA, pL2MarketData->OfferCountA);
 	} while (false);
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
 }
 
-void CLevel2UserApi::SubscribeL2Index(const string& szInstrumentIDs, const string& szExchageID)
-{
-	if (nullptr == m_pApi)
-		return;
+//void CLevel2UserApi::SubscribeL2Index(const string& szInstrumentIDs, const string& szExchageID)
+//{
+//	if (nullptr == m_pApi)
+//		return;
+//
+//	vector<char*> vct;
+//	set<char*> st;
+//
+//	lock_guard<mutex> cl(m_csMapIDs);
+//
+//	set<string> _setInstrumentIDs;
+//	map<string, set<string> >::iterator it = m_mapIndexIDs.find(szExchageID);
+//	if (it != m_mapIndexIDs.end())
+//	{
+//		_setInstrumentIDs = it->second;
+//	}
+//
+//	char* pBuf = GetSetFromString(szInstrumentIDs.c_str(), _QUANTBOX_SEPS_, vct, st, 1, _setInstrumentIDs);
+//	m_mapIndexIDs[szExchageID] = _setInstrumentIDs;
+//
+//	if (vct.size()>0)
+//	{
+//		//转成字符串数组
+//		char** pArray = new char*[vct.size()];
+//		for (size_t j = 0; j<vct.size(); ++j)
+//		{
+//			pArray[j] = vct[j];
+//		}
+//
+//		//订阅
+//		m_pApi->SubscribeL2Index(pArray, (int)vct.size(), (char*)(szExchageID.c_str()));
+//
+//		delete[] pArray;
+//	}
+//	delete[] pBuf;
+//}
 
-	vector<char*> vct;
-	set<char*> st;
-
-	lock_guard<mutex> cl(m_csMapIndexIDs);
-
-	set<string> _setInstrumentIDs;
-	map<string, set<string> >::iterator it = m_mapIndexIDs.find(szExchageID);
-	if (it != m_mapIndexIDs.end())
-	{
-		_setInstrumentIDs = it->second;
-	}
-
-	char* pBuf = GetSetFromString(szInstrumentIDs.c_str(), _QUANTBOX_SEPS_, vct, st, 1, _setInstrumentIDs);
-	m_mapIndexIDs[szExchageID] = _setInstrumentIDs;
-
-	if (vct.size()>0)
-	{
-		//转成字符串数组
-		char** pArray = new char*[vct.size()];
-		for (size_t j = 0; j<vct.size(); ++j)
-		{
-			pArray[j] = vct[j];
-		}
-
-		//订阅
-		m_pApi->SubscribeL2Index(pArray, (int)vct.size(), (char*)(szExchageID.c_str()));
-
-		delete[] pArray;
-	}
-	delete[] pBuf;
-}
-
-void CLevel2UserApi::UnSubscribeL2Index(const string& szInstrumentIDs, const string& szExchageID)
-{
-	if (nullptr == m_pApi)
-		return;
-
-	vector<char*> vct;
-	set<char*> st;
-
-	lock_guard<mutex> cl(m_csMapIndexIDs);
-
-	set<string> _setInstrumentIDs;
-	map<string, set<string> >::iterator it = m_mapIndexIDs.find(szExchageID);
-	if (it != m_mapIndexIDs.end())
-	{
-		_setInstrumentIDs = it->second;
-	}
-
-	char* pBuf = GetSetFromString(szInstrumentIDs.c_str(), _QUANTBOX_SEPS_, vct, st, -1, _setInstrumentIDs);
-	m_mapIndexIDs[szExchageID] = _setInstrumentIDs;
-
-	if (vct.size()>0)
-	{
-		//转成字符串数组
-		char** pArray = new char*[vct.size()];
-		for (size_t j = 0; j<vct.size(); ++j)
-		{
-			pArray[j] = vct[j];
-		}
-
-		//订阅
-		m_pApi->UnSubscribeL2Index(pArray, (int)vct.size(), (char*)(szExchageID.c_str()));
-
-		delete[] pArray;
-	}
-	delete[] pBuf;
-}
-
-void CLevel2UserApi::SubscribeL2Index(const set<string>& instrumentIDs, const string& szExchageID)
-{
-	if (nullptr == m_pApi)
-		return;
-
-	string szInstrumentIDs;
-	for (set<string>::iterator i = instrumentIDs.begin(); i != instrumentIDs.end(); ++i)
-	{
-		szInstrumentIDs.append(*i);
-		szInstrumentIDs.append(";");
-	}
-
-	if (szInstrumentIDs.length()>1)
-	{
-		UnSubscribeL2Index(szInstrumentIDs, szExchageID);
-	}
-}
+//void CLevel2UserApi::UnSubscribeL2Index(const string& szInstrumentIDs, const string& szExchageID)
+//{
+//	if (nullptr == m_pApi)
+//		return;
+//
+//	vector<char*> vct;
+//	set<char*> st;
+//
+//	lock_guard<mutex> cl(m_csMapIndexIDs);
+//
+//	set<string> _setInstrumentIDs;
+//	map<string, set<string> >::iterator it = m_mapIndexIDs.find(szExchageID);
+//	if (it != m_mapIndexIDs.end())
+//	{
+//		_setInstrumentIDs = it->second;
+//	}
+//
+//	char* pBuf = GetSetFromString(szInstrumentIDs.c_str(), _QUANTBOX_SEPS_, vct, st, -1, _setInstrumentIDs);
+//	m_mapIndexIDs[szExchageID] = _setInstrumentIDs;
+//
+//	if (vct.size()>0)
+//	{
+//		//转成字符串数组
+//		char** pArray = new char*[vct.size()];
+//		for (size_t j = 0; j<vct.size(); ++j)
+//		{
+//			pArray[j] = vct[j];
+//		}
+//
+//		//订阅
+//		m_pApi->UnSubscribeL2Index(pArray, (int)vct.size(), (char*)(szExchageID.c_str()));
+//
+//		delete[] pArray;
+//	}
+//	delete[] pBuf;
+//}
+//
+//void CLevel2UserApi::SubscribeL2Index(const set<string>& instrumentIDs, const string& szExchageID)
+//{
+//	if (nullptr == m_pApi)
+//		return;
+//
+//	string szInstrumentIDs;
+//	for (set<string>::iterator i = instrumentIDs.begin(); i != instrumentIDs.end(); ++i)
+//	{
+//		szInstrumentIDs.append(*i);
+//		szInstrumentIDs.append(";");
+//	}
+//
+//	if (szInstrumentIDs.length()>1)
+//	{
+//		UnSubscribeL2Index(szInstrumentIDs, szExchageID);
+//	}
+//}
 
 void CLevel2UserApi::OnRspSubL2Index(CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
@@ -608,7 +824,7 @@ void CLevel2UserApi::OnRspSubL2Index(CSecurityFtdcSpecificInstrumentField *pSpec
 	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast)
 		&& pSpecificInstrument)
 	{
-		lock_guard<mutex> cl(m_csMapIndexIDs);
+		lock_guard<mutex> cl(m_csMapIDs);
 
 		set<string> _setInstrumentIDs;
 		map<string, set<string> >::iterator it = m_mapIndexIDs.find(pSpecificInstrument->ExchangeID);
@@ -628,7 +844,7 @@ void CLevel2UserApi::OnRspUnSubL2Index(CSecurityFtdcSpecificInstrumentField *pSp
 	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast)
 		&& pSpecificInstrument)
 	{
-		lock_guard<mutex> cl(m_csMapIndexIDs);
+		lock_guard<mutex> cl(m_csMapIDs);
 
 		set<string> _setInstrumentIDs;
 		map<string, set<string> >::iterator it = m_mapIndexIDs.find(pSpecificInstrument->ExchangeID);

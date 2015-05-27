@@ -41,10 +41,8 @@ public:
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	void SubscribeL2MarketData(const string& szInstrumentIDs, const string& szExchageID);
-	void UnSubscribeL2MarketData(const string& szInstrumentIDs, const string& szExchageID);
-	void SubscribeL2Index(const string& szInstrumentIDs, const string& szExchageID);
-	void UnSubscribeL2Index(const string& szInstrumentIDs, const string& szExchageID);
+	void Subscribe(const string& szInstrumentIDs, const string& szExchageID);
+	void Unsubscribe(const string& szInstrumentIDs, const string& szExchageID);
 
 	void SubscribeL2OrderAndTrade();
 	void UnSubscribeL2OrderAndTrade();
@@ -59,8 +57,12 @@ private:
 	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
 	//订阅行情
-	void SubscribeL2MarketData(const set<string>& instrumentIDs, const string& szExchageID);
-	void SubscribeL2Index(const set<string>& instrumentIDs, const string& szExchageID);
+	void SubscribeL2MarketData(const string& szInstrumentIDs, const string& szExchageID);
+	void UnSubscribeL2MarketData(const string& szInstrumentIDs, const string& szExchageID);
+	void SubscribeL2Index(const string& szInstrumentIDs, const string& szExchageID);
+	void UnSubscribeL2Index(const string& szInstrumentIDs, const string& szExchageID);
+
+	void Subscribe(const set<string>& instrumentIDs, const string& szExchageID);
 
 	virtual void OnFrontConnected();
 	virtual void OnFrontDisconnected(int nReason);
@@ -81,8 +83,7 @@ private:
 	bool IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo);//不送出错消息
 
 private:
-	mutex						m_csMapSecurityIDs;
-	mutex						m_csMapIndexIDs;
+	mutex						m_csMapIDs;
 
 	int							m_lRequestID;			//请求ID，每次请求前自增
 

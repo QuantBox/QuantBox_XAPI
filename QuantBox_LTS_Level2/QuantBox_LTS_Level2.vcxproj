@@ -94,6 +94,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\LTS\x86</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -211,6 +212,7 @@ xcopy "$(SolutionDir)include\LTS_L2\win32\*.dll"  "$(SolutionDir)XAPI\LTS\x86\" 
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\ApiProcess.h" />
+    <ClInclude Include="..\include\ChinaStock.h" />
     <ClInclude Include="..\include\toolkit.h" />
     <ClInclude Include="Level2UserApi.h" />
     <ClInclude Include="stdafx.h" />
@@ -218,6 +220,7 @@ xcopy "$(SolutionDir)include\LTS_L2\win32\*.dll"  "$(SolutionDir)XAPI\LTS\x86\" 
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\include\ApiProcess.cpp" />
+    <ClCompile Include="..\include\ChinaStock.cpp" />
     <ClCompile Include="..\include\toolkit.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
