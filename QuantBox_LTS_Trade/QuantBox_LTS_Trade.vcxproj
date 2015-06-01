@@ -75,7 +75,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\LTS\x86</OutDir>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug64|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -134,6 +134,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\ChinaStock.h" />
     <ClInclude Include="..\include\LTS\SecurityFtdcTraderApi.h" />
     <ClInclude Include="..\include\LTS\SecurityFtdcUserApiDataType.h" />
     <ClInclude Include="..\include\LTS\SecurityFtdcUserApiStruct.h" />
@@ -144,6 +145,7 @@
     <ClInclude Include="TypeConvert.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\ChinaStock.cpp" />
     <ClCompile Include="..\include\toolkit.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>

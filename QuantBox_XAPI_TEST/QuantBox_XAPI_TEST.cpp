@@ -44,9 +44,9 @@ public:
 					int x = mon + i;
 					int a = x / 12;
 					int b = x % 12;
-					sprintf(buf, "IF%d%02d", (1900 + timeinfo->tm_year + a) % 100, b + 1);
+					sprintf(buf, "au%d%02d", (1900 + timeinfo->tm_year + a) % 100, b + 1);
 					pApi->Subscribe(buf, "");
-					sprintf(buf, "TF%d%02d", (1900 + timeinfo->tm_year + a) % 100, b + 1);
+					sprintf(buf, "ag%d%02d", (1900 + timeinfo->tm_year + a) % 100, b + 1);
 					pApi->Subscribe(buf, "");
 				}
 			}
@@ -237,7 +237,8 @@ int main(int argc, char* argv[])
 {
 	CXSpiImpl* p = new CXSpiImpl();
 #if defined WINDOWS || _WIN32
-	char DLLPath1[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\CTP\\x86\\QuantBox_CTP_Quote.dll";
+	//char DLLPath1[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\CTP\\x86\\QuantBox_CTP_Quote.dll";
+	char DLLPath1[250] = ".\\QuantBox_CTP_Quote.dll";
 #else
 	char DLLPath1[250] = "libQuantBox_CTP_Quote.so";
 #endif
