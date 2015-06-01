@@ -94,5 +94,7 @@ private:
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;
 	void*						m_pClass;
+
+	CMsgQueue*					m_remoteQueue;
 };
 

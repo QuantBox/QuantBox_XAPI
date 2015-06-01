@@ -12,6 +12,9 @@
 #include "../include/ChinaStock.h"
 
 #include "../QuantBox_Queue/MsgQueue.h"
+#ifdef _REMOTE
+#include "../QuantBox_Queue/RemoteQueue.h"
+#endif
 
 #include <mutex>
 #include <vector>
@@ -81,6 +84,8 @@ CLevel2UserApi::CLevel2UserApi(void)
 
 	m_msgQueue_Query->Register((void*)Query,this);
 	m_msgQueue_Query->StartThread();
+
+	m_remoteQueue = nullptr;
 }
 
 CLevel2UserApi::~CLevel2UserApi(void)
@@ -140,6 +145,15 @@ void CLevel2UserApi::Connect(const string& szPath,
 
 	m_msgQueue_Query->Input_NoCopy(RequestType::E_Init, m_msgQueue_Query, this, 0, 0,
 		nullptr, 0, nullptr, 0, nullptr, 0);
+
+#ifdef _REMOTE
+	// 将收到的行情通过ZeroMQ发送出去
+	if (strlen(m_ServerInfo.ExtendInformation) > 0)
+	{
+		m_remoteQueue = new CRemoteQueue(m_ServerInfo.ExtendInformation);
+		m_remoteQueue->StartThread();
+	}
+#endif
 }
 
 int CLevel2UserApi::_Init()
@@ -227,6 +241,16 @@ void CLevel2UserApi::Disconnect()
 		m_msgQueue->Clear();
 		delete m_msgQueue;
 		m_msgQueue = nullptr;
+	}
+
+	// 清理队列
+	if (m_remoteQueue)
+	{
+		m_remoteQueue->StopThread();
+		m_remoteQueue->Register(nullptr, nullptr);
+		m_remoteQueue->Clear();
+		delete m_remoteQueue;
+		m_remoteQueue = nullptr;
 	}
 }
 
@@ -723,6 +747,16 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 		AddAsk(pField, pL2MarketData->OfferPriceA, pL2MarketData->OfferVolumeA, pL2MarketData->OfferCountA);
 	} while (false);
 
+
+	// 这两个队列先头循序不要搞混，有删除功能的语句要放在后面
+	// 如果放前面，会导致远程收到乱码
+#ifdef _REMOTE
+	if (m_remoteQueue)
+	{
+		m_remoteQueue->Input_Copy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
+	}
+#endif
+
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
 }
 
@@ -916,6 +950,15 @@ void CLevel2UserApi::OnRtnL2Index(CSecurityFtdcL2IndexField *pL2Index)
 	//	marketData.AskPrice5 = pL2MarketData->OfferPrice5;
 	//	marketData.AskVolume5 = pL2MarketData->OfferVolume5;
 	//}
+
+	// 这两个队列先头循序不要搞混，有删除功能的语句要放在后面
+	// 如果放前面，会导致远程收到乱码
+#ifdef _REMOTE
+	if (m_remoteQueue)
+	{
+		m_remoteQueue->Input_Copy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
+	}
+#endif
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
 }
