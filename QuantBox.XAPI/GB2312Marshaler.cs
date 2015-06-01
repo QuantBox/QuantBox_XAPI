@@ -33,7 +33,7 @@ namespace QuantBox.XAPI
             Marshal.WriteByte(buffer + strbuf.Length, 0);
             return buffer;
         }
-
+        
         public unsafe object MarshalNativeToManaged(IntPtr pNativeData)
         {
             byte* walk = (byte*)pNativeData;
@@ -52,7 +52,7 @@ namespace QuantBox.XAPI
             string data = encodingGB2312.GetString(strbuf);
             return data;
         }
-
+        
         public void CleanUpNativeData(IntPtr pNativeData)
         {
             Marshal.FreeHGlobal(pNativeData);
