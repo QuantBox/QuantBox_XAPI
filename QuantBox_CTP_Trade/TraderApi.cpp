@@ -1051,6 +1051,7 @@ void CTraderApi::OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingA
 		{
 			AccountField* pField = (AccountField*)m_msgQueue->new_block(sizeof(AccountField));
 
+			strcpy(pField->Account, pTradingAccount->AccountID);
 			pField->PreBalance = pTradingAccount->PreBalance;
 			pField->CurrMargin = pTradingAccount->CurrMargin;
 			pField->Commission = pTradingAccount->Commission;

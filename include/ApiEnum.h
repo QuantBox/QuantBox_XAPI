@@ -150,6 +150,21 @@ enum InstrumentType :char
 	Synthetic,
 };
 
+
+/*
+发现融资融券的只有部分功能加入，还有一些功能缺失
+这下回到XAPI的定位问题，到底是一个只服务自动套利交易的API,还是全功能的API
+*/
+enum SecurityType :char
+{
+	CS, // Common Stock
+	CB, // Convertible Bond，标记后，深圳卖出当前可转债表示转股
+	ETF, // 标记后，买入表示申购，卖出表示赎回
+	LOF, // 标记后，买入表示申购，卖出表示赎回
+	SF, // 标记后，买入表示合并，卖出表示分拆
+	CashMargin, // 标记后，开仓表示"融"，平仓表示"还"
+};
+
 enum BarType :char
 {
 	Time,
@@ -208,5 +223,6 @@ enum ExchangeType :char
 	NEEQ, // 全国中小企业股份转让系统,三板，临时这么写
 	HKEx,
 };
+
 
 #endif

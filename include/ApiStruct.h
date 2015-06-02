@@ -411,6 +411,7 @@ struct InstrumentField
 ///账号
 struct AccountField
 {
+	AccountIDType Account;
 	///上次结算准备金
 	MoneyType	PreBalance;
 	///当前保证金总额

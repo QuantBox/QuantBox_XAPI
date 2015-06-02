@@ -564,6 +564,8 @@ namespace QuantBox.XAPI
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     public struct AccountField
     {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+        public string Account;
         /// <summary>
         /// 上次结算准备金
         /// </summary>

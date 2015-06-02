@@ -682,6 +682,7 @@ void CTraderApi::OnRspQryTradingAccount(CSecurityFtdcTradingAccountField *pTradi
 		{
 			AccountField* pField = (AccountField*)m_msgQueue->new_block(sizeof(AccountField));
 
+			strcpy(pField->Account, pTradingAccount->AccountID);
 			pField->PreBalance = pTradingAccount->PreBalance;
 			pField->CurrMargin = pTradingAccount->CurrMargin;
 			//pField->CloseProfit = pTradingAccount->CloseProfit;

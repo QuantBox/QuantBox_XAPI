@@ -1028,6 +1028,7 @@ void CTraderApi::OnRspQryInvestorAccount(CUstpFtdcRspInvestorAccountField *pRspI
 		{
 			AccountField* pField = (AccountField*)m_msgQueue->new_block(sizeof(AccountField));
 
+			strcpy(pField->Account, pRspInvestorAccount->AccountID);
 			pField->PreBalance = pRspInvestorAccount->PreBalance;
 			pField->CurrMargin = pRspInvestorAccount->Margin;
 			pField->Commission = pRspInvestorAccount->Fee;

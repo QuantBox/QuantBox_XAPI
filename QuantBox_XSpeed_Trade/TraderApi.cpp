@@ -845,6 +845,7 @@ void CTraderApi::OnRspCustomerCapital(struct DFITCCapitalInfoRtnField * pCapital
 		{
 			AccountField* pField = (AccountField*)m_msgQueue->new_block(sizeof(AccountField));
 
+			strcpy(pField->Account, pCapitalInfoRtn->accountID);
 			pField->PreBalance = pCapitalInfoRtn->preEquity;
 			pField->CurrMargin = pCapitalInfoRtn->margin;
 			pField->Commission = pCapitalInfoRtn->fee;
