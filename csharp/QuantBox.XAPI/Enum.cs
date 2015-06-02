@@ -146,6 +146,7 @@ namespace QuantBox
         Limit,
         StopLimit,
         MarketOnClose,
+        Pegged,
         TrailingStop,
         TrailingStopLimit,
     };
@@ -162,6 +163,7 @@ namespace QuantBox
         GTX,
         GTD,
         GFS,
+        AUC,
     };
 
     public enum PositionSide : byte
@@ -214,14 +216,16 @@ namespace QuantBox
 
     public enum BarType:byte
     {
-        Time,
+        Time = 1,
         Tick,
         Volume,
         Range,
+        Session,
     };
 
     public enum DataObjetType : byte
     {
+        DataObject,
         Tick,
         Bid,
         Ask,

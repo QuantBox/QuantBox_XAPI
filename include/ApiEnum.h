@@ -82,6 +82,7 @@ enum OrderType :char
 	Limit,
 	StopLimit,
 	MarketOnClose,
+	Pegged,
 	TrailingStop,
 	TrailingStopLimit,
 };
@@ -98,8 +99,8 @@ enum TimeInForce :char
 	GTX,
 	GTD,
 	GFS,
+	AUC,
 };
-
 
 
 enum PositionSide :char
@@ -167,14 +168,16 @@ enum SecurityType :char
 
 enum BarType :char
 {
-	Time,
+	Time = 1,
 	Tick,
 	Volume,
 	Range,
+	Session,
 };
 
 enum DataObjetType : char
 {
+	DataObject,
 	Tick_,
 	Bid,
 	Ask,
