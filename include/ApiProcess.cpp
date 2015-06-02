@@ -54,3 +54,32 @@ DepthField* GetAsk(DepthMarketDataNField* pField, int Pos)
 	DepthField* pDF = (DepthField*)p;
 	return pDF + pField->BidCount + (Pos - 1);
 }
+
+char* ExchangeType_2_String(ExchangeType exchange)
+{
+	switch (exchange)
+	{
+	case Undefined_:
+		return "Undefined";
+	case SHFE:
+		return "SHFE";
+	case DCE:
+		return "DCE";
+	case CZCE:
+		return "CZCE";
+	case CFFEX:
+		return "CFFEX";
+	case INE:
+		return "INE";
+	case SSE:
+		return "SSE";
+	case SZE:
+		return "SZE";
+	case NEEQ:
+		return "NEEQ";
+	case HKEx:
+		return "HKEx";
+	default:
+		return "Undefined";
+	}
+}

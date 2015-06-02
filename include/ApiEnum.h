@@ -160,7 +160,7 @@ enum SecurityType :char
 {
 	CS, // Common Stock
 	CB, // Convertible Bond，标记后，深圳卖出当前可转债表示转股
-	ETF, // 标记后，买入表示申购，卖出表示赎回
+	ETF_, // 标记后，买入表示申购，卖出表示赎回
 	LOF, // 标记后，买入表示申购，卖出表示赎回
 	SF, // 标记后，买入表示合并，卖出表示分拆
 	CashMargin, // 标记后，开仓表示"融"，平仓表示"还"
@@ -226,6 +226,5 @@ enum ExchangeType :char
 	NEEQ, // 全国中小企业股份转让系统,三板，临时这么写
 	HKEx,
 };
-
 
 #endif

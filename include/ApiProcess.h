@@ -14,4 +14,6 @@ DepthField* GetBid(DepthMarketDataNField* pField, int Pos);
 // 从结构体中读出卖档，Pos=1是卖一
 DepthField* GetAsk(DepthMarketDataNField* pField, int Pos);
 
+char* ExchangeType_2_String(ExchangeType exchange);
+
 #endif
