@@ -256,21 +256,22 @@ void GetExchangeTime_CZCE(int iTradingDay, char* TradingDay, char* ActionDay, ch
 	// TradingDay处理
 	if (_TradingDay)
 	{
+		int tradingday = 0;
 		if ((HH > 18 || HH < 6))
 		{
-			*_TradingDay = iTradingDay;
+			tradingday = iTradingDay;
 		}
 		else
 		{
-			int tradingday = atoi(TradingDay);
-			if (tradingday == 0)
-			{
-				time_t now = time(0);
-				struct tm *ptmNow = localtime(&now);
-				tradingday = (ptmNow->tm_year + 1900) * 10000 + (ptmNow->tm_mon + 1) * 100 + ptmNow->tm_mday;
-			}
-			*_TradingDay = tradingday;
+			tradingday = atoi(TradingDay);
 		}
+		if (tradingday == 0)
+		{
+			time_t now = time(0);
+			struct tm *ptmNow = localtime(&now);
+			tradingday = (ptmNow->tm_year + 1900) * 10000 + (ptmNow->tm_mon + 1) * 100 + ptmNow->tm_mday;
+		}
+		*_TradingDay = tradingday;
 	}
 
 	if (_ActionDay == nullptr)
@@ -319,7 +320,7 @@ void GetExchangeTime_Undefined(int iTradingDay, char* TradingDay, char* ActionDa
 		int tradingday = 0;
 		if ((HH > 18 || HH < 6))
 		{
-			*_TradingDay = iTradingDay;
+			tradingday = iTradingDay;
 		}
 		else
 		{
