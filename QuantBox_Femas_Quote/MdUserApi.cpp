@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "MdUserApi.h"
 #include "../include/QueueEnum.h"
 #include "../include/QueueHeader.h"
@@ -20,7 +20,7 @@ using namespace std;
 
 void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	// ÓÉÄÚ²¿µ÷ÓÃ£¬²»ÓÃ¼ì²éÊÇ·ñÎª¿Õ
+	// ç”±å†…éƒ¨è°ƒç”¨ï¼Œä¸ç”¨æ£€æŸ¥æ˜¯å¦ä¸ºç©º
 	CMdUserApi* pApi = (CMdUserApi*)pApi2;
 	pApi->QueryInThread(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 	return nullptr;
@@ -43,13 +43,13 @@ void CMdUserApi::QueryInThread(char type, void* pApi1, void* pApi2, double doubl
 
 	if (0 == iRet)
 	{
-		//·µ»Ø³É¹¦£¬Ìî¼Óµ½ÒÑ·¢ËÍ³Ø
+		//è¿”å›æˆåŠŸï¼Œå¡«åŠ åˆ°å·²å‘é€æ± 
 		m_nSleep = 1;
 	}
 	else
 	{
 		m_msgQueue_Query->Input_Copy(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
-		//Ê§°Ü£¬°´4µÄÃİ½øĞĞÑÓÊ±£¬µ«²»³¬¹ı1s
+		//å¤±è´¥ï¼ŒæŒ‰4çš„å¹‚è¿›è¡Œå»¶æ—¶ï¼Œä½†ä¸è¶…è¿‡1s
 		m_nSleep *= 4;
 		m_nSleep %= 1023;
 	}
@@ -62,7 +62,7 @@ CMdUserApi::CMdUserApi(void)
 	m_lRequestID = 0;
 	m_nSleep = 1;
 
-	// ×Ô¼ºÎ¬»¤Á½¸öÏûÏ¢¶ÓÁĞ
+	// è‡ªå·±ç»´æŠ¤ä¸¤ä¸ªæ¶ˆæ¯é˜Ÿåˆ—
 	m_msgQueue = new CMsgQueue();
 	m_msgQueue_Query = new CMsgQueue();
 
@@ -150,17 +150,27 @@ int CMdUserApi::_Init()
 	{
 		m_pApi->RegisterSpi(this);
 
-		//Ìí¼ÓµØÖ·
+		//æ·»åŠ åœ°å€
 		size_t len = strlen(m_ServerInfo.Address) + 1;
 		char* buf = new char[len];
 		strncpy(buf, m_ServerInfo.Address, len);
+
+		m_pApi->SetUseMultiChannel(m_ServerInfo.IsMulticast);
 
 		char* token = strtok(buf, _QUANTBOX_SEPS_);
 		while (token)
 		{
 			if (strlen(token)>0)
 			{
-				m_pApi->RegisterFront(token);
+				if (m_ServerInfo.IsMulticast)
+				{
+					// RegisterMultiChannel("multi://[æ¥æ”¶å¤šæ’­çš„ç½‘å¡æ‰€å±çš„åœ°å€æ®µ]@[æ¥æ”¶å¤šæ’­çš„åœ°å€]:[ç«¯å£å·]")
+					m_pApi->RegisterMultiChannel(token);
+				}
+				else
+				{
+					m_pApi->RegisterFront(token);
+				}
 			}
 			token = strtok(NULL, _QUANTBOX_SEPS_);
 		}
@@ -168,7 +178,7 @@ int CMdUserApi::_Init()
 
 		if (m_ServerInfo.MarketDataTopicResumeType<ResumeType::Undefined)
 			m_pApi->SubscribeMarketDataTopic(m_ServerInfo.TopicId, (USTP_TE_RESUME_TYPE)m_ServerInfo.MarketDataTopicResumeType);
-		//³õÊ¼»¯Á¬½Ó
+		//åˆå§‹åŒ–è¿æ¥
 		m_pApi->Init();
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Connecting, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 	}
@@ -196,7 +206,7 @@ int CMdUserApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 
 void CMdUserApi::Disconnect()
 {
-	// ÇåÀí²éÑ¯¶ÓÁĞ
+	// æ¸…ç†æŸ¥è¯¢é˜Ÿåˆ—
 	if (m_msgQueue_Query)
 	{
 		m_msgQueue_Query->StopThread();
@@ -212,14 +222,14 @@ void CMdUserApi::Disconnect()
 		m_pApi->Release();
 		m_pApi = NULL;
 
-		// È«ÇåÀí£¬Ö»Áô×îºóÒ»¸ö
+		// å…¨æ¸…ç†ï¼Œåªç•™æœ€åä¸€ä¸ª
 		m_msgQueue->Clear();
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-		// Ö÷¶¯´¥·¢
+		// ä¸»åŠ¨è§¦å‘
 		m_msgQueue->Process();
 	}
 
-	// ÇåÀíÏìÓ¦¶ÓÁĞ
+	// æ¸…ç†å“åº”é˜Ÿåˆ—
 	if (m_msgQueue)
 	{
 		m_msgQueue->StopThread();
@@ -244,14 +254,14 @@ void CMdUserApi::Subscribe(const string& szInstrumentIDs, const string& szExchag
 
 	if(vct.size()>0)
 	{
-		//×ª³É×Ö·û´®Êı×é
+		//è½¬æˆå­—ç¬¦ä¸²æ•°ç»„
 		char** pArray = new char*[vct.size()];
 		for (size_t j = 0; j<vct.size(); ++j)
 		{
 			pArray[j] = vct[j];
 		}
 
-		//¶©ÔÄ
+		//è®¢é˜…
 		m_pApi->SubMarketData(pArray, (int)vct.size());
 
 		delete[] pArray;
@@ -290,14 +300,14 @@ void CMdUserApi::Unsubscribe(const string& szInstrumentIDs, const string& szExch
 
 	if(vct.size()>0)
 	{
-		//×ª³É×Ö·û´®Êı×é
+		//è½¬æˆå­—ç¬¦ä¸²æ•°ç»„
 		char** pArray = new char*[vct.size()];
 		for (size_t j = 0; j<vct.size(); ++j)
 		{
 			pArray[j] = vct[j];
 		}
 
-		//¶©ÔÄ
+		//è®¢é˜…
 		m_pApi->UnSubMarketData(pArray, (int)vct.size());
 
 		delete[] pArray;
@@ -309,14 +319,14 @@ void CMdUserApi::OnFrontConnected()
 {
 	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
-	//Á¬½Ó³É¹¦ºó×Ô¶¯ÇëÇóµÇÂ¼
+	//è¿æ¥æˆåŠŸåè‡ªåŠ¨è¯·æ±‚ç™»å½•
 	ReqUserLogin();
 }
 
 void CMdUserApi::OnFrontDisconnected(int nReason)
 {
 	RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
-	//Á¬½ÓÊ§°Ü·µ»ØµÄĞÅÏ¢ÊÇÆ´½Ó¶ø³É£¬Ö÷ÒªÊÇÎªÁËÍ³Ò»Êä³ö
+	//è¿æ¥å¤±è´¥è¿”å›çš„ä¿¡æ¯æ˜¯æ‹¼æ¥è€Œæˆï¼Œä¸»è¦æ˜¯ä¸ºäº†ç»Ÿä¸€è¾“å‡º
 	pField->ErrorID = nReason;
 	GetOnFrontDisconnectedMsg(nReason, pField->ErrorMsg);
 
@@ -338,10 +348,10 @@ void CMdUserApi::OnRspUserLogin(CUstpFtdcRspUserLoginField *pRspUserLogin, CUstp
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
-		//ÓĞ¿ÉÄÜ¶ÏÏßÁË£¬±¾´¦ÊÇ¶ÏÏßÖØÁ¬ºóÖØĞÂ¶©ÔÄ
-		set<string> mapOld = m_setInstrumentIDs;//¼ÇÏÂÉÏ´Î¶©ÔÄµÄºÏÔ¼
-		//Unsubscribe(mapOld);//ÓÉÓÚÒÑ¾­¶ÏÏßÁË£¬Ã»ÓĞ±ØÒªÔÙÈ¡Ïû¶©ÔÄ
-		Subscribe(mapOld,"");//¶©ÔÄ
+		//æœ‰å¯èƒ½æ–­çº¿äº†ï¼Œæœ¬å¤„æ˜¯æ–­çº¿é‡è¿åé‡æ–°è®¢é˜…
+		set<string> mapOld = m_setInstrumentIDs;//è®°ä¸‹ä¸Šæ¬¡è®¢é˜…çš„åˆçº¦
+		//Unsubscribe(mapOld);//ç”±äºå·²ç»æ–­çº¿äº†ï¼Œæ²¡æœ‰å¿…è¦å†å–æ¶ˆè®¢é˜…
+		Subscribe(mapOld,"");//è®¢é˜…
 	}
 	else
 	{
@@ -359,7 +369,7 @@ void CMdUserApi::OnRspError(CUstpFtdcRspInfoField *pRspInfo, int nRequestID, boo
 
 void CMdUserApi::OnRspSubMarketData(CUstpFtdcSpecificInstrumentField *pSpecificInstrument, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	//ÔÚÄ£ÄâÆ½Ì¨¿ÉÄÜÕâ¸öº¯Êı²»»á´¥·¢£¬ËùÒÔÒª×Ô¼ºÎ¬»¤Ò»ÕÅÒÑ¾­¶©ÔÄµÄºÏÔ¼ÁĞ±í
+	//åœ¨æ¨¡æ‹Ÿå¹³å°å¯èƒ½è¿™ä¸ªå‡½æ•°ä¸ä¼šè§¦å‘ï¼Œæ‰€ä»¥è¦è‡ªå·±ç»´æŠ¤ä¸€å¼ å·²ç»è®¢é˜…çš„åˆçº¦åˆ—è¡¨
 	if(!IsErrorRspInfo(pRspInfo,nRequestID,bIsLast)
 		&&pSpecificInstrument)
 	{
@@ -371,7 +381,7 @@ void CMdUserApi::OnRspSubMarketData(CUstpFtdcSpecificInstrumentField *pSpecificI
 
 void CMdUserApi::OnRspUnSubMarketData(CUstpFtdcSpecificInstrumentField *pSpecificInstrument, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	//Ä£ÄâÆ½Ì¨¿ÉÄÜÕâ¸öº¯Êı²»»á´¥·¢
+	//æ¨¡æ‹Ÿå¹³å°å¯èƒ½è¿™ä¸ªå‡½æ•°ä¸ä¼šè§¦å‘
 	if(!IsErrorRspInfo(pRspInfo,nRequestID,bIsLast)
 		&&pSpecificInstrument)
 	{
@@ -381,7 +391,7 @@ void CMdUserApi::OnRspUnSubMarketData(CUstpFtdcSpecificInstrumentField *pSpecifi
 	}
 }
 
-//ĞĞÇé»Øµ÷£¬µÃ±£Ö¤´Ëº¯Êı¾¡¿ì·µ»Ø
+//è¡Œæƒ…å›è°ƒï¼Œå¾—ä¿è¯æ­¤å‡½æ•°å°½å¿«è¿”å›
 void CMdUserApi::OnRtnDepthMarketData(CUstpFtdcDepthMarketDataField *pDepthMarketData)
 {
 	DepthMarketDataNField* pField = (DepthMarketDataNField*)m_msgQueue->new_block(sizeof(DepthMarketDataNField)+sizeof(DepthField)* 10);
