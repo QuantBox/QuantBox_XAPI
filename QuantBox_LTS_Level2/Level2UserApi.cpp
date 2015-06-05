@@ -645,19 +645,19 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 	pField->Volume = pL2MarketData->TotalTradeVolume;
 	pField->Turnover = pL2MarketData->TotalTradeValue;
 	//marketData.OpenInterest = pL2MarketData->OpenInterest;
-	//marketData.AveragePrice = pL2MarketData->AveragePrice;
+	//pField->AveragePrice = pL2MarketData->;
 
 	pField->OpenPrice = pL2MarketData->OpenPrice == DBL_MAX ? 0 : pL2MarketData->OpenPrice;
 	pField->HighestPrice = pL2MarketData->HighPrice == DBL_MAX ? 0 : pL2MarketData->HighPrice;
 	pField->LowestPrice = pL2MarketData->LowPrice == DBL_MAX ? 0 : pL2MarketData->LowPrice;
 	pField->ClosePrice = pL2MarketData->ClosePrice == DBL_MAX ? 0 : pL2MarketData->ClosePrice;
-	//marketData.SettlementPrice = pL2MarketData->SettlementPrice;
+	//pField->SettlementPrice = pL2MarketData->SettlementPrice;
 
-	//marketData.UpperLimitPrice = pL2MarketData->UpperLimitPrice;
-	//marketData.LowerLimitPrice = pL2MarketData->LowerLimitPrice;
-	//marketData.PreClosePrice = pL2MarketData->PreClosePrice;
-	//marketData.PreSettlementPrice = pL2MarketData->PreSettlementPrice;
-	//marketData.PreOpenInterest = pL2MarketData->PreOpenInterest;
+	//pField->UpperLimitPrice = pL2MarketData->UpperLimitPrice;
+	//pField->LowerLimitPrice = pL2MarketData->LowerLimitPrice;
+	pField->PreClosePrice = pL2MarketData->PreClosePrice;
+	//pField->PreSettlementPrice = pL2MarketData->PreSettlementPrice;
+	//pField->PreOpenInterest = pL2MarketData->PreOpenInterest;
 
 	InitBidAsk(pField);
 
