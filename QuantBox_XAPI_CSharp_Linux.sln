@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantBox.XAPI_Linux", "QuantBox.XAPI\QuantBox.XAPI_Linux.csproj", "{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantBox.XAPI_Linux", "csharp\QuantBox.XAPI\QuantBox.XAPI_Linux.csproj", "{6AA065F5-2E4A-4112-A3AE-1F75CAE42FFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -78,11 +78,11 @@ namespace QuantBox.XAPI.Event
             }
         }
 
-        private void OnRtnDepthMarketData_callback(object sender, ref DepthMarketDataField marketData)
+        private void OnRtnDepthMarketData_callback(object sender, ref DepthMarketDataNClass marketData)
         {
             if (null != OnRtnDepthMarketData)
             {
-                OnRtnDepthMarketData(this, new OnRtnDepthMarketDataEventArgs(ref marketData));
+                OnRtnDepthMarketData(this, new OnRtnDepthMarketDataNEventArgs(ref marketData));
             }
         }
 

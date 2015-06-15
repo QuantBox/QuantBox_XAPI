@@ -3,9 +3,15 @@
 
 #include <stdint.h>
 
+#ifdef _WIN64
+#define QUEUE_INT LONG64
+#else
+#define QUEUE_INT unsigned long
+#endif
+
 #define ARRAY_LOCK_FREE_Q_DEFAULT_SIZE 65535 // 2^16
 
-template <typename ELEM_T, uint32_t Q_SIZE = ARRAY_LOCK_FREE_Q_DEFAULT_SIZE>
+template <typename ELEM_T, QUEUE_INT Q_SIZE = ARRAY_LOCK_FREE_Q_DEFAULT_SIZE>
 class ArrayLockFreeQueue
 {
 public:
@@ -13,7 +19,7 @@ public:
 	ArrayLockFreeQueue();
 	virtual ~ArrayLockFreeQueue();
 
-	uint32_t size();
+	QUEUE_INT size();
 
 	bool enqueue(const ELEM_T &a_data);
 
@@ -25,14 +31,15 @@ private:
 
 	ELEM_T m_thequeue[Q_SIZE];
 
-	volatile uint32_t m_count;
-	volatile uint32_t m_writeIndex;
 
-	volatile uint32_t m_readIndex;
+	volatile QUEUE_INT m_count;
+	volatile QUEUE_INT m_writeIndex;
 
-	volatile uint32_t m_maximumReadIndex;
+	volatile QUEUE_INT m_readIndex;
 
-	inline uint32_t countToIndex(uint32_t a_count);
+	volatile QUEUE_INT m_maximumReadIndex;
+
+	inline QUEUE_INT countToIndex(QUEUE_INT a_count);
 };
 
 #include "ArrayLockFreeQueueImp.h"

@@ -4,6 +4,7 @@
 #include <mutex>
 #include <cstring>
 #include <condition_variable>
+#include <atomic>
 
 #include "../include/CrossPlatform.h"
 
@@ -14,6 +15,7 @@
 //#include "readerwriterqueue.h"
 //#include "concurrentqueue.h"
 #include "ArrayLockFreeQueue.h"
+
 
 using namespace std;
 //using namespace moodycamel;
@@ -214,15 +216,17 @@ private:
 			lpParam->RunInThread();
 	}
 protected:
-	volatile bool						m_bRunning;
+	//volatile bool						m_bRunning;
+	atomic_bool							m_bRunning;
 	mutex								m_mtx;
 	mutex								m_mtx_del;
 	condition_variable					m_cv;
 	thread*								m_hThread;
 
 private:
-//	ConcurrentQueue<ResponeItem*>		m_queue;
-	ArrayLockFreeQueue<ResponeItem*, 2048>	m_queue;
+	//	ConcurrentQueue<ResponeItem*>		m_queue;
+	ArrayLockFreeQueue<ResponeItem*>	m_queue;
+
 	fnOnRespone							m_fnOnRespone;
 	void*								m_pClass;
 };

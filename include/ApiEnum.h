@@ -205,7 +205,7 @@ enum ExchangeType :char
 	INE, // 能源中心
 	SSE, // 上交所
 	SZE, // 深交所
-	NEEQ, // 全国中小企业股份转让系统
+	NEEQ, // 全国中小企业股份转让系统,三板，临时这么写
 	HKEx,
 };
 

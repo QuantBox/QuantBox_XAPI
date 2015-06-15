@@ -22,11 +22,11 @@ namespace QuantBox.XAPI
             Console.WriteLine("22222" + status+userLogin.ErrorMsg());
         }
 
-        static void OnRtnDepthMarketData(object sender, ref DepthMarketDataField marketData)
+        static void OnRtnDepthMarketData(object sender, ref DepthMarketDataNClass marketData)
         {
             Debugger.Log(0, null, "CTP:C#");
             Console.WriteLine(marketData.InstrumentID);
-            Console.WriteLine(marketData.ExchangeID);
+            Console.WriteLine(marketData.Exchange);
             Console.WriteLine(marketData.LastPrice);
         }
 

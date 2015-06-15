@@ -72,15 +72,19 @@ void CMsgQueue::StartThread()
 void CMsgQueue::StopThread()
 {
     m_bRunning = false;
+	this_thread::sleep_for(chrono::milliseconds(1));
 	m_cv.notify_all();
+	this_thread::sleep_for(chrono::milliseconds(1));
 	lock_guard<mutex> cl(m_mtx_del);
     if(m_hThread)
     {
+		//m_cv.notify_all();
         m_hThread->join();
         delete m_hThread;
         m_hThread = nullptr;
     }
 }
+
 
 void CMsgQueue::RunInThread()
 {
@@ -92,12 +96,12 @@ void CMsgQueue::RunInThread()
 		else
 		{
 			// 空闲时等1ms,如果立即有事件过来就晚了1ms
-			 //this_thread::sleep_for(chrono::milliseconds(1));
+			//this_thread::sleep_for(chrono::milliseconds(1));
 
 			// 空闲时过来等1ms,没等到就回去再试
 			// 如过正好等到了，就立即去试，应当会快一点吧?
 			unique_lock<mutex> lck(m_mtx);
-			m_cv.wait_for(lck, std::chrono::seconds(1));
+			m_cv.wait_for(lck, std::chrono::seconds(1), [this]{return m_bRunning == false; });
 		}
 	}
 

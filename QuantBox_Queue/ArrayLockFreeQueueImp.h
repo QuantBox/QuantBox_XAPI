@@ -5,7 +5,7 @@
 #include <assert.h>
 #include "atom_opt.h"
 
-template <typename ELEM_T, uint32_t Q_SIZE>
+template <typename ELEM_T, QUEUE_INT Q_SIZE>
 ArrayLockFreeQueue<ELEM_T, Q_SIZE>::ArrayLockFreeQueue() :
 	m_writeIndex(0),
 	m_readIndex(0),
@@ -16,23 +16,24 @@ ArrayLockFreeQueue<ELEM_T, Q_SIZE>::ArrayLockFreeQueue() :
 
 }
 
-template <typename ELEM_T, uint32_t Q_SIZE>
+template <typename ELEM_T, QUEUE_INT Q_SIZE>
 ArrayLockFreeQueue<ELEM_T, Q_SIZE>::~ArrayLockFreeQueue()
 {
 
 }
 
-template <typename ELEM_T, uint32_t Q_SIZE>
-inline uint32_t ArrayLockFreeQueue<ELEM_T, Q_SIZE>::countToIndex(uint32_t a_count)
+template <typename ELEM_T, QUEUE_INT Q_SIZE>
+inline QUEUE_INT ArrayLockFreeQueue<ELEM_T, Q_SIZE>::countToIndex(QUEUE_INT a_count)
 {
 	return (a_count % Q_SIZE);
 }
 
-template <typename ELEM_T, uint32_t Q_SIZE>
-uint32_t ArrayLockFreeQueue<ELEM_T, Q_SIZE>::size()
+
+template <typename ELEM_T, QUEUE_INT Q_SIZE>
+QUEUE_INT ArrayLockFreeQueue<ELEM_T, Q_SIZE>::size()
 {
-	uint32_t currentWriteIndex = m_writeIndex;
-	uint32_t currentReadIndex = m_readIndex;
+	QUEUE_INT currentWriteIndex = m_writeIndex;
+	QUEUE_INT currentReadIndex = m_readIndex;
 
 	if(currentWriteIndex>=currentReadIndex)
 		return currentWriteIndex - currentReadIndex;
@@ -41,11 +42,11 @@ uint32_t ArrayLockFreeQueue<ELEM_T, Q_SIZE>::size()
 
 }
 
-template <typename ELEM_T, uint32_t Q_SIZE>
+template <typename ELEM_T, QUEUE_INT Q_SIZE>
 bool ArrayLockFreeQueue<ELEM_T, Q_SIZE>::enqueue(const ELEM_T &a_data)
 {
-	uint32_t currentWriteIndex;
-	uint32_t currentReadIndex;
+	QUEUE_INT currentWriteIndex;
+	QUEUE_INT currentReadIndex;
 	do
 	{
 		currentWriteIndex = m_writeIndex;
@@ -70,17 +71,18 @@ bool ArrayLockFreeQueue<ELEM_T, Q_SIZE>::enqueue(const ELEM_T &a_data)
 
 }
 
-template <typename ELEM_T, uint32_t Q_SIZE>
+template <typename ELEM_T, QUEUE_INT Q_SIZE>
 bool ArrayLockFreeQueue<ELEM_T, Q_SIZE>::try_dequeue(ELEM_T &a_data)
 {
     return dequeue(a_data);
 }
 
-template <typename ELEM_T, uint32_t Q_SIZE>
+
+template <typename ELEM_T, QUEUE_INT Q_SIZE>
 bool ArrayLockFreeQueue<ELEM_T, Q_SIZE>::dequeue(ELEM_T &a_data)
 {
-	uint32_t currentMaximumReadIndex;
-	uint32_t currentReadIndex;
+	QUEUE_INT currentMaximumReadIndex;
+	QUEUE_INT currentReadIndex;
 
 	do
 	{

@@ -54,9 +54,24 @@ public:
 	}
 	virtual void OnRtnError(CXApi* pApi, ErrorField* pError){};
 
-	virtual void OnRtnDepthMarketData(CXApi* pApi, DepthMarketDataField* pMarketData)
+	virtual void OnRtnDepthMarketDataN(CXApi* pApi, DepthMarketDataNField* pMarketData)
 	{
 		printf("%s,%f,%d\r\n", pMarketData->Symbol, pMarketData->LastPrice, ++count);
+
+		int size = sizeof(DepthField);
+		char* pBid = ((char*)pMarketData) + sizeof(DepthMarketDataNField);
+		int AskCount = (pMarketData->Size - sizeof(DepthMarketDataNField)) / size - pMarketData->BidCount;
+		char* pAsk = ((char*)pMarketData) + sizeof(DepthMarketDataNField)+pMarketData->BidCount*size;
+		for (int i = 0; i < pMarketData->BidCount; ++i)
+		{
+			DepthField* pDF = (DepthField*)(pBid + i * size);
+			printf("%d,%f,%d,%d\r\n", i, pDF->Price, pDF->Size, pDF->Count);
+		}
+		for (int i = 0; i < AskCount; ++i)
+		{
+			DepthField* pDF = (DepthField*)(pAsk + i * size);
+			printf("%d,%f,%d,%d\r\n", i, pDF->Price, pDF->Size, pDF->Count);
+		}
 	}
 
 	virtual void OnRtnQuoteRequest(CXApi* pApi, QuoteRequestField* pQuoteRequest){};
@@ -194,7 +209,7 @@ int main_1(int argc, char* argv[])
 
 
 
-int main_2(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	CXSpiImpl* p = new CXSpiImpl();
 
@@ -233,7 +248,7 @@ int main_2(int argc, char* argv[])
 }
 
 
-int main(int argc, char* argv[])
+int main_4(int argc, char* argv[])
 {
 	CXSpiImpl* p = new CXSpiImpl();
 #if defined WINDOWS || _WIN32
@@ -285,4 +300,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-

@@ -43,6 +43,15 @@
 			<Add option="-std=c++11" />
 			<Add option="-fexceptions" />
 			<Add option="-fPIC" />
+			<Add option="-Wno-undef" />
+			<Add option="-Wno-c++98-compat-pedantic" />
+			<Add option="-Wno-c++98-compat" />
+			<Add option="-Wno-extra-semi" />
+			<Add option="-Wno-unused-parameter" />
+			<Add option="-Wno-documentation" />
+			<Add option="-Wno-unknown-pragmas" />
+			<Add option="-Wno-padded" />
+			<Add option="-Wno-ignored-attributes" />
 		</Compiler>
 		<Linker>
 			<Add library="thostmduserapi" />
@@ -50,6 +59,7 @@
 			<Add directory="../include/CTP/linux64" />
 			<Add directory="../QuantBox.TAPI/bin" />
 		</Linker>
+		<Unit filename="../QuantBox_CTP_Trade/TypeConvert.cpp" />
 		<Unit filename="../include/toolkit.cpp" />
 		<Unit filename="../include/toolkit.h" />
 		<Unit filename="MdUserApi.cpp" />

@@ -76,7 +76,7 @@ namespace QuantBox.XAPI.Callback
                     break;
 
                 case ResponeType.OnRtnDepthMarketData:
-                    _OnRtnDepthMarketData(ptr1);
+                    _OnRtnDepthMarketData(ptr1,size1,double1);
                     break;
                 case ResponeType.OnRtnQuoteRequest:
                     _OnRtnQuoteRequest(ptr1, size1);

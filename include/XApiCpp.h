@@ -17,7 +17,7 @@ public:
 	virtual void OnConnectionStatus(CXApi* pApi, ConnectionStatus status, RspUserLoginField* pUserLogin, int size1){};
 	virtual void OnRtnError(CXApi* pApi, ErrorField* pError){};
 
-	virtual void OnRtnDepthMarketData(CXApi* pApi, DepthMarketDataField* pMarketData){};
+	virtual void OnRtnDepthMarketDataN(CXApi* pApi, DepthMarketDataNField* pMarketData){};
 	virtual void OnRtnQuoteRequest(CXApi* pApi, QuoteRequestField* pQuoteRequest){};
 
 	virtual void OnRspQryInstrument(CXApi* pApi, InstrumentField* pInstrument, int size1, bool bIsLast){};

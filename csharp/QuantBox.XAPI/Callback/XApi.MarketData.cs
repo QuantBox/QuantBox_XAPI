@@ -10,7 +10,6 @@ namespace QuantBox.XAPI.Callback
 {
     public partial class XApi : IXMarketData
     {
-        
         public DelegateOnRtnDepthMarketData OnRtnDepthMarketData
         {
             get { return OnRtnDepthMarketData_; }
@@ -128,15 +127,13 @@ namespace QuantBox.XAPI.Callback
         }
         #endregion
 
-        private void _OnRtnDepthMarketData(IntPtr ptr1)
+        private void _OnRtnDepthMarketData(IntPtr ptr1,int size1,double double1)
         {
             // 求快，这个地方不判断
             //if (OnRtnDepthMarketData_ == null)
             //    return;
-
-            DepthMarketDataField obj = (DepthMarketDataField)Marshal.PtrToStructure(ptr1, typeof(DepthMarketDataField));
-
-            OnRtnDepthMarketData_(this, ref obj);
+            DepthMarketDataNClass cls = PInvokeUtility.GetDepthMarketDataNClass(ptr1);
+            OnRtnDepthMarketData(this, ref cls);
         }
 
         private bool _OnFilterSubscribe(double double1, int size1, int size2, int size3, IntPtr ptr1)

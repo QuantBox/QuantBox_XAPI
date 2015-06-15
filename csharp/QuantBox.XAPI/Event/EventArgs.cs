@@ -30,11 +30,11 @@ namespace QuantBox.XAPI.Event
         }
     }
 
-    public class OnRtnDepthMarketDataEventArgs : EventArgs
+    public class OnRtnDepthMarketDataNEventArgs : EventArgs
     {
-        public readonly DepthMarketDataField marketData;
+        public readonly DepthMarketDataNClass marketData;
 
-        public OnRtnDepthMarketDataEventArgs(ref DepthMarketDataField marketData)
+        public OnRtnDepthMarketDataNEventArgs(ref DepthMarketDataNClass marketData)
         {
             this.marketData = marketData;
         }

@@ -30,7 +30,7 @@ void* CXApiImpl::_OnRespone(char type, void* pApi1, void* pApi2, double double1,
 		m_pSpi->OnRtnError(this, (ErrorField*)ptr1);
 		break;
 	case OnRtnDepthMarketData:
-		m_pSpi->OnRtnDepthMarketData(this, (DepthMarketDataField*)ptr1);
+		m_pSpi->OnRtnDepthMarketDataN(this, (DepthMarketDataNField*)ptr1);
 		break;
 	case OnRspQryInstrument:
 		m_pSpi->OnRspQryInstrument(this, (InstrumentField*)ptr1, size1, double1 != 0);

@@ -1,4 +1,4 @@
-#ifndef _TOOLKIT_H_
+ï»¿#ifndef _TOOLKIT_H_
 #define _TOOLKIT_H_
 
 #include <vector>
@@ -9,14 +9,17 @@ using namespace std;
 
 void WriteLog(const char *fmt, ...);
 
-//ÊäÈëÂ·¾¶£¬Éú³É¶à¼¶Ä¿Â¼
+//è¾“å…¥è·¯å¾„ï¼Œç”Ÿæˆå¤šçº§ç›®å½•
 void makedirs(const char* dir);
 
-//½«×Ö·û´®°´Ö¸¶¨×Ö·û·Ö¸î
+//å°†å­—ç¬¦ä¸²æŒ‰æŒ‡å®šå­—ç¬¦åˆ†å‰²
 typedef void fnGetSetFromStringProcess(char* token);
 char* GetSetFromString(const char* szString, const char* seps, vector<char*>& vct, set<char*>& st, int modify, set<string>& st2, int before = 1, const char* prefix = nullptr);
 
 int GetUpdateTime(char* UpdateTime, int* _UpdateTime, int* UpdateMillisec);
+void GetExchangeTime_CZCE(int iTradingDay, char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime, int* UpdateMillisec);
+void GetExchangeTime_Undefined(int iTradingDay, char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime, int* UpdateMillisec);
+void GetExchangeTime_DCE(char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime, int* UpdateMillisec);
 void GetExchangeTime(char* TradingDay, char* ActionDay, char* UpdateTime, int* _TradingDay, int* _ActionDay, int* _UpdateTime, int* UpdateMillisec);
 void GetExchangeTime(time_t Time, int* _TradingDay, int* _ActionDay, int* _UpdateTime);
 
@@ -25,7 +28,7 @@ int GetTime(char* UpdateTime);
 
 double my_round(float val, int x = 0);
 
-//¸ù¾İOnFrontDisconnected(int nReason)µÄÖµÌîÉÏ´íÎóÏûÏ¢
+//æ ¹æ®OnFrontDisconnected(int nReason)çš„å€¼å¡«ä¸Šé”™è¯¯æ¶ˆæ¯
 void GetOnFrontDisconnectedMsg(int ErrorId, char* ErrorMsg);
 
 #endif

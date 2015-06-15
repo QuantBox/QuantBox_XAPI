@@ -7,8 +7,10 @@
 #include "../include/ApiStruct.h"
 
 #include "../include/toolkit.h"
+#include "../include/ApiProcess.h"
 
 #include "../QuantBox_Queue/MsgQueue.h"
+#include "../QuantBox_XSpeed_Trade/TypeConvert.h"
 
 #include <string.h>
 #include <cfloat>
@@ -37,6 +39,9 @@ void CMdUserApi::QueryInThread(char type, void* pApi1, void* pApi2, double doubl
 		break;
 	case E_UserLoginField:
 		iRet = _ReqUserLogin(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		break;
+	case E_TradingDayField:
+		iRet = _ReqTradingDay(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 	default:
 		break;
 	}
@@ -176,6 +181,37 @@ int CMdUserApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 	DFITCUserLoginField* pBody = (DFITCUserLoginField*)ptr1;
 	pBody->lRequestID = ++m_lRequestID;
 	return m_pApi->ReqUserLogin(pBody);
+}
+
+void CMdUserApi::ReqTradingDay()
+{
+	DFITCTradingDayField* pBody = (DFITCTradingDayField*)m_msgQueue_Query->new_block(sizeof(DFITCTradingDayField));
+
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_TradingDayField, m_msgQueue_Query, this, 0, 0,
+		pBody, sizeof(DFITCTradingDayField), nullptr, 0, nullptr, 0);
+}
+
+int CMdUserApi::_ReqTradingDay(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	DFITCTradingDayField* pBody = (DFITCTradingDayField*)ptr1;
+	pBody->lRequestID = ++m_lRequestID;
+	return m_pApi->ReqTradingDay(pBody);
+}
+
+void CMdUserApi::OnRspTradingDay(struct DFITCTradingDayRtnField * pTradingDayRtnData)
+{
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+
+	m_TradingDay = GetDate(pTradingDayRtnData->date);
+
+	//有可能断线了，本处是断线重连后重新订阅
+	set<string> mapOld = m_setInstrumentIDs;//记下上次订阅的合约
+	//Unsubscribe(mapOld);//由于已经断线了，没有必要再取消订阅
+	Subscribe(mapOld, "");//订阅
+
+	////有可能断线了，本处是断线重连后重新订阅
+	//mapOld = m_setQuoteInstrumentIDs;//记下上次订阅的合约
+	//SubscribeQuote(mapOld, "");//订阅
 }
 
 void CMdUserApi::Disconnect()
@@ -396,19 +432,10 @@ void CMdUserApi::OnRspUserLogin(struct DFITCUserLoginInfoRtnField * pRspUserLogi
 		//strncpy(field.LoginTime, pRspUserLogin->LoginTime, sizeof(TimeType));
 		//GetExchangeTime(pRspUserLogin->TradingDay, nullptr, pRspUserLogin->LoginTime,
 		//	&field.TradingDay, nullptr, &field.LoginTime, nullptr);
+
 		sprintf(pField->SessionID, "%d", pRspUserLogin->sessionID);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logined, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-
-		//有可能断线了，本处是断线重连后重新订阅
-		set<string> mapOld = m_setInstrumentIDs;//记下上次订阅的合约
-		//Unsubscribe(mapOld);//由于已经断线了，没有必要再取消订阅
-		Subscribe(mapOld,"");//订阅
-
-		////有可能断线了，本处是断线重连后重新订阅
-		//mapOld = m_setQuoteInstrumentIDs;//记下上次订阅的合约
-		//SubscribeQuote(mapOld, "");//订阅
 	}
 	else
 	{
@@ -451,14 +478,26 @@ void CMdUserApi::OnRspUnSubMarketData(struct DFITCSpecificInstrumentField * pSpe
 //行情回调，得保证此函数尽快返回
 void CMdUserApi::OnMarketData(struct DFITCDepthMarketDataField *pMarketDataField)
 {
-	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
+	DepthMarketDataNField* pField = (DepthMarketDataNField*)m_msgQueue->new_block(sizeof(DepthMarketDataNField)+sizeof(DepthField)* 10);
+
 
 	strcpy(pField->InstrumentID, pMarketDataField->instrumentID);
-	strcpy(pField->ExchangeID, pMarketDataField->exchangeID);
+	pField->Exchange = DFITCExchangeIDType_2_ExchangeType(pMarketDataField->exchangeID);
 
-	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
-	GetExchangeTime(pMarketDataField->tradingDay, nullptr, pMarketDataField->UpdateTime
-		, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pMarketDataField->exchangeID);
+
+	switch (pField->Exchange)
+	{
+	case ExchangeType::CZCE:
+		GetExchangeTime_CZCE(m_TradingDay, pMarketDataField->tradingDay, nullptr, pMarketDataField->UpdateTime
+			, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+		break;
+	default:
+		GetExchangeTime(pMarketDataField->tradingDay, nullptr, pMarketDataField->UpdateTime
+			, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+		break;
+	}
+
 	pField->UpdateMillisec = pMarketDataField->UpdateMillisec;
 
 	pField->LastPrice = pMarketDataField->lastPrice;
@@ -479,63 +518,55 @@ void CMdUserApi::OnMarketData(struct DFITCDepthMarketDataField *pMarketDataField
 	pField->PreSettlementPrice = pMarketDataField->preSettlementPrice;
 	pField->PreOpenInterest = pMarketDataField->preOpenInterest;
 
+	InitBidAsk(pField);
+
 	do
 	{
 		if (pMarketDataField->BidVolume1 == 0)
 			break;
-		pField->BidPrice1 = pMarketDataField->BidPrice1;
-		pField->BidVolume1 = pMarketDataField->BidVolume1;
+		AddBid(pField, pMarketDataField->BidPrice1, pMarketDataField->BidVolume1, 0);
 
 		if (pMarketDataField->BidVolume2 == 0)
 			break;
-		pField->BidPrice2 = pMarketDataField->BidPrice2;
-		pField->BidVolume2 = pMarketDataField->BidVolume2;
+		AddBid(pField, pMarketDataField->BidPrice2, pMarketDataField->BidVolume2, 0);
 
 		if (pMarketDataField->BidVolume3 == 0)
 			break;
-		pField->BidPrice3 = pMarketDataField->BidPrice3;
-		pField->BidVolume3 = pMarketDataField->BidVolume3;
+		AddBid(pField, pMarketDataField->BidPrice3, pMarketDataField->BidVolume3, 0);
 
 		if (pMarketDataField->BidVolume4 == 0)
 			break;
-		pField->BidPrice4 = pMarketDataField->BidPrice4;
-		pField->BidVolume4 = pMarketDataField->BidVolume4;
+		AddBid(pField, pMarketDataField->BidPrice4, pMarketDataField->BidVolume4, 0);
 
 		if (pMarketDataField->BidVolume5 == 0)
 			break;
-		pField->BidPrice5 = pMarketDataField->BidPrice5;
-		pField->BidVolume5 = pMarketDataField->BidVolume5;
+		AddBid(pField, pMarketDataField->BidPrice5, pMarketDataField->BidVolume5, 0);
 	} while (false);
 
 	do
 	{
 		if (pMarketDataField->AskVolume1 == 0)
 			break;
-		pField->AskPrice1 = pMarketDataField->AskPrice1;
-		pField->AskVolume1 = pMarketDataField->AskVolume1;
+		AddAsk(pField, pMarketDataField->AskPrice1, pMarketDataField->AskVolume1, 0);
 
 		if (pMarketDataField->AskVolume2 == 0)
 			break;
-		pField->AskPrice2 = pMarketDataField->AskPrice2;
-		pField->AskVolume2 = pMarketDataField->AskVolume2;
+		AddAsk(pField, pMarketDataField->AskPrice2, pMarketDataField->AskVolume2, 0);
 
 		if (pMarketDataField->AskVolume3 == 0)
 			break;
-		pField->AskPrice3 = pMarketDataField->AskPrice3;
-		pField->AskVolume3 = pMarketDataField->AskVolume3;
+		AddAsk(pField, pMarketDataField->AskPrice3, pMarketDataField->AskVolume3, 0);
 
 		if (pMarketDataField->AskVolume4 == 0)
 			break;
-		pField->AskPrice4 = pMarketDataField->AskPrice4;
-		pField->AskVolume4 = pMarketDataField->AskVolume4;
+		AddAsk(pField, pMarketDataField->AskPrice4, pMarketDataField->AskVolume4, 0);
 
 		if (pMarketDataField->AskVolume5 == 0)
 			break;
-		pField->AskPrice5 = pMarketDataField->AskPrice5;
-		pField->AskVolume5 = pMarketDataField->AskVolume5;
+		AddAsk(pField, pMarketDataField->AskPrice5, pMarketDataField->AskVolume5, 0);
 	} while (false);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
 }
 
 //void CMdUserApi::OnRspSubForQuoteRsp(CThostFtdcSpecificInstrumentField *pSpecificInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

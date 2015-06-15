@@ -135,16 +135,210 @@ namespace QuantBox.XAPI
         public byte[] InvestorName;
     }
 
+    ///// <summary>
+    ///// 深度行情
+    ///// </summary>
+    //[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    //public struct DepthMarketDataField
+    //{
+    //    public int TradingDay;
+    //    public int ActionDay;
+    //    public int UpdateTime;
+    //    public int UpdateMillisec;
+
+    //    /// <summary>
+    //    /// 最新价
+    //    /// </summary>
+    //    public double LastPrice;
+    //    /// <summary>
+    //    /// 数量
+    //    /// </summary>
+    //    public double Volume;
+    //    /// <summary>
+    //    /// 成交金额
+    //    /// </summary>
+    //    public double Turnover;
+    //    /// <summary>
+    //    /// 持仓量
+    //    /// </summary>
+    //    public double OpenInterest;
+    //    /// <summary>
+    //    /// 当日均价
+    //    /// </summary>
+    //    public double AveragePrice;
+
+
+    //    /// <summary>
+    //    /// 今开盘
+    //    /// </summary>
+    //    public double OpenPrice;
+    //    /// <summary>
+    //    /// 最高价
+    //    /// </summary>
+    //    public double HighestPrice;
+    //    /// <summary>
+    //    /// 最低价
+    //    /// </summary>
+    //    public double LowestPrice;
+    //    /// <summary>
+    //    /// 今收盘
+    //    /// </summary>
+    //    public double ClosePrice;
+    //    /// <summary>
+    //    /// 本次结算价
+    //    /// </summary>
+    //    public double SettlementPrice;
+
+    //    /// <summary>
+    //    /// 涨停板价
+    //    /// </summary>
+    //    public double UpperLimitPrice;
+    //    /// <summary>
+    //    /// 跌停板价
+    //    /// </summary>
+    //    public double LowerLimitPrice;
+    //    /// <summary>
+    //    /// 昨收盘
+    //    /// </summary>
+    //    public double PreClosePrice;
+    //    /// <summary>
+    //    /// 上次结算价
+    //    /// </summary>
+    //    public double PreSettlementPrice;
+    //    /// <summary>
+    //    /// 昨持仓量
+    //    /// </summary>
+    //    public double PreOpenInterest;
+        
+    //    /// <summary>
+    //    /// 申买价一
+    //    /// </summary>
+    //    public double BidPrice1;
+    //    /// <summary>
+    //    /// 申买量一
+    //    /// </summary>
+    //    public int BidVolume1;
+    //    /// <summary>
+    //    /// 申卖价一
+    //    /// </summary>
+    //    public double AskPrice1;
+    //    /// <summary>
+    //    /// 申卖量一
+    //    /// </summary>
+    //    public int AskVolume1;
+    //    /// <summary>
+    //    /// 申买价二
+    //    /// </summary>
+    //    public double BidPrice2;
+    //    /// <summary>
+    //    /// 申买量二
+    //    /// </summary>
+    //    public int BidVolume2;
+    //    /// <summary>
+    //    /// 申卖价二
+    //    /// </summary>
+    //    public double AskPrice2;
+    //    /// <summary>
+    //    /// 申卖量二
+    //    /// </summary>
+    //    public int AskVolume2;
+    //    /// <summary>
+    //    /// 申买价三
+    //    /// </summary>
+    //    public double BidPrice3;
+    //    /// <summary>
+    //    /// 申买量三
+    //    /// </summary>
+    //    public int BidVolume3;
+    //    /// <summary>
+    //    /// 申卖价三
+    //    /// </summary>
+    //    public double AskPrice3;
+    //    /// <summary>
+    //    /// 申卖量三
+    //    /// </summary>
+    //    public int AskVolume3;
+    //    /// <summary>
+    //    /// 申买价四
+    //    /// </summary>
+    //    public double BidPrice4;
+    //    /// <summary>
+    //    /// 申买量四
+    //    /// </summary>
+    //    public int BidVolume4;
+    //    /// <summary>
+    //    /// 申卖价四
+    //    /// </summary>
+    //    public double AskPrice4;
+    //    /// <summary>
+    //    /// 申卖量四
+    //    /// </summary>
+    //    public int AskVolume4;
+    //    /// <summary>
+    //    /// 申买价五
+    //    /// </summary>
+    //    public double BidPrice5;
+    //    /// <summary>
+    //    /// 申买量五
+    //    /// </summary>
+    //    public int BidVolume5;
+    //    /// <summary>
+    //    /// 申卖价五
+    //    /// </summary>
+    //    public double AskPrice5;
+    //    /// <summary>
+    //    /// 申卖量五
+    //    /// </summary>
+    //    public int AskVolume5;
+
+    //    /// <summary>
+    //    /// 交易所代码
+    //    /// </summary>
+    //    public ExchangeType Exchange;
+
+    //    /// <summary>
+    //    /// 合约代码
+    //    /// </summary>
+    //    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+    //    public string Symbol;
+    //    /// <summary>
+    //    /// 合约代码
+    //    /// </summary>
+    //    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 31)]
+    //    public string InstrumentID;
+
+    //}
+
     /// <summary>
-    /// 深度行情
+    /// 深度行情N档
     /// </summary>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-    public struct DepthMarketDataField
+    public struct DepthMarketDataNField
     {
+        ///占用总字节大小
+        public int Size;
+
         public int TradingDay;
         public int ActionDay;
         public int UpdateTime;
         public int UpdateMillisec;
+
+        /// <summary>
+        /// 交易所代码
+        /// </summary>
+        public ExchangeType Exchange;
+
+        /// <summary>
+        /// 合约代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string Symbol;
+        /// <summary>
+        /// 合约代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 31)]
+        public string InstrumentID;
+
 
         /// <summary>
         /// 最新价
@@ -209,103 +403,20 @@ namespace QuantBox.XAPI
         /// 昨持仓量
         /// </summary>
         public double PreOpenInterest;
-        
-        /// <summary>
-        /// 申买价一
-        /// </summary>
-        public double BidPrice1;
-        /// <summary>
-        /// 申买量一
-        /// </summary>
-        public int BidVolume1;
-        /// <summary>
-        /// 申卖价一
-        /// </summary>
-        public double AskPrice1;
-        /// <summary>
-        /// 申卖量一
-        /// </summary>
-        public int AskVolume1;
-        /// <summary>
-        /// 申买价二
-        /// </summary>
-        public double BidPrice2;
-        /// <summary>
-        /// 申买量二
-        /// </summary>
-        public int BidVolume2;
-        /// <summary>
-        /// 申卖价二
-        /// </summary>
-        public double AskPrice2;
-        /// <summary>
-        /// 申卖量二
-        /// </summary>
-        public int AskVolume2;
-        /// <summary>
-        /// 申买价三
-        /// </summary>
-        public double BidPrice3;
-        /// <summary>
-        /// 申买量三
-        /// </summary>
-        public int BidVolume3;
-        /// <summary>
-        /// 申卖价三
-        /// </summary>
-        public double AskPrice3;
-        /// <summary>
-        /// 申卖量三
-        /// </summary>
-        public int AskVolume3;
-        /// <summary>
-        /// 申买价四
-        /// </summary>
-        public double BidPrice4;
-        /// <summary>
-        /// 申买量四
-        /// </summary>
-        public int BidVolume4;
-        /// <summary>
-        /// 申卖价四
-        /// </summary>
-        public double AskPrice4;
-        /// <summary>
-        /// 申卖量四
-        /// </summary>
-        public int AskVolume4;
-        /// <summary>
-        /// 申买价五
-        /// </summary>
-        public double BidPrice5;
-        /// <summary>
-        /// 申买量五
-        /// </summary>
-        public int BidVolume5;
-        /// <summary>
-        /// 申卖价五
-        /// </summary>
-        public double AskPrice5;
-        /// <summary>
-        /// 申卖量五
-        /// </summary>
-        public int AskVolume5;
 
-        /// <summary>
-        /// 合约代码
-        /// </summary>
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
-        public string Symbol;
-        /// <summary>
-        /// 合约代码
-        /// </summary>
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 31)]
-        public string InstrumentID;
-        /// <summary>
-        /// 交易所代码
-        /// </summary>
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
-        public string ExchangeID;
+        ///买档个数
+        public int BidCount;
+    }
+
+    /// <summary>
+    /// DepthField行情
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    public struct DepthField
+    {
+        public double Price;
+        public int Size;
+        public int Count;
     }
 
     /// <summary>
@@ -430,6 +541,11 @@ namespace QuantBox.XAPI
         /// </summary>
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
         public string ExchangeID;
+        /// <summary>
+        /// 产品代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 31)]
+        public string ProductID;
         /// <summary>
         /// 合约名称
         /// </summary>
@@ -763,5 +879,99 @@ namespace QuantBox.XAPI
         /// </summary>
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 9)]
         public string ExchangeID;
+    }
+
+
+    public class DepthMarketDataNClass
+    {
+        public int TradingDay;
+        public int ActionDay;
+        public int UpdateTime;
+        public int UpdateMillisec;
+
+        /// <summary>
+        /// 交易所代码
+        /// </summary>
+        public ExchangeType Exchange;
+
+        /// <summary>
+        /// 合约代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string Symbol;
+        /// <summary>
+        /// 合约代码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 31)]
+        public string InstrumentID;
+
+
+        /// <summary>
+        /// 最新价
+        /// </summary>
+        public double LastPrice;
+        /// <summary>
+        /// 数量
+        /// </summary>
+        public double Volume;
+        /// <summary>
+        /// 成交金额
+        /// </summary>
+        public double Turnover;
+        /// <summary>
+        /// 持仓量
+        /// </summary>
+        public double OpenInterest;
+        /// <summary>
+        /// 当日均价
+        /// </summary>
+        public double AveragePrice;
+
+
+        /// <summary>
+        /// 今开盘
+        /// </summary>
+        public double OpenPrice;
+        /// <summary>
+        /// 最高价
+        /// </summary>
+        public double HighestPrice;
+        /// <summary>
+        /// 最低价
+        /// </summary>
+        public double LowestPrice;
+        /// <summary>
+        /// 今收盘
+        /// </summary>
+        public double ClosePrice;
+        /// <summary>
+        /// 本次结算价
+        /// </summary>
+        public double SettlementPrice;
+
+        /// <summary>
+        /// 涨停板价
+        /// </summary>
+        public double UpperLimitPrice;
+        /// <summary>
+        /// 跌停板价
+        /// </summary>
+        public double LowerLimitPrice;
+        /// <summary>
+        /// 昨收盘
+        /// </summary>
+        public double PreClosePrice;
+        /// <summary>
+        /// 上次结算价
+        /// </summary>
+        public double PreSettlementPrice;
+        /// <summary>
+        /// 昨持仓量
+        /// </summary>
+        public double PreOpenInterest;
+
+        ///买档个数
+        public DepthField[] Bids;
+        public DepthField[] Asks;
     }
 }

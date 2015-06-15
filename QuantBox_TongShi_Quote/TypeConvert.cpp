@@ -18,7 +18,7 @@ ExchangeType Market_2_ExchangeType(WORD In)
 	}
 }
 
-char* Market_2_Exchange(WORD In)
+char* Market_2_ExchangeID(WORD In)
 {
 	switch (In)
 	{

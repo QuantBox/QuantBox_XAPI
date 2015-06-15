@@ -7,6 +7,8 @@
 #include "../include/ApiStruct.h"
 
 #include "../include/toolkit.h"
+#include "../include/ApiProcess.h"
+#include "../QuantBox_Kingstar_Trade/TypeConvert.h"
 
 #include "../QuantBox_Queue/MsgQueue.h"
 
@@ -404,6 +406,7 @@ void CMdUserApi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CTho
 	{
 		pField->TradingDay = GetDate(pRspUserLogin->TradingDay);
 		pField->LoginTime = GetTime(pRspUserLogin->LoginTime);
+		m_TradingDay = pField->TradingDay;
 
 		sprintf(pField->SessionID, "%d:%d", pRspUserLogin->FrontID, pRspUserLogin->SessionID);
 
@@ -465,20 +468,38 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	//	// 测试平台穿越速度，用完后需要注释掉
 	//	WriteLog("CTP:OnRtnDepthMarketData:%s %f %s.%03d", pDepthMarketData->InstrumentID, pDepthMarketData->LastPrice, pDepthMarketData->UpdateTime, pDepthMarketData->UpdateMillisec);
 
-	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
+	DepthMarketDataNField* pField = (DepthMarketDataNField*)m_msgQueue->new_block(sizeof(DepthMarketDataNField)+sizeof(DepthField)* 10);
+
 
 	strcpy(pField->InstrumentID, pDepthMarketData->InstrumentID);
-	strcpy(pField->ExchangeID, pDepthMarketData->ExchangeID);
+	pField->Exchange = TThostFtdcExchangeIDType_2_ExchangeType(pDepthMarketData->ExchangeID);
 
-	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
+	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pDepthMarketData->ExchangeID);
 
-	//TODO:CTP大连没有ActionDay，所以API中是将TradingDay填到了这里，所以这里这种用法可能会出错，要测
-	GetExchangeTime(pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
-		, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+	// 交易时间
+	switch (pField->Exchange)
+	{
+	case ExchangeType::DCE:
+		GetExchangeTime_DCE(pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
+			, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+		break;
+	case ExchangeType::CZCE:
+		GetExchangeTime_CZCE(m_TradingDay, pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
+			, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+		break;
+	case ExchangeType::Undefined_:
+		GetExchangeTime_Undefined(m_TradingDay, pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
+			, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+		break;
+	default:
+		GetExchangeTime(pDepthMarketData->TradingDay, pDepthMarketData->ActionDay, pDepthMarketData->UpdateTime
+			, &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime, &pField->UpdateMillisec);
+		break;
+	}
 
 	pField->UpdateMillisec = pDepthMarketData->UpdateMillisec;
 
-	pField->LastPrice = pDepthMarketData->LastPrice != DBL_MAX ? pDepthMarketData->LastPrice : 0;
+	pField->LastPrice = pDepthMarketData->LastPrice == DBL_MAX ? 0 : pDepthMarketData->LastPrice;
 	pField->Volume = pDepthMarketData->Volume;
 	pField->Turnover = pDepthMarketData->Turnover;
 	pField->OpenInterest = pDepthMarketData->OpenInterest;
@@ -504,63 +525,55 @@ void CMdUserApi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMark
 	pField->PreSettlementPrice = pDepthMarketData->PreSettlementPrice;
 	pField->PreOpenInterest = pDepthMarketData->PreOpenInterest;
 
+	InitBidAsk(pField);
+
 	do
 	{
 		if (pDepthMarketData->BidVolume1 == 0)
 			break;
-		pField->BidPrice1 = pDepthMarketData->BidPrice1;
-		pField->BidVolume1 = pDepthMarketData->BidVolume1;
+		AddBid(pField, pDepthMarketData->BidPrice1, pDepthMarketData->BidVolume1, 0);
 
 		if (pDepthMarketData->BidVolume2 == 0)
 			break;
-		pField->BidPrice2 = pDepthMarketData->BidPrice2;
-		pField->BidVolume2 = pDepthMarketData->BidVolume2;
+		AddBid(pField, pDepthMarketData->BidPrice2, pDepthMarketData->BidVolume2, 0);
 
 		if (pDepthMarketData->BidVolume3 == 0)
 			break;
-		pField->BidPrice3 = pDepthMarketData->BidPrice3;
-		pField->BidVolume3 = pDepthMarketData->BidVolume3;
+		AddBid(pField, pDepthMarketData->BidPrice3, pDepthMarketData->BidVolume3, 0);
 
 		if (pDepthMarketData->BidVolume4 == 0)
 			break;
-		pField->BidPrice4 = pDepthMarketData->BidPrice4;
-		pField->BidVolume4 = pDepthMarketData->BidVolume4;
+		AddBid(pField, pDepthMarketData->BidPrice4, pDepthMarketData->BidVolume4, 0);
 
 		if (pDepthMarketData->BidVolume5 == 0)
 			break;
-		pField->BidPrice5 = pDepthMarketData->BidPrice5;
-		pField->BidVolume5 = pDepthMarketData->BidVolume5;
+		AddBid(pField, pDepthMarketData->BidPrice5, pDepthMarketData->BidVolume5, 0);
 	} while (false);
 
 	do
 	{
 		if (pDepthMarketData->AskVolume1 == 0)
 			break;
-		pField->AskPrice1 = pDepthMarketData->AskPrice1;
-		pField->AskVolume1 = pDepthMarketData->AskVolume1;
+		AddAsk(pField, pDepthMarketData->AskPrice1, pDepthMarketData->AskVolume1, 0);
 
 		if (pDepthMarketData->AskVolume2 == 0)
 			break;
-		pField->AskPrice2 = pDepthMarketData->AskPrice2;
-		pField->AskVolume2 = pDepthMarketData->AskVolume2;
+		AddAsk(pField, pDepthMarketData->AskPrice2, pDepthMarketData->AskVolume2, 0);
 
 		if (pDepthMarketData->AskVolume3 == 0)
 			break;
-		pField->AskPrice3 = pDepthMarketData->AskPrice3;
-		pField->AskVolume3 = pDepthMarketData->AskVolume3;
+		AddAsk(pField, pDepthMarketData->AskPrice3, pDepthMarketData->AskVolume3, 0);
 
 		if (pDepthMarketData->AskVolume4 == 0)
 			break;
-		pField->AskPrice4 = pDepthMarketData->AskPrice4;
-		pField->AskVolume4 = pDepthMarketData->AskVolume4;
+		AddAsk(pField, pDepthMarketData->AskPrice4, pDepthMarketData->AskVolume4, 0);
 
 		if (pDepthMarketData->AskVolume5 == 0)
 			break;
-		pField->AskPrice5 = pDepthMarketData->AskPrice5;
-		pField->AskVolume5 = pDepthMarketData->AskVolume5;
+		AddAsk(pField, pDepthMarketData->AskPrice5, pDepthMarketData->AskVolume5, 0);
 	} while (false);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
 	//}
 }
 

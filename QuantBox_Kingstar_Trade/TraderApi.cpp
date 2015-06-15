@@ -1167,6 +1167,7 @@ void CTraderApi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CTho
 			strncpy(pField->ExchangeID, pInstrument->ExchangeID, sizeof(ExchangeIDType));
 
 			strncpy(pField->Symbol, pInstrument->InstrumentID, sizeof(SymbolType));
+			strncpy(pField->ProductID, pInstrument->ProductID, sizeof(InstrumentIDType));
 
 			strncpy(pField->InstrumentName, pInstrument->InstrumentName, sizeof(InstrumentNameType));
 			pField->Type = CThostFtdcInstrumentField_2_InstrumentType(pInstrument);
@@ -1174,7 +1175,7 @@ void CTraderApi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CTho
 			pField->PriceTick = pInstrument->PriceTick;
 			pField->ExpireDate = GetDate(pInstrument->ExpireDate);
 			pField->OptionsType = TThostFtdcOptionsTypeType_2_PutCall(pInstrument->OptionsType);
-			pField->StrikePrice = pInstrument->StrikePrice < DBL_EPSILON ? 0 : pInstrument->StrikePrice;
+			pField->StrikePrice = (pInstrument->StrikePrice < DBL_EPSILON || pInstrument->StrikePrice == DBL_MAX) ? 0 : pInstrument->StrikePrice;
 
 			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInstrument, m_msgQueue, m_pClass, bIsLast, 0, pField, sizeof(InstrumentField), nullptr, 0, nullptr, 0);
 		}

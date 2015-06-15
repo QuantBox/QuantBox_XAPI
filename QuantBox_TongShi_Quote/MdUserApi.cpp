@@ -6,6 +6,7 @@
 #include "../include/ApiStruct.h"
 
 #include "../include/toolkit.h"
+#include "../include/ApiProcess.h"
 
 #include "../QuantBox_Queue/MsgQueue.h"
 
@@ -288,12 +289,12 @@ void CMdUserApi::Disconnect()
 	}
 }
 
-void CMdUserApi::OnRspQryInstrument(DepthMarketDataField* _pField,RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count)
+void CMdUserApi::OnRspQryInstrument(DepthMarketDataNField* _pField,RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count)
 {
 	InstrumentField* pField = (InstrumentField*)m_msgQueue->new_block(sizeof(InstrumentField));
 
 	strcpy(pField->InstrumentID, _pField->InstrumentID);
-	strcpy(pField->ExchangeID, _pField->ExchangeID);
+	strcpy(pField->ExchangeID, Market_2_ExchangeID(pDepthMarketData->m_wMarket));
 	strcpy(pField->Symbol, _pField->Symbol);
 
 	strncpy(pField->InstrumentName, pDepthMarketData->m_szName, sizeof(InstrumentNameType));
@@ -339,12 +340,12 @@ void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int
 		)
 		return;
 
-	DepthMarketDataField* pField = (DepthMarketDataField*)m_msgQueue->new_block(sizeof(DepthMarketDataField));
+	DepthMarketDataNField* pField = (DepthMarketDataNField*)m_msgQueue->new_block(sizeof(DepthMarketDataNField)+sizeof(DepthField)* 10);
 
 	strcpy(pField->InstrumentID, OldSymbol_2_NewSymbol(pDepthMarketData->m_szLabel, pDepthMarketData->m_wMarket));
-	strcpy(pField->ExchangeID, Market_2_Exchange(pDepthMarketData->m_wMarket));
+	pField->Exchange = Market_2_ExchangeType(pDepthMarketData->m_wMarket);
 
-	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, pField->ExchangeID);
+	sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, Market_2_ExchangeID(pDepthMarketData->m_wMarket));
 
 	// 为合约导入功能所加，如果合约不需要再导入，还是注释了比较好
 	set<string>::iterator it = m_setInstrumentIDsReceived.find(pField->Symbol);
@@ -368,63 +369,55 @@ void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int
 
 	int nLots = 1;
 
+	InitBidAsk(pField);
+
 	do
 	{
 		if (pDepthMarketData->m_fBuyVolume[0] == 0)
 			break;
-		pField->BidPrice1 = my_round(pDepthMarketData->m_fBuyPrice[0]);
-		pField->BidVolume1 = pDepthMarketData->m_fBuyVolume[0] * nLots;
+		AddBid(pField, my_round(pDepthMarketData->m_fBuyPrice[0]), pDepthMarketData->m_fBuyVolume[0] * nLots, 0);
 
 		if (pDepthMarketData->m_fBuyVolume[1] == 0)
 			break;
-		pField->BidPrice2 = my_round(pDepthMarketData->m_fBuyPrice[1]);
-		pField->BidVolume2 = pDepthMarketData->m_fBuyVolume[1] * nLots;
+		AddBid(pField, my_round(pDepthMarketData->m_fBuyPrice[1]), pDepthMarketData->m_fBuyVolume[1] * nLots, 0);
 
 		if (pDepthMarketData->m_fBuyVolume[2] == 0)
 			break;
-		pField->BidPrice3 = my_round(pDepthMarketData->m_fBuyPrice[2]);
-		pField->BidVolume3 = pDepthMarketData->m_fBuyVolume[2] * nLots;
+		AddBid(pField, my_round(pDepthMarketData->m_fBuyPrice[2]), pDepthMarketData->m_fBuyVolume[2] * nLots, 0);
 
 		if (pDepthMarketData->m_fBuyVolume4 == 0)
 			break;
-		pField->BidPrice4 = my_round(pDepthMarketData->m_fBuyPrice4);
-		pField->BidVolume4 = pDepthMarketData->m_fBuyVolume4 * nLots;
+		AddBid(pField, my_round(pDepthMarketData->m_fBuyPrice4), pDepthMarketData->m_fBuyVolume4 * nLots, 0);
 
 		if (pDepthMarketData->m_fBuyVolume5 == 0)
 			break;
-		pField->BidPrice5 = my_round(pDepthMarketData->m_fBuyPrice5);
-		pField->BidVolume5 = pDepthMarketData->m_fBuyVolume5 * nLots;
+		AddBid(pField, my_round(pDepthMarketData->m_fBuyPrice5), pDepthMarketData->m_fBuyVolume5 * nLots, 0);
 	} while (false);
 
 	do
 	{
 		if (pDepthMarketData->m_fSellVolume[0] == 0)
 			break;
-		pField->AskPrice1 = my_round(pDepthMarketData->m_fSellPrice[0]);
-		pField->AskVolume1 = pDepthMarketData->m_fSellVolume[0] * nLots;
+		AddAsk(pField, my_round(pDepthMarketData->m_fSellPrice[0]), pDepthMarketData->m_fSellVolume[0] * nLots, 0);
 
 		if (pDepthMarketData->m_fSellVolume[1] == 0)
 			break;
-		pField->AskPrice2 = my_round(pDepthMarketData->m_fSellPrice[1]);
-		pField->AskVolume2 = pDepthMarketData->m_fSellVolume[1] * nLots;
+		AddAsk(pField, my_round(pDepthMarketData->m_fSellPrice[1]), pDepthMarketData->m_fSellVolume[1] * nLots, 0);
 
 		if (pDepthMarketData->m_fSellVolume[2] == 0)
 			break;
-		pField->AskPrice3 = my_round(pDepthMarketData->m_fSellPrice[2]);
-		pField->AskVolume3 = pDepthMarketData->m_fSellVolume[2] * nLots;
+		AddAsk(pField, my_round(pDepthMarketData->m_fSellPrice[2]), pDepthMarketData->m_fSellVolume[2] * nLots, 0);
 
 		if (pDepthMarketData->m_fSellVolume4 == 0)
 			break;
-		pField->AskPrice4 = my_round(pDepthMarketData->m_fSellPrice4);
-		pField->AskVolume4 = pDepthMarketData->m_fSellVolume4 * nLots;
+		AddAsk(pField, my_round(pDepthMarketData->m_fSellPrice4), pDepthMarketData->m_fSellVolume4 * nLots, 0);
 
 		if (pDepthMarketData->m_fSellVolume5 == 0)
 			break;
-		pField->AskPrice5 = my_round(pDepthMarketData->m_fSellPrice5);
-		pField->AskVolume5 = pDepthMarketData->m_fSellVolume5 * nLots;
+		AddAsk(pField, my_round(pDepthMarketData->m_fSellPrice5), pDepthMarketData->m_fSellVolume5 * nLots, 0);
 	} while (false);
 
-	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, 0, 0, pField, sizeof(DepthMarketDataField), nullptr, 0, nullptr, 0);
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
 }
 
 void CMdUserApi::StartThread()

@@ -66,18 +66,19 @@ CZC
      */
     public static class Extensions_Misc
     {
-        public static DateTime ExchangeDateTime([In]this DepthMarketDataField field)
+        public static DateTime ExchangeDateTime([In]this DepthMarketDataNClass field)
         {
             // 大商所夜盘时，ActionDay可能已经是指向的第二天
             int HH = field.UpdateTime / 10000;
 
-            if (HH > 20)
-            {
-                if (field.ExchangeID.CompareTo("DCE") == 0)
-                {
-                    return field.ExchangeDateTime_();
-                }
-            }
+            // 这个功能写入到C层中
+            //if (HH > 20)
+            //{
+            //    if (field.ExchangeID.CompareTo("DCE") == 0)
+            //    {
+            //        return field.ExchangeDateTime_();
+            //    }
+            //}
 
             int mm = field.UpdateTime % 10000 / 100;
             int ss = field.UpdateTime % 100;
@@ -89,7 +90,7 @@ CZC
             return new DateTime(yyyy, MM, dd, HH, mm, ss, field.UpdateMillisec);
         }
 
-        public static DateTime ExchangeDateTime_([In]this DepthMarketDataField field)
+        public static DateTime ExchangeDateTime_([In]this DepthMarketDataNClass field)
         {
             // 表示传回来的时间可能有问题，要检查一下
             if(field.UpdateTime == 0)
@@ -243,7 +244,7 @@ CZC
             return string.Format("[BrokerID={0};InvestorID={1};IdentifiedCardType={2},IdentifiedCardNo={3};InvestorName={4}]",
                 field.BrokerID, field.InvestorID, Enum<IdCardType>.ToString(field.IdentifiedCardType),field.IdentifiedCardNo, field.InvestorName());
         }
-        public static string ToFormattedStringExchangeDateTime([In]this DepthMarketDataField field)
+        public static string ToFormattedStringExchangeDateTime([In]this DepthMarketDataNClass field)
         {
             return string.Format("[TradingDay={0};ActionDay={1};UpdateTime={2},UpdateMillisec={3}]",
                 field.TradingDay, field.ActionDay, field.UpdateTime, field.UpdateMillisec);

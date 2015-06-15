@@ -129,6 +129,10 @@ struct CSecurityFtdcInstrumentField
 	TSecurityFtdcMoneyType	UnitMargin;
 	///合约类型
 	TSecurityFtdcInstrumentTypeType	InstrumentType;
+	///期权保证金参数1
+	TSecurityFtdcRatioType	OptionsMarginParam1;
+	///期权保证金参数2
+	TSecurityFtdcRatioType	OptionsMarginParam2;
 };
 
 ///经纪公司
@@ -346,6 +350,14 @@ struct CSecurityFtdcTradingAccountField
 	TSecurityFtdcMoneyType	SSStockValue;
 	///维持担保比例
 	TSecurityFtdcRatioType	CreditRatio;
+	///行权冻结资金
+	TSecurityFtdcMoneyType	FrozenExecCash;
+	///期权买入资金(SSE)
+	TSecurityFtdcMoneyType	SSEOptionsBuyAmount;
+	///期权买入冻结资金(SSE)
+	TSecurityFtdcMoneyType	SSEOptionsBuyFrozenAmount;
+	///结算保证金总额
+	TSecurityFtdcMoneyType	SettleMargin;
 };
 
 ///禁止登录用户
@@ -448,6 +460,8 @@ struct CSecurityFtdcDepthMarketDataField
 	TSecurityFtdcPriceType	AveragePrice;
 	///业务日期
 	TSecurityFtdcDateType	ActionDay;
+	///数量(新)
+	TSecurityFtdcLargeVolumeType	Volume_New;
 };
 
 ///投资者合约交易权限
@@ -659,7 +673,7 @@ struct CSecurityFtdcOFInstrumentField
 	TSecurityFtdcPriceType	NetPrice;
 };
 
-///ETF合约
+///SF合约
 struct CSecurityFtdcSFInstrumentField
 {
 	///交易所代码
@@ -678,6 +692,164 @@ struct CSecurityFtdcSFInstrumentField
 	TSecurityFtdcVolumeType	VolumeRatio;
 	///基金净值
 	TSecurityFtdcPriceType	NetPrice;
+};
+
+///合约单手保证金
+struct CSecurityFtdcInstrumentUnitMarginField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///合约代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+	///合约单手保证金
+	TSecurityFtdcMoneyType	UnitMargin;
+};
+
+///期权资金限制参数
+struct CSecurityFtdcOptionsFundLimitParamField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///最大可买金额
+	TSecurityFtdcMoneyType	MaxBuyAmount;
+};
+
+///投资者期权持仓
+struct CSecurityFtdcInvestorOptionsPositionField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者范围
+	TSecurityFtdcInvestorRangeType	InvestorRange;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///InstrumentID
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+	///最大多头仓位限制
+	TSecurityFtdcVolumeType	MaxLongPositionLimit;
+	///最大买开量限制
+	TSecurityFtdcVolumeType	MaxBuyVolLimit;
+	///最大总仓位限制
+	TSecurityFtdcVolumeType	MaxPositionLimit;
+	///多头持仓
+	TSecurityFtdcVolumeType	LongPosition;
+	///空头持仓
+	TSecurityFtdcVolumeType	ShortPosition;
+	///买开量
+	TSecurityFtdcVolumeType	BuyVolume;
+	///买开冻结量
+	TSecurityFtdcVolumeType	BuyFrozenVolume;
+	///多头冻结持仓
+	TSecurityFtdcVolumeType	LongFrozenPosition;
+	///空头冻结持仓
+	TSecurityFtdcVolumeType	ShortFrozenPosition;
+};
+
+///预交割信息
+struct CSecurityFtdcPreDelivInfoField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///合约代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+	///交割类型
+	TSecurityFtdcDelivTypeType	DelivType;
+	///标的合约代码
+	TSecurityFtdcInstrumentIDType	UnderlyingInstrumentID;
+	///交割数量
+	TSecurityFtdcVolumeType	DelivVolume;
+	///交割金额
+	TSecurityFtdcMoneyType	DelivAmount;
+	///期权执行数量
+	TSecurityFtdcVolumeType	ExecVolume;
+	///买卖方向
+	TSecurityFtdcDirectionType	Direction;
+};
+
+///可融券分配信息
+struct CSecurityFtdcCreditStockAssignInfoField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///合约代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+	///融券限量
+	TSecurityFtdcVolumeType	LimitVolume;
+	///上日融券数量
+	TSecurityFtdcVolumeType	YDVolume;
+	///剩余可融券数量
+	TSecurityFtdcVolumeType	LeftVolume;
+	///冻结融券数量
+	TSecurityFtdcVolumeType	FrozenVolume;
+};
+
+///可融资分配信息
+struct CSecurityFtdcCreditCashAssignInfoField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///融资限额
+	TSecurityFtdcMoneyType	LimitAmount;
+	///上日融资金额
+	TSecurityFtdcMoneyType	YDAmount;
+};
+
+///证券折算率
+struct CSecurityFtdcConversionRateField
+{
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///合约代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+	///折算比率
+	TSecurityFtdcRatioType	ConversionRate;
+	///当前是否支持融资交易
+	TSecurityFtdcBoolType	IsTradingForMargin;
+	///当前是否支持融券交易
+	TSecurityFtdcBoolType	IsTradingForShort;
+};
+
+///历史信用负债信息
+struct CSecurityFtdcHisCreditDebtInfoField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///合约代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+	///开仓日期
+	TSecurityFtdcDateType	OpenDate;
+	///负债类型
+	TSecurityFtdcDirectionType	Direction;
+	///开仓价
+	TSecurityFtdcPriceType	OpenPrice;
+	///数量
+	TSecurityFtdcVolumeType	Volume;
+	///融资融券金额
+	TSecurityFtdcMoneyType	Amount;
 };
 
 ///交易所交易员报盘机
@@ -1178,7 +1350,7 @@ struct CSecurityFtdcInvestorPositionField
 	TSecurityFtdcPositionDateType	PositionDate;
 	///上日持仓
 	TSecurityFtdcVolumeType	YdPosition;
-	///今日持仓
+	///总持仓
 	TSecurityFtdcVolumeType	Position;
 	///多头冻结
 	TSecurityFtdcVolumeType	LongFrozen;
@@ -1275,7 +1447,11 @@ struct CSecurityFtdcInvestorPositionField
 	///解锁冻结仓位
 	TSecurityFtdcVolumeType	UnlockFrozenPosition;
 	///备兑冻结仓位
-	TSecurityFtdcVolumeType	CoverForzenPosition;
+	TSecurityFtdcVolumeType	CoverFrozenPosition;
+	///行权冻结仓位
+	TSecurityFtdcVolumeType	ExecFrozenPosition;
+	///上日备兑仓位
+	TSecurityFtdcVolumeType	YDCoverPosition;
 };
 
 ///出入金同步
@@ -1476,6 +1652,8 @@ struct CSecurityFtdcQryInstrumentCommissionRateField
 	TSecurityFtdcInstrumentIDType	InstrumentID;
 	///买卖方向
 	TSecurityFtdcDirectionType	Direction;
+	///开平标志
+	TSecurityFtdcOffsetFlagType	OffsetFlag;
 };
 
 ///查询余券信息
@@ -1534,6 +1712,100 @@ struct CSecurityFtdcQrySFInstrumentField
 	TSecurityFtdcExchangeIDType	ExchangeID;
 	///ETF证券代码
 	TSecurityFtdcInstrumentIDType	SFInstrumentID;
+};
+
+///查询合约单手保证金
+struct CSecurityFtdcQryInstrumentUnitMarginField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///合约代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+};
+
+///查询期权资金限制参数
+struct CSecurityFtdcQryOptionsFundLimitParamField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+};
+
+///查询投资者期权持仓
+struct CSecurityFtdcQryInvestorOptionsPositionField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///标的合约代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+};
+
+///查询预交割信息
+struct CSecurityFtdcQryPreDelivInfoField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///合约代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+};
+
+///查询可融券分配信息
+struct CSecurityFtdcQryCreditStockAssignInfoField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///合约代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+};
+
+///查询可融资分配信息
+struct CSecurityFtdcQryCreditCashAssignInfoField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+};
+
+///查询证券折算率
+struct CSecurityFtdcQryConversionRateField
+{
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///合约代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
+};
+
+///查询历史信用负债信息
+struct CSecurityFtdcQryHisCreditDebtInfoField
+{
+	///经纪公司代码
+	TSecurityFtdcBrokerIDType	BrokerID;
+	///投资者代码
+	TSecurityFtdcInvestorIDType	InvestorID;
+	///交易所代码
+	TSecurityFtdcExchangeIDType	ExchangeID;
+	///合约代码
+	TSecurityFtdcInstrumentIDType	InstrumentID;
 };
 
 ///查询交易员报盘机
@@ -2033,6 +2305,8 @@ struct CSecurityFtdcMarketDataLastMatchField
 	TSecurityFtdcMoneyType	Turnover;
 	///持仓量
 	TSecurityFtdcLargeVolumeType	OpenInterest;
+	///数量(新)
+	TSecurityFtdcLargeVolumeType	Volume_New;
 };
 
 ///行情最优价属性
@@ -2296,6 +2570,10 @@ struct CSecurityFtdcMDUserInfoField
 	TSecurityFtdcPasswordType	Password;
 	///行情系统编号
 	TSecurityFtdcSequenceNoType	MDSysID;
+	///股票最大订阅数量
+	TSecurityFtdcVolumeType	MaxStockCount;
+	///期权最大订阅数量
+	TSecurityFtdcVolumeType	MaxOptionsCount;
 };
 
 
