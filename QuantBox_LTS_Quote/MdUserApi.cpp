@@ -470,7 +470,7 @@ void CMdUserApi::OnRtnDepthMarketData(CSecurityFtdcDepthMarketDataField *pDepthM
 	pField->UpdateMillisec = pDepthMarketData->UpdateMillisec;
 
 	pField->LastPrice = pDepthMarketData->LastPrice;
-	pField->Volume = pDepthMarketData->Volume;
+	pField->Volume = pDepthMarketData->Volume_New;
 	pField->Turnover = pDepthMarketData->Turnover;
 	pField->OpenInterest = pDepthMarketData->OpenInterest;
 	pField->AveragePrice = pDepthMarketData->AveragePrice;
