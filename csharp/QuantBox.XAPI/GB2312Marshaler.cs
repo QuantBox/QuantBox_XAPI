@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace QuantBox.XAPI
 {
@@ -30,7 +30,7 @@ namespace QuantBox.XAPI
             Marshal.Copy(strbuf, 0, buffer, strbuf.Length);
 
             // write the terminating null
-            Marshal.WriteByte(buffer + strbuf.Length, 0);
+            Marshal.WriteByte(new IntPtr(buffer.ToInt64() + strbuf.Length), 0);
             return buffer;
         }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace QuantBox.XAPI
 {
@@ -76,21 +76,21 @@ namespace QuantBox.XAPI
             //obj.BidCount;
 
             int size = Marshal.SizeOf(typeof(DepthField));
-            IntPtr pBid = ptr + Marshal.SizeOf(typeof(DepthMarketDataNField));
+            IntPtr pBid = new IntPtr(ptr.ToInt64() + Marshal.SizeOf(typeof(DepthMarketDataNField)));
             int AskCount = (obj.Size - Marshal.SizeOf(typeof(DepthMarketDataNField))) / size - obj.BidCount;
-            IntPtr pAsk = ptr + Marshal.SizeOf(typeof(DepthMarketDataNField)) + obj.BidCount * size;
+            IntPtr pAsk = new IntPtr(ptr.ToInt64() + Marshal.SizeOf(typeof(DepthMarketDataNField)) + obj.BidCount * size);
 
             cls.Bids = new DepthField[obj.BidCount];
             cls.Asks = new DepthField[AskCount];
             
             for (int i = 0; i < obj.BidCount; ++i)
             {
-                cls.Bids[i] = (DepthField)Marshal.PtrToStructure(pBid + i * size, typeof(DepthField));
+                cls.Bids[i] = (DepthField)Marshal.PtrToStructure(new IntPtr(pBid.ToInt64() + i * size), typeof(DepthField));
             }
 
             for (int i = 0; i < AskCount; ++i)
             {
-                cls.Asks[i] = (DepthField)Marshal.PtrToStructure(pAsk + i * size, typeof(DepthField));
+                cls.Asks[i] = (DepthField)Marshal.PtrToStructure(new IntPtr(pAsk.ToInt64() + i * size), typeof(DepthField));
             }
 
             return cls;

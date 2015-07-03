@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace QuantBox.XAPI.Callback
 {
@@ -153,7 +152,7 @@ namespace QuantBox.XAPI.Callback
 
                     for (int i = 0; i < UserList.Count; ++i)
                     {
-                        Marshal.StructureToPtr(UserList[i], UserListIntPtr + i * Marshal.SizeOf(typeof(UserInfoField)), false);
+                        Marshal.StructureToPtr(UserList[i], new IntPtr(UserListIntPtr.ToInt64() + i * Marshal.SizeOf(typeof(UserInfoField))), false);
                     }
                 }
                 else

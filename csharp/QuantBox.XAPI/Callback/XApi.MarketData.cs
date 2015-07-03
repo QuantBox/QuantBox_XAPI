@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace QuantBox.XAPI.Callback
 {
@@ -49,7 +48,7 @@ namespace QuantBox.XAPI.Callback
         {
             lock (locker)
             {
-                SortedSet<string> instruments;
+                HashSet<string> instruments;
                 if(_SubscribedInstruments.TryGetValue(szExchange, out instruments))
                 {
                     return instruments.Contains(szInstrument);
@@ -58,8 +57,8 @@ namespace QuantBox.XAPI.Callback
             }
         }
 
-        private Dictionary<string, SortedSet<string>> _SubscribedInstruments = new Dictionary<string, SortedSet<string>>();
-        public Dictionary<string, SortedSet<string>> SubscribedInstruments
+        private Dictionary<string, HashSet<string>> _SubscribedInstruments = new Dictionary<string, HashSet<string>>();
+        public Dictionary<string, HashSet<string>> SubscribedInstruments
         {
             get
             {
@@ -82,10 +81,10 @@ namespace QuantBox.XAPI.Callback
                 proxy.XRequest((byte)RequestType.Subscribe, Handle, IntPtr.Zero, 0, 0,
                     szInstrumentPtr, 0, szExchangePtr, 0, IntPtr.Zero, 0);
 
-                SortedSet<string> instruments;
+                HashSet<string> instruments;
                 if(!_SubscribedInstruments.TryGetValue(szExchange, out instruments))
                 {
-                    instruments = new SortedSet<string>();
+                    instruments = new HashSet<string>();
                     _SubscribedInstruments[szExchange] = instruments;
                 }                
 
@@ -109,10 +108,10 @@ namespace QuantBox.XAPI.Callback
                 proxy.XRequest((byte)RequestType.Unsubscribe, Handle, IntPtr.Zero, 0, 0,
                     szInstrumentPtr, 0, szExchangePtr, 0, IntPtr.Zero, 0);
 
-                SortedSet<string> instruments;
+                HashSet<string> instruments;
                 if (!_SubscribedInstruments.TryGetValue(szExchange, out instruments))
                 {
-                    instruments = new SortedSet<string>();
+                    instruments = new HashSet<string>();
                     _SubscribedInstruments[szExchange] = instruments;
                 }
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace QuantBox.XAPI.Callback
 {
@@ -97,7 +97,7 @@ namespace QuantBox.XAPI.Callback
             // 将结构体写成内存块
             for (int i = 0; i < orders.Length;++i)
             {
-                Marshal.StructureToPtr(orders[i], OrderField_Ptr + i * OrderField_size, false);
+                Marshal.StructureToPtr(orders[i], new IntPtr(OrderField_Ptr.ToInt64() + i * OrderField_size), false);
             }
 
             IntPtr ptr = proxy.XRequest((byte)RequestType.ReqOrderInsert, Handle, IntPtr.Zero,
@@ -109,7 +109,7 @@ namespace QuantBox.XAPI.Callback
             for(int i = 0;i<orders.Length;++i)
             {
                 // 这里定义一个ID占64字节
-                OrderIDType output = (OrderIDType)Marshal.PtrToStructure(OrderIDType_Ptr + i * OrderIDType_size, typeof(OrderIDType));
+                OrderIDType output = (OrderIDType)Marshal.PtrToStructure(new IntPtr(OrderIDType_Ptr.ToInt64() + i * OrderIDType_size), typeof(OrderIDType));
 
                 OrderRefs[i] = output.ID;
             }
@@ -130,7 +130,7 @@ namespace QuantBox.XAPI.Callback
             {
                 OrderIDType _szId = new OrderIDType();
                 _szId.ID = szId[i];
-                Marshal.StructureToPtr(_szId, Input_Ptr + i * OrderIDType_size, false);
+                Marshal.StructureToPtr(_szId, new IntPtr(Input_Ptr.ToInt64() + i * OrderIDType_size), false);
             }
 
             IntPtr ptr = proxy.XRequest((byte)RequestType.ReqOrderAction, Handle, IntPtr.Zero, 0, 0,
@@ -141,7 +141,7 @@ namespace QuantBox.XAPI.Callback
             for (int i = 0; i < szId.Length; ++i)
             {
                 // 这里定义一个ID占64字节
-                OrderIDType output = (OrderIDType)Marshal.PtrToStructure(Output_Ptr + i * OrderIDType_size, typeof(OrderIDType));
+                OrderIDType output = (OrderIDType)Marshal.PtrToStructure(new IntPtr(Output_Ptr.ToInt64() + i * OrderIDType_size), typeof(OrderIDType));
 
                 errs[i] = output.ID;
             }
@@ -162,7 +162,7 @@ namespace QuantBox.XAPI.Callback
             // 将结构体写成内存块
             for (int i = 0; i < 1; ++i)
             {
-                Marshal.StructureToPtr(quote, QuoteField_Ptr + i * QuoteField_size, false);
+                Marshal.StructureToPtr(quote, new IntPtr(QuoteField_Ptr.ToInt64() + i * QuoteField_size), false);
             }
 
             IntPtr ptr = proxy.XRequest((byte)RequestType.ReqQuoteInsert, Handle, IntPtr.Zero,
@@ -175,9 +175,9 @@ namespace QuantBox.XAPI.Callback
             for (int i = 0; i < 1; ++i)
             {
                 // 这里定义一个ID占64字节
-                OrderIDType output = (OrderIDType)Marshal.PtrToStructure(AskRef_Ptr + i * OrderIDType_size, typeof(OrderIDType));
+                OrderIDType output = (OrderIDType)Marshal.PtrToStructure(new IntPtr(AskRef_Ptr.ToInt64() + i * OrderIDType_size), typeof(OrderIDType));
                 AskRef = output.ID;
-                output = (OrderIDType)Marshal.PtrToStructure(BidRef_Ptr + i * OrderIDType_size, typeof(OrderIDType));
+                output = (OrderIDType)Marshal.PtrToStructure(new IntPtr(BidRef_Ptr.ToInt64() + i * OrderIDType_size), typeof(OrderIDType));
                 BidRef = output.ID;
             }
 
@@ -200,7 +200,7 @@ namespace QuantBox.XAPI.Callback
             for (int i = 0; i < 1; ++i)
             {
                 // 这里定义一个ID占64字节
-                OrderIDType output = (OrderIDType)Marshal.PtrToStructure(OrderIDType_Ptr + i * OrderIDType_size, typeof(OrderIDType));
+                OrderIDType output = (OrderIDType)Marshal.PtrToStructure(new IntPtr(OrderIDType_Ptr.ToInt64() + i * OrderIDType_size), typeof(OrderIDType));
 
                 err = output.ID;
             }
