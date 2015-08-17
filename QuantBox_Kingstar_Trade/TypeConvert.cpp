@@ -281,6 +281,8 @@ InstrumentType CThostFtdcInstrumentField_2_InstrumentType(CThostFtdcInstrumentFi
 		return InstrumentType::Future;
 	case THOST_FTDC_PC_SpotOption:
 		return InstrumentType::Option;
+	case THOST_FTDC_PC_ETFOption:
+		return InstrumentType::Option;
 	default:
 		return InstrumentType::Stock;
 	}
