@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////
-///@system 期货交易系统
-///@company Kingstar
+///@system 新一代交易系统
+///@company SunGard China
 ///@file KSTradeAPI.h
 ///@brief 定义了客户端接口使用的业务通讯接口
 ///@history 

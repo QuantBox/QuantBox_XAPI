@@ -69,9 +69,12 @@ namespace QuantBox.XAPI
 
         public override void Dispose()
         {
-            if (hLib != IntPtr.Zero)
-                FreeLibrary(hLib);
-            hLib = IntPtr.Zero;
+            // Kingstar交易接口在这里为何会导致软件当?
+            // 由于接口的问题，在这里只好先这样，以后没有这个问题后再恢复
+
+            //if (hLib != IntPtr.Zero)
+            //    FreeLibrary(hLib);
+            //hLib = IntPtr.Zero;
         }
     }
 }

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////
-///@system 期货交易系统
+///@system 新一代交易系统
 ///@company SunGard China
 ///@file KSMarketDataAPI.h
 ///@brief 定义了客户端接口使用的业务通讯接口
@@ -29,5 +29,6 @@
 #endif 
 
 #include "../IncEx/KSMdApiEx.h"
+#include "../IncEx/KSVocMdApi.h"
 
 #endif

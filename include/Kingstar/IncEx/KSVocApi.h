@@ -1,13 +1,12 @@
+/////////////////////////////////////////////////////////////////////////
+///@system 新一代交易系统
+///@company SunGard China
+///@file KSVocApi.h
+///@brief 定义了客户端客户定制接口
+/////////////////////////////////////////////////////////////////////////
+
 #ifndef __KSVOCAPI_H_INCLUDED_
 #define __KSVOCAPI_H_INCLUDED_
-/**
-* @file KSVocApi.h
-* @author bonny.liu
-* system：KSTradeAPI
-* company：Kingstar
-* history：
-* 2014/05/08	bonny.liu	 create
-*/
 
 #if _MSC_VER > 1000
 #pragma once
@@ -64,23 +63,23 @@ namespace KingstarAPI
 		///用户端产品资源查询应答
 		virtual void OnRspQryUserProductUrl(CKSUserProductUrlField *pUserProductUrl, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-		///请求查询交叉汇率响应
-		virtual void OnRspQryCrossRate(CKSCrossRateField *pCrossRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
-
-		///组合拆分单录入响应
-		virtual void OnRspMatchOrderInsert(CKSMatchOrderInsertField *pMatchOrderInsert, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
-
-		///组合拆分单查询请求响应
-		virtual void OnRspQryMatchOrder(CKSMatchOrderField *pMatchOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
-
 		///最大组合拆分单量查询请求响应
-		virtual void OnRspQryMaxMatchOrderVolume(CKSMaxMatchOrderVolumeField *pMaxMatchOrderVolume, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+		virtual void OnRspQryMaxCombActionVolume(CKSMaxCombActionVolumeField *pMaxCombActionVolume, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
 		///交易通知
 		virtual void OnRtnKSTradingNotice(CKSTradingNoticeField *pTradingNoticeInfo) {};
 
-		///组合拆分单通知
-		virtual void OnRtnMatchOrder(CKSMatchOrderField *pMatchOrder) {};
+		///请求查询合约保证金率响应
+		virtual void OnRspQryKSInstrumentMarginRate(CKSInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+
+		///客户每日出金额度申请响应
+		virtual void OnRspFundOutCreditApply(CKSInputFundOutCreditApplyField *pFundOutCreditApply, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+
+		///客户每日出金额度查询响应
+		virtual void OnRspQryFundOutCredit(CKSRspQryFundOutCreditField *pRspQryFundOutCredit, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+
+		///客户每日出金额度申请查询响应
+		virtual void OnRspQryFundOutCreditApply(CKSRspQryFundOutCreditApplyField *pRspQryFundOutCreditApply, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 	};
 
 	class TRADER_VOCAPI_EXPORT CKSVocApi
@@ -113,17 +112,20 @@ namespace KingstarAPI
 		///用户端产品资源查询请求
 		virtual int ReqQryUserProductUrl (CKSQryUserProductUrlField *pQryUserProductUrl, int nRequestID) = 0;
 
-		///请求查询交叉汇率
-		virtual int ReqQryCrossRate(CKSQryCrossRateField *pQryCrossRate, int nRequestID) = 0;
-
-		///组合拆分单录入
-		virtual int ReqMatchOrderInsert(CKSMatchOrderInsertField *pMatchOrderInsert, int nRequestID) = 0;
-
-		///组合拆分单查询请求
-		virtual int ReqQryMatchOrder(CKSQryMatchOrderField *pQryMatchOrder, int nRequestID) = 0;
-
 		///最大组合拆分单量查询请求
-		virtual int ReqQryMaxMatchOrderVolume(CKSQryMaxMatchOrderVolumeField *pQryMaxMatchOrderVolume, int nRequestID) = 0;
+		virtual int ReqQryMaxCombActionVolume(CKSQryMaxCombActionVolumeField *pQryMaxCombActionVolume, int nRequestID) = 0;
+
+		///请求查询合约保证金率
+		virtual int ReqQryKSInstrumentMarginRate(CKSQryInstrumentMarginRateField *pQryInstrumentMarginRate, int nRequestID) = 0;
+
+		///客户每日出金额度申请
+		virtual int ReqFundOutCreditApply(CKSInputFundOutCreditApplyField *pFundOutCreditApply, int nRequestID) = 0;
+
+		///客户每日出金额度查询
+		virtual int ReqQryFundOutCredit(CKSQryFundOutCreditField *pQryFundOutCredit, int nRequestID) = 0;
+
+		///客户每日出金额度申请查询
+		virtual int ReqQryFundOutCreditApply(CKSQryFundOutCreditApplyField *pQryFundOutCreditApply, int nRequestID) = 0;
 
 	protected:
 		~CKSVocApi(){};

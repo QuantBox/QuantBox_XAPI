@@ -51,8 +51,10 @@ namespace QuantBox.XAPI
                 }
                 // Free your own state (unmanaged objects).
                 // Set large fields to null.
-                if(_Invoke != null)
+                
+                if (_Invoke != null)
                     _Invoke.Dispose();
+                
                 _Invoke = null;
                 _XRequest = null;
                 disposed = true;

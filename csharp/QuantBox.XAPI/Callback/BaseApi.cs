@@ -180,7 +180,7 @@ namespace QuantBox.XAPI.Callback
 
                 IsConnected = false;
 
-                if (proxy != null)
+                if (proxy != null && Handle.ToInt64() !=0)
                 {                    
                     proxy.XRequest((byte)RequestType.Disconnect, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);
                     proxy.XRequest((byte)RequestType.Release, Handle, IntPtr.Zero, 0, 0, IntPtr.Zero, 0, IntPtr.Zero, 0, IntPtr.Zero, 0);

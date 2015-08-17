@@ -380,10 +380,13 @@ void CTraderApi::Disconnect()
 		m_pApi = nullptr;
 
 		// 全清理，只留最后一个
-		m_msgQueue->Clear();
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-		// 主动触发
-		m_msgQueue->Process();
+		if (m_msgQueue)
+		{
+			m_msgQueue->Clear();
+			m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+			// 主动触发
+			m_msgQueue->Process();
+		}
 	}
 
 	if (m_msgQueue)
