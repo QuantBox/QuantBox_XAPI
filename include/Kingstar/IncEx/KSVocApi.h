@@ -69,6 +69,9 @@ namespace KingstarAPI
 		///交易通知
 		virtual void OnRtnKSTradingNotice(CKSTradingNoticeField *pTradingNoticeInfo) {};
 
+		///请求查询期权合约手续费响应
+		virtual void OnRspQryKSOptionInstrCommRate(CKSOptionInstrCommRateField *pOptionInstrCommRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+
 		///请求查询合约保证金率响应
 		virtual void OnRspQryKSInstrumentMarginRate(CKSInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
@@ -80,6 +83,12 @@ namespace KingstarAPI
 
 		///客户每日出金额度申请查询响应
 		virtual void OnRspQryFundOutCreditApply(CKSRspQryFundOutCreditApplyField *pRspQryFundOutCreditApply, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+
+		///大额出金预约（取消）申请响应
+		virtual void OnRspLargeFundOutApply(CKSLargeFundOutApplyField *pLargeFundOutApply, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
+
+		///大额出金预约查询响应
+		virtual void OnRspQryLargeFundOutApply(CKSRspLargeFundOutApplyField *pRspLargeFundOutApply, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 	};
 
 	class TRADER_VOCAPI_EXPORT CKSVocApi
@@ -115,6 +124,9 @@ namespace KingstarAPI
 		///最大组合拆分单量查询请求
 		virtual int ReqQryMaxCombActionVolume(CKSQryMaxCombActionVolumeField *pQryMaxCombActionVolume, int nRequestID) = 0;
 
+		///请求查询期权合约手续费
+		virtual int ReqQryKSOptionInstrCommRate(CKSQryOptionInstrCommRateField *pQryOptionInstrCommRate, int nRequestID) = 0;
+
 		///请求查询合约保证金率
 		virtual int ReqQryKSInstrumentMarginRate(CKSQryInstrumentMarginRateField *pQryInstrumentMarginRate, int nRequestID) = 0;
 
@@ -126,6 +138,12 @@ namespace KingstarAPI
 
 		///客户每日出金额度申请查询
 		virtual int ReqQryFundOutCreditApply(CKSQryFundOutCreditApplyField *pQryFundOutCreditApply, int nRequestID) = 0;
+
+		///大额出金预约（取消）申请
+		virtual int ReqLargeFundOutApply(CKSLargeFundOutApplyField *pLargeFundOutApply, int nRequestID) = 0;
+
+		///大额出金预约查询
+		virtual int ReqQryLargeFundOutApply(CKSQryLargeFundOutApplyField *pQryLargeFundOutApply, int nRequestID) = 0;
 
 	protected:
 		~CKSVocApi(){};

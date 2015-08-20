@@ -1797,5 +1797,126 @@ namespace KingstarAPI
 		///审核时间
 		TThostFtdcTimeType	ConfirmTime;
 	};
+
+	///大额出金预约（取消）申请
+	struct CKSLargeFundOutApplyField
+	{
+		///经纪公司代码
+		TThostFtdcBrokerIDType	BrokerID;
+		///投资者代码
+		TThostFtdcInvestorIDType	InvestorID;
+		///预约出金日期
+		TThostFtdcDateType	ApplyDate;
+		///操作类型
+		TKSFOCreditApplyType ApplyFlag;
+		///流水号
+		TThostFtdcTradeSerialNoType	ApplySerial;
+		///预约出金金额
+		TThostFtdcMoneyType	FundOutCredit;
+		///币种代码
+		TThostFtdcCurrencyIDType	CurrencyID;
+		///银行代码
+		TThostFtdcBankIDType	BankID;		
+	};
+
+	///大额出金预约查询请求
+	struct CKSQryLargeFundOutApplyField
+	{
+		///经纪公司代码
+		TThostFtdcBrokerIDType	BrokerID;
+		///投资者代码
+		TThostFtdcInvestorIDType	InvestorID;
+		///预约申请日期
+		TThostFtdcDateType	ApplyDate;
+		///预约出金日期
+		TThostFtdcDateType	FundOutDate;
+		///审核状态
+		TKSFOCreditStatusType ApplyFlag;
+		///银行代码
+		TThostFtdcBankIDType	BankID;		
+	};
+
+	///大额出金预约查询
+	struct CKSRspLargeFundOutApplyField
+	{
+		///经纪公司代码
+		TThostFtdcBrokerIDType	BrokerID;
+		///投资者代码
+		TThostFtdcInvestorIDType	InvestorID;
+		///流水号
+		TThostFtdcTradeSerialNoType	ApplySerial;
+		///审核状态
+		TKSFOCreditStatusType ApplyFlag;
+		///银行代码
+		TThostFtdcBankIDType	BankID;	
+		///币种代码
+		TThostFtdcCurrencyIDType	CurrencyID;
+		///预约出金金额
+		TThostFtdcMoneyType	FundOutCredit;	
+		///预约申请日期
+		TThostFtdcDateType	ApplyDate;
+		///预约出金日期
+		TThostFtdcDateType	FundOutDate;
+		///设置日期
+		TThostFtdcDateType	SetDate;
+		///设置时间
+		TThostFtdcTimeType	SetTime;
+	};
+
+	///期权手续费率查询
+	struct CKSQryOptionInstrCommRateField
+	{
+		///经纪公司代码
+		TThostFtdcBrokerIDType	BrokerID;
+		///投资者代码
+		TThostFtdcInvestorIDType	InvestorID;
+		///合约代码
+		TThostFtdcInstrumentIDType	InstrumentID;
+		///交易所代码
+		TThostFtdcExchangeIDType	ExchangeID;
+	};
+
+	///当前期权合约手续费的详细内容
+	struct CKSOptionInstrCommRateField
+	{
+		///合约代码
+		TThostFtdcInstrumentIDType	InstrumentID;
+		///投资者范围
+		TThostFtdcInvestorRangeType	InvestorRange;
+		///经纪公司代码
+		TThostFtdcBrokerIDType	BrokerID;
+		///投资者代码
+		TThostFtdcInvestorIDType	InvestorID;
+		///买开仓手续费率
+		TThostFtdcRatioType	BuyOpenRatioByMoney;
+		///买开仓手续费
+		TThostFtdcRatioType	BuyOpenRatioByVolume;
+		///买平仓手续费率
+		TThostFtdcRatioType	BuyCloseRatioByMoney;
+		///买平仓手续费
+		TThostFtdcRatioType	BuyCloseRatioByVolume;
+		///行权手续费率
+		TThostFtdcRatioType	StrikeRatioByMoney;
+		///行权手续费
+		TThostFtdcRatioType	StrikeRatioByVolume;
+		///卖开仓手续费率
+		TThostFtdcRatioType	SellOpenRatioByMoney;
+		///卖开仓手续费
+		TThostFtdcRatioType	SellOpenRatioByVolume;
+		///卖平仓手续费率
+		TThostFtdcRatioType	SellCloseRatioByMoney;
+		///卖平仓手续费
+		TThostFtdcRatioType	SellCloseRatioByVolume;
+		///备兑开仓手续费率
+		TThostFtdcRatioType	CoveredOpenRatioByMoney;
+		///备兑开仓手续费
+		TThostFtdcRatioType	CoveredOpenRatioByVolume;
+		///备兑平仓手续费率
+		TThostFtdcRatioType	CoveredCloseRatioByMoney;
+		///备兑平仓手续费
+		TThostFtdcRatioType	CoveredCloseRatioByVolume;
+		///交易所代码
+		TThostFtdcExchangeIDType	ExchangeID;
+	};
 }	// end of namespace KingstarAPI
 #endif
