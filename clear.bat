@@ -28,6 +28,7 @@ rd QuantBox_XSpeedStock_Quote\Debug /S /Q
 rd QuantBox_XSpeedStock_Trade\Debug /S /Q
 rd QuantBox_ZeroMQ_Quote\Debug /S /Q
 rd QuantBox_TongShi_Quote\Debug /S /Q
+rd QuantBox_Tdx_Trade\Debug /S /Q
 
 rd QuantBox_CTP_Quote\Debug64 /S /Q
 rd QuantBox_CTP_Trade\Debug64 /S /Q
