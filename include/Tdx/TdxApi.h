@@ -31,8 +31,8 @@ public:
 	virtual int SendMultiOrders(Order_STRUCT* pOrders, int count, FieldInfo_STRUCT*** pppFieldInfos, char*** pppResults, Error_STRUCT*** pppErrs) = 0;
 	
 	// 必需从委托列表中找到股东代码
-	virtual int CancelMultiOrders(char* gddm[], char* wtbh[], int count) = 0;
-	virtual int CancelMultiOrders(Order_STRUCT* pOrders, int count) = 0;
+	//virtual int CancelMultiOrders(char* gddm[], char* wtbh[], int count, FieldInfo_STRUCT*** pppFieldInfos, char*** pppResults, Error_STRUCT*** pppErrs) = 0;
+	virtual int CancelMultiOrders(Order_STRUCT* pOrders, int count, FieldInfo_STRUCT*** pppFieldInfos, char*** pppResults, Error_STRUCT*** pppErrs) = 0;
 	// 发送查询请求
 	// 有些请求是当日数据，后面的起始和结束日期自动忽略
 	// 对于历史数据，需要查询的区别，格式“yyyyMMdd”，客户端上有60天或90天的时间限制，这里没有，但如果数据太多，间隔设成一周或一月
@@ -41,6 +41,8 @@ public:
 public:
 	// 设置会话
 	virtual void SetClient(void* client) = 0;
+
+	virtual void* GetClient() = 0;
 	// 设置资金账号
 	virtual void SetAccount(const char* szAccount) = 0;
 	// 得到资金账号

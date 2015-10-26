@@ -36,6 +36,7 @@ struct Order_STRUCT
 	long MMBZ;		// 130_买卖标志
 	long WTFS;		// 166_委托方式
 
+	char ZHLB_[2];	// 125_帐号类别
 	// 下完单后用来回填
 	char WTBH[32];	// 146_委托编号
 };

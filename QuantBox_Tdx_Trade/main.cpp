@@ -58,10 +58,10 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case ReqQrySettlementInfo:
 		pApi->ReqQrySettlementInfo((const char*)ptr1);
 		break;*/
-	//case ReqOrderInsert:
-	//	return (void*)pApi->ReqOrderInsert((OrderField*)ptr1, size1, (OrderIDType*)ptr2);
-	//case ReqOrderAction:
-	//	return (void*)pApi->ReqOrderAction((OrderIDType*)ptr1, size1, (OrderIDType*)ptr2);
+	case ReqOrderInsert:
+		return (void*)pApi->ReqOrderInsert((OrderField*)ptr1, size1, (OrderIDType*)ptr2);
+	/*case ReqOrderAction:
+		return (void*)pApi->ReqOrderAction((OrderIDType*)ptr1, size1, (OrderIDType*)ptr2);*/
 		/*
 	case ReqQuoteInsert:
 		return pApi->ReqQuoteInsert((int)double1, (QuoteField*)ptr1);
@@ -69,6 +69,9 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		return (void*)pApi->ReqOrderAction((const char*)ptr1);
 	case ReqQuoteAction:
 		return (void*)pApi->ReqQuoteAction((const char*)ptr1);*/
+	case ReqQryInvestor:
+		pApi->ReqQryInvestor();
+		break;
 	default:
 		break;
 	}

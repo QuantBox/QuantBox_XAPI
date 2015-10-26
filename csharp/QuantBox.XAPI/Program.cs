@@ -90,7 +90,7 @@ namespace QuantBox.XAPI
         {
             //for (int i = 0; i < 10000; ++i)
             {
-                test_TongShi_Main(args);
+                test_Tdx_Main(args);
             }
             Console.ReadKey();
         }
@@ -277,6 +277,33 @@ namespace QuantBox.XAPI
 
             Console.ReadKey();
             api.Subscribe("IF1411", "");
+
+            Console.ReadKey();
+
+            api.Dispose();
+
+            Console.ReadKey();
+
+            Console.ReadKey();
+        }
+
+        static void test_Tdx_Main(string[] args)
+        {
+            api = new XApi(@"C:\Program Files\SmartQuant Ltd\OpenQuant 2014\XAPI\Tdx\x86\QuantBox_Tdx_Trade.dll");
+
+            api.Server.BrokerID = "";
+            api.Server.Address = @"D:\new_hbzq_qq\Login.lua";
+            api.Server.ExtendInformation = @"D:\new_hbzq_qq\";
+
+            api.User.UserID = "05000000000";
+            api.User.Password = "123456";
+
+            api.OnConnectionStatus = OnConnectionStatus;
+            api.OnRtnDepthMarketData = OnRtnDepthMarketData;
+
+            api.Connect();
+
+            Console.ReadKey();
 
             Console.ReadKey();
 

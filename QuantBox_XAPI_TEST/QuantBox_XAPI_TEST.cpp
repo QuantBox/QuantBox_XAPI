@@ -28,6 +28,10 @@ public:
 	virtual void OnConnectionStatus(CXApi* pApi, ConnectionStatus status, RspUserLoginField* pUserLogin, int size1)
 	{
 		printf("%d\r\n", status);
+		if (pUserLogin)
+		{
+			printf("%s\r\n", pUserLogin->ErrorMsg);
+		}
 		if (status == ConnectionStatus::Done)
 		{
 			if ((pApi->GetApiType() & ApiType::MarketData) == ApiType::MarketData)
@@ -209,7 +213,7 @@ int main_1(int argc, char* argv[])
 
 
 
-int main(int argc, char* argv[])
+int main_2(int argc, char* argv[])
 {
 	CXSpiImpl* p = new CXSpiImpl();
 
@@ -267,6 +271,56 @@ int main_4(int argc, char* argv[])
 	
 	strcpy(m_UserInfo.UserID, "00049");
 	strcpy(m_UserInfo.Password, "123456");
+
+	CXApi* pApi1 = CXApi::CreateApi(DLLPath1);
+	if (pApi1)
+	{
+		if (!pApi1->Init())
+		{
+			printf("%s\r\n", pApi1->GetLastError());
+			pApi1->Disconnect();
+			return -1;
+		}
+
+		//p->m_pApi = pApi1;
+		pApi1->RegisterSpi(p);
+
+#if defined WINDOWS || _WIN32
+		pApi1->Connect("D:\\", &m_ServerInfo1, &m_UserInfo, 1);
+#else
+		pApi1->Connect("./", &m_ServerInfo1, &m_UserInfo, 1);
+#endif
+
+		do
+		{
+			int c = getchar();
+			if (c == 'q')
+				break;
+		} while (true);
+
+		pApi1->Disconnect();
+	}
+
+	return 0;
+}
+
+int main(int argc, char* argv[])
+{
+	CXSpiImpl* p = new CXSpiImpl();
+#if defined WINDOWS || _WIN32
+	char DLLPath1[250] = "C:\\Program Files\\SmartQuant Ltd\\OpenQuant 2014\\XAPI\\Tdx\\x86\\QuantBox_Tdx_Trade.dll";
+#else
+	char DLLPath1[250] = "libQuantBox_CTP_Quote.so";
+#endif
+
+	ServerInfoField				m_ServerInfo1 = { 0 };
+	UserInfoField				m_UserInfo = { 0 };
+
+	strcpy(m_ServerInfo1.Address, "D:\\new_hbzq_qq\\Login.lua");
+	strcpy(m_ServerInfo1.ExtendInformation, "D:\\new_hbzq_qq\\");
+
+	strcpy(m_UserInfo.UserID, "00000000000");
+	strcpy(m_UserInfo.Password, "111111");
 
 	CXApi* pApi1 = CXApi::CreateApi(DLLPath1);
 	if (pApi1)

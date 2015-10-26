@@ -175,7 +175,9 @@ namespace QuantBox
     public enum ExecType : byte
     {
         ExecNew,
+        ExecStopped,
         ExecRejected,
+        ExecExpired,
         ExecTrade,
         ExecPendingCancel,
         ExecCancelled,

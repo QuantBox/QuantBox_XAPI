@@ -112,7 +112,9 @@ enum PositionSide :char
 enum ExecType : char
 {
 	ExecNew,
+	ExecStopped,
 	ExecRejected,
+	ExecExpired,
 	ExecTrade,
 	ExecPendingCancel,
 	ExecCancelled,

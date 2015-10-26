@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../include/Tdx/TdxApi.h"
+#include "../include/Tdx/LuaRunner.h"
 #include "../include/ApiStruct.h"
+#include "../include/IDGenerator.h"
 
 #ifdef _WIN64
 #pragma comment(lib, "../include/Tdx/win64/TdxApi.lib")
@@ -42,12 +44,14 @@ class CTraderApi
 	{
 		E_Init,
 		E_ReqUserLoginField,
+		E_QryInvestorField,
+		E_InputOrderField,
+		E_InputOrderActionField,
 
 
 		E_SettlementInfoConfirmField,
 		E_QryInstrumentField,
-		E_InputOrderField,
-		E_InputOrderActionField,
+		
 		E_InputQuoteField,
 		E_InputQuoteActionField,
 		E_ParkedOrderField,
@@ -87,7 +91,7 @@ public:
 	//	OrderField* pOrder2);
 
 	int ReqOrderAction(OrderIDType* szId, int count, OrderIDType* pOutput);
-	//int ReqOrderAction(OrderFieldEx *pOrder, int count, OrderIDType* pOutput);
+	int ReqOrderAction(Order_STRUCT *pOrder, int count, OrderIDType* pOutput);
 
 	//char* ReqQuoteInsert(
 	//	int QuoteRef,
@@ -109,7 +113,8 @@ public:
 	//void ReqQryTrade(TCustNoType cust_no, TSecCodeType sec_code);
 	//void ReqQryQuote();
 
-	
+	void ReqQryInvestor();
+
 private:
 	//static void __stdcall OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData);
 	//void _OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData);
@@ -123,18 +128,23 @@ private:
 	void ReqUserLogin();
 	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
+	int _ReqQryInvestor(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+
 	int _ReqQryOrder(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	int _ReqQryTrade(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
+	int _ReqOrderInsert(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	int _ReqOrderAction(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
 	//void OnPST16203PushData(PST16203PushData pEtxPushData);
 	//void OnPST16204PushData(PST16204PushData pEtxPushData);
 
 	//
 
-	////检查是否出错
-	//bool IsErrorRspInfo(STRspMsg *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
-	//bool IsErrorRspInfo(STRspMsg *pRspInfo);//不输出信息
+	//检查是否出错
+	//bool IsErrorRspInfo(Error_STRUCT *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
+	bool IsErrorRspInfo(Error_STRUCT *pRspInfo);//不输出信息
 
 	////连接
 	//virtual void OnFrontConnected();
@@ -205,6 +215,7 @@ private:
 	int							m_nMaxOrderRef;			//报单引用，用于区分报单，保持自增
 
 	//STRspMsg					m_err_msg;
+	CLuaRunner*					m_pRunner;
 	CTdxApi*					m_pApi;					//交易API
 
 
@@ -214,8 +225,8 @@ private:
 
 	int							m_nSleep;
 
-	//unordered_map<string, OrderFieldEx*>				m_id_platform_order;
-	//unordered_map<string, STOrderInfo*>				m_id_api_order;
+	unordered_map<string, OrderField*>				m_id_platform_order;
+	unordered_map<string, Order_STRUCT*>			m_id_api_order;
 	//unordered_map<string, string>					m_sysId_orderId;//成交回报时使用找到原订单
 
 	//unordered_map<string, QuoteField*>				m_id_platform_quote;
@@ -237,5 +248,7 @@ private:
 	//STOrderCancel				m_temp_ordercancel;
 
 	void*						m_pClass;
+
+	CIDGenerator*				m_pIDGenerator;
 };
 

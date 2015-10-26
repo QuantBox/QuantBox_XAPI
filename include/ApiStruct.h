@@ -77,10 +77,19 @@ struct OrderField
 	ExchangeIDType	ExchangeID;
 	ErrorMsgType Text;
 
-	OrderIDType ID;
-	OrderIDType OrderID;
 	UserIDType ClientID;
 	AccountIDType Account;
+
+	//////////////////////////////////////////////////////////////////////////
+	// 20151021 此处做了大调整，主要是因为股票接口无法立即得到ID，只能从回报是获得
+	// 所以为了实现异步只能先生成一个ID，然后做映射
+
+	// 本地ID,可能在重启后发生变化
+	OrderIDType LocalID;
+	// 系统ID，其实是柜台ID，唯一
+	OrderIDType ID;
+	// 交易所生成的ID，此字段可供比较报单先后。不同交易所可能出现一样的ID
+	OrderIDType OrderID;
 };
 
 struct TradeField
@@ -95,8 +104,8 @@ struct TradeField
 	InstrumentIDType InstrumentID;
 	ExchangeIDType	ExchangeID;
 
-	
 	OrderIDType ID;
+	// 交易所产生的成交ID，可用于判断自成交
 	TradeIDType TradeID;
 };
 
