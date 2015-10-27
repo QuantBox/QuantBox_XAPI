@@ -60,8 +60,8 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		break;*/
 	case ReqOrderInsert:
 		return (void*)pApi->ReqOrderInsert((OrderField*)ptr1, size1, (OrderIDType*)ptr2);
-	/*case ReqOrderAction:
-		return (void*)pApi->ReqOrderAction((OrderIDType*)ptr1, size1, (OrderIDType*)ptr2);*/
+	case ReqOrderAction:
+		return (void*)pApi->ReqOrderAction((OrderIDType*)ptr1, size1, (OrderIDType*)ptr2);
 		/*
 	case ReqQuoteInsert:
 		return pApi->ReqQuoteInsert((int)double1, (QuoteField*)ptr1);

@@ -16,37 +16,6 @@
 #include <cstring>
 #include <assert.h>
 
-//CTraderApi* CTraderApi::pThis = nullptr;
-//
-//void __stdcall CTraderApi::OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData)
-//{
-//	// 这个类在一个dll不能实例化多次了，因为使用了static变量
-//	pThis->_OnReadPushData(FuncNO, pEtxPushData);
-//}
-//
-////客户端实现推送回调函数
-//void CTraderApi::_OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData)
-//{
-//	switch (FuncNO)
-//	{
-//	case ETX_16203:
-//		OnPST16203PushData((PST16203PushData)pEtxPushData);
-//		break;
-//	case ETX_16204:
-//		OnPST16204PushData((PST16204PushData)pEtxPushData);
-//		break;
-//	default:
-//	{
-//			   ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
-//
-//			   pField->ErrorID = FuncNO;
-//			   sprintf(pField->ErrorMsg, "无法识别的推送数据[%d]", FuncNO);
-//
-//			   m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
-//	}
-//		break;
-//	}
-//}
 
 void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
@@ -103,12 +72,15 @@ void CTraderApi::QueryInThread(char type, void* pApi1, void* pApi2, double doubl
 
 int CTraderApi::_Init()
 {
-	m_pRunner = CLuaRunner::CreateRunner();
+	if (m_pApi == nullptr)
+	{
+		m_pApi = CTdxApi::CreateApi(m_ServerInfo.ExtendInformation);
+	}
 
 	Error_STRUCT* pErr = nullptr;
-	
-	m_pRunner->LoadScript(m_ServerInfo.Address, true, false);
-	m_pRunner->Init(m_ServerInfo.ExtendInformation, &pErr);
+
+	m_pApi->LoadScript(m_ServerInfo.Address, true, false);
+	m_pApi->Init(m_ServerInfo.ExtendInformation, &pErr);
 
 	if (pErr)
 	{
@@ -152,24 +124,21 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
-	void* pClient = m_pRunner->Login(m_UserInfo.UserID, m_UserInfo.Password, &ppResults, &pErr);
+	m_pClient = m_pApi->Login(m_UserInfo.UserID, m_UserInfo.Password, &ppResults, &pErr);
 
-	if (pErr)
+	if (m_pClient)
 	{
+		// 有授权信息要输出
 		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+		if (pErr)
+		{
+			pField->ErrorID = pErr->ErrCode;
+			strcpy(pField->ErrorMsg, pErr->ErrInfo);
+		}
 
-		pField->ErrorID = pErr->ErrCode;
-		strcpy(pField->ErrorMsg, pErr->ErrInfo);
-
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
-	}
-	else
-	{
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logined, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logined, 0, pField, sizeof(pField), nullptr, 0, nullptr, 0);
 		
-		// 目前这个地方先做成只支持一个账号的模式
-		m_pApi = CTdxApi::CreateApi(m_ServerInfo.ExtendInformation);
-		m_pApi->SetClient(pClient);
+		m_pApi->SetClient(m_pClient);
 		m_pApi->SetAccount(m_UserInfo.UserID);
 
 		// 查询股东列表
@@ -181,6 +150,18 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 		// 登录下一个账号
 		//++m_UserInfo_Pos;
 		//ReqUserLogin();
+	}
+	else
+	{
+		if (pErr)
+		{
+			RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+
+			pField->ErrorID = pErr->ErrCode;
+			strcpy(pField->ErrorMsg, pErr->ErrInfo);
+
+			m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+		}
 	}
 
 	DeleteError(pErr);
@@ -197,9 +178,13 @@ void CTraderApi::ReqQryInvestor()
 
 int CTraderApi::_ReqQryInvestor(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
+	if (m_pApi == nullptr)
+		return 0;
+
 	FieldInfo_STRUCT** ppFieldInfos = nullptr;
 	char** ppResults = nullptr;
 	Error_STRUCT* pErr = nullptr;
+
 	m_pApi->ReqQueryData(REQUEST_GDLB, &ppFieldInfos, &ppResults, &pErr);
 
 	if (!IsErrorRspInfo(pErr))
@@ -230,7 +215,7 @@ CTraderApi::CTraderApi(void)
 {
 	m_pIDGenerator = nullptr;
 	m_pApi = nullptr;
-	m_pRunner = nullptr;
+	m_pClient = nullptr;
 	m_lRequestID = 0;
 	m_nSleep = 1;
 
@@ -283,13 +268,6 @@ bool CTraderApi::IsErrorRspInfo(Error_STRUCT *pRspInfo)
 	return bRet;
 }
 
-//bool CTraderApi::IsErrorRspInfo(Error_STRUCT *pRspInfo)
-//{
-//	bool bRet = ((pRspInfo) && (pRspInfo->error_no != 0));
-//
-//	return bRet;
-//}
-
 void CTraderApi::Connect(const string& szPath,
 	ServerInfoField* pServerInfo,
 	UserInfoField* pUserInfo,
@@ -324,22 +302,22 @@ void CTraderApi::Disconnect()
 
 	if(m_pApi)
 	{
-		m_pRunner->Logout(m_pApi->GetClient());
+		// 还没有登出
+		m_pApi->Logout(m_pClient);
+		m_pClient = nullptr;
+		m_pApi->Exit();
+		
 		m_pApi->Release();
 		m_pApi = nullptr;
 
 		// 全清理，只留最后一个
-		m_msgQueue->Clear();
-		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-		// 主动触发
-		m_msgQueue->Process();
-	}
-
-	if (m_pRunner)
-	{
-		m_pRunner->Exit();
-		m_pRunner->Release();
-		m_pRunner = nullptr;
+		if (m_msgQueue)
+		{
+			m_msgQueue->Clear();
+			m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+			// 主动触发
+			m_msgQueue->Process();
+		}
 	}
 
 	if (m_msgQueue)
@@ -363,26 +341,32 @@ int CTraderApi::ReqOrderInsert(
 	int count,
 	OrderIDType* pInOut)
 {
-	if (count < 1)
-		return 0;
-
 	memset(pInOut, 0, sizeof(OrderIDType)*count);
 
-	OrderField* pNewOrder = new OrderField[count];
-	memcpy(pNewOrder, pOrder, sizeof(OrderField)*count);
+	if (count < 1)
+		return 0;	
 
+	OrderField** ppOrders = new OrderField*[count];
+	
 	// 生成本地ID，供上层进行定位使用
 	for (int i = 0; i < count; ++i)
 	{
+		OrderField* pNewOrder = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
+		memcpy(pNewOrder, pOrder, sizeof(OrderField));
+
 		strcpy(pInOut[i], m_pIDGenerator->GetIDString());
-		strcpy(pNewOrder[i].LocalID, pInOut[i]);		 
+		strcpy(pNewOrder[i].LocalID, pInOut[i]);
+		ppOrders[i] = pNewOrder;
+
+		// 注意这里保存了最开始发单的结构体的备份
+		m_id_platform_order.insert(pair<string, OrderField*>(pNewOrder->LocalID, pNewOrder));
 	}
 
 	m_msgQueue_Query->Input_Copy(RequestType::E_InputOrderField, m_msgQueue_Query, this, 0, 0,
-		pNewOrder, sizeof(OrderField)*count, nullptr, 0, nullptr, 0);
+		ppOrders, sizeof(OrderField*)*count, nullptr, 0, nullptr, 0);
 
-	delete[] pNewOrder;
-
+	delete[] ppOrders;
+	
 	return 0;
 }
 
@@ -424,94 +408,72 @@ void BuildOrder(OrderField* pIn, Order_STRUCT* pOut)
 
 int CTraderApi::_ReqOrderInsert(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	// 这个函数返回后将被删除，所以需要进行复制
-	OrderField* pOrders = (OrderField*)ptr1;
-	int count = (int)size1 / sizeof(OrderField);
+	if (m_pApi == nullptr)
+		return 0;
 
-	Order_STRUCT* pTdxOrders = new Order_STRUCT[count];
+	// 得到报单指针列表
+	OrderField** ppOrders = (OrderField**)ptr1;
+	int count = (int)size1 / sizeof(OrderField*);
+
+	Order_STRUCT** ppTdxOrders = new Order_STRUCT*[count];
 	for (int i = 0; i < count; ++i)
 	{
-		BuildOrder(&pOrders[i], &pTdxOrders[i]);
+		ppTdxOrders[i] = (Order_STRUCT*)m_msgQueue->new_block(sizeof(Order_STRUCT));
+		BuildOrder(ppOrders[i], ppTdxOrders[i]);
 	}
 
 	FieldInfo_STRUCT** ppFieldInfos = nullptr;
 	char** ppResults = nullptr;
 	Error_STRUCT** ppErrs = nullptr;
 
-	int n = m_pApi->SendMultiOrders(pTdxOrders, count, &ppFieldInfos, &ppResults, &ppErrs);
+	// 注意：pTdxOrders在这里被修改了，需要使用修改后的东西
+	int n = m_pApi->SendMultiOrders(ppTdxOrders, count, &ppFieldInfos, &ppResults, &ppErrs);
 
 	// 将结果立即取出来
 	for (int i = 0; i < count;++i)
 	{
+		m_id_api_order.insert(pair<string, Order_STRUCT*>(ppOrders[i]->LocalID, ppTdxOrders[i]));
 		// 处理错误
 		if (ppErrs && ppErrs[i])
 		{
-			pOrders[i].ErrorID = ppErrs[i]->ErrCode;
-			strcpy(pOrders[i].Text, ppErrs[i]->ErrInfo);
+			ppOrders[i]->ErrorID = ppErrs[i]->ErrCode;
+			strcpy(ppOrders[i]->Text, ppErrs[i]->ErrInfo);
 		}
 
 		// 处理结果
 		if (ppResults && ppResults[i*COL_EACH_ROW + 0])
 		{
-			strcpy(pOrders[i].ID, ppResults[i*COL_EACH_ROW + 0]);
+			// 写上柜台的ID，以后将基于此进行定位
+			strcpy(ppOrders[i]->ID, ppResults[i*COL_EACH_ROW + 0]);
+
+			m_id_api_order.erase(ppOrders[i]->LocalID);
+			m_id_api_order.insert(pair<string, Order_STRUCT*>(ppOrders[i]->ID, ppTdxOrders[i]));
+
+			m_id_platform_order.erase(ppOrders[i]->LocalID);
+			m_id_platform_order.insert(pair<string, OrderField*>(ppOrders[i]->ID, ppOrders[i]));
 		}
 
-		// 现在有两个结构体
-
-
-		OrderIDType orderId = { 0 };
-		sprintf(orderId, "%s", pOrders[i].ID);
-
-		OrderField* pField = nullptr;
-		unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
-		if (it == m_id_platform_order.end())
+		// 现在有两个结构体，需要进行操作了
+		// 1.通知下单的结果
+		// 2.记录下单
+		
+		OrderField* pField = ppOrders[i];
+		if (pField->ErrorID != 0)
 		{
-			// 开盘时发单信息还没有，所以找不到对应的单子，需要进行Order的恢复
-			pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
-
-			memcpy(pField, &pOrders[i], sizeof(OrderField));
-
-			//strcpy(pField->ID, orderId);
-			//strcpy(pField->InstrumentID, pOrder->InstrumentID);
-			//strcpy(pField->ExchangeID, pOrder->ExchangeID);
-			//pField->HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pOrder->CombHedgeFlag[0]);
-			//pField->Side = TThostFtdcDirectionType_2_OrderSide(pOrder->Direction);
-			//pField->Price = pOrder->LimitPrice;
-			//pField->StopPx = pOrder->StopPrice;
-			//strncpy(pField->Text, pOrder->StatusMsg, sizeof(ErrorMsgType));
-			//pField->OpenClose = TThostFtdcOffsetFlagType_2_OpenCloseType(pOrder->CombOffsetFlag[0]);
-			//pField->Status = CThostFtdcOrderField_2_OrderStatus(pOrder);
-			//pField->Qty = pOrder->VolumeTotalOriginal;
-			//pField->Type = CThostFtdcOrderField_2_OrderType(pOrder);
-			//pField->TimeInForce = CThostFtdcOrderField_2_TimeInForce(pOrder);
-			if (pField->ErrorID != 0)
-			{
-				pField->ExecType = ExecType::ExecRejected;
-				pField->Status = OrderStatus::Rejected;
-			}
-			else
-			{
-				pField->ExecType = ExecType::ExecNew;
-				pField->Status = OrderStatus::New;
-			}
-
-			// 添加到map中，用于其它工具的读取，撤单失败时的再通知等
-			m_id_platform_order.insert(pair<string, OrderField*>(orderId, pField));
+			pField->ExecType = ExecType::ExecRejected;
+			pField->Status = OrderStatus::Rejected;
 		}
 		else
 		{
-			pField = it->second;
-			//strcpy(pField->ID, orderId);
-			//pField->LeavesQty = pOrder->VolumeTotal;
-			//pField->Price = pOrder->LimitPrice;
-			//pField->Status = CThostFtdcOrderField_2_OrderStatus(pOrder);
-			//pField->ExecType = CThostFtdcOrderField_2_ExecType(pOrder);
-			//strcpy(pField->OrderID, pOrder->OrderSysID);
-			//strncpy(pField->Text, pOrder->StatusMsg, sizeof(ErrorMsgType));
+			pField->ExecType = ExecType::ExecNew;
+			pField->Status = OrderStatus::New;
 		}
-
+		
 		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 	}
+
+	// 复制完了，可以删了以前东西
+	delete[] ppTdxOrders;
 
 	DeleteTableBody(ppResults, count);
 	DeleteErrors(ppErrs, count);
@@ -521,237 +483,79 @@ int CTraderApi::_ReqOrderInsert(char type, void* pApi1, void* pApi2, double doub
 
 int CTraderApi::ReqOrderAction(OrderIDType* szId, int count, OrderIDType* pOutput)
 {
-	Order_STRUCT *pOrder = new Order_STRUCT[count];
+	memset(pOutput, 0, sizeof(OrderIDType)*count);
+
+	OrderField** ppOrders = new OrderField*[count];
+	Order_STRUCT** ppTdxOrders = new Order_STRUCT*[count];
 
 	for (int i = 0; i < count; ++i)
 	{
-		unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(szId[i]);
-		if (it == m_id_platform_order.end())
+		ppOrders[i] = nullptr;
+		ppTdxOrders[i] = nullptr;
+
 		{
-			// 没找到怎么办？第一个就没找到怎么办？
-			
+			unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(szId[i]);
+			if (it != m_id_platform_order.end())
+				ppOrders[i] = it->second;
 		}
-		else
+		
 		{
-			memcpy(&pOrder[i], it->second, sizeof(Order_STRUCT));
-		}
-	}
-
-	int nRet = ReqOrderAction(pOrder, count, pOutput);
-	delete[] pOrder;
-	return nRet;
-}
-
-//void BuildCancelOrder(OrderFieldEx* pIn, STOrderCancel* pOut)
-//{
-//	strcpy(pOut->cust_no,pIn->cust_no);
-//	pOut->market_code = pIn->market_code;
-//	pOut->ordercancel_type = 1;
-//	pOut->order_no = pIn->order_no;
-//}
-
-int CTraderApi::ReqOrderAction(Order_STRUCT *pOrder, int count, OrderIDType* pOutput)
-{
-	int row_num = 0;
-
-	FieldInfo_STRUCT** ppFieldInfos = nullptr;
-	char** ppResults = nullptr;
-	Error_STRUCT** ppErrs = nullptr;
-
-	int n = m_pApi->CancelMultiOrders(pOrder, count, &ppFieldInfos, &ppResults, &ppErrs);
-
-	for (int i = 0; i < count; ++i)
-	{
-		// 是否要将Account写回到原Order中呢？
-		if (ppErrs)
-		{
-			if (ppErrs[i])
-			{
-				//pOrders[i].ErrorID = ppErrs[i]->ErrCode;
-				//strcpy(pOrders[i].Text, ppErrs[i]->ErrInfo);
-			}
-		}
-		if (ppResults)
-		{
-			if (ppResults[i*COL_EACH_ROW + 0])
-			{
-				//strcpy(pOrders[i].ID, ppResults[i*COL_EACH_ROW + 0]);
-			}
+			unordered_map<string, Order_STRUCT*>::iterator it = m_id_api_order.find(szId[i]);
+			if (it != m_id_api_order.end())
+				ppTdxOrders[i] = it->second;
 		}
 	}
 
-	//STOrderCancel *p_ordercancel_req = new STOrderCancel[count];
-	//STOrderCancelRsp *p_ordercancel_rsp = NULL;
+	m_msgQueue_Query->Input_Copy(RequestType::E_InputOrderActionField, m_msgQueue_Query, this, 0, 0,
+		ppOrders, sizeof(OrderField*)*count, ppTdxOrders, sizeof(Order_STRUCT*)*count, nullptr, 0);
 
-	//for (int i = 0; i < count; ++i)
-	//{
-	//	BuildCancelOrder(&pOrder[i], &p_ordercancel_req[i]);
-	//}
-
-	//bool bRet = SPX_API_OrderCancel(m_pApi, p_ordercancel_req, &p_ordercancel_rsp, count, &row_num, &m_err_msg);
-
-	//if (bRet && m_err_msg.error_no == 0)
-	//{
-	//	if (p_ordercancel_rsp != NULL)
-	//	{
-	//		for (int i = 0; i<row_num; i++)
-	//		{
-	//			if (p_ordercancel_rsp[i].error_no == 0)
-	//			{
-	//				// 这是撤单成功还是撤单失败了呢？
-	//				memset(pOutput[i], 0, sizeof(OrderIDType));
-	//				
-	//				pOrder[i].Field.ErrorID = p_ordercancel_rsp[i].error_no;
-	//				strncpy(pOrder[i].Field.Text, p_ordercancel_rsp[i].err_msg, sizeof(ErrorMsgType));
-	//				pOrder[i].Field.ExecType = ExecType::ExecCancelReject;
-	//				pOrder[i].Field.Status = OrderStatus::Rejected;
-
-	//				m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, &pOrder[i].Field, sizeof(OrderField), nullptr, 0, nullptr, 0);
-	//			}
-	//			else
-	//			{
-	//				memset(pOutput[i], 0, sizeof(OrderIDType));
-	//				//sprintf(pOutput[i],"%d",p_ordercancel_rsp[i].error_no);
-
-	//				pOrder[i].Field.ErrorID = p_ordercancel_rsp[i].error_no;
-	//				strncpy(pOrder[i].Field.Text, p_ordercancel_rsp[i].err_msg, sizeof(ErrorMsgType));
-	//				pOrder[i].Field.ExecType = ExecType::ExecCancelReject;
-	//				// 撤单拒绝，状态要用上次的
-	//				//pOrder[i].Field.Status = OrderStatus::Rejected;
-
-	//				m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, &pOrder[i].Field, sizeof(OrderField), nullptr, 0, nullptr, 0);
-	//			}
-	//		}
-	//	}
-	//	else
-	//	{
-	//		for (int i = 0; i < count; ++i)
-	//		{
-	//			//sprintf(pOutput[i], "%d", 0);
-	//			memset(pOutput[i], 0, sizeof(OrderIDType));
-
-	//			pOrder[i].Field.ErrorID = 0;
-	//			strcpy(pOrder[i].Field.Text, "返回结果为空");
-	//			pOrder[i].Field.ExecType = ExecType::ExecCancelReject;
-	//			//pOrder[i].Field.Status = OrderStatus::Rejected;
-
-	//			m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, &pOrder[i].Field, sizeof(OrderField), nullptr, 0, nullptr, 0);
-	//		}
-	//	}
-	//}
-	//else
-	//{
-	//	// 出错了，全输出
-	//	for (int i = 0; i < count; ++i)
-	//	{
-	//		//sprintf(pOutput[i], "%d", m_err_msg.error_no);
-	//		memset(pOutput[i], 0, sizeof(OrderIDType));
-
-	//		pOrder[i].Field.ErrorID = m_err_msg.error_no;
-	//		strcpy(pOrder[i].Field.Text, m_err_msg.msg);
-	//		pOrder[i].Field.ExecType = ExecType::ExecCancelReject;
-	//		//pOrder[i].Field.Status = OrderStatus::Rejected;
-
-	//		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, &pOrder[i].Field, sizeof(OrderField), nullptr, 0, nullptr, 0);
-	//	}
-	//}
-
-	//delete[] p_ordercancel_req;
+	delete[] ppOrders;
+	delete[] ppTdxOrders;
 
 	return 0;
 }
 
 int CTraderApi::_ReqOrderAction(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
+	int count = (int)size1 / sizeof(OrderField*);
 	// 通过ID找到原始结构，用于撤单
 	// 通过ID找到通用结构，用于接收回报
-	OrderField* pOrders = (OrderField*)ptr1;
-	int count = (int)size1 / sizeof(OrderField);
-
-	Order_STRUCT* pTdxOrders = new Order_STRUCT[count];
-	for (int i = 0; i < count; ++i)
-	{
-		BuildOrder(&pOrders[i], &pTdxOrders[i]);
-	}
+	OrderField** ppOrders = (OrderField**)ptr1;
+	Order_STRUCT** ppTdxOrders = (Order_STRUCT**)ptr2;
 
 	FieldInfo_STRUCT** ppFieldInfos = nullptr;
 	char** ppResults = nullptr;
 	Error_STRUCT** ppErrs = nullptr;
 
-	int n = m_pApi->CancelMultiOrders(pTdxOrders, count, &ppFieldInfos, &ppResults, &ppErrs);
+	int n = m_pApi->CancelMultiOrders(ppTdxOrders, count, &ppFieldInfos, &ppResults, &ppErrs);
 
 	// 将结果立即取出来
 	for (int i = 0; i < count; ++i)
 	{
-		// 是否要将Account写回到原Order中呢？
 		if (ppErrs)
 		{
 			if (ppErrs[i])
 			{
-				pOrders[i].ErrorID = ppErrs[i]->ErrCode;
-				strcpy(pOrders[i].Text, ppErrs[i]->ErrInfo);
-			}
-		}
-		if (ppResults)
-		{
-			if (ppResults[i*COL_EACH_ROW + 0])
-			{
-				strcpy(pOrders[i].ID, ppResults[i*COL_EACH_ROW + 0]);
-			}
-		}
+				ppOrders[i]->ErrorID = ppErrs[i]->ErrCode;
+				strcpy(ppOrders[i]->Text, ppErrs[i]->ErrInfo);
 
-		OrderIDType orderId = { 0 };
-		sprintf(orderId, "%s", pOrders[i].ID);
-
-		OrderField* pField = nullptr;
-		unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
-		if (it == m_id_platform_order.end())
-		{
-			// 开盘时发单信息还没有，所以找不到对应的单子，需要进行Order的恢复
-			pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
-
-			memcpy(pField, &pOrders[i], sizeof(OrderField));
-
-			//strcpy(pField->ID, orderId);
-			//strcpy(pField->InstrumentID, pOrder->InstrumentID);
-			//strcpy(pField->ExchangeID, pOrder->ExchangeID);
-			//pField->HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pOrder->CombHedgeFlag[0]);
-			//pField->Side = TThostFtdcDirectionType_2_OrderSide(pOrder->Direction);
-			//pField->Price = pOrder->LimitPrice;
-			//pField->StopPx = pOrder->StopPrice;
-			//strncpy(pField->Text, pOrder->StatusMsg, sizeof(ErrorMsgType));
-			//pField->OpenClose = TThostFtdcOffsetFlagType_2_OpenCloseType(pOrder->CombOffsetFlag[0]);
-			//pField->Status = CThostFtdcOrderField_2_OrderStatus(pOrder);
-			//pField->Qty = pOrder->VolumeTotalOriginal;
-			//pField->Type = CThostFtdcOrderField_2_OrderType(pOrder);
-			//pField->TimeInForce = CThostFtdcOrderField_2_TimeInForce(pOrder);
-			if (pField->ErrorID != 0)
-			{
-				pField->ExecType = ExecType::ExecRejected;
-				pField->Status = OrderStatus::Rejected;
+				ppOrders[i]->ExecType = ExecType::ExecCancelReject;
 			}
 			else
 			{
-				pField->ExecType = ExecType::ExecNew;
-				pField->Status = OrderStatus::New;
+				ppOrders[i]->ExecType = ExecType::ExecCancelled;
+				ppOrders[i]->Status = OrderStatus::Cancelled;
 			}
-
-			// 添加到map中，用于其它工具的读取，撤单失败时的再通知等
-			m_id_platform_order.insert(pair<string, OrderField*>(orderId, pField));
 		}
-		else
-		{
-			pField = it->second;
-			//strcpy(pField->ID, orderId);
-			//pField->LeavesQty = pOrder->VolumeTotal;
-			//pField->Price = pOrder->LimitPrice;
-			//pField->Status = CThostFtdcOrderField_2_OrderStatus(pOrder);
-			//pField->ExecType = CThostFtdcOrderField_2_ExecType(pOrder);
-			//strcpy(pField->OrderID, pOrder->OrderSysID);
-			//strncpy(pField->Text, pOrder->StatusMsg, sizeof(ErrorMsgType));
-		}
+		// 撤单成功时，返回的东西还是null,所以这里使用错误信息来进行区分
+		//if (ppResults)
+		//{	
+		//	if (ppResults[i*COL_EACH_ROW + 0])
+		//	{
+		//	}
+		//}
 
-		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, ppOrders[i], sizeof(OrderField), nullptr, 0, nullptr, 0);
 	}
 
 	DeleteTableBody(ppResults, count);

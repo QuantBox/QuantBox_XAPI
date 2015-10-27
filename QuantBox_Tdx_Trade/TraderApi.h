@@ -1,7 +1,7 @@
-#pragma once
+ï»¿#pragma once
 
 #include "../include/Tdx/TdxApi.h"
-#include "../include/Tdx/LuaRunner.h"
+//#include "../include/Tdx/LuaRunner.h"
 #include "../include/ApiStruct.h"
 #include "../include/IDGenerator.h"
 
@@ -25,21 +25,11 @@
 
 using namespace std;
 
-//struct OrderFieldEx
-//{
-//	OrderField Field;
-//	TCustNoType         cust_no;                    ///< ¿Í»§ºÅ
-//	TMarketCodeType     market_code;                ///< ÊĞ³¡´úÂë£¨°´Åú³·±ØĞëÌîÈë£©
-//	THolderNoType       holder_acc_no;              ///< ¹É¶«ÕÊºÅ
-//	TBatchNoType        batch_no;                   ///< ÅúºÅ
-//	TContractNoType     order_no;                   ///< Á÷Ë®ºÅ
-//};
-
 class CMsgQueue;
 
 class CTraderApi
 {
-	//ÇëÇóÊı¾İ°üÀàĞÍ
+	//è¯·æ±‚æ•°æ®åŒ…ç±»å‹
 	enum RequestType
 	{
 		E_Init,
@@ -124,7 +114,7 @@ private:
 	
 	int _Init();
 
-	//µÇÂ¼ÇëÇó
+	//ç™»å½•è¯·æ±‚
 	void ReqUserLogin();
 	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
@@ -142,84 +132,83 @@ private:
 
 	//
 
-	//¼ì²éÊÇ·ñ³ö´í
-	//bool IsErrorRspInfo(Error_STRUCT *pRspInfo, int nRequestID, bool bIsLast);//ÏòÏûÏ¢¶ÓÁĞÊä³öĞÅÏ¢
-	bool IsErrorRspInfo(Error_STRUCT *pRspInfo);//²»Êä³öĞÅÏ¢
+	//æ£€æŸ¥æ˜¯å¦å‡ºé”™
+	//bool IsErrorRspInfo(Error_STRUCT *pRspInfo, int nRequestID, bool bIsLast);//å‘æ¶ˆæ¯é˜Ÿåˆ—è¾“å‡ºä¿¡æ¯
+	bool IsErrorRspInfo(Error_STRUCT *pRspInfo);//ä¸è¾“å‡ºä¿¡æ¯
 
-	////Á¬½Ó
+	////è¿æ¥
 	//virtual void OnFrontConnected();
 	//virtual void OnFrontDisconnected(int nReason);
 
-	////ÈÏÖ¤
+	////è®¤è¯
 	//virtual void OnRspAuthenticate(CThostFtdcRspAuthenticateField *pRspAuthenticateField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-	////ÏÂµ¥
+	////ä¸‹å•
 	//virtual void OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo);
 
-	////³·µ¥
+	////æ’¤å•
 	//virtual void OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, CThostFtdcRspInfoField *pRspInfo);
 
-	////±¨µ¥»Ø±¨
+	////æŠ¥å•å›æŠ¥
 	//virtual void OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRtnOrder(CThostFtdcOrderField *pOrder);
 
-	////³É½»»Ø±¨
+	////æˆäº¤å›æŠ¥
 	//virtual void OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRtnTrade(CThostFtdcTradeField *pTrade);
 
-	////±¨¼ÛÂ¼Èë
+	////æŠ¥ä»·å½•å…¥
 	//virtual void OnRspQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnErrRtnQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThostFtdcRspInfoField *pRspInfo);
 	//virtual void OnRspQryQuote(CThostFtdcQuoteField *pQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRtnQuote(CThostFtdcQuoteField *pQuote);
 
-	////±¨¼Û³·µ¥
+	////æŠ¥ä»·æ’¤å•
 	//virtual void OnRspQuoteAction(CThostFtdcInputQuoteActionField *pInputQuoteAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnErrRtnQuoteAction(CThostFtdcQuoteActionField *pQuoteAction, CThostFtdcRspInfoField *pRspInfo);
 
-	////²ÖÎ»
+	////ä»“ä½
 	//virtual void OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspQryInvestorPositionCombineDetail(CThostFtdcInvestorPositionCombineDetailField *pInvestorPositionCombineDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	////×Ê½ğ
+	////èµ„é‡‘
 	//virtual void OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-	////ºÏÔ¼¡¢ÊÖĞø·Ñ
+	////åˆçº¦ã€æ‰‹ç»­è´¹
 	//virtual void OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-	////²éÑ¯ĞĞÇéÏìÓ¦
+	////æŸ¥è¯¢è¡Œæƒ…å“åº”
 	//virtual void OnRspQryDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-	////ÇëÇó²éÑ¯Í¶×ÊÕß½áËã½á¹ûÏìÓ¦
+	////è¯·æ±‚æŸ¥è¯¢æŠ•èµ„è€…ç»“ç®—ç»“æœå“åº”
 	//virtual void OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInfo, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-	////ÆäËü
+	////å…¶å®ƒ
 	//virtual void OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus);
 
 private:
-	atomic<int>					m_lRequestID;			//ÇëÇóID,µÃ±£³Ö×ÔÔö
+	atomic<int>					m_lRequestID;			//è¯·æ±‚ID,å¾—ä¿æŒè‡ªå¢
 
-	//CThostFtdcRspUserLoginField m_RspUserLogin;			//·µ»ØµÄµÇÂ¼³É¹¦ÏìÓ¦£¬Ä¿Ç°ÀûÓÃ´ËÄÚ³ÉÔ±½øĞĞ±¨µ¥ËùÊôÇø·Ö
+	//CThostFtdcRspUserLoginField m_RspUserLogin;			//è¿”å›çš„ç™»å½•æˆåŠŸå“åº”ï¼Œç›®å‰åˆ©ç”¨æ­¤å†…æˆå‘˜è¿›è¡ŒæŠ¥å•æ‰€å±åŒºåˆ†
 	
 	OrderIDType					m_orderInsert_Id;
 
 	mutex						m_csOrderRef;
-	int							m_nMaxOrderRef;			//±¨µ¥ÒıÓÃ£¬ÓÃÓÚÇø·Ö±¨µ¥£¬±£³Ö×ÔÔö
+	int							m_nMaxOrderRef;			//æŠ¥å•å¼•ç”¨ï¼Œç”¨äºåŒºåˆ†æŠ¥å•ï¼Œä¿æŒè‡ªå¢
 
-	//STRspMsg					m_err_msg;
-	CLuaRunner*					m_pRunner;
-	CTdxApi*					m_pApi;					//½»Ò×API
+	CTdxApi*					m_pApi;					//äº¤æ˜“API
+	void*						m_pClient;
 
 
-	string						m_szPath;				//Éú³ÉÅäÖÃÎÄ¼şµÄÂ·¾¶
+	string						m_szPath;				//ç”Ÿæˆé…ç½®æ–‡ä»¶çš„è·¯å¾„
 	ServerInfoField				m_ServerInfo;
 	UserInfoField				m_UserInfo;
 
@@ -227,7 +216,7 @@ private:
 
 	unordered_map<string, OrderField*>				m_id_platform_order;
 	unordered_map<string, Order_STRUCT*>			m_id_api_order;
-	//unordered_map<string, string>					m_sysId_orderId;//³É½»»Ø±¨Ê±Ê¹ÓÃÕÒµ½Ô­¶©µ¥
+	//unordered_map<string, string>					m_sysId_orderId;//æˆäº¤å›æŠ¥æ—¶ä½¿ç”¨æ‰¾åˆ°åŸè®¢å•
 
 	//unordered_map<string, QuoteField*>				m_id_platform_quote;
 	//unordered_map<string, CThostFtdcQuoteField*>		m_id_api_quote;
@@ -237,9 +226,9 @@ private:
 
 	unordered_map<string, string>					m_cust_acc_no;
 
-	CMsgQueue*					m_msgQueue;				//ÏûÏ¢¶ÓÁĞÖ¸Õë
-	CMsgQueue*					m_msgQueue_Query;		//·¢ËÍÏûÏ¢¶ÓÁĞÖ¸Õë
-	CMsgQueue*					m_msgQueue_Order;		//±¨µ¥ÏûÏ¢¶ÓÁĞÖ¸Õë
+	CMsgQueue*					m_msgQueue;				//æ¶ˆæ¯é˜Ÿåˆ—æŒ‡é’ˆ
+	CMsgQueue*					m_msgQueue_Query;		//å‘é€æ¶ˆæ¯é˜Ÿåˆ—æŒ‡é’ˆ
+	CMsgQueue*					m_msgQueue_Order;		//æŠ¥å•æ¶ˆæ¯é˜Ÿåˆ—æŒ‡é’ˆ
 
 	UserInfoField*				m_pUserInfos;
 	int							m_UserInfo_Pos;

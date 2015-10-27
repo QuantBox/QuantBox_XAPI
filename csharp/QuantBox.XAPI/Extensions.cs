@@ -144,11 +144,11 @@ CZC
         public static string ToFormattedString([In]this OrderField field)
         {
             return string.Format("[InstrumentID={0};ExchangeID={1};Side={2};Qty={3};Price={4};OpenClose={5};HedgeFlag={6};"
-                + "ID={7};OrderID={8};Time={9};"
-                + "Type={10};TimeInForce={11};Status={12};ExecType={13};"
-                + "ErrorID={14};Text={15}]",
+                + "LocalID={7};ID={8};OrderID={9};Time={10};"
+                + "Type={11};TimeInForce={12};Status={13};ExecType={14};"
+                + "ErrorID={15};Text={16}]",
                 field.InstrumentID, field.ExchangeID, Enum<OrderSide>.ToString(field.Side), field.Qty, field.Price, Enum<OpenCloseType>.ToString(field.OpenClose), Enum<HedgeFlagType>.ToString(field.HedgeFlag),
-                field.ID, field.OrderID, field.Time,
+                field.LocalID,field.ID, field.OrderID, field.Time,
                 Enum<OrderType>.ToString(field.Type), Enum<TimeInForce>.ToString(field.TimeInForce), Enum<OrderStatus>.ToString(field.Status), Enum<ExecType>.ToString(field.ExecType),
                 field.ErrorID, field.Text());
         }

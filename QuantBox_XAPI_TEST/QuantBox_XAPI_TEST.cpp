@@ -319,8 +319,8 @@ int main(int argc, char* argv[])
 	strcpy(m_ServerInfo1.Address, "D:\\new_hbzq_qq\\Login.lua");
 	strcpy(m_ServerInfo1.ExtendInformation, "D:\\new_hbzq_qq\\");
 
-	strcpy(m_UserInfo.UserID, "00000000000");
-	strcpy(m_UserInfo.Password, "111111");
+	strcpy(m_UserInfo.UserID, "05000000");
+	strcpy(m_UserInfo.Password, "4");
 
 	CXApi* pApi1 = CXApi::CreateApi(DLLPath1);
 	if (pApi1)
@@ -340,6 +340,13 @@ int main(int argc, char* argv[])
 #else
 		pApi1->Connect("./", &m_ServerInfo1, &m_UserInfo, 1);
 #endif
+
+		getchar();
+
+		pApi1->Disconnect();
+		pApi1->Disconnect();
+
+		getchar();
 
 		do
 		{
