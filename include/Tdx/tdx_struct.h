@@ -55,38 +55,82 @@ struct GDLB_STRUCT
 	int RZRQBS_;	// 281_融资融券标识
 };
 
+// 当日委托/历史委托=委托列表
+struct WTLB_STRUCT
+{
+	char WTRQ[32];	// 142_委托日期
+	char WTSJ[32];	// 143_委托时间
+	char GDDM[32];  // 123_股东代码
+	char ZQDM[32];  // 140_证券代码
+	char ZQMC[32];  // 141_证券名称
+	char MMBZ[32];  // 130_买卖标志
+	char WTLB[32];  // 131_委托类别
+	char JYSDM[32];	// 100_交易所代码
+	char WTJG[32];  // 145_委托价格
+	char WTSL[32];  // 144_委托数量
+	char CJJG[32];  // 153_成交价格
+	char CJSL[32];  // 152_成交数量
+	char CDSL[32];  // 162_撤单数量
+	char WTBH[32];  // 146_委托编号
+	char BJFS[32];  // 194_报价方式
+	char ZTSM[32];  // 147_状态说明
+	char DJZJ[32];  // 161_冻结资金
+	char BLXX[32];	// 1213_保留信息
+
+	int WTRQ_;
+	int WTSJ_;
+	char MMBZ_;
+	char JYSDM_;
+	double WTJG_;
+	int WTSL_;
+	double CJJG_;
+	int CJSL_;
+	int CDSL_;
+	double DJZJ_;
+};
+
+struct CJLB_STRUCT
+{
+	char CJRQ[32];	// 150_成交日期
+	char CJSJ[32];	// 151_成交时间
+	char GDDM[32];	// 123_股东代码
+	char ZQDM[32];	// 140_证券代码
+	char ZQMC[32];	// 141_证券名称
+	char MMBZ[32];	// 130_买卖标志
+	char WTLB[32];	// 131_委托类别
+	char CJJG[32];	// 153_成交价格
+	char CJSL[32];	// 152_成交数量
+	char FSJE[32];	// 303_发生金额
+	char SYJE[32];	// 304_剩余金额
+	char YJ[32];	// 206_佣金
+	char YHS[32];	// 210_印花税
+	char GHF[32];	// 207_过户费
+	char CJF[32];	// 208_成交费
+	char CJBH[32];	// 155_成交编号
+	char CDBZ[32];	// 167_撤单标志
+	char WTBH[32];	// 146_委托编号
+
+	int CJRQ_;
+	int CJSJ_;
+	char MMBZ_;
+	char WTLB_;
+	double CJJG_;
+	int CJSL_;
+	double FSJE_;
+	double SYJE_;
+	double YJ_;
+	double YHS_;
+	double GHF_;
+	double CJF_;
+	char CDBZ_;
+};
+
+
 //
 ////////////////////////////////////////////////////////////////////////////
 //// 以下的在整理完后要删除
 //
 
-//
-//// 当日委托/历史委托=委托列表
-//struct WTLB_STRUCT
-//{
-//	char WTRQ[64];	// 委托日期
-//	char WTSJ[64];	// 委托时间
-//	char GDDM[64];  // 股东代码
-//	char ZQDM[64];  // 证券代码
-//	char ZQMC[64];  // 证券名称
-//	char MMBZ[64];  // 买卖标志
-//	char WTJG[64];  // 委托价格
-//	char WTSL[64];  // 委托数量
-//	char CJJG[64];  // 成交价格
-//	char CJSL[64];  // 成交数量
-//	char CDSL[64];  // 撤单数量
-//	char WTBH[64];  // 委托编号
-//	char BJFS[64];  // 报价方式
-//	char ZTSM[64];  // 状态说明
-//	char DJZJ[64];  // 冻结资金
-//
-//	double WTJG_;
-//	int WTSL_;
-//	double CJJG_;
-//	int CJSL_;
-//	int CDSL_;
-//	double DJZJ_;
-//};
 //
 //// 股份列表
 //struct GFLB_STRUCT

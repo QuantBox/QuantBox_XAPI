@@ -11,7 +11,7 @@
 
 #include "../QuantBox_Queue/MsgQueue.h"
 
-//#include "TypeConvert.h"
+#include "TypeConvert.h"
 
 #include <cstring>
 #include <assert.h>
@@ -144,6 +144,9 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 		// 查询股东列表
 		ReqQryInvestor();
 
+		// 测试用,事后需要删除
+		ReqQryTrade();
+
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 
@@ -273,9 +276,6 @@ void CTraderApi::Connect(const string& szPath,
 	UserInfoField* pUserInfo,
 	int count)
 {
-	m_pIDGenerator = new CIDGenerator();
-	m_pIDGenerator->SetPrefix(m_UserInfo.UserID);
-
 	m_szPath = szPath;
 	memcpy(&m_ServerInfo, pServerInfo, sizeof(ServerInfoField));
 	memcpy(&m_UserInfo, pUserInfo, sizeof(UserInfoField));
@@ -285,6 +285,9 @@ void CTraderApi::Connect(const string& szPath,
 
 	m_UserInfo_Pos = 0;
 	m_UserInfo_Count = count;
+
+	m_pIDGenerator = new CIDGenerator();
+	m_pIDGenerator->SetPrefix(m_UserInfo.UserID);
 
 	m_msgQueue_Query->Input_NoCopy(E_Init, m_msgQueue_Query, this, 0, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 }
@@ -564,198 +567,64 @@ int CTraderApi::_ReqOrderAction(char type, void* pApi1, void* pApi2, double doub
 	return 0;
 }
 
-//void CTraderApi::ReqQryOrder(TCustNoType cust_no, TSecCodeType sec_code)
-//{
-//	STQueryOrder* pField = (STQueryOrder*)m_msgQueue->new_block(sizeof(STQueryOrder));
-//	strcpy(pField->cust_no, cust_no);
-//	strcpy(pField->sec_code, sec_code);
-//	pField->market_code = '0';
-//	pField->order_no = 0;
-//	pField->query_type = 0;
-//
-//	m_msgQueue_Query->Input_NoCopy(RequestType::E_QryOrderField, m_msgQueue_Query, this, 0, 0,
-//		pField, sizeof(STQueryOrder), nullptr, 0, nullptr, 0);
-//}
+void CTraderApi::ReqQryOrder()
+{
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_QryOrderField, m_msgQueue_Query, this, 0, 0,
+		nullptr, 0, nullptr, 0, nullptr, 0);
+}
 
 int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	int row_num = 0;
+	FieldInfo_STRUCT** ppFieldInfos = nullptr;
+	char** ppResults = nullptr;
+	Error_STRUCT* pErr = nullptr;
 
-	//STQueryOrder *p_qry_order_req = (STQueryOrder *)ptr1;
-	//STOrderInfo *p_qry_order_rsp = NULL;
+	m_pApi->ReqQueryData(REQUEST_DRWT, &ppFieldInfos, &ppResults, &pErr);
 
-	//bool bRet = SPX_API_QueryOrder(m_pApi, p_qry_order_req, &p_qry_order_rsp, &row_num, &m_err_msg);
+	WTLB_STRUCT** ppRS = nullptr;
+	CharTable2WTLB(ppFieldInfos, ppResults, &ppRS);
 
-	//if (bRet && m_err_msg.error_no == 0)
-	//{
-	//	if (p_qry_order_rsp != NULL)
-	//	{
-	//		for (int i = 0; i<row_num; i++)
-	//		{
-	//			OrderIDType ID = { 0 };
-	//			sprintf(ID,"%d",p_qry_order_rsp[i].order_no);
+	if (ppRS)
+	{
+		// 需要将它输入到一个地方用于计算
+	}
 
-	//			OrderFieldEx* pField = nullptr;
-	//			
-	//			unordered_map<string, OrderFieldEx*>::iterator it = m_id_platform_order.find(ID);
-	//			if (it == m_id_platform_order.end())
-	//			{
-	//				// 订单可能不存在，要进行还原
-	//				pField = (OrderFieldEx*)m_msgQueue->new_block(sizeof(OrderFieldEx));
-
-	//				strncpy(pField->cust_no, p_qry_order_req->cust_no, sizeof(TCustNoType));
-	//				strncpy(pField->holder_acc_no, p_qry_order_rsp[i].holder_acc_no, sizeof(THolderNoType));
-	//				pField->batch_no = p_qry_order_rsp[i].batch_no;
-	//				pField->order_no = p_qry_order_rsp[i].order_no;
-	//				pField->market_code = p_qry_order_rsp[i].market_code;
-
-	//				pField->Field.Status = TOrderStatusType_2_OrderStatus(p_qry_order_rsp[i].order_status);
-	//				pField->Field.ExecType = TOrderStatusType_2_ExecType(p_qry_order_rsp[i].order_status);
-	//				pField->Field.Price = p_qry_order_rsp[i].price;
-	//				pField->Field.Qty = p_qry_order_rsp[i].order_vol;
-	//				pField->Field.CumQty = p_qry_order_rsp[i].done_vol;
-	//				pField->Field.LeavesQty = p_qry_order_rsp[i].order_vol - p_qry_order_rsp[i].done_vol - p_qry_order_rsp[i].cancel_vol;
-	//				pField->Field.Time = p_qry_order_rsp[i].order_time;
-	//				strcpy(pField->Field.ID, ID);
-	//				strcpy(pField->Field.InstrumentID, p_qry_order_rsp[i].sec_code);
-	//				sprintf(pField->Field.ExchangeID, "%c", p_qry_order_rsp[i].market_code);
-
-	//				m_id_platform_order.insert(pair<string, OrderFieldEx*>(ID, pField));
-	//			}
-	//			else
-	//			{
-	//				pField = it->second;
-
-	//				pField->Field.Status = TOrderStatusType_2_OrderStatus(p_qry_order_rsp[i].order_status);
-	//				pField->Field.ExecType = TOrderStatusType_2_ExecType(p_qry_order_rsp[i].order_status);
-
-	//				pField->Field.Price = p_qry_order_rsp[i].price;
-	//				pField->Field.Qty = p_qry_order_rsp[i].order_vol;
-	//				pField->Field.CumQty = p_qry_order_rsp[i].done_vol;
-	//				pField->Field.LeavesQty = p_qry_order_rsp[i].order_vol - p_qry_order_rsp[i].done_vol - p_qry_order_rsp[i].cancel_vol;
-	//				pField->Field.Time = p_qry_order_rsp[i].order_time;
-	//				strcpy(pField->Field.InstrumentID, p_qry_order_rsp[i].sec_code);
-	//				sprintf(pField->Field.ExchangeID, "%c", p_qry_order_rsp[i].market_code);
-	//				
-	//			}
-	//			
-	//			m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, &pField->Field, sizeof(OrderField), nullptr, 0, nullptr, 0);
-	//		}
-	//	}
-	//	else
-	//	{
-	//		//cout << "返回结果为空" << endl;
-	//		// 反回为空，表示已经查过一次，没有新的生成，不用处理
-	//		// 但如果是多账号，会出现对每个查询都自动变成全量了，看来是游标被重置了,如何处理
-	//		//return 0;
-	//	}
-	//}
-	//else
-	//{
-	//	//cout << "QueryOrder error:" << err_msg.error_no << err_msg.msg << endl;
-	//	ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
-
-	//	pField->ErrorID = m_err_msg.error_no;
-	//	strcpy(pField->ErrorMsg, m_err_msg.msg);
-
-	//	m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
-	//}
+	DeleteTableBody(ppResults);
+	DeleteError(pErr);
 
 	return 0;
 }
 
-//void CTraderApi::ReqQryTrade(TCustNoType cust_no, TSecCodeType sec_code)
-//{
-//	STQueryDone* pField = (STQueryDone*)m_msgQueue->new_block(sizeof(STQueryDone));
-//	strcpy(pField->cust_no, cust_no);
-//	strcpy(pField->sec_code, sec_code);
-//	pField->market_code = '0';
-//	pField->query_type = 0;
-//
-//	m_msgQueue_Query->Input_NoCopy(RequestType::E_QryTradeField, m_msgQueue_Query, this, 0, 0,
-//		pField, sizeof(STQueryDone), nullptr, 0, nullptr, 0);
-//}
+void CTraderApi::ReqQryTrade()
+{
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_QryTradeField, m_msgQueue_Query, this, 0, 0,
+		nullptr, 0, nullptr, 0, nullptr, 0);
+}
 
 int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	int row_num = 0;
+	FieldInfo_STRUCT** ppFieldInfos = nullptr;
+	char** ppResults = nullptr;
+	Error_STRUCT* pErr = nullptr;
 
-	//STQueryDone *p_qry_done_req = (STQueryDone *)ptr1;
-	//STDoneInfo *p_qry_done_rsp = NULL;
+	m_pApi->ReqQueryData(REQUEST_DRCJ, &ppFieldInfos, &ppResults, &pErr);
 
-	//bool bRet = SPX_API_QueryDone(m_pApi, p_qry_done_req, &p_qry_done_rsp, &row_num, &m_err_msg);
+	CJLB_STRUCT** ppRS = nullptr;
+	CharTable2CJLB(ppFieldInfos, ppResults, &ppRS);
 
-	//if (bRet && m_err_msg.error_no == 0)
-	//{
-	//	if (p_qry_done_rsp != NULL)
-	//	{
-	//		//cout << "QueryOrder OK." << endl;
-	//		for (int i = 0; i<row_num; i++)
-	//		{
-	//			//cout << p_qry_order_rsp[i].market_code << " " << p_qry_order_rsp[i].sec_code << " " << p_qry_order_rsp[i].batch_no << " " << p_qry_order_rsp[i].order_no << " " << p_qry_order_rsp[i].bs << " ";
-	//			//cout << p_qry_order_rsp[i].order_date << " " << p_qry_order_rsp[i].price << " " << p_qry_order_rsp[i].order_vol << " " << p_qry_order_rsp[i].order_status << " " << p_qry_order_rsp[i].done_price << endl;
-	//			TradeField* pField = (TradeField*)m_msgQueue->new_block(sizeof(TradeField));
-	//			strcpy(pField->InstrumentID, p_qry_done_rsp[i].sec_code);
-	//			sprintf(pField->ExchangeID, "%c", p_qry_done_rsp[i].market_code);
+	if (ppRS)
+	{
+		// 需要将它输入到一个地方用于计算
+		TradeField* pField = (TradeField*)m_msgQueue->new_block(sizeof(TradeField));
 
-	//			pField->Side = TBSFLAG_2_OrderSide(p_qry_done_rsp[i].bs);
-	//			pField->Qty = p_qry_done_rsp[i].done_vol;
-	//			pField->Price = p_qry_done_rsp[i].done_price;
-	//			//pField->OpenClose = TThostFtdcOffsetFlagType_2_OpenCloseType(pTrade->OffsetFlag);
-	//			//pField->HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pTrade->HedgeFlag);
-	//			pField->Commission = 0;//TODO收续费以后要计算出来
-	//			pField->Time = p_qry_done_rsp[i].done_time;
-	//			strcpy(pField->TradeID, p_qry_done_rsp[i].done_no);
-	//			sprintf(pField->ID, "%d", p_qry_done_rsp[i].order_no);
+		CJLB_2_TradeField(ppRS[0], pField);
+		
+		m_msgQueue->Input_Copy(ResponeType::OnRtnTrade, m_msgQueue, m_pClass, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+	}
 
-	//			m_msgQueue->Input_Copy(ResponeType::OnRtnTrade, m_msgQueue, m_pClass, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+	DeleteTableBody(ppResults);
+	DeleteError(pErr);
 
-	//			//OrderIDType orderSysId = { 0 };
-	//			//sprintf(orderSysId, "%s:%s", pTrade->ExchangeID, pTrade->OrderSysID);
-	//			//unordered_map<string, string>::iterator it = m_sysId_orderId.find(pField->ID);
-	//			//if (it == m_sysId_orderId.end())
-	//			//{
-	//			//	// 此成交找不到对应的报单
-	//			//	//assert(false);
-	//			//}
-	//			//else
-	//			//{
-	//			//	// 找到对应的报单
-	//			//	strcpy(pField->ID, it->second.c_str());
-
-	//			//	
-
-	//			//	//unordered_map<string, OrderField*>::iterator it2 = m_id_platform_order.find(it->second);
-	//			//	//if (it2 == m_id_platform_order.end())
-	//			//	//{
-	//			//	//	// 此成交找不到对应的报单
-	//			//	//	//assert(false);
-	//			//	//}
-	//			//	//else
-	//			//	//{
-	//			//	//	// 更新订单的状态
-	//			//	//	// 是否要通知接口
-	//			//	//}
-
-	//			//	//OnTrade(pField);
-	//			//}
-	//		}
-	//	}
-	//	else
-	//	{
-	//		//cout << "返回结果为空" << endl;
-	//	}
-	//}
-	//else
-	//{
-	//	//cout << "QueryOrder error:" << err_msg.error_no << err_msg.msg << endl;
-	//	ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
-
-	//	pField->ErrorID = m_err_msg.error_no;
-	//	strcpy(pField->ErrorMsg, m_err_msg.msg);
-
-	//	m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
-	//}
 	return 0;
 }
 

@@ -1,420 +1,45 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "TypeConvert.h"
+#include "../include/Tdx/tdx_enum.h"
 
-
-/// ÀàËÆÓÚOpenQuant FIXÒ»ÑùµÄÐ§¹û£¬²å¼þ²ã¼òµ¥£¬»ù±¾²»Òª×öÔõÃ´¼ÆËã»ò´¦Àí
-/// ¶ÔÓÚÒ»¸öµ¥×ÓµÄÄ³¸ö×´Ì¬¿ÉÄÜÊÇÕâÑùµÄ£¬ÐÂµ¥£¬²¿·Ö³É½»£¬ÍêÈ«³É½»
-/// EmitAccept,EmitFill
-/// OnRtnOrder,OnRtnTrade,ÈçºÎ×ª³ÉEmit
-/// EmitAcceptÊÇÊ²Ã´
-///
-/// ½Ó¿ÚÏòÍâÌá¹©µÄ»Ø±¨¿ÉÒÔ·ÖÁ½ÖÖ·½°¸£¬ExecutionReport»òÎ¯ÍÐ»Ø±¨Óë³É½»»Ø±¨
-/// OpenQuantÖÐÊ¹ÓÃExecutionReportÎÊÌâÊÇÒòÎªOQ×Ô¼ºÓÐOrderManager£¬Èç¹ûÆäËüÈí¼þÒª¿´µ½Î¯ÍÐºÍ³É½»ÁÐ±íÊÇÃ»·¨µÃµ½µÄ
-/// ËùÒÔ½Ó¿ÚÓ¦µ±·µ»ØÎ¯ÍÐÓë³É½»»Ø±¨
-
-//PutCall TThostFtdcOptionsTypeType_2_PutCall(TThostFtdcOptionsTypeType In)
-//{
-//	if (In == THOST_FTDC_CP_CallOptions)
-//		return PutCall::Call;
-//	return PutCall::Put;
-//}
-//
-//HedgeFlagType TThostFtdcHedgeFlagType_2_HedgeFlagType(TThostFtdcHedgeFlagType In)
-//{
-//	switch (In)
-//	{
-//	case THOST_FTDC_HF_Arbitrage:
-//		return HedgeFlagType::Arbitrage;
-//	case THOST_FTDC_HF_Hedge:
-//		return HedgeFlagType::Hedge;
-//	case THOST_FTDC_HF_Speculation:
-//	default:
-//		return HedgeFlagType::Speculation;
-//	}
-//}
-//
-//TThostFtdcHedgeFlagType HedgeFlagType_2_TThostFtdcHedgeFlagType(HedgeFlagType In)
-//{
-//	switch (In)
-//	{
-//	case HedgeFlagType::Arbitrage:
-//		return THOST_FTDC_HF_Arbitrage;
-//	case HedgeFlagType::Hedge:
-//		return THOST_FTDC_HF_Hedge;
-//	case HedgeFlagType::Speculation:
-//	default:
-//		return THOST_FTDC_HF_Speculation;
-//	}
-//}
-//
-//OpenCloseType TThostFtdcOffsetFlagType_2_OpenCloseType(TThostFtdcOffsetFlagType In)
-//{
-//	switch (In)
-//	{
-//	case THOST_FTDC_OF_CloseToday:
-//		return OpenCloseType::CloseToday;
-//	case THOST_FTDC_OF_Close:
-//		return OpenCloseType::Close;
-//	case THOST_FTDC_OF_Open:
-//	default:
-//		return OpenCloseType::Open;
-//	}
-//}
-//
-//TThostFtdcOffsetFlagType OpenCloseType_2_TThostFtdcOffsetFlagType(OpenCloseType In)
-//{
-//	switch (In)
-//	{
-//	case OpenCloseType::CloseToday:
-//		return THOST_FTDC_OF_CloseToday;
-//	case OpenCloseType::Close:
-//		return THOST_FTDC_OF_Close;
-//	case OpenCloseType::Open:
-//	default:
-//		return THOST_FTDC_OF_Open;
-//	}
-//}
-
-void OrderField_2_TBSType(OrderField* pIn, PSTOrder pOut)
+int BJFS_2_WTFS(char* pIn)
 {
-	switch (pIn->Side)
+	// æœ€å¤§çš„é—®é¢˜æ˜¯ä¸­æ–‡å¯¹åº”ä¸ä¸Š
+	// å®ƒå½±å“äº†Typeå’ŒTimeInForce
+	if (strstr("é™ä»·,é™ä»·å§”æ‰˜,", pIn))
 	{
-	case OrderSide::Sell:
-		strcpy(pOut->bs, "1");
-		break;
-	case OrderSide::Buy:
-		strcpy(pOut->bs, "1");
-		break;
-	default:
-		break;
+		return WTFS_Limit;
 	}
-
-	//switch (pIn->Side)
-	//{
-	//case OrderSide::Sell:
-	//	strcpy(pOut->bs, "1");
-	//case OrderSide::Buy:
-	//	strcpy(pOut->bs, "1");
-	//default:
-	//	break;
-	//}
-}
-
-OrderSide TBSFLAG_2_OrderSide(TBSFLAG In)
-{
-	switch (In)
+	else
 	{
-	case '1':
-		return OrderSide::Buy;
-	case '2':
-		return OrderSide::Sell;
-	default:
-		return OrderSide::Buy;
+		return WTFS_Five_IOC;
 	}
 }
 
-void OrderField_2_TMarketOrderFlagType(OrderField* pIn, PSTOrder pOut)
+void CJLB_2_TradeField(CJLB_STRUCT* pIn, TradeField* pOut)
 {
-	// ÊÐ¼ÛÎ¯ÍÐ±ê¼ÇÓÐºÜ¶àÖÖ£¬ÔÚÕâÖ»Ñ¡Ò»ÖÖÎÈÍ×²¢ÇÒË«·½¶¼Ö§³ÖµÄ
-	// »¦Éî×îÓÅÎåµµ²¢³·ÏúÎ¯ÍÐ 5
-	switch (pIn->Type)
-	{
-	case OrderType::Limit:
-	case OrderType::StopLimit:
-	case OrderType::TrailingStopLimit:
-		pOut->market_order_flag = 0;
-		break;
-	case OrderType::Market:
-	case OrderType::MarketOnClose:
-	case OrderType::Stop:
-	case OrderType::TrailingStop:
-		pOut->market_order_flag = '5';
-	default:
-		break;
-	}
+	strcpy(pOut->ID, pIn->WTBH);
+	strcpy(pOut->InstrumentID, pIn->ZQDM);
+	pOut->Price = pIn->CJJG_;
+	strcpy(pOut->TradeID, pIn->CJBH);
+
+	pOut->Commission = pIn->YJ_ + pIn->YHS_ + pIn->GHF_ + pIn->CJF_;
+
+	pOut->OpenClose = OpenCloseType::Open;
+	pOut->HedgeFlag = HedgeFlagType::Speculation;
+	pOut->Side = OrderSide::Buy;
+	pOut->Time = pIn->CJSJ_;
 }
 
-TMarketCodeType OrderField_2_TMarketCodeType(OrderField* pIn)
+void WTLB_2_OrderField_0(WTLB_STRUCT* pIn, OrderField* pOut)
 {
-	// 1.ºÏÔ¼µ¼ÈëÊ±¾Íµ¼ÈëÁË¶ÔÓ¦µÄÊÐ³¡´úÂë
-	// 2.Ã»ÓÐ¶ÔÓ¦µÄÊÐ³¡´úÂë£¬Ö»ÄÜ´ÓºÏÔ¼ÃûÖÐÈ¡
-	if (strlen(pIn->ExchangeID) == 1)
-		return pIn->ExchangeID[0];
+	strcpy(pOut->ID, pIn->WTBH);
 
-	int code = atoi(pIn->InstrumentID);
-	if (code>500000)
-	{
-		// 600000
-		// 515050
+	pOut->Price = pIn->WTJG_;
+	pOut->Qty = pIn->WTSL_;
 
-		// ÉÏº£A¹É
-		return '1';
-	}
-	else if (code>0)
-	{
-		// 000000
-		// 300000
-		return '2';
-	}
-	return '1';
+	strcpy(pOut->Account, pIn->GDDM);
+
+	pOut->Time = pIn->WTSJ_;
+
 }
-
-TMarketCodeType TSecCodeType_2_TMarketCodeType(TSecCodeType* pIn)
-{
-	//if (strcmp())
-	return '1';
-}
-
-OrderStatus TOrderStatusType_2_OrderStatus(TOrderStatusType In)
-{
-	switch (In)
-	{
-	case 0:
-	case '0':
-	case '1':
-	case '2':
-	case '3':
-		return OrderStatus::New;
-	case '5':
-	case '6':
-		return OrderStatus::Cancelled;
-	case '7':
-		return OrderStatus::PartiallyFilled;
-	case '8':
-		return OrderStatus::Filled;
-	case '9':
-	case 'A':
-		return OrderStatus::Rejected;
-	default:
-		return OrderStatus::New;
-	}
-}
-
-ExecType TOrderStatusType_2_ExecType(TOrderStatusType In)
-{
-	switch (In)
-	{
-	case 0:
-	case '0':
-	case '1':
-	case '2':
-	case '3':
-		return ExecType::ExecNew;
-	case '5':
-	case '6':
-		return ExecType::ExecCancelled;
-	case '7':
-		return ExecType::ExecTrade;
-	case '8':
-		return ExecType::ExecTrade;
-	case '9':
-	case 'A':
-		return ExecType::ExecRejected;
-	default:
-		return ExecType::ExecNew;
-	}
-}
-
-//OrderSide TThostFtdcDirectionType_2_OrderSide(TThostFtdcDirectionType In)
-//{
-//	if (In == THOST_FTDC_D_Sell)
-//		return OrderSide::Sell;
-//	return OrderSide::Buy;
-//}
-//
-//PositionSide TThostFtdcPosiDirectionType_2_PositionSide(TThostFtdcPosiDirectionType In)
-//{
-//	if (In == THOST_FTDC_PD_Short)
-//		return PositionSide::Short;
-//	return PositionSide::Long;
-//}
-//
-//PositionSide TradeField_2_PositionSide(TradeField* pIn)
-//{
-//	if (pIn->OpenClose == OpenCloseType::Open)
-//	{
-//		if (pIn->Side == OrderSide::Buy)
-//			return PositionSide::Long;
-//		return PositionSide::Short;
-//	}
-//	else
-//	{
-//		if (pIn->Side == OrderSide::Buy)
-//			return PositionSide::Short;
-//		return PositionSide::Long;
-//	}
-//}
-//
-//TThostFtdcOrderPriceTypeType OrderType_2_TThostFtdcOrderPriceTypeType(OrderType In)
-//{
-//	switch (In)
-//	{
-//	case Market:
-//		return THOST_FTDC_OPT_AnyPrice;
-//	case Stop:
-//		return THOST_FTDC_OPT_AnyPrice;
-//	case Limit:
-//		return THOST_FTDC_OPT_LimitPrice;
-//	case StopLimit:
-//		return THOST_FTDC_OPT_LimitPrice;
-//	case MarketOnClose:
-//		return THOST_FTDC_OPT_AnyPrice;
-//	case TrailingStop:
-//		return THOST_FTDC_OPT_AnyPrice;
-//	case TrailingStopLimit:
-//		return THOST_FTDC_OPT_LimitPrice;
-//	default:
-//		return THOST_FTDC_OPT_LimitPrice;
-//	}
-//}
-//
-//OrderStatus CThostFtdcOrderField_2_OrderStatus(CThostFtdcOrderField* pIn)
-//{
-//	switch (pIn->OrderStatus)
-//	{
-//	case THOST_FTDC_OST_Canceled:
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertRejected)
-//			return OrderStatus::Rejected;
-//		return OrderStatus::Cancelled;
-//	case THOST_FTDC_OST_Unknown:
-//		// Èç¹ûÊÇ³·µ¥£¬Ò²ÓÐ¿ÉÄÜ³öÏÖÕâÒ»Ìõ£¬ÈçºÎ¹ýÂË£¿
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertSubmitted)
-//			return OrderStatus::New;
-//	default:
-//		if (pIn->VolumeTotal == 0)
-//			return OrderStatus::Filled;
-//		else if (pIn->VolumeTotal == pIn->VolumeTotalOriginal)
-//			return OrderStatus::New;
-//		else
-//			return OrderStatus::PartiallyFilled;
-//	}
-//}
-//
-//ExecType CThostFtdcOrderField_2_ExecType(CThostFtdcOrderField* pIn)
-//{
-//	switch (pIn->OrderStatus)
-//	{
-//	case THOST_FTDC_OST_Canceled:
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertRejected)
-//			return ExecType::ExecRejected;
-//		return ExecType::ExecCancelled;
-//	case THOST_FTDC_OST_Unknown:
-//		// Èç¹ûÊÇ³·µ¥£¬Ò²ÓÐ¿ÉÄÜ³öÏÖÕâÒ»Ìõ£¬ÈçºÎ¹ýÂË£¿
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertSubmitted)
-//			return ExecType::ExecNew;
-//	case THOST_FTDC_OST_AllTraded:
-//	case THOST_FTDC_OST_PartTradedQueueing:
-//		return ExecType::ExecTrade;
-//	default:
-//		return ExecType::ExecNew;
-//	}
-//}
-//
-//OrderStatus CThostFtdcQuoteField_2_OrderStatus(CThostFtdcQuoteField* pIn)
-//{
-//	switch (pIn->QuoteStatus)
-//	{
-//	case THOST_FTDC_OST_Canceled:
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertRejected)
-//			return OrderStatus::Rejected;
-//		return OrderStatus::Cancelled;
-//	case THOST_FTDC_OST_Unknown:
-//		// Èç¹ûÊÇ³·µ¥£¬Ò²ÓÐ¿ÉÄÜ³öÏÖÕâÒ»Ìõ£¬ÈçºÎ¹ýÂË£¿
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertSubmitted)
-//			return OrderStatus::New;
-//	case THOST_FTDC_OST_Touched:
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertRejected)
-//			return OrderStatus::Rejected;
-//	default:
-//		// Õâ¸öµØ·½Òª¸Ä
-//
-//		//if (pIn->VolumeTotal == 0)
-//		//	return OrderStatus::Filled;
-//		//else if (pIn->VolumeTotal == pIn->VolumeTotalOriginal)
-//			return OrderStatus::New;
-//		//else
-//		//	return OrderStatus::PartiallyFilled;
-//	}
-//}
-//
-//ExecType CThostFtdcQuoteField_2_ExecType(CThostFtdcQuoteField* pIn)
-//{
-//	switch (pIn->QuoteStatus)
-//	{
-//	case THOST_FTDC_OST_Canceled:
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertRejected)
-//			return ExecType::ExecRejected;
-//		return ExecType::ExecCancelled;
-//	case THOST_FTDC_OST_Unknown:
-//		// Èç¹ûÊÇ³·µ¥£¬Ò²ÓÐ¿ÉÄÜ³öÏÖÕâÒ»Ìõ£¬ÈçºÎ¹ýÂË£¿
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertSubmitted)
-//			return ExecType::ExecNew;
-//	case THOST_FTDC_OST_AllTraded:
-//	case THOST_FTDC_OST_PartTradedQueueing:
-//		return ExecType::ExecTrade;
-//	case THOST_FTDC_OST_Touched:
-//		if (pIn->OrderSubmitStatus == THOST_FTDC_OSS_InsertRejected)
-//			return ExecType::ExecRejected;
-//	default:
-//		return ExecType::ExecNew;
-//	}
-//}
-//
-//
-//
-//OrderType CThostFtdcOrderField_2_OrderType(CThostFtdcOrderField* pIn)
-//{
-//	switch (pIn->OrderPriceType)
-//	{
-//	case THOST_FTDC_OPT_AnyPrice:
-//		return OrderType::Market;
-//	case THOST_FTDC_OPT_LimitPrice:
-//		return OrderType::Limit;
-//	default:
-//		return OrderType::Limit;
-//	}
-//}
-//
-//TimeInForce CThostFtdcOrderField_2_TimeInForce(CThostFtdcOrderField* pIn)
-//{
-//	switch (pIn->TimeCondition)
-//	{
-//	case THOST_FTDC_TC_GFD:
-//		return TimeInForce::Day;
-//	case THOST_FTDC_TC_IOC:
-//		switch (pIn->VolumeCondition)
-//		{
-//		case THOST_FTDC_VC_AV:
-//			return TimeInForce::IOC;
-//		case THOST_FTDC_VC_CV:
-//			return TimeInForce::FOK;
-//		default:
-//			return TimeInForce::IOC;
-//		}
-//	default:
-//		return TimeInForce::Day;
-//	}
-//}
-//
-//
-//
-//
-//
-//InstrumentType CThostFtdcInstrumentField_2_InstrumentType(CThostFtdcInstrumentField* pIn)
-//{
-//	switch (pIn->ProductClass)
-//	{
-//	case THOST_FTDC_PC_Futures:
-//		return InstrumentType::Future;
-//	case THOST_FTDC_PC_Options:
-//		return InstrumentType::Option;
-//	case THOST_FTDC_PC_Combination:
-//		return InstrumentType::MultiLeg;
-//	case THOST_FTDC_PC_EFP:
-//		return InstrumentType::Future;
-//	case THOST_FTDC_PC_SpotOption:
-//		return InstrumentType::Option;
-//	default:
-//		return InstrumentType::Stock;
-//	}
-//}

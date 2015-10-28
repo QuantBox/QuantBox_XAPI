@@ -1426,6 +1426,9 @@ void CTraderApi::OnTrade(CThostFtdcTradeField *pTrade)
 
 		OnTrade(pField);
 	}
+
+	// 清理内存
+	m_msgQueue->delete_block(pField);
 }
 
 void CTraderApi::OnTrade(TradeField *pTrade)

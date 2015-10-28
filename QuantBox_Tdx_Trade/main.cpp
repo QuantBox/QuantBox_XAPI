@@ -46,6 +46,11 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case Disconnect:
 		pApi->Disconnect();
 		break;
+	case ReqQryOrder:
+		
+		break;
+	case ReqQryTrade:
+		break;
 	/*case ReqQryInstrument:
 		pApi->ReqQryInstrument((const char*)ptr1, (const char*)ptr2);
 		break;

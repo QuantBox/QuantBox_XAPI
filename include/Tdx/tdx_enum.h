@@ -29,11 +29,11 @@
 
 // 166_委托方式
 // 上海只有046,深圳只有012345,所以市价只发4最简单
-#define WTFS_Limit				0 // 限价
-#define WTFS_Best_Reverse		1 // 对手方最优价格委托
-#define WTFS_Best_Forward		2 // 本方最优价格委托
-#define WTFS_IOC				3 // 即时成交剩余撤销委托
-#define WTFS_Five_IOC			4 // 五档即时成交剩余撤销
+#define WTFS_Limit				0 // 限价,限价委托,
+#define WTFS_Best_Reverse		1 // 对手方最优价格委托,
+#define WTFS_Best_Forward		2 // 本方最优价格委托,
+#define WTFS_IOC				3 // 即时成交剩余撤销委托,
+#define WTFS_Five_IOC			4 // 五档即时成交剩余撤销,最优五档即时成交剩余撤消委托
 #define WTFS_FOK				5 // 全额成交或撤销委托
 #define WTFS_Five_Limit			6 // 五档即时成交剩余转限
 

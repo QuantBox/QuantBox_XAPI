@@ -37,6 +37,8 @@ class CTraderApi
 		E_QryInvestorField,
 		E_InputOrderField,
 		E_InputOrderActionField,
+		E_QryOrderField,
+		E_QryTradeField,
 
 
 		E_SettlementInfoConfirmField,
@@ -52,8 +54,7 @@ class CTraderApi
 		E_QryInstrumentMarginRateField,
 		E_QryDepthMarketDataField,
 		E_QrySettlementInfoField,
-		E_QryOrderField,
-		E_QryTradeField,
+		
 		E_QryQuoteField,
 	};
 
@@ -99,8 +100,8 @@ public:
 	//void ReqQryDepthMarketData(const string& szInstrumentId);
 	//void ReqQrySettlementInfo(const string& szTradingDay);
 
-	//void ReqQryOrder(TCustNoType cust_no, TSecCodeType sec_code);
-	//void ReqQryTrade(TCustNoType cust_no, TSecCodeType sec_code);
+	void ReqQryOrder();
+	void ReqQryTrade();
 	//void ReqQryQuote();
 
 	void ReqQryInvestor();

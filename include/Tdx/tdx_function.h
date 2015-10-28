@@ -58,3 +58,10 @@ TDXAPI_API void DeleteErrors(Error_STRUCT** pErrs, int count);
 // 得到错误数
 TDXAPI_API int GetCountErrors(Error_STRUCT** pErrs);
 
+
+TDXAPI_API void CharTable2GDLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, GDLB_STRUCT*** pppResults);
+
+TDXAPI_API void CharTable2WTLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, WTLB_STRUCT*** pppResults);
+
+TDXAPI_API void CharTable2CJLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, CJLB_STRUCT*** pppResults);
+

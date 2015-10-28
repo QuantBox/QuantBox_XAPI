@@ -82,12 +82,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\IDGenerator.h" />
+    <ClInclude Include="..\include\toolkit.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Struct.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TraderApi.h" />
+    <ClInclude Include="TypeConvert.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\include\IDGenerator.cpp" />
+    <ClCompile Include="..\include\toolkit.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -103,6 +107,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TraderApi.cpp" />
+    <ClCompile Include="TypeConvert.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,8 +1,10 @@
 ﻿#include "stdafx.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "tdx_function.h"
 #include "tdx_enum.h"
+#include "../TdxApi/TcSdk_Const.h"
 
 #ifdef TDXAPI_EXPORTS
 
@@ -354,6 +356,228 @@ int GetCountErrors(Error_STRUCT** pErrs)
 		pRow = pErrs[i];
 	}
 	return i;
+}
+
+
+void CharTable2GDLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, GDLB_STRUCT*** pppResults)
+{
+	*pppResults = nullptr;
+	if (ppTable == nullptr)
+		return;
+
+	int count = GetRowCountTableBody(ppTable);
+	if (count <= 0)
+		return;
+
+	GDLB_STRUCT** ppResults = new GDLB_STRUCT*[count + 1]();
+	ppResults[count] = nullptr;
+	*pppResults = ppResults;
+
+	int col_123 = GetIndexByFieldID(ppFieldInfos, FIELD_GDDM);
+	int col_124 = GetIndexByFieldID(ppFieldInfos, FIELD_GDMC);
+	int col_121 = GetIndexByFieldID(ppFieldInfos, FIELD_ZJZH);
+	int col_125 = GetIndexByFieldID(ppFieldInfos, FIELD_ZHLB);
+	int col_281 = GetIndexByFieldID(ppFieldInfos, FIELD_RZRQBS);
+	int col_1213 = GetIndexByFieldID(ppFieldInfos, FIELD_BLXX);
+
+	for (int i = 0; i < count; ++i)
+	{
+		ppResults[i] = new GDLB_STRUCT();
+
+		//if (col_123 >= 0)
+		strcpy(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
+		//if (col_124 >= 0)
+		strcpy(ppResults[i]->GDMC, ppTable[i * COL_EACH_ROW + col_124]);
+		//if (col_121 >= 0)
+		strcpy(ppResults[i]->ZJZH, ppTable[i * COL_EACH_ROW + col_121]);
+		//if (col_125 >= 0)
+		strcpy(ppResults[i]->ZHLB, ppTable[i * COL_EACH_ROW + col_125]);
+		//if (col_281 >= 0)
+		strcpy(ppResults[i]->RZRQBS, ppTable[i * COL_EACH_ROW + col_281]);
+		//if (col_1213 >= 0)
+		//	strcpy(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
+
+		ppResults[i]->ZHLB_ = atoi(ppResults[i]->ZHLB);
+		ppResults[i]->RZRQBS_ = atoi(ppResults[i]->RZRQBS);
+	}
+}
+
+void CharTable2WTLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, WTLB_STRUCT*** pppResults)
+{
+	*pppResults = nullptr;
+	if (ppTable == nullptr)
+		return;
+
+	int count = GetRowCountTableBody(ppTable);
+	if (count <= 0)
+		return;
+
+	WTLB_STRUCT** ppResults = new WTLB_STRUCT*[count + 1]();
+	ppResults[count] = nullptr;
+	*pppResults = ppResults;
+
+	int col_142 = GetIndexByFieldID(ppFieldInfos, FIELD_WTRQ);
+	int col_143 = GetIndexByFieldID(ppFieldInfos, FIELD_WTSJ);
+	int col_123 = GetIndexByFieldID(ppFieldInfos, FIELD_GDDM);
+	int col_140 = GetIndexByFieldID(ppFieldInfos, FIELD_ZQDM);
+	int col_141 = GetIndexByFieldID(ppFieldInfos, FIELD_ZQMC);
+	int col_130 = GetIndexByFieldID(ppFieldInfos, FIELD_MMBZ);
+	int col_131 = GetIndexByFieldID(ppFieldInfos, FIELD_WTLB);
+	int col_100 = GetIndexByFieldID(ppFieldInfos, FIELD_JYSDM);
+	int col_145 = GetIndexByFieldID(ppFieldInfos, FIELD_WTJG);
+	int col_144 = GetIndexByFieldID(ppFieldInfos, FIELD_WTSL);
+	int col_153 = GetIndexByFieldID(ppFieldInfos, FIELD_CJJG);
+	int col_152 = GetIndexByFieldID(ppFieldInfos, FIELD_CJSL);
+	int col_162 = GetIndexByFieldID(ppFieldInfos, FIELD_CDSL);
+	int col_146 = GetIndexByFieldID(ppFieldInfos, FIELD_WTBH);
+	int col_194 = GetIndexByFieldID(ppFieldInfos, FIELD_BJFS);
+	int col_147 = GetIndexByFieldID(ppFieldInfos, FIELD_ZTSM);
+	int col_161 = GetIndexByFieldID(ppFieldInfos, FIELD_DJZJ);
+	int col_1213 = GetIndexByFieldID(ppFieldInfos, FIELD_BLXX);
+
+	for (int i = 0; i < count; ++i)
+	{
+		ppResults[i] = new WTLB_STRUCT();
+
+		if (col_142 >= 0)
+			strcpy(ppResults[i]->WTRQ, ppTable[i * COL_EACH_ROW + col_142]);
+		if (col_143 >= 0)
+			strcpy(ppResults[i]->WTSJ, ppTable[i * COL_EACH_ROW + col_143]);
+		//if (col_123 >= 0)
+		strcpy(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
+		//if (col_140 >= 0)
+		strcpy(ppResults[i]->ZQDM, ppTable[i * COL_EACH_ROW + col_140]);
+		//if (col_141 >= 0)
+		strcpy(ppResults[i]->ZQMC, ppTable[i * COL_EACH_ROW + col_141]);
+		//if (col_130 >= 0)
+		strcpy(ppResults[i]->MMBZ, ppTable[i * COL_EACH_ROW + col_130]);
+		//if (col_131 >= 0)
+		strcpy(ppResults[i]->WTLB, ppTable[i * COL_EACH_ROW + col_131]);
+		//if (col_100 >= 0)
+		strcpy(ppResults[i]->JYSDM, ppTable[i * COL_EACH_ROW + col_100]);
+		//if (col_145 >= 0)
+		strcpy(ppResults[i]->WTJG, ppTable[i * COL_EACH_ROW + col_145]);
+		//if (col_144 >= 0)
+		strcpy(ppResults[i]->WTSL, ppTable[i * COL_EACH_ROW + col_144]);
+		//if (col_153 >= 0)
+		strcpy(ppResults[i]->CJJG, ppTable[i * COL_EACH_ROW + col_153]);
+		//if (col_152 >= 0)
+		strcpy(ppResults[i]->CJSL, ppTable[i * COL_EACH_ROW + col_152]);
+		//if (col_162 >= 0)
+		strcpy(ppResults[i]->CDSL, ppTable[i * COL_EACH_ROW + col_162]);
+		//if (col_146 >= 0)
+		strcpy(ppResults[i]->WTBH, ppTable[i * COL_EACH_ROW + col_146]);
+		//if (col_194 >= 0)
+		strcpy(ppResults[i]->BJFS, ppTable[i * COL_EACH_ROW + col_194]);
+		if (col_147 >= 0)
+			strcpy(ppResults[i]->ZTSM, ppTable[i * COL_EACH_ROW + col_147]);
+		if (col_161 >= 0)
+			strcpy(ppResults[i]->DJZJ, ppTable[i * COL_EACH_ROW + col_161]);
+		//if (col_1213 >= 0)
+		//	strcpy(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
+
+		ppResults[i]->WTRQ_ = atoi(ppResults[i]->WTRQ);
+		//ppResults[i]->WTSJ_ = atoi(ppResults[i]->WTSJ);
+		ppResults[i]->MMBZ_ = atoi(ppResults[i]->MMBZ);
+		ppResults[i]->JYSDM_ = atoi(ppResults[i]->JYSDM);
+		ppResults[i]->WTJG_ = atof(ppResults[i]->WTJG);
+		ppResults[i]->WTSL_ = atoi(ppResults[i]->WTSL);
+		ppResults[i]->CJJG_ = atof(ppResults[i]->CJJG);
+		ppResults[i]->CJSL_ = atoi(ppResults[i]->CJSL);
+		ppResults[i]->CDSL_ = atoi(ppResults[i]->CDSL);
+		ppResults[i]->DJZJ_ = atof(ppResults[i]->DJZJ);
+	}
+}
+
+void CharTable2CJLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, CJLB_STRUCT*** pppResults)
+{
+	*pppResults = nullptr;
+	if (ppTable == nullptr)
+		return;
+
+	int count = GetRowCountTableBody(ppTable);
+	if (count <= 0)
+		return;
+
+	CJLB_STRUCT** ppResults = new CJLB_STRUCT*[count + 1]();
+	ppResults[count] = nullptr;
+	*pppResults = ppResults;
+
+	int col_150 = GetIndexByFieldID(ppFieldInfos, FIELD_CJRQ);
+	int col_151 = GetIndexByFieldID(ppFieldInfos, FIELD_CJSJ);
+	int col_123 = GetIndexByFieldID(ppFieldInfos, FIELD_GDDM);
+	int col_140 = GetIndexByFieldID(ppFieldInfos, FIELD_ZQDM);
+	int col_141 = GetIndexByFieldID(ppFieldInfos, FIELD_ZQMC);
+	int col_130 = GetIndexByFieldID(ppFieldInfos, FIELD_MMBZ);
+	int col_131 = GetIndexByFieldID(ppFieldInfos, FIELD_WTLB);
+	int col_153 = GetIndexByFieldID(ppFieldInfos, FIELD_CJJG);
+	int col_152 = GetIndexByFieldID(ppFieldInfos, FIELD_CJSL);
+	int col_303 = GetIndexByFieldID(ppFieldInfos, FIELD_FSJE);
+	int col_304 = GetIndexByFieldID(ppFieldInfos, FIELD_SYJE);
+	int col_206 = GetIndexByFieldID(ppFieldInfos, FIELD_YJ);
+	int col_210 = GetIndexByFieldID(ppFieldInfos, FIELD_YHS);
+	int col_207 = GetIndexByFieldID(ppFieldInfos, FIELD_GHF);
+	int col_208 = GetIndexByFieldID(ppFieldInfos, FIELD_CJF);
+	int col_155 = GetIndexByFieldID(ppFieldInfos, FIELD_CJBH);
+	int col_167 = GetIndexByFieldID(ppFieldInfos, FIELD_CDBZ);
+	int col_146 = GetIndexByFieldID(ppFieldInfos, FIELD_WTBH);
+
+	for (int i = 0; i < count; ++i)
+	{
+		ppResults[i] = new CJLB_STRUCT();
+
+		if (col_150 >= 0)
+			strcpy(ppResults[i]->CJRQ, ppTable[i * COL_EACH_ROW + col_150]);
+		//if (col_151 >= 0)
+		strcpy(ppResults[i]->CJSJ, ppTable[i * COL_EACH_ROW + col_151]);
+		//if (col_123 >= 0)
+		strcpy(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
+		//if (col_140 >= 0)
+		strcpy(ppResults[i]->ZQDM, ppTable[i * COL_EACH_ROW + col_140]);
+		//if (col_141 >= 0)
+		strcpy(ppResults[i]->ZQMC, ppTable[i * COL_EACH_ROW + col_141]);
+		//if (col_130 >= 0)
+		strcpy(ppResults[i]->MMBZ, ppTable[i * COL_EACH_ROW + col_130]);
+		//if (col_131 >= 0)
+		strcpy(ppResults[i]->WTLB, ppTable[i * COL_EACH_ROW + col_131]);
+		//if (col_153 >= 0)
+		strcpy(ppResults[i]->CJJG, ppTable[i * COL_EACH_ROW + col_153]);
+		//if (col_152 >= 0)
+		strcpy(ppResults[i]->CJSL, ppTable[i * COL_EACH_ROW + col_152]);
+		//if (col_303 >= 0)
+		strcpy(ppResults[i]->FSJE, ppTable[i * COL_EACH_ROW + col_303]);
+		if (col_304 >= 0)
+			strcpy(ppResults[i]->SYJE, ppTable[i * COL_EACH_ROW + col_304]);
+		if (col_206 >= 0)
+			strcpy(ppResults[i]->YJ, ppTable[i * COL_EACH_ROW + col_206]);
+		if (col_210 >= 0)
+			strcpy(ppResults[i]->YHS, ppTable[i * COL_EACH_ROW + col_210]);
+		if (col_207 >= 0)
+			strcpy(ppResults[i]->GHF, ppTable[i * COL_EACH_ROW + col_207]);
+		if (col_208 >= 0)
+			strcpy(ppResults[i]->CJF, ppTable[i * COL_EACH_ROW + col_208]);
+		//if (col_155 >= 0)
+		strcpy(ppResults[i]->CJBH, ppTable[i * COL_EACH_ROW + col_155]);
+		if (col_167 >= 0)
+			strcpy(ppResults[i]->CDBZ, ppTable[i * COL_EACH_ROW + col_167]);
+		if (col_146 >= 0)
+			strcpy(ppResults[i]->WTBH, ppTable[i * COL_EACH_ROW + col_146]);
+
+
+		ppResults[i]->CJRQ_ = atoi(ppResults[i]->CJRQ);
+		//ppResults[i]->CJSJ_ = atoi(ppResults[i]->CJSJ);
+		ppResults[i]->MMBZ_ = atoi(ppResults[i]->MMBZ);
+		ppResults[i]->WTLB_ = atoi(ppResults[i]->WTLB);
+		ppResults[i]->CJJG_ = atof(ppResults[i]->CJJG);
+		ppResults[i]->CJSL_ = atoi(ppResults[i]->CJSL);
+		ppResults[i]->FSJE_ = atof(ppResults[i]->FSJE);
+		ppResults[i]->SYJE_ = atof(ppResults[i]->SYJE);
+		ppResults[i]->YJ_ = atof(ppResults[i]->YJ);
+		ppResults[i]->YHS_ = atof(ppResults[i]->YHS);
+		ppResults[i]->GHF_ = atof(ppResults[i]->GHF);
+		ppResults[i]->CJF_ = atof(ppResults[i]->CJF);
+		ppResults[i]->CDBZ_ = atoi(ppResults[i]->CDBZ);
+	}
 }
 
 #else
