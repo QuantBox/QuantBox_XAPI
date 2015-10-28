@@ -72,6 +72,7 @@ struct OrderField
 	QtyType CumQty;
 	PriceType AvgPx;
 	ErrorIDType ErrorID;
+	DateIntType Date;
 	TimeIntType Time;
 	InstrumentIDType InstrumentID;
 	ExchangeIDType	ExchangeID;
@@ -100,6 +101,7 @@ struct TradeField
 	OpenCloseType OpenClose;
 	HedgeFlagType HedgeFlag;
 	MoneyType Commission;
+	DateIntType Date;
 	TimeIntType Time;
 	InstrumentIDType InstrumentID;
 	ExchangeIDType	ExchangeID;

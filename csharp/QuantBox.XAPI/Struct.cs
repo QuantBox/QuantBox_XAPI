@@ -560,6 +560,7 @@ namespace QuantBox.XAPI
         /// 错误代码
         /// </summary>
         public int ErrorID;
+        public int Date;
         public int Time;
 
         /// <summary>
@@ -614,6 +615,7 @@ namespace QuantBox.XAPI
         public OpenCloseType OpenClose;
         public HedgeFlagType HedgeFlag;
         public double Commission;
+        public int Date;
         public int Time;
         /// <summary>
         /// 合约代码

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "TraderApi.h"
 
 #include "../include/QueueEnum.h"
@@ -19,7 +19,7 @@
 
 void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
-	// ÓÉÄÚ²¿µ÷ÓÃ£¬²»ÓÃ¼ì²éÊÇ·ñÎª¿Õ
+	// ç”±å†…éƒ¨è°ƒç”¨ï¼Œä¸ç”¨æ£€æŸ¥æ˜¯å¦ä¸ºç©º
 	CTraderApi* pApi = (CTraderApi*)pApi2;
 	pApi->QueryInThread(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 	return nullptr;
@@ -57,13 +57,13 @@ void CTraderApi::QueryInThread(char type, void* pApi1, void* pApi2, double doubl
 
 	if (0 == iRet)
 	{
-		//·µ»Ø³É¹¦£¬Ìî¼Óµ½ÒÑ·¢ËÍ³Ø
+		//è¿”å›æˆåŠŸï¼Œå¡«åŠ åˆ°å·²å‘é€æ± 
 		m_nSleep = 1;
 	}
 	else
 	{
 		m_msgQueue_Query->Input_Copy(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
-		//Ê§°Ü£¬°´4µÄÃİ½øĞĞÑÓÊ±£¬µ«²»³¬¹ı1s
+		//å¤±è´¥ï¼ŒæŒ‰4çš„å¹‚è¿›è¡Œå»¶æ—¶ï¼Œä½†ä¸è¶…è¿‡1s
 		m_nSleep *= 4;
 		m_nSleep %= 1023;
 	}
@@ -128,7 +128,7 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 
 	if (m_pClient)
 	{
-		// ÓĞÊÚÈ¨ĞÅÏ¢ÒªÊä³ö
+		// æœ‰æˆæƒä¿¡æ¯è¦è¾“å‡º
 		RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
 		if (pErr)
 		{
@@ -141,16 +141,17 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 		m_pApi->SetClient(m_pClient);
 		m_pApi->SetAccount(m_UserInfo.UserID);
 
-		// ²éÑ¯¹É¶«ÁĞ±í
+		// æŸ¥è¯¢è‚¡ä¸œåˆ—è¡¨
 		ReqQryInvestor();
 
-		// ²âÊÔÓÃ,ÊÂºóĞèÒªÉ¾³ı
+		// æµ‹è¯•ç”¨,äº‹åéœ€è¦åˆ é™¤
 		ReqQryTrade();
+		ReqQryOrder();
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 
-		// µÇÂ¼ÏÂÒ»¸öÕËºÅ
+		// ç™»å½•ä¸‹ä¸€ä¸ªè´¦å·
 		//++m_UserInfo_Pos;
 		//ReqUserLogin();
 	}
@@ -222,7 +223,7 @@ CTraderApi::CTraderApi(void)
 	m_lRequestID = 0;
 	m_nSleep = 1;
 
-	// ×Ô¼ºÎ¬»¤Á½¸öÏûÏ¢¶ÓÁĞ
+	// è‡ªå·±ç»´æŠ¤ä¸¤ä¸ªæ¶ˆæ¯é˜Ÿåˆ—
 	m_msgQueue = new CMsgQueue();
 	m_msgQueue_Query = new CMsgQueue();
 
@@ -305,7 +306,7 @@ void CTraderApi::Disconnect()
 
 	if(m_pApi)
 	{
-		// »¹Ã»ÓĞµÇ³ö
+		// è¿˜æ²¡æœ‰ç™»å‡º
 		m_pApi->Logout(m_pClient);
 		m_pClient = nullptr;
 		m_pApi->Exit();
@@ -313,12 +314,12 @@ void CTraderApi::Disconnect()
 		m_pApi->Release();
 		m_pApi = nullptr;
 
-		// È«ÇåÀí£¬Ö»Áô×îºóÒ»¸ö
+		// å…¨æ¸…ç†ï¼Œåªç•™æœ€åä¸€ä¸ª
 		if (m_msgQueue)
 		{
 			m_msgQueue->Clear();
 			m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
-			// Ö÷¶¯´¥·¢
+			// ä¸»åŠ¨è§¦å‘
 			m_msgQueue->Process();
 		}
 	}
@@ -351,7 +352,7 @@ int CTraderApi::ReqOrderInsert(
 
 	OrderField** ppOrders = new OrderField*[count];
 	
-	// Éú³É±¾µØID£¬¹©ÉÏ²ã½øĞĞ¶¨Î»Ê¹ÓÃ
+	// ç”Ÿæˆæœ¬åœ°IDï¼Œä¾›ä¸Šå±‚è¿›è¡Œå®šä½ä½¿ç”¨
 	for (int i = 0; i < count; ++i)
 	{
 		OrderField* pNewOrder = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
@@ -361,7 +362,7 @@ int CTraderApi::ReqOrderInsert(
 		strcpy(pNewOrder[i].LocalID, pInOut[i]);
 		ppOrders[i] = pNewOrder;
 
-		// ×¢ÒâÕâÀï±£´æÁË×î¿ªÊ¼·¢µ¥µÄ½á¹¹ÌåµÄ±¸·İ
+		// æ³¨æ„è¿™é‡Œä¿å­˜äº†æœ€å¼€å§‹å‘å•çš„ç»“æ„ä½“çš„å¤‡ä»½
 		m_id_platform_order.insert(pair<string, OrderField*>(pNewOrder->LocalID, pNewOrder));
 	}
 
@@ -379,7 +380,7 @@ void BuildOrder(OrderField* pIn, Order_STRUCT* pOut)
 	pOut->Price = pIn->Price;
 	pOut->Qty = pIn->Qty;
 
-	// Õâ¸öµØ·½ºóÆÚÒªÔÙ¸Ä
+	// è¿™ä¸ªåœ°æ–¹åæœŸè¦å†æ”¹
 	switch (pIn->Type)
 	{
 	case OrderType::Market:
@@ -414,7 +415,7 @@ int CTraderApi::_ReqOrderInsert(char type, void* pApi1, void* pApi2, double doub
 	if (m_pApi == nullptr)
 		return 0;
 
-	// µÃµ½±¨µ¥Ö¸ÕëÁĞ±í
+	// å¾—åˆ°æŠ¥å•æŒ‡é’ˆåˆ—è¡¨
 	OrderField** ppOrders = (OrderField**)ptr1;
 	int count = (int)size1 / sizeof(OrderField*);
 
@@ -429,24 +430,24 @@ int CTraderApi::_ReqOrderInsert(char type, void* pApi1, void* pApi2, double doub
 	char** ppResults = nullptr;
 	Error_STRUCT** ppErrs = nullptr;
 
-	// ×¢Òâ£ºpTdxOrdersÔÚÕâÀï±»ĞŞ¸ÄÁË£¬ĞèÒªÊ¹ÓÃĞŞ¸ÄºóµÄ¶«Î÷
+	// æ³¨æ„ï¼špTdxOrdersåœ¨è¿™é‡Œè¢«ä¿®æ”¹äº†ï¼Œéœ€è¦ä½¿ç”¨ä¿®æ”¹åçš„ä¸œè¥¿
 	int n = m_pApi->SendMultiOrders(ppTdxOrders, count, &ppFieldInfos, &ppResults, &ppErrs);
 
-	// ½«½á¹ûÁ¢¼´È¡³öÀ´
+	// å°†ç»“æœç«‹å³å–å‡ºæ¥
 	for (int i = 0; i < count;++i)
 	{
 		m_id_api_order.insert(pair<string, Order_STRUCT*>(ppOrders[i]->LocalID, ppTdxOrders[i]));
-		// ´¦Àí´íÎó
+		// å¤„ç†é”™è¯¯
 		if (ppErrs && ppErrs[i])
 		{
 			ppOrders[i]->ErrorID = ppErrs[i]->ErrCode;
 			strcpy(ppOrders[i]->Text, ppErrs[i]->ErrInfo);
 		}
 
-		// ´¦Àí½á¹û
+		// å¤„ç†ç»“æœ
 		if (ppResults && ppResults[i*COL_EACH_ROW + 0])
 		{
-			// Ğ´ÉÏ¹ñÌ¨µÄID£¬ÒÔºó½«»ùÓÚ´Ë½øĞĞ¶¨Î»
+			// å†™ä¸ŠæŸœå°çš„IDï¼Œä»¥åå°†åŸºäºæ­¤è¿›è¡Œå®šä½
 			strcpy(ppOrders[i]->ID, ppResults[i*COL_EACH_ROW + 0]);
 
 			m_id_api_order.erase(ppOrders[i]->LocalID);
@@ -456,9 +457,9 @@ int CTraderApi::_ReqOrderInsert(char type, void* pApi1, void* pApi2, double doub
 			m_id_platform_order.insert(pair<string, OrderField*>(ppOrders[i]->ID, ppOrders[i]));
 		}
 
-		// ÏÖÔÚÓĞÁ½¸ö½á¹¹Ìå£¬ĞèÒª½øĞĞ²Ù×÷ÁË
-		// 1.Í¨ÖªÏÂµ¥µÄ½á¹û
-		// 2.¼ÇÂ¼ÏÂµ¥
+		// ç°åœ¨æœ‰ä¸¤ä¸ªç»“æ„ä½“ï¼Œéœ€è¦è¿›è¡Œæ“ä½œäº†
+		// 1.é€šçŸ¥ä¸‹å•çš„ç»“æœ
+		// 2.è®°å½•ä¸‹å•
 		
 		OrderField* pField = ppOrders[i];
 		if (pField->ErrorID != 0)
@@ -475,7 +476,7 @@ int CTraderApi::_ReqOrderInsert(char type, void* pApi1, void* pApi2, double doub
 		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
 	}
 
-	// ¸´ÖÆÍêÁË£¬¿ÉÒÔÉ¾ÁËÒÔÇ°¶«Î÷
+	// å¤åˆ¶å®Œäº†ï¼Œå¯ä»¥åˆ äº†ä»¥å‰ä¸œè¥¿
 	delete[] ppTdxOrders;
 
 	DeleteTableBody(ppResults, count);
@@ -521,8 +522,8 @@ int CTraderApi::ReqOrderAction(OrderIDType* szId, int count, OrderIDType* pOutpu
 int CTraderApi::_ReqOrderAction(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	int count = (int)size1 / sizeof(OrderField*);
-	// Í¨¹ıIDÕÒµ½Ô­Ê¼½á¹¹£¬ÓÃÓÚ³·µ¥
-	// Í¨¹ıIDÕÒµ½Í¨ÓÃ½á¹¹£¬ÓÃÓÚ½ÓÊÕ»Ø±¨
+	// é€šè¿‡IDæ‰¾åˆ°åŸå§‹ç»“æ„ï¼Œç”¨äºæ’¤å•
+	// é€šè¿‡IDæ‰¾åˆ°é€šç”¨ç»“æ„ï¼Œç”¨äºæ¥æ”¶å›æŠ¥
 	OrderField** ppOrders = (OrderField**)ptr1;
 	Order_STRUCT** ppTdxOrders = (Order_STRUCT**)ptr2;
 
@@ -532,7 +533,7 @@ int CTraderApi::_ReqOrderAction(char type, void* pApi1, void* pApi2, double doub
 
 	int n = m_pApi->CancelMultiOrders(ppTdxOrders, count, &ppFieldInfos, &ppResults, &ppErrs);
 
-	// ½«½á¹ûÁ¢¼´È¡³öÀ´
+	// å°†ç»“æœç«‹å³å–å‡ºæ¥
 	for (int i = 0; i < count; ++i)
 	{
 		if (ppErrs)
@@ -550,7 +551,7 @@ int CTraderApi::_ReqOrderAction(char type, void* pApi1, void* pApi2, double doub
 				ppOrders[i]->Status = OrderStatus::Cancelled;
 			}
 		}
-		// ³·µ¥³É¹¦Ê±£¬·µ»ØµÄ¶«Î÷»¹ÊÇnull,ËùÒÔÕâÀïÊ¹ÓÃ´íÎóĞÅÏ¢À´½øĞĞÇø·Ö
+		// æ’¤å•æˆåŠŸæ—¶ï¼Œè¿”å›çš„ä¸œè¥¿è¿˜æ˜¯null,æ‰€ä»¥è¿™é‡Œä½¿ç”¨é”™è¯¯ä¿¡æ¯æ¥è¿›è¡ŒåŒºåˆ†
 		//if (ppResults)
 		//{	
 		//	if (ppResults[i*COL_EACH_ROW + 0])
@@ -579,14 +580,29 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 	char** ppResults = nullptr;
 	Error_STRUCT* pErr = nullptr;
 
-	m_pApi->ReqQueryData(REQUEST_DRWT, &ppFieldInfos, &ppResults, &pErr);
+	//m_pApi->ReqQueryData(REQUEST_DRWT, &ppFieldInfos, &ppResults, &pErr);
+	// æµ‹è¯•ç”¨ï¼Œäº‹åè¦åˆ é™¤
+	m_pApi->ReqQueryData(REQUEST_LSWT, &ppFieldInfos, &ppResults, &pErr, "20150801", "20151031");
 
 	WTLB_STRUCT** ppRS = nullptr;
 	CharTable2WTLB(ppFieldInfos, ppResults, &ppRS);
 
 	if (ppRS)
 	{
-		// ĞèÒª½«ËüÊäÈëµ½Ò»¸öµØ·½ÓÃÓÚ¼ÆËã
+		int i = 0;
+		while (ppRS[i])
+		{
+			// éœ€è¦å°†å®ƒè¾“å…¥åˆ°ä¸€ä¸ªåœ°æ–¹ç”¨äºè®¡ç®—
+			OrderField* pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
+
+			WTLB_2_OrderField_0(ppRS[i], pField);
+
+			m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
+
+			++i;
+
+			m_msgQueue->delete_block(pField);
+		}
 	}
 
 	DeleteTableBody(ppResults);
@@ -607,19 +623,29 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 	char** ppResults = nullptr;
 	Error_STRUCT* pErr = nullptr;
 
-	m_pApi->ReqQueryData(REQUEST_DRCJ, &ppFieldInfos, &ppResults, &pErr);
+	//m_pApi->ReqQueryData(REQUEST_DRCJ, &ppFieldInfos, &ppResults, &pErr);
+	// æµ‹è¯•ç”¨ï¼Œäº‹åè¦åˆ é™¤
+	m_pApi->ReqQueryData(REQUEST_LSCJ, &ppFieldInfos, &ppResults, &pErr, "20150801", "20151031");
 
 	CJLB_STRUCT** ppRS = nullptr;
 	CharTable2CJLB(ppFieldInfos, ppResults, &ppRS);
 
 	if (ppRS)
 	{
-		// ĞèÒª½«ËüÊäÈëµ½Ò»¸öµØ·½ÓÃÓÚ¼ÆËã
-		TradeField* pField = (TradeField*)m_msgQueue->new_block(sizeof(TradeField));
+		int i = 0;
+		while (ppRS[i])
+		{
+			// éœ€è¦å°†å®ƒè¾“å…¥åˆ°ä¸€ä¸ªåœ°æ–¹ç”¨äºè®¡ç®—
+			TradeField* pField = (TradeField*)m_msgQueue->new_block(sizeof(TradeField));
 
-		CJLB_2_TradeField(ppRS[0], pField);
-		
-		m_msgQueue->Input_Copy(ResponeType::OnRtnTrade, m_msgQueue, m_pClass, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+			CJLB_2_TradeField(ppRS[i], pField);
+
+			m_msgQueue->Input_Copy(ResponeType::OnRtnTrade, m_msgQueue, m_pClass, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+
+			++i;
+
+			m_msgQueue->delete_block(pField);
+		}
 	}
 
 	DeleteTableBody(ppResults);
@@ -637,7 +663,7 @@ void CTraderApi::ReqQryInstrument(const string& szInstrumentId, const string& sz
 //{
 //	OrderIDType orderId = { 0 };
 //
-//	// Ö»ÊÇ´òÓ¡³É½»
+//	// åªæ˜¯æ‰“å°æˆäº¤
 //	ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
 //
 //	//pField->ErrorID = pRspInfo->error_no;
@@ -650,7 +676,7 @@ void CTraderApi::ReqQryInstrument(const string& szInstrumentId, const string& sz
 //{
 //	OrderIDType orderId = { 0 };
 //
-//	// Ö»ÊÇ´òÓ¡³É½»
+//	// åªæ˜¯æ‰“å°æˆäº¤
 //	ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
 //
 //	//pField->ErrorID = pRspInfo->error_no;
