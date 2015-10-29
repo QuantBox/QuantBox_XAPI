@@ -35,6 +35,25 @@ void PrintTableHeader(FieldInfo_STRUCT** ppHeader)
 	printf("\n");
 }
 
+void OutputCSVTableHeader(FILE* pFile, FieldInfo_STRUCT** ppHeader)
+{
+	if (ppHeader == nullptr || pFile == nullptr)
+		return;
+
+	int i = 0;
+	FieldInfo_STRUCT* pRow = ppHeader[i];
+	while (pRow != 0)
+	{
+		char buf[512] = { 0 };
+		fprintf(pFile,"%d_%s,",//"%d,%s,%d,%d,%d,%d,%d",
+			pRow->FieldID, pRow->FieldName, pRow->a, pRow->b, pRow->Len, pRow->d, pRow->e);
+
+		++i;
+		pRow = ppHeader[i];
+	}
+	fprintf(pFile, "\n");
+}
+
 FieldInfo_STRUCT** CopyTableHeader(FieldInfo_STRUCT** ppHeader)
 {
 	if (ppHeader == nullptr)
@@ -178,6 +197,62 @@ void PrintTableBody(char** ppTable, int count)
 				break;
 		}
 		printf("\n");
+	}
+
+	return;
+}
+
+void OutputCSVTableBody(FILE* pFile, char** ppTable)
+{
+	if (ppTable == nullptr || pFile == nullptr)
+		return;
+
+	// 如果有数据，第一列就不为空
+	int i = 0;
+	int j = 0;
+	char* p = ppTable[i * COL_EACH_ROW + j];
+	while (p != nullptr)
+	{
+		//printf("%d:", i);
+		for (j = 0; j < COL_EACH_ROW; ++j)
+		{
+			p = ppTable[i * COL_EACH_ROW + j];
+			if (p)
+			{
+				fprintf(pFile, "%s,", p);
+			}
+			else
+				break;
+		}
+		fprintf(pFile, "\n");
+		j = 0;
+		++i;
+		p = ppTable[i * COL_EACH_ROW + j];
+	}
+
+	return;
+}
+
+void OutputCSVTableBody(FILE* pFile, char** ppTable, int count)
+{
+	if (ppTable == nullptr || pFile == nullptr)
+		return;
+
+	for (int i = 0; i < count; ++i)
+	{
+		//printf("%d:", i);
+		for (int j = 0; j < COL_EACH_ROW; ++j)
+		{
+			char* p = ppTable[i * COL_EACH_ROW + j];
+			if (p)
+			{
+				fprintf(pFile, "%s,", p);
+
+			}
+			else
+				break;
+		}
+		fprintf(pFile, "\n");
 	}
 
 	return;
@@ -388,12 +463,12 @@ void CharTable2GDLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, GDLB_STRUCT
 		strcpy(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
 		//if (col_124 >= 0)
 		strcpy(ppResults[i]->GDMC, ppTable[i * COL_EACH_ROW + col_124]);
-		//if (col_121 >= 0)
-		strcpy(ppResults[i]->ZJZH, ppTable[i * COL_EACH_ROW + col_121]);
+		if (col_121 >= 0)
+			strcpy(ppResults[i]->ZJZH, ppTable[i * COL_EACH_ROW + col_121]);
 		//if (col_125 >= 0)
 		strcpy(ppResults[i]->ZHLB, ppTable[i * COL_EACH_ROW + col_125]);
-		//if (col_281 >= 0)
-		strcpy(ppResults[i]->RZRQBS, ppTable[i * COL_EACH_ROW + col_281]);
+		if (col_281 >= 0)
+			strcpy(ppResults[i]->RZRQBS, ppTable[i * COL_EACH_ROW + col_281]);
 		//if (col_1213 >= 0)
 		//	strcpy(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
 
@@ -477,7 +552,6 @@ void CharTable2WTLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, WTLB_STRUCT
 		//	strcpy(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
 
 		ppResults[i]->WTRQ_ = atoi(ppResults[i]->WTRQ);
-		//ppResults[i]->WTSJ_ = atoi(ppResults[i]->WTSJ);
 		ppResults[i]->MMBZ_ = atoi(ppResults[i]->MMBZ);
 		ppResults[i]->JYSDM_ = atoi(ppResults[i]->JYSDM);
 		ppResults[i]->WTJG_ = atof(ppResults[i]->WTJG);
@@ -486,6 +560,10 @@ void CharTable2WTLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, WTLB_STRUCT
 		ppResults[i]->CJSL_ = atoi(ppResults[i]->CJSL);
 		ppResults[i]->CDSL_ = atoi(ppResults[i]->CDSL);
 		ppResults[i]->DJZJ_ = atof(ppResults[i]->DJZJ);
+
+		int HH = 0, mm = 0, ss = 0;
+		GetUpdateTime_HH_mm_ss(ppResults[i]->WTSJ, &HH, &mm, &ss);
+		ppResults[i]->WTSJ_ = HH * 10000 + mm * 100 + ss;
 	}
 }
 
@@ -577,7 +655,34 @@ void CharTable2CJLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, CJLB_STRUCT
 		ppResults[i]->GHF_ = atof(ppResults[i]->GHF);
 		ppResults[i]->CJF_ = atof(ppResults[i]->CJF);
 		ppResults[i]->CDBZ_ = atoi(ppResults[i]->CDBZ);
+
+		int HH = 0, mm = 0, ss = 0;
+		GetUpdateTime_HH_mm_ss(ppResults[i]->CJSJ, &HH, &mm, &ss);
+		ppResults[i]->CJSJ_ = HH * 10000 + mm * 100 + ss;
 	}
+}
+
+void GetUpdateTime_HH_mm_ss(char* UpdateTime, int* _HH, int* _mm, int* _ss)
+{
+	*_HH = atoi(&UpdateTime[0]);
+	*_mm = atoi(&UpdateTime[3]);
+	*_ss = atoi(&UpdateTime[6]);
+}
+
+void DeleteStructs(void** ppStructs)
+{
+	if (ppStructs == nullptr)
+		return;
+
+	int i = 0;
+	while (ppStructs[i] != 0)
+	{
+		delete[] ppStructs[i];
+
+		++i;
+	}
+
+	delete[] ppStructs;
 }
 
 #else

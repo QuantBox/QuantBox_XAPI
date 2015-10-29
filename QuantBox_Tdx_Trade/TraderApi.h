@@ -113,6 +113,9 @@ private:
 	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	virtual void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	
+	friend void* __stdcall Test(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	virtual void TestInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
 	int _Init();
 
 	//登录请求
@@ -230,6 +233,7 @@ private:
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	CMsgQueue*					m_msgQueue_Query;		//发送消息队列指针
 	CMsgQueue*					m_msgQueue_Order;		//报单消息队列指针
+	CMsgQueue*					m_msgQueue_Test;		//测试用
 
 	UserInfoField*				m_pUserInfos;
 	int							m_UserInfo_Pos;
@@ -240,5 +244,11 @@ private:
 	void*						m_pClass;
 
 	CIDGenerator*				m_pIDGenerator;
+
+	list<TradeField*>			m_OldTradeList;
+	list<TradeField*>			m_NewTradeList;
+
+	list<OrderField*>			m_OldOrderList;
+	list<OrderField*>			m_NewOrderList;
 };
 
