@@ -1,13 +1,15 @@
-#pragma once
+ï»¿#pragma once
 
 #include "../include/ApiStruct.h"
 
 #include "../include/Tdx/tdx_struct.h"
 
-// Á½ÖÖÇé¿ö£º
-// 1.ÍêÈ«ÖØ½¨
-// 2.²¿·ÖÖØ½¨
+// ä¸¤ç§æƒ…å†µï¼š
+// 1.å®Œå…¨é‡å»º
+// 2.éƒ¨åˆ†é‡å»º
 int BJFS_2_WTFS(char* pIn);
+bool ZTSM_IsDone(int In);
+bool ZTSM_IsNotSent(int In);
 
 void CJLB_2_TradeField(CJLB_STRUCT* pIn, TradeField* pOut);
 

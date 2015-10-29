@@ -15,6 +15,7 @@
 #include "tdx_struct.h"
 #include "tdx_function.h"
 #include "tdx_request.h"
+#include "tdx_field.h"
 
 class TDXAPI_API CTdxApi
 {

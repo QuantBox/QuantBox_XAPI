@@ -52,6 +52,8 @@ void CTraderApi::QueryInThread(char type, void* pApi1, void* pApi2, double doubl
 		iRet = _ReqOrderAction(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 		break;
 	default:
+		// 感觉在此处启动一个查询会比较合适，因为队列中已经空闲下来了
+		// 不对，好像有一个数据包只会执行一次
 		break;
 	}
 
@@ -180,9 +182,10 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 		// 查询股东列表
 		ReqQryInvestor();
 
-		// 测试用,事后需要删除
-		ReqQryTrade();
+		// 查列表，这样就不会一下单就
 		ReqQryOrder();
+		ReqQryTrade();
+		
 
 		// 测试用
 		m_msgQueue_Test->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue_Test, this, 0, 0, nullptr, 0, nullptr, 0, nullptr, 0);
@@ -454,6 +457,8 @@ int CTraderApi::_ReqOrderInsert(char type, void* pApi1, void* pApi2, double doub
 	// 注意：pTdxOrders在这里被修改了，需要使用修改后的东西
 	int n = m_pApi->SendMultiOrders(ppTdxOrders, count, &ppFieldInfos, &ppResults, &ppErrs);
 
+	// 标记批量下单是否有发成功过单的
+	bool bSuccess = false;
 	// 将结果立即取出来
 	for (int i = 0; i < count;++i)
 	{
@@ -468,6 +473,7 @@ int CTraderApi::_ReqOrderInsert(char type, void* pApi1, void* pApi2, double doub
 		// 处理结果
 		if (ppResults && ppResults[i*COL_EACH_ROW + 0])
 		{
+			bSuccess = true;
 			// 写上柜台的ID，以后将基于此进行定位
 			strcpy(ppOrders[i]->ID, ppResults[i*COL_EACH_ROW + 0]);
 
@@ -505,6 +511,11 @@ int CTraderApi::_ReqOrderInsert(char type, void* pApi1, void* pApi2, double doub
 
 	DeleteTableBody(ppResults, count);
 	DeleteErrors(ppErrs, count);
+
+	if (bSuccess)
+	{
+		// 有挂单的，需要进行查询了
+	}
 
 	return 0;
 }
@@ -557,6 +568,7 @@ int CTraderApi::_ReqOrderAction(char type, void* pApi1, void* pApi2, double doub
 
 	int n = m_pApi->CancelMultiOrders(ppTdxOrders, count, &ppFieldInfos, &ppResults, &ppErrs);
 
+	bool bSuccess = false;
 	// 将结果立即取出来
 	for (int i = 0; i < count; ++i)
 	{
@@ -572,9 +584,12 @@ int CTraderApi::_ReqOrderAction(char type, void* pApi1, void* pApi2, double doub
 			}
 			else
 			{
+				bSuccess = true;
+
 				// 会不会出现撤单时，当时不知道是否成功撤单，查询才得知没有撤成功？
-				ppOrders[i]->ExecType = ExecType::ExecCancelled;
-				ppOrders[i]->Status = OrderStatus::Cancelled;
+				//ppOrders[i]->ExecType = ExecType::ExecCancelled;
+				//ppOrders[i]->Status = OrderStatus::Cancelled;
+				continue;
 			}
 		}
 		// 撤单成功时，返回的东西还是null,所以这里使用错误信息来进行区分
@@ -591,6 +606,11 @@ int CTraderApi::_ReqOrderAction(char type, void* pApi1, void* pApi2, double doub
 
 	DeleteTableBody(ppResults, count);
 	DeleteErrors(ppErrs, count);
+
+	if (bSuccess)
+	{
+		// 需要进行查询了
+	}
 
 	return 0;
 }
@@ -617,6 +637,13 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 	// 操作前清空，按说之前已经清空过一次了
 	m_NewOrderList.clear();
 
+	// 有未完成的，标记为true
+	bool IsDone = true;
+	// 有未申报的，标记为true
+	bool IsNotSent = false;
+	// 有更新的
+	bool IsUpdated = false;
+
 	if (ppRS)
 	{
 		int i = 0;
@@ -629,18 +656,25 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 				OrderField* pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
 
 				WTLB_2_OrderField_0(ppRS[i], pField);
-
 				m_NewOrderList.push_back(pField);
+
+				if (!ZTSM_IsDone(ppRS[i]->ZTSM_))
+				{
+					IsDone = false;
+				}
+				if (ZTSM_IsNotSent(ppRS[i]->ZTSM_))
+				{
+					IsNotSent = true;
+				}
 			}
 			++i;
 		}
 	}
 
-
-
 	// 委托列表
 	// 1.新增的都需要输出
 	// 2.老的看是否有变化
+	
 	int i = 0;
 	list<OrderField*>::iterator it2 = m_OldOrderList.begin();
 	for (list<OrderField*>::iterator it = m_NewOrderList.begin(); it != m_NewOrderList.end(); ++it)
@@ -664,6 +698,7 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 
 		if (bUpdate)
 		{
+			bUpdate = true;
 			// 如果能找到下单时的委托，就修改后发出来
 			unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(pField->ID);
 			if (it != m_id_platform_order.end())
@@ -707,6 +742,27 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 
 	DeleteTableBody(ppResults);
 	DeleteError(pErr);
+
+	if (!IsDone)
+	{
+		if (!IsUpdated)
+		{
+			// 没有更新，是否要慢点查
+		}
+		// 有没有完成的，需要定时查询
+		if (IsNotSent)
+		{
+			// 有没申报的，是否没在交易时间？慢点查
+		}
+		else
+		{
+			// 交易时间了，是否需要考虑
+		}
+	}
+	else
+	{
+		// 全完成了，可以不查或慢查
+	}
 
 	return 0;
 }

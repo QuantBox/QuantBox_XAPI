@@ -87,6 +87,7 @@ struct WTLB_STRUCT
 	int CJSL_;
 	int CDSL_;
 	double DJZJ_;
+	int ZTSM_;
 };
 
 struct CJLB_STRUCT

@@ -4,7 +4,7 @@
 
 #include "tdx_function.h"
 #include "tdx_enum.h"
-#include "../TdxApi/TcSdk_Const.h"
+#include "tdx_field.h"
 
 #ifdef TDXAPI_EXPORTS
 
@@ -564,6 +564,9 @@ void CharTable2WTLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, WTLB_STRUCT
 		int HH = 0, mm = 0, ss = 0;
 		GetUpdateTime_HH_mm_ss(ppResults[i]->WTSJ, &HH, &mm, &ss);
 		ppResults[i]->WTSJ_ = HH * 10000 + mm * 100 + ss;
+
+		// 最第一个的字符，并转成数字
+		ppResults[i]->ZTSM_ = ppResults[i]->ZTSM[0] - '0';
 	}
 }
 

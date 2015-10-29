@@ -76,12 +76,6 @@ TimeInForce WTFS_2_TimeInForce(int In)
 	}
 }
 
-// 提取状态说明中的数字
-int ZTSM_str_2_int(char* pIn)
-{
-	return pIn[0] - '0';
-}
-
 OrderStatus ZTSM_2_OrderStatus(int In)
 {
 	switch (In)
@@ -118,6 +112,28 @@ ExecType ZTSM_2_ExecType(int In)
 	default:
 		return ExecType::ExecNew;
 	}
+}
+
+bool ZTSM_IsDone(int In)
+{
+	switch (In)
+	{
+	case ZTSM_Illegal:
+	case ZTSM_AllFilled:
+	case ZTSM_AllCancelled:
+		return true;
+	}
+	return false;
+}
+
+bool ZTSM_IsNotSent(int In)
+{
+	switch (In)
+	{
+	case ZTSM_0:
+		return true;
+	}
+	return false;
 }
 
 // 将买卖方式转成买卖方向
@@ -169,9 +185,8 @@ void WTLB_2_OrderField_0(WTLB_STRUCT* pIn, OrderField* pOut)
 	pOut->Type = WTFS_2_OrderType(wtfs);
 	pOut->TimeInForce = WTFS_2_TimeInForce(wtfs);
 
-	int ztsm = ZTSM_str_2_int(pIn->ZTSM);
-	pOut->Status = ZTSM_2_OrderStatus(ztsm);
-	pOut->ExecType = ZTSM_2_ExecType(ztsm);
+	pOut->Status = ZTSM_2_OrderStatus(pIn->ZTSM_);
+	pOut->ExecType = ZTSM_2_ExecType(pIn->ZTSM_);
 
 	pOut->OpenClose = pOut->Side == OrderSide::Buy ? OpenCloseType::Open : OpenCloseType::Close;
 	pOut->HedgeFlag = HedgeFlagType::Speculation;
@@ -203,7 +218,6 @@ int OrderType_2_WTFS(OrderType In)
 		return WTFS_Limit;
 	}
 }
-
 
 
 void OrderField_2_Order_STRUCT(OrderField* pIn, Order_STRUCT* pOut)
