@@ -82,7 +82,7 @@ private:
 
 	virtual void OnHeartBeatLost() { }
 	//检查是否出错
-	bool IsErrorRspInfo_Output(struct ErrorRtnField * pErrorField);//将出错消息送到消息队列
+	bool IsErrorRspInfo_Output(const char* szSource, struct ErrorRtnField * pErrorField);//将出错消息送到消息队列
 	bool IsErrorRspInfo(struct ErrorRtnField * pErrorField); //不输出信息
 
 private:

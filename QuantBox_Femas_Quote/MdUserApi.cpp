@@ -100,7 +100,7 @@ ConfigInfoField* CMdUserApi::Config(ConfigInfoField* pConfigInfo)
 	return nullptr;
 }
 
-bool CMdUserApi::IsErrorRspInfo(CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+bool CMdUserApi::IsErrorRspInfo(const char* szSource, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	bool bRet = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bRet)
@@ -109,6 +109,7 @@ bool CMdUserApi::IsErrorRspInfo(CUstpFtdcRspInfoField *pRspInfo, int nRequestID,
 
 		pField->ErrorID = pRspInfo->ErrorID;
 		strcpy(pField->ErrorMsg, pRspInfo->ErrorMsg);
+		strcpy(pField->Source, szSource);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, bIsLast, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -364,13 +365,13 @@ void CMdUserApi::OnRspUserLogin(CUstpFtdcRspUserLoginField *pRspUserLogin, CUstp
 
 void CMdUserApi::OnRspError(CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+	IsErrorRspInfo("OnRspError", pRspInfo, nRequestID, bIsLast);
 }
 
 void CMdUserApi::OnRspSubMarketData(CUstpFtdcSpecificInstrumentField *pSpecificInstrument, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	//在模拟平台可能这个函数不会触发，所以要自己维护一张已经订阅的合约列表
-	if(!IsErrorRspInfo(pRspInfo,nRequestID,bIsLast)
+	if (!IsErrorRspInfo("OnRspSubMarketData", pRspInfo, nRequestID, bIsLast)
 		&&pSpecificInstrument)
 	{
 		lock_guard<mutex> cl(m_csMapInstrumentIDs);
@@ -382,7 +383,7 @@ void CMdUserApi::OnRspSubMarketData(CUstpFtdcSpecificInstrumentField *pSpecificI
 void CMdUserApi::OnRspUnSubMarketData(CUstpFtdcSpecificInstrumentField *pSpecificInstrument, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	//模拟平台可能这个函数不会触发
-	if(!IsErrorRspInfo(pRspInfo,nRequestID,bIsLast)
+	if (!IsErrorRspInfo("OnRspUnSubMarketData", pRspInfo, nRequestID, bIsLast)
 		&&pSpecificInstrument)
 	{
 		lock_guard<mutex> cl(m_csMapInstrumentIDs);

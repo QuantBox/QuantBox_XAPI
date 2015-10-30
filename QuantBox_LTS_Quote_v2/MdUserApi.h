@@ -73,7 +73,7 @@ private:
 	//virtual void OnRtnForQuoteRsp(CSecurityFtdcForQuoteRspField *pForQuoteRsp);
 
 	//检查是否出错
-	bool IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//将出错消息送到消息队列
+	bool IsErrorRspInfo(const char* szSource, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//将出错消息送到消息队列
 	bool IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo);//不送出错消息
 
 private:

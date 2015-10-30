@@ -110,7 +110,7 @@ private:
 	//virtual void OnRspSopAvailableQuot(struct DFITCRspQuotQryField * pAvailableQuotInfo, struct DFITCSECRspInfoField * pRspInfo, bool flag);
 
 	//检查是否出错
-	bool IsErrorRspInfo_Output(struct DFITCSECRspInfoField *pRspInfo);//将出错消息送到消息队列
+	bool IsErrorRspInfo_Output(const char* szSource, struct DFITCSECRspInfoField *pRspInfo);//将出错消息送到消息队列
 	bool IsErrorRspInfo(struct DFITCSECRspInfoField *pRspInfo);//不送出错消息
 
 private:

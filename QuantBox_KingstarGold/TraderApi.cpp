@@ -105,7 +105,7 @@ CTraderApi::~CTraderApi(void)
 	Disconnect();
 }
 
-bool CTraderApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+bool CTraderApi::IsErrorRspInfo(const char* szSource, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	bool bRet = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bRet)
@@ -114,6 +114,7 @@ bool CTraderApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, int nRequestID
 
 		pField->ErrorID = pRspInfo->ErrorID;
 		strcpy(pField->ErrorMsg, pRspInfo->ErrorMsg);
+		strcpy(pField->Source, szSource);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, bIsLast, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -1049,7 +1050,7 @@ int CTraderApi::_ReqQryInstrument(char type, void* pApi1, void* pApi2, double do
 
 void CTraderApi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	if (!IsErrorRspInfo("OnRspQryInstrument", pRspInfo, nRequestID, bIsLast))
 	{
 		if (pInstrument)
 		{
@@ -1198,7 +1199,7 @@ void CTraderApi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CTho
 
 void CTraderApi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+	IsErrorRspInfo("OnRspError", pRspInfo, nRequestID, bIsLast);
 }
 
 void CTraderApi::ReqQryOrder()
@@ -1299,7 +1300,7 @@ void CTraderApi::OnOrder(CThostFtdcOrderField *pOrder)
 
 void CTraderApi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	if (!IsErrorRspInfo("OnRspQryOrder", pRspInfo, nRequestID, bIsLast))
 	{
 		OnOrder(pOrder);
 	}
@@ -1370,7 +1371,7 @@ void CTraderApi::OnTrade(CThostFtdcTradeField *pTrade)
 
 void CTraderApi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	if (!IsErrorRspInfo("OnRspQryTrade", pRspInfo, nRequestID, bIsLast))
 	{
 		OnTrade(pTrade);
 	}

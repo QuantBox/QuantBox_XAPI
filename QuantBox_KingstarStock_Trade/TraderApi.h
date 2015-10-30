@@ -133,7 +133,7 @@ private:
 	
 
 	//检查是否出错
-	bool IsErrorRspInfo(STRspMsg *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
+	bool IsErrorRspInfo(const char* szSource, STRspMsg *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
 	bool IsErrorRspInfo(STRspMsg *pRspInfo);//不输出信息
 
 	////连接

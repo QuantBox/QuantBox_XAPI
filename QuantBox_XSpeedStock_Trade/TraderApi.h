@@ -121,7 +121,7 @@ private:
 	int ReqInit();
 
 	//检查是否出错
-	bool IsErrorRspInfo_Output(struct DFITCSECRspInfoField *pRspInfo);//将出错消息送到消息队列
+	bool IsErrorRspInfo_Output(const char* szSource, struct DFITCSECRspInfoField *pRspInfo);//将出错消息送到消息队列
 	bool IsErrorRspInfo(struct DFITCSECRspInfoField *pRspInfo); //不输出信息
 
 	//连接

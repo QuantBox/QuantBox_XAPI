@@ -93,7 +93,7 @@ void CTraderApi::Register(void* pCallback, void* pClass)
 	}
 }
 
-bool CTraderApi::IsErrorRspInfo_Output(struct DFITCErrorRtnField *pRspInfo)
+bool CTraderApi::IsErrorRspInfo_Output(const char* szSource, struct DFITCErrorRtnField *pRspInfo)
 {
 	bool bRet = ((pRspInfo) && (pRspInfo->nErrorID != 0));
 	if (bRet)
@@ -102,6 +102,7 @@ bool CTraderApi::IsErrorRspInfo_Output(struct DFITCErrorRtnField *pRspInfo)
 
 		pField->ErrorID = pRspInfo->nErrorID;
 		strcpy(pField->ErrorMsg, pRspInfo->errorMsg);
+		strcpy(pField->Source, szSource);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -356,6 +357,7 @@ int CTraderApi::ReqOrderInsert(
 			OrderField* pField = new OrderField();
 			memcpy(pField, pOrder, sizeof(OrderField));
 			strcpy(pField->ID, m_orderInsert_Id);
+			strcpy(pField->LocalID, pField->ID);
 			m_id_platform_order.insert(pair<string, OrderField*>(m_orderInsert_Id, pField));
 		}
 		strncpy((char*)pInOut, m_orderInsert_Id, sizeof(OrderIDType));
@@ -1184,6 +1186,7 @@ void CTraderApi::OnOrder(DFITCOrderRtnField *pOrder)
 			pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
 
 			strcpy(pField->ID, orderId);
+			strcpy(pField->LocalID, pField->ID);
 			strcpy(pField->InstrumentID, pOrder->instrumentID);
 			strcpy(pField->ExchangeID, pOrder->exchangeID);
 			pField->HedgeFlag = DFITCSpeculatorType_2_HedgeFlagType(pOrder->speculator);
@@ -1207,6 +1210,7 @@ void CTraderApi::OnOrder(DFITCOrderRtnField *pOrder)
 		{
 			pField = it->second;
 			strcpy(pField->ID, orderId);
+			strcpy(pField->LocalID, pField->ID);
 			//pField->LeavesQty = pOrder->;
 			pField->Price = pOrder->insertPrice;
 			pField->Status = DFITCOrderRtnField_2_OrderStatus(pOrder);

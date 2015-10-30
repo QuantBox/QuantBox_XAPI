@@ -116,7 +116,7 @@ private:
 	//void OnQuote(CUstpFtdcRtnQuoteField *pQuote);
 
 	//检查是否出错
-	bool IsErrorRspInfo(CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
+	bool IsErrorRspInfo(const char* szSource, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
 	bool IsErrorRspInfo(CUstpFtdcRspInfoField *pRspInfo);//不输出信息
 
 	//连接

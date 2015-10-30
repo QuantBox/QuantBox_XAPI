@@ -94,7 +94,7 @@ void CLevel2UserApi::Register(void* pCallback, void* pClass)
 	}
 }
 
-bool CLevel2UserApi::IsErrorRspInfo_Output(struct ErrorRtnField * pErrorField)
+bool CLevel2UserApi::IsErrorRspInfo_Output(const char* szSource, struct ErrorRtnField * pErrorField)
 {
 	bool bRet = ((pErrorField) && (pErrorField->ErrorID != 0));
 	if (bRet)
@@ -103,6 +103,7 @@ bool CLevel2UserApi::IsErrorRspInfo_Output(struct ErrorRtnField * pErrorField)
 
 		pField->ErrorID = pErrorField->ErrorID;
 		strcpy(pField->ErrorMsg, pErrorField->ErrorMsg);
+		strcpy(pField->Source, szSource);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -342,22 +343,22 @@ void CLevel2UserApi::UnsubscribeAll()
 
 void CLevel2UserApi::OnRspSubscribeMarketData(struct ErrorRtnField * pErrorField)
 {
-	IsErrorRspInfo_Output(pErrorField);
+	IsErrorRspInfo_Output("OnRspSubscribeMarketData", pErrorField);
 }
 
 void CLevel2UserApi::OnRspUnSubscribeMarketData(struct ErrorRtnField * pErrorField)
 {
-	IsErrorRspInfo_Output(pErrorField);
+	IsErrorRspInfo_Output("OnRspUnSubscribeMarketData", pErrorField);
 }
 
 void CLevel2UserApi::OnRspSubscribeAll(struct ErrorRtnField * pErrorField)
 {
-	IsErrorRspInfo_Output(pErrorField);
+	IsErrorRspInfo_Output("OnRspSubscribeAll", pErrorField);
 }
 
 void CLevel2UserApi::OnRspUnSubscribeAll(struct ErrorRtnField * pErrorField)
 {
-	IsErrorRspInfo_Output(pErrorField);
+	IsErrorRspInfo_Output("OnRspUnSubscribeAll", pErrorField);
 }
 
 void CLevel2UserApi::OnBestAndDeep(MDBestAndDeep * const pQuote)

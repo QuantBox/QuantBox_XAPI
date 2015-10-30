@@ -120,7 +120,7 @@ private:
 	void OnTrade(TradeField *pTrade, bool bFromQry);
 
 	//检查是否出错
-	bool IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
+	bool IsErrorRspInfo(const char* szSource, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
 	bool IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo);//不输出信息
 
 	//连接

@@ -137,8 +137,8 @@ CZC
     {
         public static string ToFormattedString([In]this ErrorField field)
         {
-            return string.Format("[ErrorID={0},ErrorMsg={1}]",
-                field.ErrorID, field.ErrorMsg());
+            return string.Format("[ErrorID={0};ErrorMsg={1};Source={2}]",
+                field.ErrorID, field.ErrorMsg(), field.Source);
         }
 
         public static string ToFormattedString([In]this OrderField field)
@@ -167,13 +167,13 @@ CZC
         {
             return string.Format("[InstrumentID={0};ExchangeID={1};"
                 + "AskPrice={2};AskQty={3};BidPrice={4};BidQty={5};"
-                + "ID={6};AskOrderID={7};BidOrderID={8};"
-                + "Status={9};ExecType={10};"
-                + "ErrorID={11};Text={12};"
-                + "AskOpenClose={13};AskHedgeFlag={14};BidOpenClose={15};BidHedgeFlag={16}]",
+                + "LocalID={6};ID={7};AskOrderID={8};BidOrderID={9};"
+                + "Status={10};ExecType={11};"
+                + "ErrorID={12};Text={13};"
+                + "AskOpenClose={14};AskHedgeFlag={15};BidOpenClose={16};BidHedgeFlag={17}]",
                 field.InstrumentID, field.ExchangeID,
                 field.AskPrice, field.AskQty, field.BidPrice, field.BidQty,
-                field.ID,field.AskOrderID,field.BidOrderID,
+                field.LocalID,field.ID,field.AskOrderID,field.BidOrderID,
                 Enum<OrderStatus>.ToString(field.Status), Enum<ExecType>.ToString(field.ExecType),
                 field.ErrorID, field.Text(),
                 Enum<OpenCloseType>.ToString(field.AskOpenClose), Enum<HedgeFlagType>.ToString(field.AskHedgeFlag), Enum<OpenCloseType>.ToString(field.BidOpenClose), Enum<HedgeFlagType>.ToString(field.BidHedgeFlag));

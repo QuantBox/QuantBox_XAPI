@@ -279,7 +279,7 @@ void CTraderApi::Register(void* pCallback, void* pClass)
 	}
 }
 
-bool CTraderApi::IsErrorRspInfo(STRspMsg *pRspInfo, int nRequestID, bool bIsLast)
+bool CTraderApi::IsErrorRspInfo(const char* szSource, STRspMsg *pRspInfo, int nRequestID, bool bIsLast)
 {
 	bool bRet = ((pRspInfo) && (pRspInfo->error_no != 0));
 	if (bRet)
@@ -288,6 +288,7 @@ bool CTraderApi::IsErrorRspInfo(STRspMsg *pRspInfo, int nRequestID, bool bIsLast
 
 		pField->ErrorID = pRspInfo->error_no;
 		strcpy(pField->ErrorMsg, pRspInfo->msg);
+		strcpy(pField->Source, szSource);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, bIsLast, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}

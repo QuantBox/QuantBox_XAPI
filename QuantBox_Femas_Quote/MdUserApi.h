@@ -72,7 +72,7 @@ private:
 	virtual void OnRtnDepthMarketData(CUstpFtdcDepthMarketDataField *pDepthMarketData);
 
 	//检查是否出错
-	bool IsErrorRspInfo(CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//将出错消息送到消息队列
+	bool IsErrorRspInfo(const char* szSource, CUstpFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//将出错消息送到消息队列
 	bool IsErrorRspInfo(CUstpFtdcRspInfoField *pRspInfo);//不送出错消息
 
 private:

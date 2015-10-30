@@ -121,7 +121,7 @@ CTraderApi::~CTraderApi(void)
 	Disconnect();
 }
 
-bool CTraderApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+bool CTraderApi::IsErrorRspInfo(const char* szSource, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	bool bRet = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bRet)
@@ -130,6 +130,7 @@ bool CTraderApi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo, int nRequestID
 
 		pField->ErrorID = pRspInfo->ErrorID;
 		strcpy(pField->ErrorMsg, pRspInfo->ErrorMsg);
+		strcpy(pField->Source, szSource);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, bIsLast, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -557,6 +558,7 @@ int CTraderApi::ReqOrderInsert(
 			OrderField* pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
 			memcpy(pField, pOrder, sizeof(OrderField));
 			strcpy(pField->ID, m_orderInsert_Id);
+			strcpy(pField->LocalID, pField->ID);
 			m_id_platform_order.insert(pair<string, OrderField*>(m_orderInsert_Id, pField));
 
 		}
@@ -576,7 +578,7 @@ void CTraderApi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThost
 	}
 	else
 	{
-		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+		IsErrorRspInfo("OnRspOrderInsert", pRspInfo, nRequestID, bIsLast);
 	}
 
 	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
@@ -608,7 +610,7 @@ void CTraderApi::OnErrRtnOrderInsert(CThostFtdcInputOrderField *pInputOrder, CTh
 	}
 	else
 	{
-		IsErrorRspInfo(pRspInfo, 0, true);
+		IsErrorRspInfo("OnErrRtnOrderInsert", pRspInfo, 0, true);
 	}
 
 	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
@@ -700,7 +702,7 @@ void CTraderApi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAc
 	}
 	else
 	{
-		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+		IsErrorRspInfo("OnRspOrderAction", pRspInfo, nRequestID, bIsLast);
 	}
 
 	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
@@ -715,6 +717,7 @@ void CTraderApi::OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAc
 		// 得使用上次的状态
 		OrderField* pField = it->second;
 		strcpy(pField->ID, orderId);
+		strcpy(pField->LocalID, pField->ID);
 		pField->ExecType = ExecType::ExecCancelReject;
 		pField->ErrorID = pRspInfo->ErrorID;
 		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
@@ -731,7 +734,7 @@ void CTraderApi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, C
 	}
 	else
 	{
-		IsErrorRspInfo(pRspInfo, 0, true);
+		IsErrorRspInfo("OnErrRtnOrderAction", pRspInfo, 0, true);
 	}
 
 	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
@@ -746,6 +749,7 @@ void CTraderApi::OnErrRtnOrderAction(CThostFtdcOrderActionField *pOrderAction, C
 		// 得使用上次的状态
 		OrderField* pField = it->second;
 		strcpy(pField->ID, orderId);
+		strcpy(pField->LocalID, pField->ID);
 		pField->ExecType = ExecType::ExecCancelReject;
 		pField->ErrorID = pRspInfo->ErrorID;
 		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
@@ -827,6 +831,7 @@ char* CTraderApi::ReqQuoteInsert(
 			QuoteField* pField = (QuoteField*)m_msgQueue->new_block(sizeof(QuoteField));
 			memcpy(pField, pQuote, sizeof(QuoteField));
 			strcpy(pField->ID, m_orderInsert_Id);
+			strcpy(pField->LocalID, pField->ID);
 			strcpy(pField->AskID, m_orderInsert_Id);
 			sprintf(pField->BidID, "%d:%d:%d", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, nRet + 1);
 
@@ -847,7 +852,7 @@ void CTraderApi::OnRspQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CThost
 	}
 	else
 	{
-		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+		IsErrorRspInfo("OnRspQuoteInsert", pRspInfo, nRequestID, bIsLast);
 	}
 
 	unordered_map<string, QuoteField*>::iterator it = m_id_platform_quote.find(quoteId);
@@ -879,7 +884,7 @@ void CTraderApi::OnErrRtnQuoteInsert(CThostFtdcInputQuoteField *pInputQuote, CTh
 	}
 	else
 	{
-		IsErrorRspInfo(pRspInfo, 0, true);
+		IsErrorRspInfo("OnErrRtnQuoteInsert", pRspInfo, 0, true);
 	}
 
 	unordered_map<string, QuoteField*>::iterator it = m_id_platform_quote.find(quoteId);
@@ -971,7 +976,7 @@ void CTraderApi::OnRspQuoteAction(CThostFtdcInputQuoteActionField *pInputQuoteAc
 	}
 	else
 	{
-		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+		IsErrorRspInfo("OnRspQuoteAction", pRspInfo, nRequestID, bIsLast);
 	}
 
 	unordered_map<string, QuoteField*>::iterator it = m_id_platform_quote.find(quoteId);
@@ -986,6 +991,7 @@ void CTraderApi::OnRspQuoteAction(CThostFtdcInputQuoteActionField *pInputQuoteAc
 		// 得使用上次的状态
 		QuoteField* pField = it->second;
 		strcpy(pField->ID, quoteId);
+		strcpy(pField->LocalID, pField->ID);
 		//sprintf(pField->AskID, "%d:%d:%s", pInputQuoteAction->FrontID, pInputQuoteAction->SessionID, pInputQuoteAction->);
 		//sprintf(pField->BidID, "%d:%d:%s", pInputQuoteAction->FrontID, pInputQuoteAction->SessionID, pInputQuoteAction->QuoteRef);
 		pField->ExecType = ExecType::ExecCancelReject;
@@ -1005,7 +1011,7 @@ void CTraderApi::OnErrRtnQuoteAction(CThostFtdcQuoteActionField *pQuoteAction, C
 	}
 	else
 	{
-		IsErrorRspInfo(pRspInfo, 0, true);
+		IsErrorRspInfo("OnErrRtnQuoteAction", pRspInfo, 0, true);
 	}
 
 	unordered_map<string, QuoteField*>::iterator it = m_id_platform_quote.find(quoteId);
@@ -1020,6 +1026,7 @@ void CTraderApi::OnErrRtnQuoteAction(CThostFtdcQuoteActionField *pQuoteAction, C
 		// 得使用上次的状态
 		QuoteField* pField = it->second;
 		strcpy(pField->ID, quoteId);
+		strcpy(pField->LocalID, pField->ID);
 		pField->ExecType = ExecType::ExecCancelReject;
 		pField->ErrorID = pRspInfo->ErrorID;
 		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
@@ -1045,7 +1052,7 @@ int CTraderApi::_ReqQryTradingAccount(char type, void* pApi1, void* pApi2, doubl
 
 void CTraderApi::OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	if (!IsErrorRspInfo("OnRspQryTradingAccount", pRspInfo, nRequestID, bIsLast))
 	{
 		if (pTradingAccount)
 		{
@@ -1092,7 +1099,7 @@ int CTraderApi::_ReqQryInvestorPosition(char type, void* pApi1, void* pApi2, dou
 // 对于上期所，目前没条件测，当成是也只有两条
 void CTraderApi::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	if (!IsErrorRspInfo("OnRspQryInvestorPosition", pRspInfo, nRequestID, bIsLast))
 	{
 		if (pInvestorPosition)
 		{
@@ -1161,7 +1168,7 @@ int CTraderApi::_ReqQryInstrument(char type, void* pApi1, void* pApi2, double do
 
 void CTraderApi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	if (!IsErrorRspInfo("OnRspQryInstrument", pRspInfo, nRequestID, bIsLast))
 	{
 		if (pInstrument)
 		{
@@ -1255,7 +1262,7 @@ void CTraderApi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, CTho
 
 void CTraderApi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+	IsErrorRspInfo("OnRspError", pRspInfo, nRequestID, bIsLast);
 }
 
 void CTraderApi::ReqQryOrder()
@@ -1317,6 +1324,7 @@ void CTraderApi::OnOrder(CThostFtdcOrderField *pOrder)
 			// 开盘时发单信息还没有，所以找不到对应的单子，需要进行Order的恢复
 			pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
 			strcpy(pField->ID, orderId);
+			strcpy(pField->LocalID, pField->ID);
 			strcpy(pField->InstrumentID, pOrder->InstrumentID);
 			strcpy(pField->ExchangeID, pOrder->ExchangeID);
 			pField->HedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pOrder->CombHedgeFlag[0]);
@@ -1340,6 +1348,7 @@ void CTraderApi::OnOrder(CThostFtdcOrderField *pOrder)
 		{
 			pField = it->second;
 			strcpy(pField->ID, orderId);
+			strcpy(pField->LocalID, pField->ID);
 			pField->LeavesQty = pOrder->VolumeTotal;
 			pField->Price = pOrder->LimitPrice;
 			pField->Status = CThostFtdcOrderField_2_OrderStatus(pOrder);
@@ -1354,7 +1363,7 @@ void CTraderApi::OnOrder(CThostFtdcOrderField *pOrder)
 
 void CTraderApi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	if (!IsErrorRspInfo("OnRspQryOrder", pRspInfo, nRequestID, bIsLast))
 	{
 		OnOrder(pOrder);
 	}
@@ -1484,7 +1493,7 @@ void CTraderApi::OnTrade(TradeField *pTrade)
 
 void CTraderApi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	if (!IsErrorRspInfo("OnRspQryTrade", pRspInfo, nRequestID, bIsLast))
 	{
 		OnTrade(pTrade);
 	}
@@ -1565,6 +1574,7 @@ void CTraderApi::OnQuote(CThostFtdcQuoteField *pQuote)
 			pField->BidHedgeFlag = TThostFtdcHedgeFlagType_2_HedgeFlagType(pQuote->BidHedgeFlag);
 
 			strcpy(pField->ID, quoteId);
+			strcpy(pField->LocalID, pField->ID);
 			strcpy(pField->AskOrderID, pQuote->AskOrderSysID);
 			strcpy(pField->BidOrderID, pQuote->BidOrderSysID);
 
@@ -1583,6 +1593,7 @@ void CTraderApi::OnQuote(CThostFtdcQuoteField *pQuote)
 			pField = it->second;
 
 			strcpy(pField->ID, quoteId);
+			strcpy(pField->LocalID, pField->ID);
 			strcpy(pField->AskOrderID, pQuote->AskOrderSysID);
 			strcpy(pField->BidOrderID, pQuote->BidOrderSysID);
 
@@ -1598,7 +1609,7 @@ void CTraderApi::OnQuote(CThostFtdcQuoteField *pQuote)
 
 void CTraderApi::OnRspQryQuote(CThostFtdcQuoteField *pQuote, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	if (!IsErrorRspInfo("OnRspQryQuote", pRspInfo, nRequestID, bIsLast))
 	{
 		OnQuote(pQuote);
 	}
@@ -1626,7 +1637,7 @@ int CTraderApi::_ReqQryInvestor(char type, void* pApi1, void* pApi2, double doub
 
 void CTraderApi::OnRspQryInvestor(CThostFtdcInvestorField *pInvestor, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast))
+	if (!IsErrorRspInfo("OnRspQryInvestor", pRspInfo, nRequestID, bIsLast))
 	{
 		if (pInvestor)
 		{

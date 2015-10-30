@@ -59,6 +59,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>..\include\ApiHeader.def</ModuleDefinitionFile>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(TargetPath)"  "$(SolutionDir)XAPI\Tdx\x86\" /Y
+xcopy "$(SolutionDir)include\Tdx\win32\*.dll"  "$(SolutionDir)XAPI\Tdx\x86\" /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

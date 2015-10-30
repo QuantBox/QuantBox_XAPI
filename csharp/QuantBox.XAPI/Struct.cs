@@ -94,6 +94,11 @@ namespace QuantBox.XAPI
         /// </summary>
         public int ErrorID;
         /// <summary>
+        /// 信息来源
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 64)]
+        public byte[] Source;
+        /// <summary>
         /// 错误信息
         /// </summary>
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 256)]
@@ -513,6 +518,8 @@ namespace QuantBox.XAPI
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
         public string QuoteReqID;
 
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string LocalID;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
         public string ID;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]

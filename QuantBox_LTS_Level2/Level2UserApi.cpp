@@ -113,7 +113,7 @@ void CLevel2UserApi::Register(void* pCallback, void* pClass)
 	}
 }
 
-bool CLevel2UserApi::IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+bool CLevel2UserApi::IsErrorRspInfo(const char* szSource, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	bool bRet = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bRet)
@@ -122,6 +122,7 @@ bool CLevel2UserApi::IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo, int nRe
 
 		pField->ErrorID = pRspInfo->ErrorID;
 		strcpy(pField->ErrorMsg, pRspInfo->ErrorMsg);
+		strcpy(pField->Source, szSource);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, bIsLast, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -323,7 +324,7 @@ void CLevel2UserApi::OnRspUserLogin(CSecurityFtdcUserLoginField *pUserLogin, CSe
 
 void CLevel2UserApi::OnRspError(CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+	IsErrorRspInfo("OnRspError", pRspInfo, nRequestID, bIsLast);
 }
 
 char* GetSetFromString_Index_Stock(const char* szString, const char* seps,
@@ -593,7 +594,7 @@ void CLevel2UserApi::Subscribe(const set<string>& instrumentIDs, const string& s
 void CLevel2UserApi::OnRspSubL2MarketData(CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	//在模拟平台可能这个函数不会触发，所以要自己维护一张已经订阅的合约列表
-	if(!IsErrorRspInfo(pRspInfo,nRequestID,bIsLast)
+	if (!IsErrorRspInfo("OnRspSubL2MarketData", pRspInfo, nRequestID, bIsLast)
 		&& pSpecificInstrument)
 	{
 		lock_guard<mutex> cl(m_csMapIDs);
@@ -613,7 +614,7 @@ void CLevel2UserApi::OnRspSubL2MarketData(CSecurityFtdcSpecificInstrumentField *
 void CLevel2UserApi::OnRspUnSubL2MarketData(CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	//模拟平台可能这个函数不会触发
-	if(!IsErrorRspInfo(pRspInfo,nRequestID,bIsLast)
+	if (!IsErrorRspInfo("OnRspUnSubL2MarketData", pRspInfo, nRequestID, bIsLast)
 		&& pSpecificInstrument)
 	{
 		lock_guard<mutex> cl(m_csMapIDs);
@@ -855,7 +856,7 @@ void CLevel2UserApi::OnRtnL2MarketData(CSecurityFtdcL2MarketDataField *pL2Market
 void CLevel2UserApi::OnRspSubL2Index(CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	//在模拟平台可能这个函数不会触发，所以要自己维护一张已经订阅的合约列表
-	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast)
+	if (!IsErrorRspInfo("OnRspSubL2Index", pRspInfo, nRequestID, bIsLast)
 		&& pSpecificInstrument)
 	{
 		lock_guard<mutex> cl(m_csMapIDs);
@@ -875,7 +876,7 @@ void CLevel2UserApi::OnRspSubL2Index(CSecurityFtdcSpecificInstrumentField *pSpec
 void CLevel2UserApi::OnRspUnSubL2Index(CSecurityFtdcSpecificInstrumentField *pSpecificInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	//模拟平台可能这个函数不会触发
-	if (!IsErrorRspInfo(pRspInfo, nRequestID, bIsLast)
+	if (!IsErrorRspInfo("OnRspUnSubL2Index", pRspInfo, nRequestID, bIsLast)
 		&& pSpecificInstrument)
 	{
 		lock_guard<mutex> cl(m_csMapIDs);

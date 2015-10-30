@@ -44,6 +44,7 @@ struct QuoteField
 	///询价编号
 	OrderIDType	QuoteReqID;
 
+	OrderIDType LocalID;
 	OrderIDType ID;
 	OrderIDType AskID;
 	OrderIDType BidID;
@@ -148,6 +149,8 @@ struct ErrorField
 {
 	// 错误代码
 	ErrorIDType	ErrorID;
+	// 消息来源
+	SourceType	Source;
 	// 错误信息
 	ErrorMsgType	ErrorMsg;
 };

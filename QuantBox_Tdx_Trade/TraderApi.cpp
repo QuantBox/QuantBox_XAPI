@@ -99,7 +99,7 @@ void CTraderApi::OutputQueryTime(time_t t,double db)
 	ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
 
 	pField->ErrorID = 0;
-	sprintf(pField->ErrorMsg, "Time:%s,Add:%d", ctime(&t), db);
+	sprintf(pField->ErrorMsg, "Time:%s,Add:%d", ctime(&t), (int)db);
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 }
@@ -181,7 +181,7 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 
 		// 查列表，这样就不会一下单就
 		ReqQryOrder();
-		ReqQryTrade();
+		//ReqQryTrade();
 		
 		// 测试用
 		m_msgQueue_Test->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue_Test, this, 0, 0, nullptr, 0, nullptr, 0, nullptr, 0);
@@ -229,7 +229,7 @@ int CTraderApi::_ReqQryInvestor(char type, void* pApi1, void* pApi2, double doub
 
 	m_pApi->ReqQueryData(REQUEST_GDLB, &ppFieldInfos, &ppResults, &pErr);
 
-	if (!IsErrorRspInfo(pErr))
+	if (!IsErrorRspInfo("ReqQryInvestor", pErr))
 	{
 		if (ppResults)
 		{
@@ -304,7 +304,7 @@ void CTraderApi::Register(void* pCallback, void* pClass)
 	}
 }
 
-bool CTraderApi::IsErrorRspInfo(Error_STRUCT *pRspInfo)
+bool CTraderApi::IsErrorRspInfo(const char* szSource, Error_STRUCT *pRspInfo)
 {
 	bool bRet = ((pRspInfo) && (pRspInfo->ErrType != 0));
 	if (bRet)
@@ -313,6 +313,7 @@ bool CTraderApi::IsErrorRspInfo(Error_STRUCT *pRspInfo)
 
 		pField->ErrorID = pRspInfo->ErrCode;
 		strcpy(pField->ErrorMsg, pRspInfo->ErrInfo);
+		strcpy(pField->Source, szSource);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -754,18 +755,18 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 		if (!IsUpdated)
 		{
 			// 没有更新，是否要慢点查
-			_queryTime = 0.5 * QUERY_TIME_MAX + QUERY_TIME_MAX;
+			_queryTime = 0.5 * QUERY_TIME_MAX + QUERY_TIME_MIN;
 		}
 		// 有没有完成的，需要定时查询
 		if (IsNotSent)
 		{
 			// 有没申报的，是否没在交易时间？慢点查
-			_queryTime = 0.5 * QUERY_TIME_MAX + QUERY_TIME_MAX;
+			_queryTime = 0.5 * QUERY_TIME_MAX + QUERY_TIME_MIN;
 		}
 		else
 		{
 			// 交易时间了，是否需要考虑
-			_queryTime = QUERY_TIME_MIN;
+			_queryTime = 2 * QUERY_TIME_MIN;
 		}
 	}
 	else

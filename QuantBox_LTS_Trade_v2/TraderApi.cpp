@@ -112,7 +112,7 @@ CTraderApi::~CTraderApi(void)
 	Disconnect();
 }
 
-bool CTraderApi::IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+bool CTraderApi::IsErrorRspInfo(const char* szSource, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	bool bRet = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (bRet)
@@ -121,6 +121,7 @@ bool CTraderApi::IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo, int nReques
 
 		pField->ErrorID = pRspInfo->ErrorID;
 		strcpy(pField->ErrorMsg, pRspInfo->ErrorMsg);
+		strcpy(pField->Source, szSource);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, bIsLast, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -460,6 +461,7 @@ int CTraderApi::ReqOrderInsert(
 			OrderField* pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
 			memcpy(pField, pOrder, sizeof(OrderField));
 			strcpy(pField->ID, m_orderInsert_Id);
+			strcpy(pField->LocalID, pField->ID);
 			m_id_platform_order.insert(pair<string, OrderField*>(m_orderInsert_Id, pField));
 		}
 		strncpy((char*)pInOut, m_orderInsert_Id, sizeof(OrderIDType));
@@ -477,7 +479,7 @@ void CTraderApi::OnRspOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, CSe
 	}
 	else
 	{
-		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+		IsErrorRspInfo("OnRspOrderInsert", pRspInfo, nRequestID, bIsLast);
 	}
 
 	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
@@ -492,6 +494,7 @@ void CTraderApi::OnRspOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, CSe
 		// 得使用上次的状态
 		OrderField* pField = it->second;
 		strcpy(pField->ID, orderId);
+		strcpy(pField->LocalID, pField->ID);
 		pField->ExecType = ExecType::ExecRejected;
 		pField->Status = OrderStatus::Rejected;
 		pField->ErrorID = pRspInfo->ErrorID;
@@ -509,7 +512,7 @@ void CTraderApi::OnErrRtnOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, 
 	}
 	else
 	{
-		IsErrorRspInfo(pRspInfo, 0, true);
+		IsErrorRspInfo("OnErrRtnOrderInsert", pRspInfo, 0, true);
 	}
 
 	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
@@ -525,6 +528,7 @@ void CTraderApi::OnErrRtnOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, 
 		// 得使用上次的状态
 		OrderField* pField = it->second;
 		strcpy(pField->ID, orderId);
+		strcpy(pField->LocalID, pField->ID);
 		pField->ExecType = ExecType::ExecRejected;
 		pField->Status = OrderStatus::Rejected;
 		pField->ErrorID = pRspInfo->ErrorID;
@@ -602,7 +606,7 @@ void CTraderApi::OnRspOrderAction(CSecurityFtdcInputOrderActionField *pInputOrde
 	}
 	else
 	{
-		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+		IsErrorRspInfo("OnRspOrderAction", pRspInfo, nRequestID, bIsLast);
 	}
 
 	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
@@ -632,7 +636,7 @@ void CTraderApi::OnErrRtnOrderAction(CSecurityFtdcOrderActionField *pOrderAction
 	}
 	else
 	{
-		IsErrorRspInfo(pRspInfo, 0, true);
+		IsErrorRspInfo("OnErrRtnOrderAction", pRspInfo, 0, true);
 	}
 
 	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
@@ -863,7 +867,7 @@ void CTraderApi::OnRtnOrder(CSecurityFtdcOrderField *pOrder)
 
 void CTraderApi::OnRspError(CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+	IsErrorRspInfo("OnRspError", pRspInfo, nRequestID, bIsLast);
 }
 
 //void CTraderApi::ReqQryOrder()
@@ -926,6 +930,7 @@ void CTraderApi::OnOrder(CSecurityFtdcOrderField *pOrder, bool bFromQry)
 			pField = (OrderField*)m_msgQueue->new_block(sizeof(OrderField));
 
 			strcpy(pField->ID, orderId);
+			strcpy(pField->LocalID, pField->ID);
 			strcpy(pField->InstrumentID, pOrder->InstrumentID);
 			strcpy(pField->ExchangeID, pOrder->ExchangeID);
 			pField->HedgeFlag = TSecurityFtdcHedgeFlagType_2_HedgeFlagType(pOrder->CombHedgeFlag[0]);
@@ -949,6 +954,7 @@ void CTraderApi::OnOrder(CSecurityFtdcOrderField *pOrder, bool bFromQry)
 		{
 			pField = it->second;
 			strcpy(pField->ID, orderId);
+			strcpy(pField->LocalID, pField->ID);
 			pField->LeavesQty = pOrder->VolumeTotal;
 			pField->Price = atof(pOrder->LimitPrice);
 			pField->Status = CSecurityFtdcOrderField_2_OrderStatus(pOrder);

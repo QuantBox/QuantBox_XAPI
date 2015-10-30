@@ -23,8 +23,8 @@
 #include <thread>
 #include <unordered_map>
 
-#define QUERY_TIME_MIN	3
-#define QUERY_TIME_MAX	60;
+#define QUERY_TIME_MIN	(3)
+#define QUERY_TIME_MAX	(60)
 
 using namespace std;
 
@@ -141,7 +141,7 @@ private:
 
 	//检查是否出错
 	//bool IsErrorRspInfo(Error_STRUCT *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
-	bool IsErrorRspInfo(Error_STRUCT *pRspInfo);//不输出信息
+	bool IsErrorRspInfo(const char* szSource, Error_STRUCT *pRspInfo);//不输出信息
 	void OutputQueryTime(time_t t, double db);
 
 	////连接

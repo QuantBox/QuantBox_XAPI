@@ -105,7 +105,7 @@ ConfigInfoField* CMdUserApi::Config(ConfigInfoField* pConfigInfo)
 	return nullptr;
 }
 
-bool CMdUserApi::IsErrorRspInfo_Output(struct DFITCErrorRtnField *pRspInfo)
+bool CMdUserApi::IsErrorRspInfo_Output(const char* szSource, struct DFITCErrorRtnField *pRspInfo)
 {
 	bool bRet = ((pRspInfo) && (pRspInfo->nErrorID != 0));
 	if (bRet)
@@ -114,6 +114,7 @@ bool CMdUserApi::IsErrorRspInfo_Output(struct DFITCErrorRtnField *pRspInfo)
 
 		pField->ErrorID = pRspInfo->nErrorID;
 		strcpy(pField->ErrorMsg, pRspInfo->errorMsg);
+		strcpy(pField->Source, szSource);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -448,13 +449,13 @@ void CMdUserApi::OnRspUserLogin(struct DFITCUserLoginInfoRtnField * pRspUserLogi
 
 void CMdUserApi::OnRspError(struct DFITCErrorRtnField *pRspInfo)
 {
-	IsErrorRspInfo_Output(pRspInfo);
+	IsErrorRspInfo_Output("OnRspError",pRspInfo);
 }
 
 void CMdUserApi::OnRspSubMarketData(struct DFITCSpecificInstrumentField * pSpecificInstrument, struct DFITCErrorRtnField * pRspInfo)
 {
 	//在模拟平台可能这个函数不会触发，所以要自己维护一张已经订阅的合约列表
-	if(!IsErrorRspInfo(pRspInfo)
+	if (!IsErrorRspInfo_Output("OnRspSubMarketData", pRspInfo)
 		&&pSpecificInstrument)
 	{
 		lock_guard<mutex> cl(m_csMapInstrumentIDs);
@@ -466,7 +467,7 @@ void CMdUserApi::OnRspSubMarketData(struct DFITCSpecificInstrumentField * pSpeci
 void CMdUserApi::OnRspUnSubMarketData(struct DFITCSpecificInstrumentField * pSpecificInstrument, struct DFITCErrorRtnField * pRspInfo)
 {
 	//模拟平台可能这个函数不会触发
-	if(!IsErrorRspInfo(pRspInfo)
+	if (!IsErrorRspInfo_Output("OnRspUnSubMarketData", pRspInfo)
 		&&pSpecificInstrument)
 	{
 		lock_guard<mutex> cl(m_csMapInstrumentIDs);

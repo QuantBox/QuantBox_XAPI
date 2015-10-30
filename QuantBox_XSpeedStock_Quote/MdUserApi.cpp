@@ -119,7 +119,7 @@ ConfigInfoField* CMdUserApi::Config(ConfigInfoField* pConfigInfo)
 	return nullptr;
 }
 
-bool CMdUserApi::IsErrorRspInfo_Output(struct DFITCSECRspInfoField *pRspInfo)
+bool CMdUserApi::IsErrorRspInfo_Output(const char* szSource, struct DFITCSECRspInfoField *pRspInfo)
 {
 	bool bRet = ((pRspInfo) && (pRspInfo->errorID != 0));
 	
@@ -129,6 +129,7 @@ bool CMdUserApi::IsErrorRspInfo_Output(struct DFITCSECRspInfoField *pRspInfo)
 
 		pField->ErrorID = pRspInfo->errorID;
 		strcpy(pField->ErrorMsg, pRspInfo->errorMsg);
+		strcpy(pField->Source, szSource);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 	}
@@ -416,13 +417,13 @@ void CMdUserApi::OnRspStockUserLogin(struct DFITCSECRspUserLoginField * pRspUser
 
 void CMdUserApi::OnRspError(struct DFITCSECRspInfoField *pRspInfo)
 {
-	IsErrorRspInfo_Output(pRspInfo);
+	IsErrorRspInfo_Output("OnRspError", pRspInfo);
 }
 
 void CMdUserApi::OnRspStockSubMarketData(struct DFITCSECSpecificInstrumentField * pSpecificInstrument, struct DFITCSECRspInfoField * pRspInfo)
 {
 	//在模拟平台可能这个函数不会触发，所以要自己维护一张已经订阅的合约列表
-	if (!IsErrorRspInfo_Output(pRspInfo)
+	if (!IsErrorRspInfo_Output("OnRspStockSubMarketData", pRspInfo)
 		&& pSpecificInstrument)
 	{
 		lock_guard<mutex> cl(m_csMapInstrumentIDs);
@@ -442,7 +443,7 @@ void CMdUserApi::OnRspStockSubMarketData(struct DFITCSECSpecificInstrumentField 
 void CMdUserApi::OnRspStockUnSubMarketData(struct DFITCSECSpecificInstrumentField * pSpecificInstrument, struct DFITCSECRspInfoField * pRspInfo)
 {
 	//模拟平台可能这个函数不会触发
-	if (!IsErrorRspInfo_Output(pRspInfo)
+	if (!IsErrorRspInfo_Output("OnRspStockUnSubMarketData", pRspInfo)
 		&& pSpecificInstrument)
 	{
 		lock_guard<mutex> cl(m_csMapInstrumentIDs);
@@ -600,7 +601,7 @@ int CMdUserApi::_ReqStockAvailableQuotQry(char type, void* pApi1, void* pApi2, d
 
 void CMdUserApi::OnRspStockAvailableQuot(struct DFITCRspQuotQryField * pAvailableQuotInfo, struct DFITCSECRspInfoField * pRspInfo, bool flag)
 {
-	if (!IsErrorRspInfo(pRspInfo))
+	if (!IsErrorRspInfo_Output("OnRspStockAvailableQuot", pRspInfo))
 	{
 		if (pAvailableQuotInfo)
 		{
