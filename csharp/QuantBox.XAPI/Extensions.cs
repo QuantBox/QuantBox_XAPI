@@ -39,6 +39,11 @@ namespace QuantBox.XAPI
             return PInvokeUtility.GetUnicodeString(field.ErrorMsg);
         }
 
+        public static string Source([In]this ErrorField field)
+        {
+            return PInvokeUtility.GetUnicodeString(field.Source);
+        }
+
         public static string InvestorName([In]this InvestorField field)
         {
             return PInvokeUtility.GetUnicodeString(field.InvestorName);
@@ -138,7 +143,7 @@ CZC
         public static string ToFormattedString([In]this ErrorField field)
         {
             return string.Format("[ErrorID={0};ErrorMsg={1};Source={2}]",
-                field.ErrorID, field.ErrorMsg(), field.Source);
+                field.ErrorID, field.ErrorMsg(), field.Source());
         }
 
         public static string ToFormattedString([In]this OrderField field)
