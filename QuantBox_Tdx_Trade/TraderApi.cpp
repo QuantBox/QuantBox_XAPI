@@ -84,29 +84,26 @@ void CTraderApi::TestInThread(char type, void* pApi1, void* pApi2, double double
 {
 	int iRet = 0;
 
-	while (true)
+	if (time(nullptr)>m_QueryTime)
 	{
-		ReqQryTrade();
-		this_thread::sleep_for(chrono::milliseconds(3000));
 		ReqQryOrder();
-		this_thread::sleep_for(chrono::milliseconds(3000));
+		ReqQryTrade();
 	}
-	
 
-	if (0 == iRet)
-	{
-		//返回成功，填加到已发送池
-		m_nSleep = 1;
-	}
-	else
-	{
-		m_msgQueue_Test->Input_Copy(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
-		//失败，按4的幂进行延时，但不超过1s
-		m_nSleep *= 4;
-		m_nSleep %= 1023;
-	}
-	
+	this_thread::sleep_for(chrono::milliseconds(1000));
+	m_msgQueue_Test->Input_Copy(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 }
+
+void CTraderApi::OutputQueryTime(time_t t,double db)
+{
+	ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
+
+	pField->ErrorID = 0;
+	sprintf(pField->ErrorMsg, "Time:%s,Add:%d", ctime(&t), db);
+
+	m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
+}
+
 
 int CTraderApi::_Init()
 {
@@ -186,7 +183,6 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 		ReqQryOrder();
 		ReqQryTrade();
 		
-
 		// 测试用
 		m_msgQueue_Test->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue_Test, this, 0, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
@@ -515,6 +511,11 @@ int CTraderApi::_ReqOrderInsert(char type, void* pApi1, void* pApi2, double doub
 	if (bSuccess)
 	{
 		// 有挂单的，需要进行查询了
+		
+		double  _queryTime = QUERY_TIME_MIN;
+
+		m_QueryTime = time(nullptr) + _queryTime;
+		OutputQueryTime(m_QueryTime, _queryTime);
 	}
 
 	return 0;
@@ -610,6 +611,10 @@ int CTraderApi::_ReqOrderAction(char type, void* pApi1, void* pApi2, double doub
 	if (bSuccess)
 	{
 		// 需要进行查询了
+		double  _queryTime = QUERY_TIME_MIN;
+
+		m_QueryTime = time(nullptr) + _queryTime;
+		OutputQueryTime(m_QueryTime, _queryTime);
 	}
 
 	return 0;
@@ -743,26 +748,34 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 	DeleteTableBody(ppResults);
 	DeleteError(pErr);
 
+	double _queryTime = 0;
 	if (!IsDone)
 	{
 		if (!IsUpdated)
 		{
 			// 没有更新，是否要慢点查
+			_queryTime = 0.5 * QUERY_TIME_MAX + QUERY_TIME_MAX;
 		}
 		// 有没有完成的，需要定时查询
 		if (IsNotSent)
 		{
 			// 有没申报的，是否没在交易时间？慢点查
+			_queryTime = 0.5 * QUERY_TIME_MAX + QUERY_TIME_MAX;
 		}
 		else
 		{
 			// 交易时间了，是否需要考虑
+			_queryTime = QUERY_TIME_MIN;
 		}
 	}
 	else
 	{
 		// 全完成了，可以不查或慢查
+		_queryTime = 5 * QUERY_TIME_MAX;
 	}
+
+	m_QueryTime = time(nullptr) + _queryTime;
+	OutputQueryTime(m_QueryTime, _queryTime);
 
 	return 0;
 }
