@@ -56,13 +56,13 @@ public:
 
 	void InitDriver(HWND hWnd, UINT Msg);
 	void QuitDriver();
-	//void Subscribe(const string& szInstrumentIDs, const string& szExchageID);
-	//void Unsubscribe(const string& szInstrumentIDs, const string& szExchageID);
+	void Subscribe(const string& szInstrumentIDs, const string& szExchageID);
+	void Unsubscribe(const string& szInstrumentIDs, const string& szExchageID);
 
 	//void SubscribeQuote(const string& szInstrumentIDs, const string& szExchageID);
 	//void UnsubscribeQuote(const string& szInstrumentIDs, const string& szExchageID);
 private:
-	bool FilterExchangeInstrument(WORD wMarket, int instrument);
+	bool FilterExchangeInstrument(WORD wMarket, string instrument);
 
 	void StartThread();
 	void StopThread();
@@ -120,6 +120,8 @@ private:
 	ServerInfoField				m_ServerInfo;
 	UserInfoField				m_UserInfo;
 	int							m_nSleep;
+
+	string						m_Filter;				//合约过滤器
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	//CMsgQueue*					m_msgQueue_Query;
