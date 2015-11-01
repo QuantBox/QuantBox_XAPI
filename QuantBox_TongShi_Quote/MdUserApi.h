@@ -19,6 +19,7 @@
 #include <atomic>
 #include <mutex>
 #include <thread>
+#include <map>
 
 using namespace std;
 
@@ -56,11 +57,11 @@ public:
 
 	void InitDriver(HWND hWnd, UINT Msg);
 	void QuitDriver();
-	void Subscribe(const string& szInstrumentIDs, const string& szExchageID);
-	void Unsubscribe(const string& szInstrumentIDs, const string& szExchageID);
+	void Subscribe(const string& szInstrumentIDs, const string& szExchangeID);
+	void Unsubscribe(const string& szInstrumentIDs, const string& szExchangeID);
 
-	//void SubscribeQuote(const string& szInstrumentIDs, const string& szExchageID);
-	//void UnsubscribeQuote(const string& szInstrumentIDs, const string& szExchageID);
+	//void SubscribeQuote(const string& szInstrumentIDs, const string& szExchangeID);
+	//void UnsubscribeQuote(const string& szInstrumentIDs, const string& szExchangeID);
 private:
 	bool FilterExchangeInstrument(WORD wMarket, string instrument);
 
@@ -84,8 +85,8 @@ private:
 	//int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
 	//订阅行情
-	void Subscribe(const set<string>& instrumentIDs, const string& szExchageID);
-	void SubscribeQuote(const set<string>& instrumentIDs, const string& szExchageID);
+	void Subscribe(const set<string>& instrumentIDs, const string& szExchangeID);
+	void SubscribeQuote(const set<string>& instrumentIDs, const string& szExchangeID);
 
 	//virtual void OnFrontConnected();
 	//virtual void OnFrontDisconnected(int nReason);
@@ -121,7 +122,7 @@ private:
 	UserInfoField				m_UserInfo;
 	int							m_nSleep;
 
-	string						m_Filter;				//合约过滤器
+	map<string,set<string>>		m_DictSet;				//合约集
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	//CMsgQueue*					m_msgQueue_Query;

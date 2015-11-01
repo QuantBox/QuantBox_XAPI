@@ -85,7 +85,6 @@ void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, doubl
 
 CMdUserApi::CMdUserApi(void)
 {
-	m_Filter = "xxxxxx";		// 这样的字符串不可能匹配
 	//m_pApi = nullptr;
 	m_lRequestID = 0;
 	m_nSleep = 1;
@@ -287,18 +286,21 @@ void CMdUserApi::Disconnect()
 	}
 }
 
-void CMdUserApi::Subscribe(const string& szInstrumentIDs, const string& szExchageID)
+void CMdUserApi::Subscribe(const string& szInstrumentIDs, const string& szExchangeID)
 {
 	if (nullptr == m_hThread)
 		return;
-	m_Filter = szInstrumentIDs;
+
+	set<string>& instruments = m_DictSet[szExchangeID];
+	instruments.insert(szInstrumentIDs);
 }
 
-void CMdUserApi::Unsubscribe(const string& szInstrumentIDs, const string& szExchageID)
+void CMdUserApi::Unsubscribe(const string& szInstrumentIDs, const string& szExchangeID)
 {
 	if (nullptr == m_hThread)
 		return;
-	m_Filter = "xxxxxx";
+	set<string>& instruments = m_DictSet[szExchangeID];
+	instruments.erase(szInstrumentIDs);
 }
 
 void CMdUserApi::OnRspQryInstrument(DepthMarketDataNField* _pField,RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count)
@@ -338,10 +340,11 @@ void CMdUserApi::OnRspQryInstrument(DepthMarketDataNField* _pField,RCV_REPORT_ST
 
 bool CMdUserApi::FilterExchangeInstrument(WORD wMarket, string instrument)
 {
-	// 行情太多，需要过滤
-	string ExhangeInstrument = instrument + "." + (wMarket==1 ? "SS" : "SZ");
-	const std::regex pattern(m_Filter);
-	return std::regex_match(ExhangeInstrument, pattern);
+	// 这里我乱写一个，暂时不知道通视对市场的定义
+	string szExchangeID = wMarket == 0 ? "SS" : "SZ";
+	set<string>& instruments = m_DictSet[szExchangeID];
+	set<string>::iterator it = instruments.find(instrument);
+	return it != instruments.end();
 }
 
 //行情回调，得保证此函数尽快返回
