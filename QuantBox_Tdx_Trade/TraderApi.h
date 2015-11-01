@@ -142,7 +142,7 @@ private:
 	//检查是否出错
 	//bool IsErrorRspInfo(Error_STRUCT *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
 	bool IsErrorRspInfo(const char* szSource, Error_STRUCT *pRspInfo);//不输出信息
-	void OutputQueryTime(time_t t, double db);
+	void OutputQueryTime(time_t t, double db,const char* szSource);
 
 	////连接
 	//virtual void OnFrontConnected();
@@ -255,6 +255,7 @@ private:
 	list<OrderField*>			m_OldOrderList;
 	list<OrderField*>			m_NewOrderList;
 
-	time_t						m_QueryTime;
+	time_t						m_QueryTradeTime;
+	time_t						m_QueryOrderTime;
 };
 

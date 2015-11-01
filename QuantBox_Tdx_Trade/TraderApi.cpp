@@ -84,9 +84,23 @@ void CTraderApi::TestInThread(char type, void* pApi1, void* pApi2, double double
 {
 	int iRet = 0;
 
-	if (time(nullptr)>m_QueryTime)
+	if (time(nullptr) > m_QueryOrderTime)
 	{
+		// 这个线程没有完就发起新的查询了吗？
+		double _queryTime = QUERY_TIME_MAX;
+		m_QueryOrderTime = time(nullptr) + _queryTime;
+		OutputQueryTime(m_QueryOrderTime, _queryTime, "QueryOrder");
+
 		ReqQryOrder();
+	}
+
+	if (time(nullptr) > m_QueryTradeTime)
+	{
+		// 这个线程没有完就发起新的查询了吗？
+		double _queryTime = QUERY_TIME_MAX;
+		m_QueryTradeTime = time(nullptr) + _queryTime;
+		OutputQueryTime(m_QueryTradeTime, _queryTime, "QueryTrade");
+
 		ReqQryTrade();
 	}
 
@@ -94,12 +108,13 @@ void CTraderApi::TestInThread(char type, void* pApi1, void* pApi2, double double
 	m_msgQueue_Test->Input_Copy(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 }
 
-void CTraderApi::OutputQueryTime(time_t t,double db)
+void CTraderApi::OutputQueryTime(time_t t, double db, const char* szSource)
 {
 	ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
 
 	pField->ErrorID = 0;
 	sprintf(pField->ErrorMsg, "Time:%s,Add:%d", ctime(&t), (int)db);
+	strcpy(pField->Source, szSource);
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 }
@@ -515,8 +530,8 @@ int CTraderApi::_ReqOrderInsert(char type, void* pApi1, void* pApi2, double doub
 		
 		double  _queryTime = QUERY_TIME_MIN;
 
-		m_QueryTime = time(nullptr) + _queryTime;
-		OutputQueryTime(m_QueryTime, _queryTime);
+		m_QueryOrderTime = time(nullptr) + _queryTime;
+		OutputQueryTime(m_QueryOrderTime, _queryTime, "NextQueryOrder_Send");
 	}
 
 	return 0;
@@ -614,8 +629,8 @@ int CTraderApi::_ReqOrderAction(char type, void* pApi1, void* pApi2, double doub
 		// 需要进行查询了
 		double  _queryTime = QUERY_TIME_MIN;
 
-		m_QueryTime = time(nullptr) + _queryTime;
-		OutputQueryTime(m_QueryTime, _queryTime);
+		m_QueryOrderTime = time(nullptr) + _queryTime;
+		OutputQueryTime(m_QueryOrderTime, _queryTime, "NextQueryOrder_Cancel");
 	}
 
 	return 0;
@@ -775,8 +790,24 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 		_queryTime = 5 * QUERY_TIME_MAX;
 	}
 
-	m_QueryTime = time(nullptr) + _queryTime;
-	OutputQueryTime(m_QueryTime, _queryTime);
+	m_QueryOrderTime = time(nullptr) + _queryTime;
+	OutputQueryTime(m_QueryOrderTime, _queryTime, "NextQueryOrder_QueryOrder");
+
+	if (IsUpdated)
+	{
+		// 委托可能是撤单，也有可能是成交了，赶紧查一下
+		_queryTime = 0;
+		m_QueryTradeTime = time(nullptr) + _queryTime;
+		OutputQueryTime(m_QueryTradeTime, _queryTime, "NextQueryTrade_QueryOrder");
+	}
+	else
+	{
+		// 委托没有变化，那成交就没有必要查那么快了
+		_queryTime = 5 * QUERY_TIME_MAX;
+		m_QueryTradeTime = time(nullptr) + _queryTime;
+		OutputQueryTime(m_QueryTradeTime, _queryTime, "NextQueryTrade_QueryOrder");
+	}
+	
 
 	return 0;
 }
