@@ -658,6 +658,10 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 		double _queryTime = 0.5 * QUERY_TIME_MAX + QUERY_TIME_MIN;
 		m_QueryOrderTime = time(nullptr) + _queryTime;
 		//OutputQueryTime(m_QueryOrderTime, _queryTime, "NextQueryOrder_QueryOrder_Error");
+
+		DeleteTableBody(ppResults);
+		DeleteError(pErr);
+
 		return 0;
 	}
 
