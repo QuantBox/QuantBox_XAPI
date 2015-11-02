@@ -188,6 +188,7 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logined, 0, pField, sizeof(pField), nullptr, 0, nullptr, 0);
 		
+		// 以后支持多账号时这地方要改
 		m_pApi->SetClient(m_pClient);
 		m_pApi->SetAccount(m_UserInfo.UserID);
 
@@ -195,10 +196,10 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 		ReqQryInvestor();
 
 		// 查列表，这样就不会一下单就
-		ReqQryOrder();
+		//ReqQryOrder();
 		//ReqQryTrade();
 		
-		// 测试用
+		// 启动定时查询功能使用
 		m_msgQueue_Test->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue_Test, this, 0, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
 		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Done, 0, nullptr, 0, nullptr, 0, nullptr, 0);
@@ -651,6 +652,14 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 	m_pApi->ReqQueryData(REQUEST_DRWT, &ppFieldInfos, &ppResults, &pErr);
 	// 测试用，事后要删除
 	//m_pApi->ReqQueryData(REQUEST_LSWT, &ppFieldInfos, &ppResults, &pErr, "20150801", "20151031");
+
+	if (IsErrorRspInfo("ReqQryOrder", pErr))
+	{
+		double _queryTime = 0.5 * QUERY_TIME_MAX + QUERY_TIME_MIN;
+		m_QueryOrderTime = time(nullptr) + _queryTime;
+		//OutputQueryTime(m_QueryOrderTime, _queryTime, "NextQueryOrder_QueryOrder_Error");
+		return 0;
+	}
 
 	WTLB_STRUCT** ppRS = nullptr;
 	CharTable2WTLB(ppFieldInfos, ppResults, &ppRS);
