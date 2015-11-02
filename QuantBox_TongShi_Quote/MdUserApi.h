@@ -57,6 +57,15 @@ public:
 
 	void InitDriver(HWND hWnd, UINT Msg);
 	void QuitDriver();
+
+	// 建议的新订阅接口
+#define Subscibe_Regex = 0x00000001,		// 字符串是正则表达式
+#define Subscibe_Last  = 0x00000002,		// 最后一个订阅请求，这时候底层应该把前面所有的订阅请求(如有)综合起来，一起发出
+#define Subscibe_All   = 0x00000004,		// 全部订阅， 此时InstrumentID指明交易所名称
+
+	void Subscribe(const string& InstrumentID, int Flags);
+	void Unsubscribe(const string& InstrumentID, int Flags);
+	
 	void Subscribe(const string& szInstrumentIDs, const string& szExchangeID);
 	void Unsubscribe(const string& szInstrumentIDs, const string& szExchangeID);
 
