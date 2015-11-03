@@ -19,6 +19,7 @@
 #include <atomic>
 #include <mutex>
 #include <thread>
+#include <map>
 
 using namespace std;
 
@@ -56,13 +57,22 @@ public:
 
 	void InitDriver(HWND hWnd, UINT Msg);
 	void QuitDriver();
-	//void Subscribe(const string& szInstrumentIDs, const string& szExchageID);
-	//void Unsubscribe(const string& szInstrumentIDs, const string& szExchageID);
 
-	//void SubscribeQuote(const string& szInstrumentIDs, const string& szExchageID);
-	//void UnsubscribeQuote(const string& szInstrumentIDs, const string& szExchageID);
+	// 建议的新订阅接口
+#define Subscibe_Regex = 0x00000001,		// 字符串是正则表达式
+#define Subscibe_Last  = 0x00000002,		// 最后一个订阅请求，这时候底层应该把前面所有的订阅请求(如有)综合起来，一起发出
+#define Subscibe_All   = 0x00000004,		// 全部订阅， 此时InstrumentID指明交易所名称
+
+	void Subscribe(const string& InstrumentID, int Flags);
+	void Unsubscribe(const string& InstrumentID, int Flags);
+	
+	void Subscribe(const string& szInstrumentIDs, const string& szExchangeID);
+	void Unsubscribe(const string& szInstrumentIDs, const string& szExchangeID);
+
+	//void SubscribeQuote(const string& szInstrumentIDs, const string& szExchangeID);
+	//void UnsubscribeQuote(const string& szInstrumentIDs, const string& szExchangeID);
 private:
-	bool FilterExchangeInstrument(WORD wMarket, int instrument);
+	bool FilterExchangeInstrument(WORD wMarket, string instrument);
 
 	void StartThread();
 	void StopThread();
@@ -84,8 +94,8 @@ private:
 	//int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
 	//订阅行情
-	void Subscribe(const set<string>& instrumentIDs, const string& szExchageID);
-	void SubscribeQuote(const set<string>& instrumentIDs, const string& szExchageID);
+	void Subscribe(const set<string>& instrumentIDs, const string& szExchangeID);
+	void SubscribeQuote(const set<string>& instrumentIDs, const string& szExchangeID);
 
 	//virtual void OnFrontConnected();
 	//virtual void OnFrontDisconnected(int nReason);
@@ -120,6 +130,8 @@ private:
 	ServerInfoField				m_ServerInfo;
 	UserInfoField				m_UserInfo;
 	int							m_nSleep;
+
+	map<string,set<string>>		m_DictSet;				//合约集
 
 	CMsgQueue*					m_msgQueue;				//消息队列指针
 	//CMsgQueue*					m_msgQueue_Query;

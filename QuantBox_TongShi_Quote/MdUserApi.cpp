@@ -21,6 +21,7 @@
 
 #include <mutex>
 #include <vector>
+#include <regex>
 
 #include "resource.h"
 #include "DialogStockDrv.h"
@@ -47,14 +48,10 @@ LRESULT CMdUserApi::_OnMsg(WPARAM wParam, LPARAM lParam)
 												RCV_REPORT_STRUCTEx* pFirst = &pHeader->m_pReport[0];
 												RCV_REPORT_STRUCTEx* pLast = &pHeader->m_pReport[pHeader->m_nPacketNum - 1];
 
-												// 前后都不合要求才跳过
-												if (FilterExchangeInstrument(pFirst->m_wMarket, 0) || FilterExchangeInstrument(pLast->m_wMarket, 0))
+												for (i = 0; i < pHeader->m_nPacketNum; i++)
 												{
-													for (i = 0; i < pHeader->m_nPacketNum; i++)
-													{
-														// 数据处理
-														OnRtnDepthMarketData(&pHeader->m_pReport[i], i, pHeader->m_nPacketNum);
-													}
+													// 数据处理
+													OnRtnDepthMarketData(&pHeader->m_pReport[i], i, pHeader->m_nPacketNum);
 												}
 	}
 		break;
@@ -289,6 +286,23 @@ void CMdUserApi::Disconnect()
 	}
 }
 
+void CMdUserApi::Subscribe(const string& szInstrumentIDs, const string& szExchangeID)
+{
+	if (nullptr == m_hThread)
+		return;
+
+	set<string>& instruments = m_DictSet[szExchangeID];
+	instruments.insert(szInstrumentIDs);
+}
+
+void CMdUserApi::Unsubscribe(const string& szInstrumentIDs, const string& szExchangeID)
+{
+	if (nullptr == m_hThread)
+		return;
+	set<string>& instruments = m_DictSet[szExchangeID];
+	instruments.erase(szInstrumentIDs);
+}
+
 void CMdUserApi::OnRspQryInstrument(DepthMarketDataNField* _pField,RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count)
 {
 	InstrumentField* pField = (InstrumentField*)m_msgQueue->new_block(sizeof(InstrumentField));
@@ -324,20 +338,20 @@ void CMdUserApi::OnRspQryInstrument(DepthMarketDataNField* _pField,RCV_REPORT_ST
 }
 
 
-bool CMdUserApi::FilterExchangeInstrument(WORD wMarket, int instrument)
+bool CMdUserApi::FilterExchangeInstrument(WORD wMarket, string instrument)
 {
-	// 行情太多，需要过滤
-	return (bool)m_msgQueue->Input_Output(ResponeType::OnFilterSubscribe, m_msgQueue, m_pClass, Market_2_ExchangeType(wMarket), 0, nullptr, instrument, nullptr, 0, nullptr, 0);
+	// 这里我乱写一个，暂时不知道通视对市场的定义
+	string szExchangeID = wMarket == 0 ? "SS" : "SZ";
+	set<string>& instruments = m_DictSet[szExchangeID];
+	set<string>::iterator it = instruments.find(instrument);
+	return it != instruments.end();
 }
 
 //行情回调，得保证此函数尽快返回
 void CMdUserApi::OnRtnDepthMarketData(RCV_REPORT_STRUCTEx *pDepthMarketData, int index, int Count)
 {
 	// 把不想要的过滤了，加快速度
-	if (!FilterExchangeInstrument(
-		pDepthMarketData->m_wMarket, 
-		atoi(pDepthMarketData->m_szLabel))
-		)
+	if (!FilterExchangeInstrument(pDepthMarketData->m_wMarket, pDepthMarketData->m_szLabel))
 		return;
 
 	DepthMarketDataNField* pField = (DepthMarketDataNField*)m_msgQueue->new_block(sizeof(DepthMarketDataNField)+sizeof(DepthField)* 10);
