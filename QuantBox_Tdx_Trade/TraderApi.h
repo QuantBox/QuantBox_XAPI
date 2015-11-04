@@ -45,6 +45,8 @@ class CTraderApi
 		E_QryTradingAccountField,
 		E_QryInvestorPositionField,
 
+		E_QryDepthMarketDataField,
+
 
 		E_SettlementInfoConfirmField,
 		E_QryInstrumentField,
@@ -54,7 +56,6 @@ class CTraderApi
 		E_QryInvestorPositionDetailField,
 		E_QryInstrumentCommissionRateField,
 		E_QryInstrumentMarginRateField,
-		E_QryDepthMarketDataField,
 		E_QrySettlementInfoField,
 		E_QryQuoteField,
 	};
@@ -107,6 +108,8 @@ public:
 
 	void ReqQryInvestor();
 
+	void Subscribe(const string& szInstrumentIDs, const string& szExchangeID);
+
 private:
 	//static void __stdcall OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData);
 	//void _OnReadPushData(ETX_APP_FUNCNO FuncNO, void* pEtxPushData);
@@ -134,6 +137,9 @@ private:
 
 	int _ReqQryTradingAccount(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	int _ReqQryInvestorPosition(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+
+	int _Subscribe(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
 
 	//检查是否出错

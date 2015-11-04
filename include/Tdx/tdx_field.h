@@ -46,6 +46,7 @@ ID一样，中文名可能不一样
 #define FIELD_CDBZ			167	//	167_撤单标志
 #define FIELD_168			168	//	?
 #define FIELD_XWDM			173	//	173_席位代码
+#define FIELD_ZXJYGS		187	//	187_最小交易股数
 #define FIELD_BJFS			194	//	194_报价方式
 #define FIELD_ZQSL			200	//	200_证券数量
 #define FIELD_KMSL			201	//	201_可卖数量
@@ -56,6 +57,8 @@ ID一样，中文名可能不一样
 #define FIELD_GHF			207	//	207_过户费
 #define FIELD_CJF			208	//	208_成交费
 #define FIELD_YHS			210	//	210_印花税
+#define FIELD_ZXMRBDJW		226	//	226_最小买入变动价位
+#define FIELD_ZXMCBDJW		227	//	227_最小卖出变动价位
 #define FIELD_CKYKBL		230	//	230_参考盈亏比例(%)
 #define FIELD_SXYK			232	//	232_实现盈亏
 #define FIELD_LX			234	//	234_类型
@@ -101,11 +104,6 @@ ID一样，中文名可能不一样
 #define FIELD_DJRQ			5676	// 5676_登记日期
 
 
-#define FIELD_BID_PRICE_1	910	// 910_买一价
-#define FIELD_BID_PRICE_2	911	// 911_买二价
-#define FIELD_BID_PRICE_3	912	// 912_买三价
-#define FIELD_BID_PRICE_4	913	// 913_买四价
-#define FIELD_BID_PRICE_5	914	// 914_买五价
 
 #define FIELD_BID_SIZE_1	900	// 900_买一量
 #define FIELD_BID_SIZE_2	901	// 901_买二量
@@ -113,11 +111,11 @@ ID一样，中文名可能不一样
 #define FIELD_BID_SIZE_4	903	// 903_买四量
 #define FIELD_BID_SIZE_5	904	// 904_买五量
 
-#define FIELD_ASK_PRICE_1	930	// 930_卖一价
-#define FIELD_ASK_PRICE_2	931	// 931_卖二价
-#define FIELD_ASK_PRICE_3	932	// 932_卖三价
-#define FIELD_ASK_PRICE_4	933	// 933_卖四价
-#define FIELD_ASK_PRICE_5	934	// 934_卖五价
+#define FIELD_BID_PRICE_1	910	// 910_买一价
+#define FIELD_BID_PRICE_2	911	// 911_买二价
+#define FIELD_BID_PRICE_3	912	// 912_买三价
+#define FIELD_BID_PRICE_4	913	// 913_买四价
+#define FIELD_BID_PRICE_5	914	// 914_买五价
 
 #define FIELD_ASK_SIZE_1	920	// 920_卖一量
 #define FIELD_ASK_SIZE_2	921	// 921_卖二量
@@ -125,9 +123,17 @@ ID一样，中文名可能不一样
 #define FIELD_ASK_SIZE_4	923	// 923_卖四量
 #define FIELD_ASK_SIZE_5	924	// 924_卖五量
 
-#define FIELD_DQJ	949 // 949_当前价
+#define FIELD_ASK_PRICE_1	930	// 930_卖一价
+#define FIELD_ASK_PRICE_2	931	// 931_卖二价
+#define FIELD_ASK_PRICE_3	932	// 932_卖三价
+#define FIELD_ASK_PRICE_4	933	// 933_卖四价
+#define FIELD_ASK_PRICE_5	934	// 934_卖五价
 
+#define FIELD_JKJ	945		// 945_今开价
+#define FIELD_ZSJ	946		// 946_昨收价
+#define FIELD_GZLX	948		// 948_国债利息
+#define FIELD_DQJ	949		// 949_当前价
 
-
+#define FIELD_GZBS	958		// 958_国债标识
 
 #endif

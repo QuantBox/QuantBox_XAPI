@@ -172,25 +172,78 @@ struct ZJYE_STRUCT
 	double KQZJ_;
 };
 
+struct HQ_STRUCT
+{
+	char ZQDM[32];		// 140_证券代码
+	char ZQMC[32];		// 141_证券名称
+	char ZSJ[32];		// 946_昨收价
+	char JKJ[32];		// 945_今开价
+	char GZLX[32];		// 948_国债利息
+	char DQJ[32];		// 949_当前价
+	char BidPrice1[32];		// 910_买一价
+	char BidPrice2[32];		// 911_买二价
+	char BidPrice3[32];		// 912_买三价
+	char BidPrice4[32];		// 913_买四价
+	char BidPrice5[32];		// 914_买五价
+	char BidSize1[32];		// 900_买一量
+	char BidSize2[32];		// 901_买二量
+	char BidSize3[32];		// 902_买三量
+	char BidSize4[32];		// 903_买四量
+	char BidSize5[32];		// 904_买五量
+	char AskPrice1[32];		// 930_卖一价
+	char AskPrice2[32];		// 931_卖二价
+	char AskPrice3[32];		// 932_卖三价
+	char AskPrice4[32];		// 933_卖四价
+	char AskPrice5[32];		// 934_卖五价
+	char AskSize1[32];		// 920_卖一量
+	char AskSize2[32];		// 921_卖二量
+	char AskSize3[32];		// 922_卖三量
+	char AskSize4[32];		// 923_卖四量
+	char AskSize5[32];		// 924_卖五量
+	char JYSDM[32];		// 100_交易所代码
+	char ZXJYGS[32];		// 187_最小交易股数
+	char ZXMRBDJW[32];		// 226_最小买入变动价位
+	char ZXMCBDJW[32];		// 227_最小卖出变动价位
+	char ZHLB[32];		// 125_帐号类别
+	char BZ[32];		// 132_币种
+	char GZBS[32];		// 958_国债标识
+	char BLXX[32];		// 1213_保留信息
+
+	double ZSJ_;		// 946_昨收价
+	double JKJ_;		// 945_今开价
+	double GZLX_;		// 948_国债利息
+	double DQJ_;		// 949_当前价
+	double BidPrice1_;		// 910_买一价
+	double BidPrice2_;		// 911_买二价
+	double BidPrice3_;		// 912_买三价
+	double BidPrice4_;		// 913_买四价
+	double BidPrice5_;		// 914_买五价
+	int BidSize1_;		// 900_买一量
+	int BidSize2_;		// 901_买二量
+	int BidSize3_;		// 902_买三量
+	int BidSize4_;		// 903_买四量
+	int BidSize5_;		// 904_买五量
+	double AskPrice1_;		// 930_卖一价
+	double AskPrice2_;		// 931_卖二价
+	double AskPrice3_;		// 932_卖三价
+	double AskPrice4_;		// 933_卖四价
+	double AskPrice5_;		// 934_卖五价
+	int AskSize1_;		// 920_卖一量
+	int AskSize2_;		// 921_卖二量
+	int AskSize3_;		// 922_卖三量
+	int AskSize4_;		// 923_卖四量
+	int AskSize5_;		// 924_卖五量
+
+	int ZXJYGS_;		// 187_最小交易股数
+	double ZXMRBDJW_;		// 226_最小买入变动价位
+	double ZXMCBDJW_;		// 227_最小卖出变动价位
+};
+
 //
 ////////////////////////////////////////////////////////////////////////////
 //// 以下的在整理完后要删除
 //
 
-
-//
-
-//
-//
-//
-//// 委托结果
-//struct WTJG_STRUCT
-//{
-//	char WTBH[32];	// 委托编号
-//
-//	// 返回的结果中没有，这里自己填上，这样就可以立即撤单，而不用等查询了
-//	char GDDM[32];  // 股东代码
-//};
 
 // 登录结果
 struct DLJG_STRUCT

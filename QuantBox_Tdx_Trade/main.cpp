@@ -71,6 +71,12 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 	case ReqQryInvestor:
 		pApi->ReqQryInvestor();
 		break;
+	case Subscribe:
+		pApi->Subscribe((const char*)ptr1, (const char*)ptr2);
+		break;
+	//case Unsubscribe:
+	//	pApi->Unsubscribe((const char*)ptr1, (const char*)ptr2);
+	//	break;
 	default:
 		break;
 	}

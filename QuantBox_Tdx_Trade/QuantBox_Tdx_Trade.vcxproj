@@ -85,6 +85,7 @@ xcopy "$(SolutionDir)include\Tdx\win32\*.dll"  "$(SolutionDir)XAPI\Tdx\x86\" /Y<
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\ApiProcess.h" />
     <ClInclude Include="..\include\IDGenerator.h" />
     <ClInclude Include="..\include\toolkit.h" />
     <ClInclude Include="stdafx.h" />
@@ -94,6 +95,7 @@ xcopy "$(SolutionDir)include\Tdx\win32\*.dll"  "$(SolutionDir)XAPI\Tdx\x86\" /Y<
     <ClInclude Include="TypeConvert.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\include\ApiProcess.cpp" />
     <ClCompile Include="..\include\IDGenerator.cpp" />
     <ClCompile Include="..\include\toolkit.cpp" />
     <ClCompile Include="dllmain.cpp">

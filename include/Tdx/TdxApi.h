@@ -47,7 +47,8 @@ public:
 	// 发送查询请求
 	// 有些请求是当日数据，后面的起始和结束日期自动忽略
 	// 对于历史数据，需要查询的区别，格式“yyyyMMdd”，客户端上有60天或90天的时间限制，这里没有，但如果数据太多，间隔设成一周或一月
-	virtual void* ReqQueryData(int requestType, FieldInfo_STRUCT*** pppFieldInfos, char*** pppResults, Error_STRUCT** ppErr, char * szKSRQ = "", char* szZZRQ = "") = 0;
+	// 订阅行情时只需要最后的股票代码
+	virtual void* ReqQueryData(int requestType, FieldInfo_STRUCT*** pppFieldInfos, char*** pppResults, Error_STRUCT** ppErr, char * szKSRQ = "", char* szZZRQ = "", char* szZQDM = "") = 0;
 
 public:
 	// 设置会话
@@ -58,12 +59,6 @@ public:
 	virtual void SetAccount(const char* szAccount) = 0;
 	// 得到资金账号
 	virtual const char* GetAccount() = 0;
-
-	//// 通过证券代码得到账号类别
-	//virtual int Get__ZHLB__By__ZQDM(char* zqdm) = 0;
-
-	//// 通过账号类别和融资融券标识，得到资金账号与股东代码
-	//virtual void Get__ZJZH_GDDM__By__ZHLB_RZRQBS(IN int zhlb, IN int rzrqbs, OUT char* zjzh, OUT char* gddm) = 0;
 
 protected:
 	CTdxApi();
