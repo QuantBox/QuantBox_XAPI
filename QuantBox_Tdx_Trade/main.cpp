@@ -47,18 +47,19 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		pApi->Disconnect();
 		break;
 	case ReqQryOrder:
-		
+		pApi->ReqQryOrder();
 		break;
 	case ReqQryTrade:
-		break;
-	/*case ReqQryInstrument:
-		pApi->ReqQryInstrument((const char*)ptr1, (const char*)ptr2);
+		pApi->ReqQryTrade();
 		break;
 	case ReqQryInvestorPosition:
-		pApi->ReqQryInvestorPosition((const char*)ptr1, (const char*)ptr2);
+		pApi->ReqQryInvestorPosition();
 		break;
 	case ReqQryTradingAccount:
 		pApi->ReqQryTradingAccount();
+		break;
+	/*case ReqQryInstrument:
+		pApi->ReqQryInstrument((const char*)ptr1, (const char*)ptr2);
 		break;
 	case ReqQrySettlementInfo:
 		pApi->ReqQrySettlementInfo((const char*)ptr1);
@@ -67,13 +68,6 @@ void* __stdcall XRequest(char type, void* pApi1, void* pApi2, double double1, do
 		return (void*)pApi->ReqOrderInsert((OrderField*)ptr1, size1, (OrderIDType*)ptr2);
 	case ReqOrderAction:
 		return (void*)pApi->ReqOrderAction((OrderIDType*)ptr1, size1, (OrderIDType*)ptr2);
-		/*
-	case ReqQuoteInsert:
-		return pApi->ReqQuoteInsert((int)double1, (QuoteField*)ptr1);
-	case ReqOrderAction:
-		return (void*)pApi->ReqOrderAction((const char*)ptr1);
-	case ReqQuoteAction:
-		return (void*)pApi->ReqQuoteAction((const char*)ptr1);*/
 	case ReqQryInvestor:
 		pApi->ReqQryInvestor();
 		break;

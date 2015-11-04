@@ -51,9 +51,13 @@ void CTraderApi::QueryInThread(char type, void* pApi1, void* pApi2, double doubl
 	case E_InputOrderActionField:
 		iRet = _ReqOrderAction(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 		break;
+	case E_QryTradingAccountField:
+		iRet = _ReqQryTradingAccount(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		break;
+	case E_QryInvestorPositionField:
+		iRet = _ReqQryInvestorPosition(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		break;
 	default:
-		// 感觉在此处启动一个查询会比较合适，因为队列中已经空闲下来了
-		// 不对，好像有一个数据包只会执行一次
 		break;
 	}
 
@@ -245,25 +249,30 @@ int CTraderApi::_ReqQryInvestor(char type, void* pApi1, void* pApi2, double doub
 
 	m_pApi->ReqQueryData(REQUEST_GDLB, &ppFieldInfos, &ppResults, &pErr);
 
-	if (!IsErrorRspInfo("ReqQryInvestor", pErr))
+	if (IsErrorRspInfo("ReqQryInvestor", pErr))
 	{
-		if (ppResults)
-		{
-			int count = GetRowCountTableBody(ppResults);
-			for (int i = 0; i < count; ++i)
-			{
-				InvestorField* pField = (InvestorField*)m_msgQueue->new_block(sizeof(InvestorField));
+		DeleteTableBody(ppResults);
+		DeleteError(pErr);
 
-				//strcpy(pField->BrokerID, pInvestor->BrokerID);
-				strcpy(pField->InvestorID, ppResults[i * COL_EACH_ROW + 0]);
-				strcpy(pField->InvestorName, ppResults[i * COL_EACH_ROW + 1]);
-
-				m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInvestor, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(InvestorField), nullptr, 0, nullptr, 0);
-			}
-		}
+		return 0;
 	}
 
-	
+	GDLB_STRUCT** ppRS = nullptr;
+	CharTable2GDLB(ppFieldInfos, ppResults, &ppRS);
+
+	if (ppRS)
+	{
+		int count = GetRowCountTableBody(ppResults);
+
+		for (int i = 0; i < count; ++i)
+		{
+			InvestorField* pField = (InvestorField*)m_msgQueue->new_block(sizeof(InvestorField));
+
+			GDLB_2_InvestorField(ppRS[i], pField);
+
+			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInvestor, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(InvestorField), nullptr, 0, nullptr, 0);
+		}
+	}
 
 	DeleteTableBody(ppResults);
 	DeleteError(pErr);
@@ -841,6 +850,17 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 	// 测试用，事后要删除
 	//m_pApi->ReqQueryData(REQUEST_LSCJ, &ppFieldInfos, &ppResults, &pErr, "20150801", "20151031");
 
+	if (IsErrorRspInfo("ReqQryTrade", pErr))
+	{
+		double _queryTime = 0.5 * QUERY_TIME_MAX + QUERY_TIME_MIN;
+		m_QueryTradeTime = time(nullptr) + _queryTime;
+
+		DeleteTableBody(ppResults);
+		DeleteError(pErr);
+
+		return 0;
+	}
+
 	CJLB_STRUCT** ppRS = nullptr;
 	CharTable2CJLB(ppFieldInfos, ppResults, &ppRS);
 
@@ -897,28 +917,96 @@ void CTraderApi::ReqQryInstrument(const string& szInstrumentId, const string& sz
 
 }
 
-//void CTraderApi::OnPST16203PushData(PST16203PushData pEtxPushData)
-//{
-//	OrderIDType orderId = { 0 };
-//
-//	// 只是打印成交
-//	ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
-//
-//	//pField->ErrorID = pRspInfo->error_no;
-//	sprintf(pField->ErrorMsg,"OnPST16203PushData %s",pEtxPushData->order_status_name);
-//
-//	m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
-//}
-//
-//void CTraderApi::OnPST16204PushData(PST16204PushData pEtxPushData)
-//{
-//	OrderIDType orderId = { 0 };
-//
-//	// 只是打印成交
-//	ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
-//
-//	//pField->ErrorID = pRspInfo->error_no;
-//	sprintf(pField->ErrorMsg, "OnPST16204PushData %s", pEtxPushData->order_status_name);
-//
-//	m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
-//}
+void CTraderApi::ReqQryTradingAccount()
+{
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_QryTradingAccountField, m_msgQueue_Query, this, 0, 0,
+		nullptr, 0, nullptr, 0, nullptr, 0);
+}
+
+int CTraderApi::_ReqQryTradingAccount(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	if (m_pApi == nullptr)
+		return 0;
+
+	FieldInfo_STRUCT** ppFieldInfos = nullptr;
+	char** ppResults = nullptr;
+	Error_STRUCT* pErr = nullptr;
+
+	m_pApi->ReqQueryData(REQUEST_ZJYE, &ppFieldInfos, &ppResults, &pErr);
+
+	if (IsErrorRspInfo("ReqQryTradingAccount", pErr))
+	{
+		DeleteTableBody(ppResults);
+		DeleteError(pErr);
+
+		return 0;
+	}
+
+	ZJYE_STRUCT** ppRS = nullptr;
+	CharTable2ZJYE(ppFieldInfos, ppResults, &ppRS);
+
+	if (ppRS)
+	{
+		int count = GetRowCountTableBody(ppResults);
+		for (int i = 0; i < count; ++i)
+		{
+			AccountField* pField = (AccountField*)m_msgQueue->new_block(sizeof(AccountField));
+
+			ZJYE_2_AccountField(ppRS[i], pField);
+			
+			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryTradingAccount, m_msgQueue, m_pClass, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+		}
+	}
+
+	DeleteTableBody(ppResults);
+	DeleteError(pErr);
+
+	return 0;
+}
+
+void CTraderApi::ReqQryInvestorPosition()
+{
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_QryInvestorPositionField, m_msgQueue_Query, this, 0, 0,
+		nullptr, 0, nullptr, 0, nullptr, 0);
+}
+
+int CTraderApi::_ReqQryInvestorPosition(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	if (m_pApi == nullptr)
+		return 0;
+
+	FieldInfo_STRUCT** ppFieldInfos = nullptr;
+	char** ppResults = nullptr;
+	Error_STRUCT* pErr = nullptr;
+
+	m_pApi->ReqQueryData(REQUEST_GFLB, &ppFieldInfos, &ppResults, &pErr);
+
+	if (IsErrorRspInfo("ReqQryInvestorPosition", pErr))
+	{
+		DeleteTableBody(ppResults);
+		DeleteError(pErr);
+
+		return 0;
+	}
+
+	GFLB_STRUCT** ppRS = nullptr;
+	CharTable2GFLB(ppFieldInfos, ppResults, &ppRS);
+
+	if (ppRS)
+	{
+		int count = GetRowCountTableBody(ppResults);
+		for (int i = 0; i < count; ++i)
+		{
+			PositionField* pField = (PositionField*)m_msgQueue->new_block(sizeof(PositionField));
+
+			GFLB_2_PositionField(ppRS[i], pField);
+
+			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInvestorPosition, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+		}
+	}
+
+	DeleteTableBody(ppResults);
+	DeleteError(pErr);
+
+	return 0;
+}

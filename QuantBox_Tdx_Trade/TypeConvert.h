@@ -11,6 +11,10 @@ int BJFS_2_WTFS(char* pIn);
 bool ZTSM_IsDone(int In);
 bool ZTSM_IsNotSent(int In);
 
+void GDLB_2_InvestorField(GDLB_STRUCT* pIn, InvestorField* pOut);
+void ZJYE_2_AccountField(ZJYE_STRUCT* pIn, AccountField* pOut);
+void GFLB_2_PositionField(GFLB_STRUCT* pIn, PositionField* pOut);
+
 void CJLB_2_TradeField(CJLB_STRUCT* pIn, TradeField* pOut);
 
 // 

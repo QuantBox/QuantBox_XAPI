@@ -24,6 +24,7 @@ struct Error_STRUCT
 	char ErrInfo[256];
 };
 
+// 委托
 struct Order_STRUCT
 {
 	char ZJZH[32];	// 121_资金帐号
@@ -90,6 +91,7 @@ struct WTLB_STRUCT
 	int ZTSM_;
 };
 
+// 成交列表
 struct CJLB_STRUCT
 {
 	char CJRQ[32];	// 150_成交日期
@@ -127,62 +129,67 @@ struct CJLB_STRUCT
 };
 
 
+// 股份列表
+struct GFLB_STRUCT
+{
+	char ZQDM[32];  // 140_证券代码
+	char ZQMC[32];  // 141_证券名称
+	char ZQSL[32];  // 200_证券数量
+	char KMSL[32];  // 201_可卖数量
+	char TBCBJ[32];  // 202_摊簿成本价
+	char DQJ[32];  // 949_当前价
+	char ZXSZ[32];  // 205_最新市值
+	char TBFDYK[32];  // 204_摊簿浮动盈亏
+	char SXYK[32];  // 232_实现盈亏
+	char CKYKBL[32];  // 230_参考盈亏比例(%)
+	char DJSL[32];  // 160_冻结数量
+	char GDDM[32];  // 123_股东代码
+	char JYSDM[32]; // 100_交易所代码
+	char JYSMC[32];  // 101_交易所名称
+	char BLXX[32];	// 1213_保留信息
+
+	int ZQSL_;
+	int KMSL_;
+	double TBCBJ_;
+	double DQJ_;
+	double ZXSZ_;
+	double DJSL_;
+};
+
+// 资金余额
+struct ZJYE_STRUCT
+{
+	char BZ[32];		// 132_币种
+	char ZJYE[32];		// 300_资金余额
+	char KYZJ[32];		// 301_可用资金
+	char ZZC[32];		// 310_总资产
+	char KQZJ[32];		// 302_可取资金
+	char ZJZH[32];		// 121_资金帐号
+
+	double ZJYE_;
+	double KYZJ_;
+	double ZZC_;
+	double KQZJ_;
+};
+
 //
 ////////////////////////////////////////////////////////////////////////////
 //// 以下的在整理完后要删除
 //
 
+
 //
-//// 股份列表
-//struct GFLB_STRUCT
-//{
-//	char ZQDM[64];  // 证券代码
-//	char ZQMC[64];  // 证券名称
-//	char ZQSL[64];  // 证券数量
-//	char KMSL[64];  // 可卖数量
-//	char TBCBJ[64];  // 摊薄成本价
-//	char DQJ[64];  // 当前价
-//	char ZXSZ[64];  // 最新市值
-//	char TBFDYK[64];  // 摊薄浮动盈亏
-//	char SXYK[64];  // 实现盈亏
-//	char CKYKBL[64];  // 参考盈亏比例
-//	char DJSL[64];  // 冻结数量
-//	char GDDM[64];  // 股东代码
-//	char SCLB[64]; // 市场类别
-//	char JYSMC[64];  // 交易所名称
-//
-//	int ZQSL_;
-//	int KMSL_;
-//	double TBCBJ_;
-//};
-//
-//// 资金余额
-//struct ZJYE_STRUCT
-//{
-//	char HBLX[64];		// 货币类型
-//	char ZJYE[64];		// 资金余额
-//	char KYZJ[64];		// 可用资金
-//	char KQZJ[64];		// 可取资金
-//	char ZC[64];		// 资产
-//
-//	double CKSZ_;		// 参考市值
-//	double YK_;			// 盈亏
-//
-//	double ZJYE_;
-//	double KYZJ_;
-//	double KQZJ_;
-//	double ZC_;
-//};
+
 //
 //
 //
 //// 委托结果
 //struct WTJG_STRUCT
 //{
-//	char WTBH[64];	// 委托编号
+//	char WTBH[32];	// 委托编号
 //
 //	// 返回的结果中没有，这里自己填上，这样就可以立即撤单，而不用等查询了
-//	char GDDM[64];  // 股东代码
+//	char GDDM[32];  // 股东代码
 //};
 
 // 登录结果

@@ -245,3 +245,33 @@ void OrderField_2_Order_STRUCT(OrderField* pIn, Order_STRUCT* pOut)
 		break;
 	}
 }
+
+void GDLB_2_InvestorField(GDLB_STRUCT* pIn, InvestorField* pOut)
+{
+	strcpy(pOut->InvestorID, pIn->GDDM);
+	strcpy(pOut->InvestorName, pIn->GDMC);
+}
+
+void ZJYE_2_AccountField(ZJYE_STRUCT* pIn, AccountField* pOut)
+{
+	strcpy(pOut->Account, pIn->ZJZH);
+	//pIn->BZ;
+	pOut->Available = pIn->KYZJ_;
+
+	// 还有很多不知道如何对应，有可能需要扩展XAPI部分
+	pOut->Balance = pIn->ZZC_;
+	
+}
+
+void GFLB_2_PositionField(GFLB_STRUCT* pIn, PositionField* pOut)
+{
+	pOut->Side = PositionSide::Long;
+	pOut->Position = pIn->ZQSL_;
+	pOut->TdPosition = pIn->DJSL_;
+	pOut->YdPosition = pIn->KMSL_;
+	pOut->HedgeFlag = HedgeFlagType::Speculation;
+	strcpy(pOut->InstrumentID, pIn->ZQDM);
+	strcpy(pOut->Symbol, pIn->ZQDM);
+
+	// 还有一些信息没有
+}

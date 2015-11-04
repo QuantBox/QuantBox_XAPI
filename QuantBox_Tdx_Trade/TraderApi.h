@@ -42,22 +42,20 @@ class CTraderApi
 		E_InputOrderActionField,
 		E_QryOrderField,
 		E_QryTradeField,
+		E_QryTradingAccountField,
+		E_QryInvestorPositionField,
 
 
 		E_SettlementInfoConfirmField,
 		E_QryInstrumentField,
-		
 		E_InputQuoteField,
 		E_InputQuoteActionField,
 		E_ParkedOrderField,
-		E_QryTradingAccountField,
-		E_QryInvestorPositionField,
 		E_QryInvestorPositionDetailField,
 		E_QryInstrumentCommissionRateField,
 		E_QryInstrumentMarginRateField,
 		E_QryDepthMarketDataField,
 		E_QrySettlementInfoField,
-		
 		E_QryQuoteField,
 	};
 
@@ -94,8 +92,8 @@ public:
 	//int ReqQuoteAction(CThostFtdcQuoteField *pQuote);
 	////int ReqQuoteAction(const string& szId);
 
-	//void ReqQryTradingAccount();
-	//void ReqQryInvestorPosition(const string& szInstrumentId, const string& szExchange);
+	void ReqQryTradingAccount();
+	void ReqQryInvestorPosition();
 	//void ReqQryInvestorPositionDetail(const string& szInstrumentId);
 	void ReqQryInstrument(const string& szInstrumentId, const string& szExchange);
 	//void ReqQryInstrumentCommissionRate(const string& szInstrumentId);
@@ -134,10 +132,9 @@ private:
 	int _ReqOrderInsert(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	int _ReqOrderAction(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
-	//void OnPST16203PushData(PST16203PushData pEtxPushData);
-	//void OnPST16204PushData(PST16204PushData pEtxPushData);
+	int _ReqQryTradingAccount(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	int _ReqQryInvestorPosition(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
-	//
 
 	//检查是否出错
 	//bool IsErrorRspInfo(Error_STRUCT *pRspInfo, int nRequestID, bool bIsLast);//向消息队列输出信息
@@ -205,8 +202,6 @@ private:
 private:
 	atomic<int>					m_lRequestID;			//请求ID,得保持自增
 
-	//CThostFtdcRspUserLoginField m_RspUserLogin;			//返回的登录成功响应，目前利用此内成员进行报单所属区分
-	
 	OrderIDType					m_orderInsert_Id;
 
 	mutex						m_csOrderRef;
@@ -224,13 +219,6 @@ private:
 
 	unordered_map<string, OrderField*>				m_id_platform_order;
 	unordered_map<string, Order_STRUCT*>			m_id_api_order;
-	//unordered_map<string, string>					m_sysId_orderId;//成交回报时使用找到原订单
-
-	//unordered_map<string, QuoteField*>				m_id_platform_quote;
-	//unordered_map<string, CThostFtdcQuoteField*>		m_id_api_quote;
-	//unordered_map<string, string>					m_sysId_quoteId;
-
-	//unordered_map<string, PositionField*>			m_id_platform_position;
 
 	unordered_map<string, string>					m_cust_acc_no;
 
@@ -242,9 +230,7 @@ private:
 	UserInfoField*				m_pUserInfos;
 	int							m_UserInfo_Pos;
 	int							m_UserInfo_Count;
-
-	//STOrderCancel				m_temp_ordercancel;
-
+	
 	void*						m_pClass;
 
 	CIDGenerator*				m_pIDGenerator;
