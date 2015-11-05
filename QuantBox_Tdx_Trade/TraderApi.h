@@ -249,5 +249,6 @@ private:
 
 	time_t						m_QueryTradeTime;
 	time_t						m_QueryOrderTime;
+	int							m_OrderNotUpdateCount;
 };
 

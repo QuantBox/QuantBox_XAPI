@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "tdx_function.h"
 #include "tdx_enum.h"
@@ -460,21 +461,58 @@ void CharTable2GDLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, GDLB_STRUCT
 		ppResults[i] = new GDLB_STRUCT();
 
 		//if (col_123 >= 0)
-		strcpy(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
+		strcpy_s(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
 		//if (col_124 >= 0)
-		strcpy(ppResults[i]->GDMC, ppTable[i * COL_EACH_ROW + col_124]);
+		strcpy_s(ppResults[i]->GDMC, ppTable[i * COL_EACH_ROW + col_124]);
 		if (col_121 >= 0)
-			strcpy(ppResults[i]->ZJZH, ppTable[i * COL_EACH_ROW + col_121]);
+			strcpy_s(ppResults[i]->ZJZH, ppTable[i * COL_EACH_ROW + col_121]);
 		//if (col_125 >= 0)
-		strcpy(ppResults[i]->ZHLB, ppTable[i * COL_EACH_ROW + col_125]);
+		strcpy_s(ppResults[i]->ZHLB, ppTable[i * COL_EACH_ROW + col_125]);
 		if (col_281 >= 0)
-			strcpy(ppResults[i]->RZRQBS, ppTable[i * COL_EACH_ROW + col_281]);
+			strcpy_s(ppResults[i]->RZRQBS, ppTable[i * COL_EACH_ROW + col_281]);
 		//if (col_1213 >= 0)
-		//	strcpy(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
+		//	strcpy_s(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
 
 		ppResults[i]->ZHLB_ = atoi(ppResults[i]->ZHLB);
 		ppResults[i]->RZRQBS_ = atoi(ppResults[i]->RZRQBS);
 	}
+}
+
+int ZTSM_str_2_int(char* pIn)
+{
+	char* pCheng = strstr(pIn, "成");
+	char* pChe = strstr(pIn, "撤");
+	char* pBu = strstr(pIn, "部");
+
+	if (pChe)
+	{
+		if (pBu)
+		{
+			return ZTSM_PartiallyCancelled;
+		}
+		return ZTSM_AllCancelled;
+	}
+	else if (pCheng)
+	{
+		if (pBu)
+		{
+			// 部成是啥？这里需要完成
+			return ZTSM_5;
+		}
+		return ZTSM_AllFilled;
+	}
+
+	char* pQ = strstr(pIn, "全");
+	char* pY = strstr(pIn, "已");
+	char* pBao = strstr(pIn, "报");
+	char* pF = strstr(pIn, "废");
+
+	if (pF)
+	{
+		return ZTSM_Illegal;
+	}
+
+	return ZTSM_New;
 }
 
 void CharTable2WTLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, WTLB_STRUCT*** pppResults)
@@ -515,41 +553,41 @@ void CharTable2WTLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, WTLB_STRUCT
 		ppResults[i] = new WTLB_STRUCT();
 
 		if (col_142 >= 0)
-			strcpy(ppResults[i]->WTRQ, ppTable[i * COL_EACH_ROW + col_142]);
+			strcpy_s(ppResults[i]->WTRQ, ppTable[i * COL_EACH_ROW + col_142]);
 		if (col_143 >= 0)
-			strcpy(ppResults[i]->WTSJ, ppTable[i * COL_EACH_ROW + col_143]);
+			strcpy_s(ppResults[i]->WTSJ, ppTable[i * COL_EACH_ROW + col_143]);
 		//if (col_123 >= 0)
-		strcpy(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
+		strcpy_s(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
 		//if (col_140 >= 0)
-		strcpy(ppResults[i]->ZQDM, ppTable[i * COL_EACH_ROW + col_140]);
+		strcpy_s(ppResults[i]->ZQDM, ppTable[i * COL_EACH_ROW + col_140]);
 		//if (col_141 >= 0)
-		strcpy(ppResults[i]->ZQMC, ppTable[i * COL_EACH_ROW + col_141]);
+		strcpy_s(ppResults[i]->ZQMC, ppTable[i * COL_EACH_ROW + col_141]);
 		//if (col_130 >= 0)
-		strcpy(ppResults[i]->MMBZ, ppTable[i * COL_EACH_ROW + col_130]);
+		strcpy_s(ppResults[i]->MMBZ, ppTable[i * COL_EACH_ROW + col_130]);
 		//if (col_131 >= 0)
-		strcpy(ppResults[i]->WTLB, ppTable[i * COL_EACH_ROW + col_131]);
+		strcpy_s(ppResults[i]->WTLB, ppTable[i * COL_EACH_ROW + col_131]);
 		//if (col_100 >= 0)
-		strcpy(ppResults[i]->JYSDM, ppTable[i * COL_EACH_ROW + col_100]);
+		strcpy_s(ppResults[i]->JYSDM, ppTable[i * COL_EACH_ROW + col_100]);
 		//if (col_145 >= 0)
-		strcpy(ppResults[i]->WTJG, ppTable[i * COL_EACH_ROW + col_145]);
+		strcpy_s(ppResults[i]->WTJG, ppTable[i * COL_EACH_ROW + col_145]);
 		//if (col_144 >= 0)
-		strcpy(ppResults[i]->WTSL, ppTable[i * COL_EACH_ROW + col_144]);
+		strcpy_s(ppResults[i]->WTSL, ppTable[i * COL_EACH_ROW + col_144]);
 		//if (col_153 >= 0)
-		strcpy(ppResults[i]->CJJG, ppTable[i * COL_EACH_ROW + col_153]);
+		strcpy_s(ppResults[i]->CJJG, ppTable[i * COL_EACH_ROW + col_153]);
 		//if (col_152 >= 0)
-		strcpy(ppResults[i]->CJSL, ppTable[i * COL_EACH_ROW + col_152]);
-		//if (col_162 >= 0)
-		strcpy(ppResults[i]->CDSL, ppTable[i * COL_EACH_ROW + col_162]);
+		strcpy_s(ppResults[i]->CJSL, ppTable[i * COL_EACH_ROW + col_152]);
+		if (col_162 >= 0)
+		strcpy_s(ppResults[i]->CDSL, ppTable[i * COL_EACH_ROW + col_162]);
 		//if (col_146 >= 0)
-		strcpy(ppResults[i]->WTBH, ppTable[i * COL_EACH_ROW + col_146]);
+		strcpy_s(ppResults[i]->WTBH, ppTable[i * COL_EACH_ROW + col_146]);
 		//if (col_194 >= 0)
-		strcpy(ppResults[i]->BJFS, ppTable[i * COL_EACH_ROW + col_194]);
+		strcpy_s(ppResults[i]->BJFS, ppTable[i * COL_EACH_ROW + col_194]);
 		if (col_147 >= 0)
-			strcpy(ppResults[i]->ZTSM, ppTable[i * COL_EACH_ROW + col_147]);
+			strcpy_s(ppResults[i]->ZTSM, ppTable[i * COL_EACH_ROW + col_147]);
 		if (col_161 >= 0)
-			strcpy(ppResults[i]->DJZJ, ppTable[i * COL_EACH_ROW + col_161]);
-		//if (col_1213 >= 0)
-		//	strcpy(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
+			strcpy_s(ppResults[i]->DJZJ, ppTable[i * COL_EACH_ROW + col_161]);
+		if (col_1213 >= 0)
+			strcpy_s(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
 
 		ppResults[i]->WTRQ_ = atoi(ppResults[i]->WTRQ);
 		ppResults[i]->MMBZ_ = atoi(ppResults[i]->MMBZ);
@@ -558,15 +596,24 @@ void CharTable2WTLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, WTLB_STRUCT
 		ppResults[i]->WTSL_ = atoi(ppResults[i]->WTSL);
 		ppResults[i]->CJJG_ = atof(ppResults[i]->CJJG);
 		ppResults[i]->CJSL_ = atoi(ppResults[i]->CJSL);
-		ppResults[i]->CDSL_ = atoi(ppResults[i]->CDSL);
 		ppResults[i]->DJZJ_ = atof(ppResults[i]->DJZJ);
+
+		// 可能没有，怎么办
+		ppResults[i]->CDSL_ = atoi(ppResults[i]->CDSL);
 
 		int HH = 0, mm = 0, ss = 0;
 		GetUpdateTime_HH_mm_ss(ppResults[i]->WTSJ, &HH, &mm, &ss);
 		ppResults[i]->WTSJ_ = HH * 10000 + mm * 100 + ss;
 
-		// 最第一个的字符，并转成数字
-		ppResults[i]->ZTSM_ = ppResults[i]->ZTSM[0] - '0';
+		// 第一个的字符，并转成数字
+		if (ppResults[i]->ZTSM[1] == '-')
+		{
+			ppResults[i]->ZTSM_ = ppResults[i]->ZTSM[0] - '0';
+		}
+		else
+		{
+			ppResults[i]->ZTSM_ = ZTSM_str_2_int(ppResults[i]->ZTSM);
+		}
 	}
 }
 
@@ -608,41 +655,41 @@ void CharTable2CJLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, CJLB_STRUCT
 		ppResults[i] = new CJLB_STRUCT();
 
 		if (col_150 >= 0)
-			strcpy(ppResults[i]->CJRQ, ppTable[i * COL_EACH_ROW + col_150]);
+			strcpy_s(ppResults[i]->CJRQ, ppTable[i * COL_EACH_ROW + col_150]);
 		//if (col_151 >= 0)
-		strcpy(ppResults[i]->CJSJ, ppTable[i * COL_EACH_ROW + col_151]);
+		strcpy_s(ppResults[i]->CJSJ, ppTable[i * COL_EACH_ROW + col_151]);
 		//if (col_123 >= 0)
-		strcpy(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
+		strcpy_s(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
 		//if (col_140 >= 0)
-		strcpy(ppResults[i]->ZQDM, ppTable[i * COL_EACH_ROW + col_140]);
+		strcpy_s(ppResults[i]->ZQDM, ppTable[i * COL_EACH_ROW + col_140]);
 		//if (col_141 >= 0)
-		strcpy(ppResults[i]->ZQMC, ppTable[i * COL_EACH_ROW + col_141]);
+		strcpy_s(ppResults[i]->ZQMC, ppTable[i * COL_EACH_ROW + col_141]);
 		//if (col_130 >= 0)
-		strcpy(ppResults[i]->MMBZ, ppTable[i * COL_EACH_ROW + col_130]);
+		strcpy_s(ppResults[i]->MMBZ, ppTable[i * COL_EACH_ROW + col_130]);
 		//if (col_131 >= 0)
-		strcpy(ppResults[i]->WTLB, ppTable[i * COL_EACH_ROW + col_131]);
+		strcpy_s(ppResults[i]->WTLB, ppTable[i * COL_EACH_ROW + col_131]);
 		//if (col_153 >= 0)
-		strcpy(ppResults[i]->CJJG, ppTable[i * COL_EACH_ROW + col_153]);
+		strcpy_s(ppResults[i]->CJJG, ppTable[i * COL_EACH_ROW + col_153]);
 		//if (col_152 >= 0)
-		strcpy(ppResults[i]->CJSL, ppTable[i * COL_EACH_ROW + col_152]);
-		//if (col_303 >= 0)
-		strcpy(ppResults[i]->FSJE, ppTable[i * COL_EACH_ROW + col_303]);
+		strcpy_s(ppResults[i]->CJSL, ppTable[i * COL_EACH_ROW + col_152]);
+		if (col_303 >= 0)
+			strcpy_s(ppResults[i]->FSJE, ppTable[i * COL_EACH_ROW + col_303]);
 		if (col_304 >= 0)
-			strcpy(ppResults[i]->SYJE, ppTable[i * COL_EACH_ROW + col_304]);
+			strcpy_s(ppResults[i]->SYJE, ppTable[i * COL_EACH_ROW + col_304]);
 		if (col_206 >= 0)
-			strcpy(ppResults[i]->YJ, ppTable[i * COL_EACH_ROW + col_206]);
+			strcpy_s(ppResults[i]->YJ, ppTable[i * COL_EACH_ROW + col_206]);
 		if (col_210 >= 0)
-			strcpy(ppResults[i]->YHS, ppTable[i * COL_EACH_ROW + col_210]);
+			strcpy_s(ppResults[i]->YHS, ppTable[i * COL_EACH_ROW + col_210]);
 		if (col_207 >= 0)
-			strcpy(ppResults[i]->GHF, ppTable[i * COL_EACH_ROW + col_207]);
+			strcpy_s(ppResults[i]->GHF, ppTable[i * COL_EACH_ROW + col_207]);
 		if (col_208 >= 0)
-			strcpy(ppResults[i]->CJF, ppTable[i * COL_EACH_ROW + col_208]);
+			strcpy_s(ppResults[i]->CJF, ppTable[i * COL_EACH_ROW + col_208]);
 		//if (col_155 >= 0)
-		strcpy(ppResults[i]->CJBH, ppTable[i * COL_EACH_ROW + col_155]);
+		strcpy_s(ppResults[i]->CJBH, ppTable[i * COL_EACH_ROW + col_155]);
 		if (col_167 >= 0)
-			strcpy(ppResults[i]->CDBZ, ppTable[i * COL_EACH_ROW + col_167]);
+			strcpy_s(ppResults[i]->CDBZ, ppTable[i * COL_EACH_ROW + col_167]);
 		if (col_146 >= 0)
-			strcpy(ppResults[i]->WTBH, ppTable[i * COL_EACH_ROW + col_146]);
+			strcpy_s(ppResults[i]->WTBH, ppTable[i * COL_EACH_ROW + col_146]);
 
 
 		ppResults[i]->CJRQ_ = atoi(ppResults[i]->CJRQ);
@@ -651,13 +698,15 @@ void CharTable2CJLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, CJLB_STRUCT
 		ppResults[i]->WTLB_ = atoi(ppResults[i]->WTLB);
 		ppResults[i]->CJJG_ = atof(ppResults[i]->CJJG);
 		ppResults[i]->CJSL_ = atoi(ppResults[i]->CJSL);
-		ppResults[i]->FSJE_ = atof(ppResults[i]->FSJE);
 		ppResults[i]->SYJE_ = atof(ppResults[i]->SYJE);
 		ppResults[i]->YJ_ = atof(ppResults[i]->YJ);
 		ppResults[i]->YHS_ = atof(ppResults[i]->YHS);
 		ppResults[i]->GHF_ = atof(ppResults[i]->GHF);
 		ppResults[i]->CJF_ = atof(ppResults[i]->CJF);
 		ppResults[i]->CDBZ_ = atoi(ppResults[i]->CDBZ);
+
+		// 可能没有
+		ppResults[i]->FSJE_ = atof(ppResults[i]->FSJE);
 
 		int HH = 0, mm = 0, ss = 0;
 		GetUpdateTime_HH_mm_ss(ppResults[i]->CJSJ, &HH, &mm, &ss);
@@ -700,35 +749,35 @@ void CharTable2GFLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, GFLB_STRUCT
 		ppResults[i] = new GFLB_STRUCT();
 
 		//if (col_140 >= 0)
-			strcpy(ppResults[i]->ZQDM, ppTable[i * COL_EACH_ROW + col_140]);
+			strcpy_s(ppResults[i]->ZQDM, ppTable[i * COL_EACH_ROW + col_140]);
 		//if (col_141 >= 0)
-			strcpy(ppResults[i]->ZQMC, ppTable[i * COL_EACH_ROW + col_141]);
+			strcpy_s(ppResults[i]->ZQMC, ppTable[i * COL_EACH_ROW + col_141]);
 		//if (col_200 >= 0)
-			strcpy(ppResults[i]->ZQSL, ppTable[i * COL_EACH_ROW + col_200]);
+			strcpy_s(ppResults[i]->ZQSL, ppTable[i * COL_EACH_ROW + col_200]);
 		//if (col_201 >= 0)
-			strcpy(ppResults[i]->KMSL, ppTable[i * COL_EACH_ROW + col_201]);
+			strcpy_s(ppResults[i]->KMSL, ppTable[i * COL_EACH_ROW + col_201]);
 		//if (col_202 >= 0)
-			strcpy(ppResults[i]->TBCBJ, ppTable[i * COL_EACH_ROW + col_202]);
+			strcpy_s(ppResults[i]->TBCBJ, ppTable[i * COL_EACH_ROW + col_202]);
 		//if (col_949 >= 0)
-			strcpy(ppResults[i]->DQJ, ppTable[i * COL_EACH_ROW + col_949]);
+			strcpy_s(ppResults[i]->DQJ, ppTable[i * COL_EACH_ROW + col_949]);
 		//if (col_205 >= 0)
-			strcpy(ppResults[i]->ZXSZ, ppTable[i * COL_EACH_ROW + col_205]);
+			strcpy_s(ppResults[i]->ZXSZ, ppTable[i * COL_EACH_ROW + col_205]);
 		//if (col_204 >= 0)
-			strcpy(ppResults[i]->TBFDYK, ppTable[i * COL_EACH_ROW + col_204]);
-		//if (col_232 >= 0)
-			strcpy(ppResults[i]->SXYK, ppTable[i * COL_EACH_ROW + col_232]);
+			strcpy_s(ppResults[i]->TBFDYK, ppTable[i * COL_EACH_ROW + col_204]);
+		if (col_232 >= 0)
+			strcpy_s(ppResults[i]->SXYK, ppTable[i * COL_EACH_ROW + col_232]);
 		//if (col_230 >= 0)
-			strcpy(ppResults[i]->CKYKBL, ppTable[i * COL_EACH_ROW + col_230]);
-		//if (col_160 >= 0)
-			strcpy(ppResults[i]->DJSL, ppTable[i * COL_EACH_ROW + col_160]);
+			strcpy_s(ppResults[i]->CKYKBL, ppTable[i * COL_EACH_ROW + col_230]);
+		if (col_160 >= 0)
+			strcpy_s(ppResults[i]->DJSL, ppTable[i * COL_EACH_ROW + col_160]);
 		//if (col_123 >= 0)
-			strcpy(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
+			strcpy_s(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
 		//if (col_100 >= 0)
-			strcpy(ppResults[i]->JYSDM, ppTable[i * COL_EACH_ROW + col_100]);
-		//if (col_101 >= 0)
-			strcpy(ppResults[i]->JYSMC, ppTable[i * COL_EACH_ROW + col_101]);
+			strcpy_s(ppResults[i]->JYSDM, ppTable[i * COL_EACH_ROW + col_100]);
+		if (col_101 >= 0)
+			strcpy_s(ppResults[i]->JYSMC, ppTable[i * COL_EACH_ROW + col_101]);
 		//if (col_1213 >= 0)
-			strcpy(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
+			strcpy_s(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
 
 
 		ppResults[i]->ZQSL_ = atoi(ppResults[i]->ZQSL);
@@ -760,29 +809,33 @@ void CharTable2ZJYE(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, ZJYE_STRUCT
 	int col_310 = GetIndexByFieldID(ppFieldInfos, FIELD_ZZC_310);
 	int col_302 = GetIndexByFieldID(ppFieldInfos, FIELD_KQZJ);
 	int col_121 = GetIndexByFieldID(ppFieldInfos, FIELD_ZJZH);
+	int col_205 = GetIndexByFieldID(ppFieldInfos, FIELD_ZXSZ);
 
 	for (int i = 0; i < count; ++i)
 	{
 		ppResults[i] = new ZJYE_STRUCT();
 
-		if (col_132 >= 0)
-			strcpy(ppResults[i]->BZ, ppTable[i * COL_EACH_ROW + col_132]);
-		if (col_300 >= 0)
-			strcpy(ppResults[i]->ZJYE, ppTable[i * COL_EACH_ROW + col_300]);
-		if (col_301 >= 0)
-			strcpy(ppResults[i]->KYZJ, ppTable[i * COL_EACH_ROW + col_301]);
-		if (col_310 >= 0)
-			strcpy(ppResults[i]->ZZC, ppTable[i * COL_EACH_ROW + col_310]);
-		if (col_302 >= 0)
-			strcpy(ppResults[i]->KQZJ, ppTable[i * COL_EACH_ROW + col_302]);
+		//if (col_132 >= 0)
+			strcpy_s(ppResults[i]->BZ, ppTable[i * COL_EACH_ROW + col_132]);
+		//if (col_300 >= 0)
+			strcpy_s(ppResults[i]->ZJYE, ppTable[i * COL_EACH_ROW + col_300]);
+		//if (col_301 >= 0)
+			strcpy_s(ppResults[i]->KYZJ, ppTable[i * COL_EACH_ROW + col_301]);
+		//if (col_310 >= 0)
+			strcpy_s(ppResults[i]->ZZC, ppTable[i * COL_EACH_ROW + col_310]);
+		//if (col_302 >= 0)
+			strcpy_s(ppResults[i]->KQZJ, ppTable[i * COL_EACH_ROW + col_302]);
 		if (col_121 >= 0)
-			strcpy(ppResults[i]->ZJZH, ppTable[i * COL_EACH_ROW + col_121]);
+			strcpy_s(ppResults[i]->ZJZH, ppTable[i * COL_EACH_ROW + col_121]);
+		if (col_205 >= 0)
+			strcpy_s(ppResults[i]->ZXSZ, ppTable[i * COL_EACH_ROW + col_205]);
 
 
 		ppResults[i]->ZJYE_ = atof(ppResults[i]->ZJYE);
 		ppResults[i]->KYZJ_ = atof(ppResults[i]->KYZJ);
 		ppResults[i]->ZZC_ = atof(ppResults[i]->ZZC);
 		ppResults[i]->KQZJ_ = atof(ppResults[i]->KQZJ);
+		ppResults[i]->ZXSZ_ = atof(ppResults[i]->ZXSZ);
 	}
 }
 
@@ -833,6 +886,8 @@ void CharTable2HQ(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, HQ_STRUCT*** 
 	int col_125 = GetIndexByFieldID(ppFieldInfos, FIELD_ZHLB);
 	int col_132 = GetIndexByFieldID(ppFieldInfos, FIELD_BZ);
 	int col_958 = GetIndexByFieldID(ppFieldInfos, FIELD_GZBS);
+	int col_940 = GetIndexByFieldID(ppFieldInfos, FIELD_ZTJG);
+	int col_941 = GetIndexByFieldID(ppFieldInfos, FIELD_DTJG);
 	int col_1213 = GetIndexByFieldID(ppFieldInfos, FIELD_BLXX);
 
 	for (int i = 0; i < count; ++i)
@@ -840,73 +895,77 @@ void CharTable2HQ(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, HQ_STRUCT*** 
 		ppResults[i] = new HQ_STRUCT();
 
 		//if (col_140 >= 0)
-			strcpy(ppResults[i]->ZQDM, ppTable[i * COL_EACH_ROW + col_140]);
+			strcpy_s(ppResults[i]->ZQDM, ppTable[i * COL_EACH_ROW + col_140]);
 		if (col_141 >= 0)
-			strcpy(ppResults[i]->ZQMC, ppTable[i * COL_EACH_ROW + col_141]);
+			strcpy_s(ppResults[i]->ZQMC, ppTable[i * COL_EACH_ROW + col_141]);
 		if (col_946 >= 0)
-			strcpy(ppResults[i]->ZSJ, ppTable[i * COL_EACH_ROW + col_946]);
+			strcpy_s(ppResults[i]->ZSJ, ppTable[i * COL_EACH_ROW + col_946]);
 		if (col_945 >= 0)
-			strcpy(ppResults[i]->JKJ, ppTable[i * COL_EACH_ROW + col_945]);
+			strcpy_s(ppResults[i]->JKJ, ppTable[i * COL_EACH_ROW + col_945]);
 		if (col_948 >= 0)
-			strcpy(ppResults[i]->GZLX, ppTable[i * COL_EACH_ROW + col_948]);
+			strcpy_s(ppResults[i]->GZLX, ppTable[i * COL_EACH_ROW + col_948]);
 		//if (col_949 >= 0)
-			strcpy(ppResults[i]->DQJ, ppTable[i * COL_EACH_ROW + col_949]);
+			strcpy_s(ppResults[i]->DQJ, ppTable[i * COL_EACH_ROW + col_949]);
 		//if (col_910 >= 0)
-			strcpy(ppResults[i]->BidPrice1, ppTable[i * COL_EACH_ROW + col_910]);
+			strcpy_s(ppResults[i]->BidPrice1, ppTable[i * COL_EACH_ROW + col_910]);
 		//if (col_911 >= 0)
-			strcpy(ppResults[i]->BidPrice2, ppTable[i * COL_EACH_ROW + col_911]);
+			strcpy_s(ppResults[i]->BidPrice2, ppTable[i * COL_EACH_ROW + col_911]);
 		//if (col_912 >= 0)
-			strcpy(ppResults[i]->BidPrice3, ppTable[i * COL_EACH_ROW + col_912]);
+			strcpy_s(ppResults[i]->BidPrice3, ppTable[i * COL_EACH_ROW + col_912]);
 		//if (col_913 >= 0)
-			strcpy(ppResults[i]->BidPrice4, ppTable[i * COL_EACH_ROW + col_913]);
+			strcpy_s(ppResults[i]->BidPrice4, ppTable[i * COL_EACH_ROW + col_913]);
 		//if (col_914 >= 0)
-			strcpy(ppResults[i]->BidPrice5, ppTable[i * COL_EACH_ROW + col_914]);
+			strcpy_s(ppResults[i]->BidPrice5, ppTable[i * COL_EACH_ROW + col_914]);
 		//if (col_900 >= 0)
-			strcpy(ppResults[i]->BidSize1, ppTable[i * COL_EACH_ROW + col_900]);
+			strcpy_s(ppResults[i]->BidSize1, ppTable[i * COL_EACH_ROW + col_900]);
 		//if (col_901 >= 0)
-			strcpy(ppResults[i]->BidSize2, ppTable[i * COL_EACH_ROW + col_901]);
+			strcpy_s(ppResults[i]->BidSize2, ppTable[i * COL_EACH_ROW + col_901]);
 		//if (col_902 >= 0)
-			strcpy(ppResults[i]->BidSize3, ppTable[i * COL_EACH_ROW + col_902]);
+			strcpy_s(ppResults[i]->BidSize3, ppTable[i * COL_EACH_ROW + col_902]);
 		//if (col_903 >= 0)
-			strcpy(ppResults[i]->BidSize4, ppTable[i * COL_EACH_ROW + col_903]);
+			strcpy_s(ppResults[i]->BidSize4, ppTable[i * COL_EACH_ROW + col_903]);
 		//if (col_904 >= 0)
-			strcpy(ppResults[i]->BidSize5, ppTable[i * COL_EACH_ROW + col_904]);
+			strcpy_s(ppResults[i]->BidSize5, ppTable[i * COL_EACH_ROW + col_904]);
 		//if (col_930 >= 0)
-			strcpy(ppResults[i]->AskPrice1, ppTable[i * COL_EACH_ROW + col_930]);
+			strcpy_s(ppResults[i]->AskPrice1, ppTable[i * COL_EACH_ROW + col_930]);
 		//if (col_931 >= 0)
-			strcpy(ppResults[i]->AskPrice2, ppTable[i * COL_EACH_ROW + col_931]);
+			strcpy_s(ppResults[i]->AskPrice2, ppTable[i * COL_EACH_ROW + col_931]);
 		//if (col_932 >= 0)
-			strcpy(ppResults[i]->AskPrice3, ppTable[i * COL_EACH_ROW + col_932]);
+			strcpy_s(ppResults[i]->AskPrice3, ppTable[i * COL_EACH_ROW + col_932]);
 		//if (col_933 >= 0)
-			strcpy(ppResults[i]->AskPrice4, ppTable[i * COL_EACH_ROW + col_933]);
+			strcpy_s(ppResults[i]->AskPrice4, ppTable[i * COL_EACH_ROW + col_933]);
 		//if (col_934 >= 0)
-			strcpy(ppResults[i]->AskPrice5, ppTable[i * COL_EACH_ROW + col_934]);
+			strcpy_s(ppResults[i]->AskPrice5, ppTable[i * COL_EACH_ROW + col_934]);
 		//if (col_920 >= 0)
-			strcpy(ppResults[i]->AskSize1, ppTable[i * COL_EACH_ROW + col_920]);
+			strcpy_s(ppResults[i]->AskSize1, ppTable[i * COL_EACH_ROW + col_920]);
 		//if (col_921 >= 0)
-			strcpy(ppResults[i]->AskSize2, ppTable[i * COL_EACH_ROW + col_921]);
+			strcpy_s(ppResults[i]->AskSize2, ppTable[i * COL_EACH_ROW + col_921]);
 		//if (col_922 >= 0)
-			strcpy(ppResults[i]->AskSize3, ppTable[i * COL_EACH_ROW + col_922]);
+			strcpy_s(ppResults[i]->AskSize3, ppTable[i * COL_EACH_ROW + col_922]);
 		//if (col_923 >= 0)
-			strcpy(ppResults[i]->AskSize4, ppTable[i * COL_EACH_ROW + col_923]);
+			strcpy_s(ppResults[i]->AskSize4, ppTable[i * COL_EACH_ROW + col_923]);
 		//if (col_924 >= 0)
-			strcpy(ppResults[i]->AskSize5, ppTable[i * COL_EACH_ROW + col_924]);
+			strcpy_s(ppResults[i]->AskSize5, ppTable[i * COL_EACH_ROW + col_924]);
 		//if (col_100 >= 0)
-			strcpy(ppResults[i]->JYSDM, ppTable[i * COL_EACH_ROW + col_100]);
+			strcpy_s(ppResults[i]->JYSDM, ppTable[i * COL_EACH_ROW + col_100]);
 		//if (col_187 >= 0)
-			strcpy(ppResults[i]->ZXJYGS, ppTable[i * COL_EACH_ROW + col_187]);
+			strcpy_s(ppResults[i]->ZXJYGS, ppTable[i * COL_EACH_ROW + col_187]);
 		//if (col_226 >= 0)
-			strcpy(ppResults[i]->ZXMRBDJW, ppTable[i * COL_EACH_ROW + col_226]);
+			strcpy_s(ppResults[i]->ZXMRBDJW, ppTable[i * COL_EACH_ROW + col_226]);
 		//if (col_227 >= 0)
-			strcpy(ppResults[i]->ZXMCBDJW, ppTable[i * COL_EACH_ROW + col_227]);
+			strcpy_s(ppResults[i]->ZXMCBDJW, ppTable[i * COL_EACH_ROW + col_227]);
 		//if (col_125 >= 0)
-			strcpy(ppResults[i]->ZHLB, ppTable[i * COL_EACH_ROW + col_125]);
+			strcpy_s(ppResults[i]->ZHLB, ppTable[i * COL_EACH_ROW + col_125]);
 		//if (col_132 >= 0)
-			strcpy(ppResults[i]->BZ, ppTable[i * COL_EACH_ROW + col_132]);
+			strcpy_s(ppResults[i]->BZ, ppTable[i * COL_EACH_ROW + col_132]);
 		//if (col_958 >= 0)
-			strcpy(ppResults[i]->GZBS, ppTable[i * COL_EACH_ROW + col_958]);
+			strcpy_s(ppResults[i]->GZBS, ppTable[i * COL_EACH_ROW + col_958]);
+		if (col_940 >= 0)
+			strcpy_s(ppResults[i]->ZTJG, ppTable[i * COL_EACH_ROW + col_940]);
+		if (col_941 >= 0)
+			strcpy_s(ppResults[i]->DTJG, ppTable[i * COL_EACH_ROW + col_941]);
 		if (col_1213 >= 0)
-			strcpy(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
+			strcpy_s(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
 
 
 		ppResults[i]->ZSJ_ = atof(ppResults[i]->ZSJ);
@@ -937,6 +996,8 @@ void CharTable2HQ(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, HQ_STRUCT*** 
 		ppResults[i]->ZXJYGS_ = atoi(ppResults[i]->ZXJYGS);
 		ppResults[i]->ZXMRBDJW_ = atof(ppResults[i]->ZXMRBDJW);
 		ppResults[i]->ZXMCBDJW_ = atof(ppResults[i]->ZXMCBDJW);
+		ppResults[i]->ZTJG_ = atof(ppResults[i]->ZTJG);
+		ppResults[i]->DTJG_ = atof(ppResults[i]->DTJG);
 	}
 }
 
@@ -947,20 +1008,24 @@ void GetUpdateTime_HH_mm_ss(char* UpdateTime, int* _HH, int* _mm, int* _ss)
 	*_ss = atoi(&UpdateTime[6]);
 }
 
-void DeleteStructs(void** ppStructs)
+void DeleteStructs(void*** pppStructs)
 {
-	if (ppStructs == nullptr)
+	if (*pppStructs == nullptr)
 		return;
+
+	void** ppStructs = *pppStructs;
 
 	int i = 0;
 	while (ppStructs[i] != 0)
 	{
 		delete[] ppStructs[i];
+		ppStructs[i] = nullptr;
 
 		++i;
 	}
 
 	delete[] ppStructs;
+	*pppStructs = nullptr;
 }
 
 #else

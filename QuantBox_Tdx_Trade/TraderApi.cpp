@@ -91,10 +91,33 @@ void* __stdcall Test(char type, void* pApi1, void* pApi2, double double1, double
 void CTraderApi::TestInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	int iRet = 0;
+	bool bQryOrder = false;
+	bool bQryTrade = false;
 
-	if (time(nullptr) > m_QueryOrderTime)
+	time_t _now = time(nullptr);
+
+	// 想在整点时查询一下，因为整点时交易所和柜台变状态的可能性比较大这样
+
+	if (_now > m_QueryOrderTime)
 	{
-		// 这个线程没有完就发起新的查询了吗？
+		bQryOrder = true;
+	}
+	else
+	{
+		
+	}
+
+	if (_now > m_QueryTradeTime)
+	{
+		bQryTrade = true;
+	}
+	else
+	{
+
+	}
+
+	if (bQryOrder)
+	{
 		double _queryTime = QUERY_TIME_MAX;
 		m_QueryOrderTime = time(nullptr) + _queryTime;
 		OutputQueryTime(m_QueryOrderTime, _queryTime, "QueryOrder");
@@ -102,9 +125,8 @@ void CTraderApi::TestInThread(char type, void* pApi1, void* pApi2, double double
 		ReqQryOrder();
 	}
 
-	if (time(nullptr) > m_QueryTradeTime)
+	if (bQryTrade)
 	{
-		// 这个线程没有完就发起新的查询了吗？
 		double _queryTime = QUERY_TIME_MAX;
 		m_QueryTradeTime = time(nullptr) + _queryTime;
 		OutputQueryTime(m_QueryTradeTime, _queryTime, "QueryTrade");
@@ -721,6 +743,7 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 	// 委托列表
 	// 1.新增的都需要输出
 	// 2.老的看是否有变化
+	++m_OrderNotUpdateCount;
 	
 	int i = 0;
 	list<OrderField*>::iterator it2 = m_OldOrderList.begin();
@@ -745,7 +768,9 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 
 		if (bUpdate)
 		{
-			bUpdate = true;
+			IsUpdated = true;
+			m_OrderNotUpdateCount = 0;
+
 			// 如果能找到下单时的委托，就修改后发出来
 			unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(pField->ID);
 			if (it != m_id_platform_order.end())
@@ -798,6 +823,7 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 			// 没有更新，是否要慢点查
 			_queryTime = 0.5 * QUERY_TIME_MAX + QUERY_TIME_MIN;
 		}
+		
 		// 有没有完成的，需要定时查询
 		if (IsNotSent)
 		{
@@ -806,8 +832,13 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 		}
 		else
 		{
-			// 交易时间了，是否需要考虑
+			// 可能是交易时间了，是否需要考虑
 			_queryTime = 2 * QUERY_TIME_MIN;
+			// 可能有些挂单一天都不会成交，挂在这一直导致查太多，加一下查询计数
+			if (m_OrderNotUpdateCount>=3)
+			{
+				_queryTime = 0.5 * QUERY_TIME_MAX + QUERY_TIME_MIN;
+			}
 		}
 	}
 	else
@@ -819,6 +850,7 @@ int CTraderApi::_ReqQryOrder(char type, void* pApi1, void* pApi2, double double1
 	m_QueryOrderTime = time(nullptr) + _queryTime;
 	OutputQueryTime(m_QueryOrderTime, _queryTime, "NextQueryOrder_QueryOrder");
 
+	// 决定成交查询间隔
 	if (IsUpdated)
 	{
 		// 委托可能是撤单，也有可能是成交了，赶紧查一下
@@ -957,6 +989,13 @@ int CTraderApi::_ReqQryTradingAccount(char type, void* pApi1, void* pApi2, doubl
 			AccountField* pField = (AccountField*)m_msgQueue->new_block(sizeof(AccountField));
 
 			ZJYE_2_AccountField(ppRS[i], pField);
+
+			// 可能资金账号查不出来，手工填上
+			if (strlen(pField->Account) <= 0)
+			{
+				// 多账户会有问题
+				strcpy(pField->Account, m_pApi->GetAccount());
+			}
 			
 			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryTradingAccount, m_msgQueue, m_pClass, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
 		}
@@ -964,6 +1003,10 @@ int CTraderApi::_ReqQryTradingAccount(char type, void* pApi1, void* pApi2, doubl
 
 	DeleteTableBody(ppResults);
 	DeleteError(pErr);
+
+	double _queryTime = 5 * QUERY_TIME_MAX;
+	m_QueryTradeTime = time(nullptr) + _queryTime;
+	OutputQueryTime(m_QueryTradeTime, _queryTime, "NextQueryTrade_QueryOrder");
 
 	return 0;
 }
@@ -1069,6 +1112,8 @@ int CTraderApi::_Subscribe(char type, void* pApi1, void* pApi2, double double1, 
 			//pField->Turnover = pDepthMarketData->Turnover;
 			//pField->OpenInterest = pDepthMarketData->OpenInterest;
 			//pField->AveragePrice = pDepthMarketData->AveragePrice;
+			pField->UpperLimitPrice = pDepthMarketData->ZTJG_;
+			pField->LowerLimitPrice = pDepthMarketData->DTJG_;
 
 			pField->PreClosePrice = pDepthMarketData->ZSJ_;
 			pField->OpenPrice = pDepthMarketData->JKJ_;

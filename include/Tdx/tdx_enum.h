@@ -22,6 +22,10 @@
 #define MMBZ_Merge				12	// 基金合并
 #define MMBZ_Split				13	// 基金分拆
 
+// 5565_委托类别
+#define WTLB_MM	0;	// 买卖
+#define WTLB_CD	1;	// 撤单
+
 // 131_委托类别
 // 3|投票
 // 3|融券
@@ -52,15 +56,17 @@
 #define RZRQBS_YES				1	// 融资融券
 
 // 147_状态说明
-#define ZTSM_0					0	// 0-未申报
+#define ZTSM_NotSent			0	// 0-未申报
 #define ZTSM_1					1	// 
-#define ZTSM_New				2	// 2-已申报未成交
+#define ZTSM_New				2	// 2-已申报未成交,未成交
 #define ZTSM_Illegal			3	// 3-非法委托
 #define ZTSM_4					4	//
 #define ZTSM_5					5	//
-#define ZTSM_AllFilled			6	// 6-全部成交
-#define ZTSM_7					7	//
-#define ZTSM_AllCancelled		8	// 8-全部撤单
-#define ZTSM_9					9	// 9-撤单未成	只会出现撤单记录中
+#define ZTSM_AllFilled			6	// 6-全部成交,已成,全部成交
+#define ZTSM_PartiallyCancelled	7	// 部撤，这是猜的，需要以后修正
+#define ZTSM_AllCancelled		8	// 8-全部撤单,已撤,全部撤单
+#define ZTSM_CancelRejected		9	// 9-撤单未成					只会出现撤单记录中
+
+// 已成,部成,废单,已撤,部撤
 
 #endif

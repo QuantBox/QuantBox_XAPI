@@ -165,11 +165,13 @@ struct ZJYE_STRUCT
 	char ZZC[32];		// 310_总资产
 	char KQZJ[32];		// 302_可取资金
 	char ZJZH[32];		// 121_资金帐号
+	char ZXSZ[32];		// 205_最新市值
 
 	double ZJYE_;
 	double KYZJ_;
 	double ZZC_;
 	double KQZJ_;
+	double ZXSZ_;
 };
 
 struct HQ_STRUCT
@@ -208,6 +210,8 @@ struct HQ_STRUCT
 	char BZ[32];		// 132_币种
 	char GZBS[32];		// 958_国债标识
 	char BLXX[32];		// 1213_保留信息
+	char ZTJG[32];		// 940_涨停价格
+	char DTJG[32];		// 941_跌停价格
 
 	double ZSJ_;		// 946_昨收价
 	double JKJ_;		// 945_今开价
@@ -237,6 +241,8 @@ struct HQ_STRUCT
 	int ZXJYGS_;		// 187_最小交易股数
 	double ZXMRBDJW_;		// 226_最小买入变动价位
 	double ZXMCBDJW_;		// 227_最小卖出变动价位
+	double ZTJG_;		// 940_涨停价格
+	double DTJG_;		// 941_跌停价格
 };
 
 //

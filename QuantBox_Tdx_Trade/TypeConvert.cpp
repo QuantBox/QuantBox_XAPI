@@ -80,7 +80,7 @@ OrderStatus ZTSM_2_OrderStatus(int In)
 {
 	switch (In)
 	{
-	case ZTSM_0:
+	case ZTSM_NotSent:
 		return OrderStatus::PendingNew;
 	case ZTSM_New:
 		return OrderStatus::New;
@@ -99,7 +99,7 @@ ExecType ZTSM_2_ExecType(int In)
 {
 	switch (In)
 	{
-	case ZTSM_0:
+	case ZTSM_NotSent:
 		return ExecType::ExecNew;
 	case ZTSM_New:
 		return ExecType::ExecNew;
@@ -130,7 +130,7 @@ bool ZTSM_IsNotSent(int In)
 {
 	switch (In)
 	{
-	case ZTSM_0:
+	case ZTSM_NotSent:
 		return true;
 	}
 	return false;

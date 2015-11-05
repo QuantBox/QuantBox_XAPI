@@ -98,11 +98,16 @@ ID一样，中文名可能不一样
 #define FIELD_XYJYBS		5254	// 5254_信用交易标识
 #define FIELD_HHH			5255	// 5255_会话号
 #define FIELD_KHDM			5256	// 5256_客户代码
+
+#define FIELD_WTLB_5565		5565	// 5565_委托类别
+
 #define FIELD_ZZHBH			5673	// 5673_子账户编号
 #define FIELD_JSJG			5674	// 5674_结算机构
 #define FIELD_JSZH			5675	// 5675_结算账号
 #define FIELD_DJRQ			5676	// 5676_登记日期
 
+#define FIELD_MMFX			5935	// 5935_买卖方向
+#define FIELD_BJFS_6027		6027	// 6027_报价方式
 
 
 #define FIELD_BID_SIZE_1	900	// 900_买一量
@@ -129,11 +134,17 @@ ID一样，中文名可能不一样
 #define FIELD_ASK_PRICE_4	933	// 933_卖四价
 #define FIELD_ASK_PRICE_5	934	// 934_卖五价
 
+#define FIELD_ZTJG	940		// 940_涨停价格
+#define FIELD_DTJG	941		// 941_跌停价格
+
 #define FIELD_JKJ	945		// 945_今开价
 #define FIELD_ZSJ	946		// 946_昨收价
 #define FIELD_GZLX	948		// 948_国债利息
 #define FIELD_DQJ	949		// 949_当前价
-
+#define FIELD_QGTHQ	956		// 956_取柜台行情
 #define FIELD_GZBS	958		// 958_国债标识
+
+
+
 
 #endif

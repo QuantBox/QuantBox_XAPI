@@ -81,4 +81,4 @@ TDXAPI_API void CharTable2ZJYE(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, 
 TDXAPI_API void CharTable2HQ(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, HQ_STRUCT*** pppResults);
 
 
-TDXAPI_API void DeleteStructs(void** ppStructs);
+TDXAPI_API void DeleteStructs(void*** ppStructs);
