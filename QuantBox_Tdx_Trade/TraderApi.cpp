@@ -997,16 +997,16 @@ int CTraderApi::_ReqQryTradingAccount(char type, void* pApi1, void* pApi2, doubl
 				strcpy(pField->Account, m_pApi->GetAccount());
 			}
 			
-			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryTradingAccount, m_msgQueue, m_pClass, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryTradingAccount, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
 		}
 	}
 
 	DeleteTableBody(ppResults);
 	DeleteError(pErr);
 
-	double _queryTime = 5 * QUERY_TIME_MAX;
-	m_QueryTradeTime = time(nullptr) + _queryTime;
-	OutputQueryTime(m_QueryTradeTime, _queryTime, "NextQueryTrade_QueryOrder");
+	//double _queryTime = 5 * QUERY_TIME_MAX;
+	//m_QueryTradeTime = time(nullptr) + _queryTime;
+	//OutputQueryTime(m_QueryTradeTime, _queryTime, "NextQueryTrade_QueryOrder");
 
 	return 0;
 }
