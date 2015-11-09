@@ -93,6 +93,7 @@ void CTraderApi::TestInThread(char type, void* pApi1, void* pApi2, double double
 	int iRet = 0;
 	bool bQryOrder = false;
 	bool bQryTrade = false;
+	bool bQryInvestor = false;
 
 	time_t _now = time(nullptr);
 
@@ -114,6 +115,24 @@ void CTraderApi::TestInThread(char type, void* pApi1, void* pApi2, double double
 	else
 	{
 
+	}
+
+	if (_now > m_QueryGDLBTime)
+	{
+		bQryInvestor = true;
+	}
+	else
+	{
+
+	}
+
+	if (bQryInvestor)
+	{
+		double _queryTime = QUERY_TIME_MAX * 60;
+		m_QueryGDLBTime = time(nullptr) + _queryTime;
+		OutputQueryTime(m_QueryGDLBTime, _queryTime, "QueryInvestor");
+
+		ReqQryInvestor();
 	}
 
 	if (bQryOrder)
@@ -222,8 +241,11 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 		m_pApi->SetClient(m_pClient);
 		m_pApi->SetAccount(m_UserInfo.UserID);
 
-		// 查询股东列表
-		ReqQryInvestor();
+		// 查询股东列表，华泰证券可能一开始查会返回非知请求[1122]
+		
+		int _queryTime = QUERY_TIME_MIN;
+		m_QueryGDLBTime = time(nullptr) + _queryTime;
+		OutputQueryTime(m_QueryGDLBTime, _queryTime, "NextQueryInvestor_Login");
 
 		// 查列表，这样就不会一下单就
 		//ReqQryOrder();
@@ -277,6 +299,10 @@ int CTraderApi::_ReqQryInvestor(char type, void* pApi1, void* pApi2, double doub
 
 	if (IsErrorRspInfo("ReqQryInvestor", pErr))
 	{
+		int _queryTime = QUERY_TIME_MIN;
+		m_QueryGDLBTime = time(nullptr) + _queryTime;
+		OutputQueryTime(m_QueryGDLBTime, _queryTime, "NextQueryInvestor_ReqQryInvestor");
+
 		DeleteTableBody(ppResults);
 		DeleteError(pErr);
 
