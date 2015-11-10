@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "../include/Tdx/TdxApi.h"
-//#include "../include/Tdx/LuaRunner.h"
 #include "../include/ApiStruct.h"
 #include "../include/IDGenerator.h"
 

@@ -14,6 +14,8 @@
 
 #include "TypeConvert.h"
 
+#include "../include/Tdx/tdx_function.h"
+
 #include <cstring>
 #include <assert.h>
 
@@ -93,7 +95,7 @@ void CTraderApi::TestInThread(char type, void* pApi1, void* pApi2, double double
 	int iRet = 0;
 	bool bQryOrder = false;
 	bool bQryTrade = false;
-	bool bQryInvestor = false;
+	//bool bQryInvestor = false;
 
 	time_t _now = time(nullptr);
 
@@ -117,23 +119,23 @@ void CTraderApi::TestInThread(char type, void* pApi1, void* pApi2, double double
 
 	}
 
-	if (_now > m_QueryGDLBTime)
-	{
-		bQryInvestor = true;
-	}
-	else
-	{
+	//if (_now > m_QueryGDLBTime)
+	//{
+	//	bQryInvestor = true;
+	//}
+	//else
+	//{
 
-	}
+	//}
 
-	if (bQryInvestor)
-	{
-		double _queryTime = QUERY_TIME_MAX * 60;
-		m_QueryGDLBTime = time(nullptr) + _queryTime;
-		OutputQueryTime(m_QueryGDLBTime, _queryTime, "QueryInvestor");
+	//if (bQryInvestor)
+	//{
+	//	double _queryTime = QUERY_TIME_MAX * 60;
+	//	m_QueryGDLBTime = time(nullptr) + _queryTime;
+	//	OutputQueryTime(m_QueryGDLBTime, _queryTime, "QueryInvestor");
 
-		ReqQryInvestor();
-	}
+	//	ReqQryInvestor();
+	//}
 
 	if (bQryOrder)
 	{
@@ -242,14 +244,27 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 		m_pApi->SetAccount(m_UserInfo.UserID);
 
 		// 查询股东列表，华泰证券可能一开始查会返回非知请求[1122]
-		
-		int _queryTime = QUERY_TIME_MIN;
-		m_QueryGDLBTime = time(nullptr) + _queryTime;
-		OutputQueryTime(m_QueryGDLBTime, _queryTime, "NextQueryInvestor_Login");
+		GDLB_STRUCT** ppRS = nullptr;
+		CharTable2Login(ppResults, &ppRS);
 
-		// 查列表，这样就不会一下单就
-		//ReqQryOrder();
-		//ReqQryTrade();
+		int count = GetCountStructs((void**)ppRS);
+
+		if (count>0)
+		{
+			for (int i = 0; i < count; ++i)
+			{
+				InvestorField* pField = (InvestorField*)m_msgQueue->new_block(sizeof(InvestorField));
+
+				GDLB_2_InvestorField(ppRS[i], pField);
+
+				m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInvestor, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(InvestorField), nullptr, 0, nullptr, 0);
+			}
+		}
+		else
+		{
+			// 查通达信仿真实验室账号不直接返回股东列表
+			ReqQryInvestor();
+		}
 		
 		// 启动定时查询功能使用
 		m_msgQueue_Test->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue_Test, this, 0, 0, nullptr, 0, nullptr, 0, nullptr, 0);
@@ -312,18 +327,15 @@ int CTraderApi::_ReqQryInvestor(char type, void* pApi1, void* pApi2, double doub
 	GDLB_STRUCT** ppRS = nullptr;
 	CharTable2GDLB(ppFieldInfos, ppResults, &ppRS);
 
-	if (ppRS)
+	int count = GetCountStructs((void**)ppRS);
+
+	for (int i = 0; i < count; ++i)
 	{
-		int count = GetRowCountTableBody(ppResults);
+		InvestorField* pField = (InvestorField*)m_msgQueue->new_block(sizeof(InvestorField));
 
-		for (int i = 0; i < count; ++i)
-		{
-			InvestorField* pField = (InvestorField*)m_msgQueue->new_block(sizeof(InvestorField));
+		GDLB_2_InvestorField(ppRS[i], pField);
 
-			GDLB_2_InvestorField(ppRS[i], pField);
-
-			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInvestor, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(InvestorField), nullptr, 0, nullptr, 0);
-		}
+		m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInvestor, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(InvestorField), nullptr, 0, nullptr, 0);
 	}
 
 	DeleteTableBody(ppResults);
@@ -1007,24 +1019,21 @@ int CTraderApi::_ReqQryTradingAccount(char type, void* pApi1, void* pApi2, doubl
 	ZJYE_STRUCT** ppRS = nullptr;
 	CharTable2ZJYE(ppFieldInfos, ppResults, &ppRS);
 
-	if (ppRS)
+	int count = GetCountStructs((void**)ppRS);
+	for (int i = 0; i < count; ++i)
 	{
-		int count = GetRowCountTableBody(ppResults);
-		for (int i = 0; i < count; ++i)
+		AccountField* pField = (AccountField*)m_msgQueue->new_block(sizeof(AccountField));
+
+		ZJYE_2_AccountField(ppRS[i], pField);
+
+		// 可能资金账号查不出来，手工填上
+		if (strlen(pField->Account) <= 0)
 		{
-			AccountField* pField = (AccountField*)m_msgQueue->new_block(sizeof(AccountField));
-
-			ZJYE_2_AccountField(ppRS[i], pField);
-
-			// 可能资金账号查不出来，手工填上
-			if (strlen(pField->Account) <= 0)
-			{
-				// 多账户会有问题
-				strcpy(pField->Account, m_pApi->GetAccount());
-			}
-			
-			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryTradingAccount, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+			// 多账户会有问题
+			strcpy(pField->Account, m_pApi->GetAccount());
 		}
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnRspQryTradingAccount, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
 	}
 
 	DeleteTableBody(ppResults);
@@ -1065,17 +1074,14 @@ int CTraderApi::_ReqQryInvestorPosition(char type, void* pApi1, void* pApi2, dou
 	GFLB_STRUCT** ppRS = nullptr;
 	CharTable2GFLB(ppFieldInfos, ppResults, &ppRS);
 
-	if (ppRS)
+	int count = GetCountStructs((void**)ppRS);
+	for (int i = 0; i < count; ++i)
 	{
-		int count = GetRowCountTableBody(ppResults);
-		for (int i = 0; i < count; ++i)
-		{
-			PositionField* pField = (PositionField*)m_msgQueue->new_block(sizeof(PositionField));
+		PositionField* pField = (PositionField*)m_msgQueue->new_block(sizeof(PositionField));
 
-			GFLB_2_PositionField(ppRS[i], pField);
+		GFLB_2_PositionField(ppRS[i], pField);
 
-			m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInvestorPosition, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
-		}
+		m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInvestorPosition, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
 	}
 
 	DeleteTableBody(ppResults);
@@ -1115,85 +1121,83 @@ int CTraderApi::_Subscribe(char type, void* pApi1, void* pApi2, double double1, 
 	HQ_STRUCT** ppRS = nullptr;
 	CharTable2HQ(ppFieldInfos, ppResults, &ppRS);
 
-	if (ppRS)
+	int count = GetCountStructs((void**)ppRS);
+
+	for (int i = 0; i < count; ++i)
 	{
-		int count = GetRowCountTableBody(ppResults);
-		for (int i = 0; i < count; ++i)
+		DepthMarketDataNField* pField = (DepthMarketDataNField*)m_msgQueue->new_block(sizeof(DepthMarketDataNField)+sizeof(DepthField)* 10);
+
+		HQ_STRUCT* pDepthMarketData = ppRS[i];
+
+		strcpy(pField->InstrumentID, pDepthMarketData->ZQDM);
+		//pField->Exchange = JYSDM_2_ExchangeType(pDepthMarketData->JYSDM);
+
+		sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, "");
+
+		// 交易时间
+		GetExchangeTime(time(nullptr), &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime);
+
+
+		pField->LastPrice = pDepthMarketData->DQJ_;
+		//pField->Volume = 0;
+		//pField->Turnover = pDepthMarketData->Turnover;
+		//pField->OpenInterest = pDepthMarketData->OpenInterest;
+		//pField->AveragePrice = pDepthMarketData->AveragePrice;
+		pField->UpperLimitPrice = pDepthMarketData->ZTJG_;
+		pField->LowerLimitPrice = pDepthMarketData->DTJG_;
+
+		pField->PreClosePrice = pDepthMarketData->ZSJ_;
+		pField->OpenPrice = pDepthMarketData->JKJ_;
+
+		InitBidAsk(pField);
+
+		do
 		{
-			DepthMarketDataNField* pField = (DepthMarketDataNField*)m_msgQueue->new_block(sizeof(DepthMarketDataNField)+sizeof(DepthField)* 10);
+			if (pDepthMarketData->BidSize1_ == 0)
+				break;
+			AddBid(pField, pDepthMarketData->BidPrice1_, pDepthMarketData->BidSize1_, 0);
 
-			HQ_STRUCT* pDepthMarketData = ppRS[i];
+			if (pDepthMarketData->BidSize2_ == 0)
+				break;
+			AddBid(pField, pDepthMarketData->BidPrice2_, pDepthMarketData->BidSize2_, 0);
 
-			strcpy(pField->InstrumentID, pDepthMarketData->ZQDM);
-			//pField->Exchange = JYSDM_2_ExchangeType(pDepthMarketData->JYSDM);
+			if (pDepthMarketData->BidSize3_ == 0)
+				break;
+			AddBid(pField, pDepthMarketData->BidPrice3_, pDepthMarketData->BidSize3_, 0);
 
-			sprintf(pField->Symbol, "%s.%s", pField->InstrumentID, "");
+			if (pDepthMarketData->BidSize4_ == 0)
+				break;
+			AddBid(pField, pDepthMarketData->BidPrice4_, pDepthMarketData->BidSize4_, 0);
 
-			// 交易时间
-			GetExchangeTime(time(nullptr), &pField->TradingDay, &pField->ActionDay, &pField->UpdateTime);
+			if (pDepthMarketData->BidSize5_ == 0)
+				break;
+			AddBid(pField, pDepthMarketData->BidPrice5_, pDepthMarketData->BidSize5_, 0);
+		} while (false);
 
+		do
+		{
+			if (pDepthMarketData->AskSize1_ == 0)
+				break;
+			AddAsk(pField, pDepthMarketData->AskPrice1_, pDepthMarketData->AskSize1_, 0);
 
-			pField->LastPrice = pDepthMarketData->DQJ_;
-			//pField->Volume = 0;
-			//pField->Turnover = pDepthMarketData->Turnover;
-			//pField->OpenInterest = pDepthMarketData->OpenInterest;
-			//pField->AveragePrice = pDepthMarketData->AveragePrice;
-			pField->UpperLimitPrice = pDepthMarketData->ZTJG_;
-			pField->LowerLimitPrice = pDepthMarketData->DTJG_;
+			if (pDepthMarketData->AskSize2_ == 0)
+				break;
+			AddAsk(pField, pDepthMarketData->AskPrice2_, pDepthMarketData->AskSize2_, 0);
 
-			pField->PreClosePrice = pDepthMarketData->ZSJ_;
-			pField->OpenPrice = pDepthMarketData->JKJ_;
+			if (pDepthMarketData->AskSize3_ == 0)
+				break;
+			AddAsk(pField, pDepthMarketData->AskPrice3_, pDepthMarketData->AskSize3_, 0);
 
-			InitBidAsk(pField);
+			if (pDepthMarketData->AskSize4_ == 0)
+				break;
+			AddAsk(pField, pDepthMarketData->AskPrice4_, pDepthMarketData->AskSize4_, 0);
 
-			do
-			{
-				if (pDepthMarketData->BidSize1_ == 0)
-					break;
-				AddBid(pField, pDepthMarketData->BidPrice1_, pDepthMarketData->BidSize1_, 0);
+			if (pDepthMarketData->AskSize5_ == 0)
+				break;
+			AddAsk(pField, pDepthMarketData->AskPrice5_, pDepthMarketData->AskSize5_, 0);
+		} while (false);
 
-				if (pDepthMarketData->BidSize2_ == 0)
-					break;
-				AddBid(pField, pDepthMarketData->BidPrice2_, pDepthMarketData->BidSize2_, 0);
-
-				if (pDepthMarketData->BidSize3_ == 0)
-					break;
-				AddBid(pField, pDepthMarketData->BidPrice3_, pDepthMarketData->BidSize3_, 0);
-
-				if (pDepthMarketData->BidSize4_ == 0)
-					break;
-				AddBid(pField, pDepthMarketData->BidPrice4_, pDepthMarketData->BidSize4_, 0);
-
-				if (pDepthMarketData->BidSize5_ == 0)
-					break;
-				AddBid(pField, pDepthMarketData->BidPrice5_, pDepthMarketData->BidSize5_, 0);
-			} while (false);
-
-			do
-			{
-				if (pDepthMarketData->AskSize1_ == 0)
-					break;
-				AddAsk(pField, pDepthMarketData->AskPrice1_, pDepthMarketData->AskSize1_, 0);
-
-				if (pDepthMarketData->AskSize2_ == 0)
-					break;
-				AddAsk(pField, pDepthMarketData->AskPrice2_, pDepthMarketData->AskSize2_, 0);
-
-				if (pDepthMarketData->AskSize3_ == 0)
-					break;
-				AddAsk(pField, pDepthMarketData->AskPrice3_, pDepthMarketData->AskSize3_, 0);
-
-				if (pDepthMarketData->AskSize4_ == 0)
-					break;
-				AddAsk(pField, pDepthMarketData->AskPrice4_, pDepthMarketData->AskSize4_, 0);
-
-				if (pDepthMarketData->AskSize5_ == 0)
-					break;
-				AddAsk(pField, pDepthMarketData->AskPrice5_, pDepthMarketData->AskSize5_, 0);
-			} while (false);
-
-			m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
-		}
+		m_msgQueue->Input_NoCopy(ResponeType::OnRtnDepthMarketData, m_msgQueue, m_pClass, DepthLevelType::FULL, 0, pField, pField->Size, nullptr, 0, nullptr, 0);
 	}
 
 	DeleteTableBody(ppResults);
