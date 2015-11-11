@@ -55,6 +55,8 @@ namespace QuantBox.XAPI.Event
 
             base.OnRspQryHistoricalTicks = OnRspQryHistoricalTicks_callback;
             base.OnRspQryHistoricalBars = OnRspQryHistoricalBars_callback;
+
+            base.OnRspQryInvestor = OnRspQryInvestor_callback;
         }
 
         public void Show()

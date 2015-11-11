@@ -47,9 +47,11 @@ struct GDLB_STRUCT
 {
 	char GDDM[32];	// 123_股东代码
 	char GDMC[32];	// 124_股东名称
-	char ZJZH[32];	// 121_资金帐号
 	char ZHLB[32];	// 125_帐号类别
+	char ZJZH[32];	// 121_资金帐号
+	char XWDM[32];	// 173_席位代码
 	char RZRQBS[32];	// 281_融资融券标识
+	char YMTZH[32];	// 5925_一码通账号
 	char BLXX[32];	// 1213_保留信息
 
 	int ZHLB_;		// 125_帐号类别

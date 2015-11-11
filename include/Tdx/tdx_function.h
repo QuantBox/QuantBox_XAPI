@@ -17,7 +17,8 @@ TDXAPI_API FieldInfo_STRUCT** CopyTableHeader(FieldInfo_STRUCT** ppHeader);
 #endif
 
 
-TDXAPI_API void GetUpdateTime_HH_mm_ss(char* UpdateTime, int* _HH, int* _mm, int* _ss);
+// 得到时间
+//TDXAPI_API void GetUpdateTime_HH_mm_ss(char* UpdateTime, int* _HH, int* _mm, int* _ss);
 
 //////////////////////////////////////////////////////////////////////////
 // 表头处理
@@ -50,19 +51,20 @@ TDXAPI_API void DeleteTableBody(char** ppTable, int count);
 TDXAPI_API char* GetAtTableBody(char** ppTable, int row, int col);
 // 只有非空的行才需要数，而中间出现空的只表示你已经知道表行数了，没有必要数
 TDXAPI_API int GetRowCountTableBody(char** ppTable);
-// 得到列数，没有必要，已经通过表头得到了列数
-//TDXAPI_API char* GetColCountTableBody(char** ppTable);
 
 //////////////////////////////////////////////////////////////////////////
 // 错误处理
-
 TDXAPI_API void PrintError(Error_STRUCT* pErr);
 TDXAPI_API void PrintErrors(Error_STRUCT** pErrs);
 TDXAPI_API void PrintErrors(Error_STRUCT** pErrs, int count);
+
+TDXAPI_API void OutputCSVError(FILE* pFile, Error_STRUCT* pErr);
+TDXAPI_API void OutputCSVErrors(FILE* pFile, Error_STRUCT** pErrs);
+TDXAPI_API void OutputCSVErrors(FILE* pFile, Error_STRUCT** pErrs, int count);
+
 TDXAPI_API void DeleteError(Error_STRUCT* pErr);
 TDXAPI_API void DeleteErrors(Error_STRUCT** pErrs);
 TDXAPI_API void DeleteErrors(Error_STRUCT** pErrs, int count);
-
 // 得到错误数
 TDXAPI_API int GetCountErrors(Error_STRUCT** pErrs);
 
@@ -80,5 +82,8 @@ TDXAPI_API void CharTable2ZJYE(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, 
 
 TDXAPI_API void CharTable2HQ(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, HQ_STRUCT*** pppResults);
 
+TDXAPI_API void CharTable2Login(char** ppTable, GDLB_STRUCT*** pppResults);
 
-TDXAPI_API void DeleteStructs(void*** ppStructs);
+TDXAPI_API int GetCountStructs(void** ppResults);
+
+TDXAPI_API void DeleteStructs(void*** pppStructs);

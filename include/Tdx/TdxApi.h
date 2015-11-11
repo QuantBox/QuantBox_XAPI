@@ -31,7 +31,7 @@ public:
 	virtual void Init(const char* TdxPath, Error_STRUCT** ppErr) = 0;
 	virtual void Exit() = 0;
 
-	virtual void* Login(const char* szAccount, const char* szPassword, char*** pppResults, Error_STRUCT** ppErr) = 0;
+	virtual void* Login(const char* szAccount, const char* szPassword, const char* szCode, char*** pppResults, Error_STRUCT** ppErr) = 0;
 	virtual void Logout(void* client) = 0;
 
 public:

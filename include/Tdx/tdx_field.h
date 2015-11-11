@@ -11,6 +11,7 @@ ID一样，中文名可能不一样
 #define FIELD_JYSMC			101 // 101_交易所名称
 #define FIELD_WTFS_110		110 // 110_委托方式
 #define FIELD_CZBZ			113	//	113_操作标志
+#define FIELD_ZDJY			116	//	116_指定交易
 #define FIELD_KHH			120	//	120_客户号
 #define FIELD_ZJZH			121	//	121_资金帐号
 #define FIELD_KHMC			122	//	122_客户名称
@@ -56,6 +57,7 @@ ID一样，中文名可能不一样
 #define FIELD_YJ			206	//	206_佣金
 #define FIELD_GHF			207	//	207_过户费
 #define FIELD_CJF			208	//	208_成交费
+#define FIELD_JSF			209	//	209_结算费
 #define FIELD_YHS			210	//	210_印花税
 #define FIELD_ZXMRBDJW		226	//	226_最小买入变动价位
 #define FIELD_ZXMCBDJW		227	//	227_最小卖出变动价位
@@ -70,6 +72,7 @@ ID一样，中文名可能不一样
 #define FIELD_KQZJ			302	//	302_可取资金
 #define FIELD_FSJE			303	//	303_发生金额
 #define FIELD_SYJE			304	//	304_剩余金额
+#define FIELD_ZY			305	//	305_摘要
 #define FIELD_ZZC_310		310	//	310_总资产
 #define FIELD_FNLX			333	//	333_方案类型
 #define FIELD_ZZC_350		350	//	350_总资产
@@ -100,12 +103,17 @@ ID一样，中文名可能不一样
 #define FIELD_KHDM			5256	// 5256_客户代码
 
 #define FIELD_WTLB_5565		5565	// 5565_委托类别
+#define FIELD_JSHL			5599	// 5599_结算汇率
 
+#define FIELD_JYF			5630	// 5630_交易费
+#define FIELD_DSGF			5638	// 5638_代收规费
+#define FIELD_GYWTBS		5639	// 5639_隔夜委托标识
 #define FIELD_ZZHBH			5673	// 5673_子账户编号
 #define FIELD_JSJG			5674	// 5674_结算机构
 #define FIELD_JSZH			5675	// 5675_结算账号
 #define FIELD_DJRQ			5676	// 5676_登记日期
 
+#define FIELD_YMTZH			5925	// 5925_一码通账号
 #define FIELD_MMFX			5935	// 5935_买卖方向
 #define FIELD_BJFS_6027		6027	// 6027_报价方式
 

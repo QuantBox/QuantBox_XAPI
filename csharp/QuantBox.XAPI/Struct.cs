@@ -10,7 +10,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 用户信息
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct UserInfoField
     {
         /// <summary>
@@ -23,12 +23,17 @@ namespace QuantBox.XAPI
         /// </summary>
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 41)]
         public string Password;
+        /// <summary>
+        /// 扩展信息，通达信中用来做通讯密码
+        /// </summary>
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
+        public string ExtInfo;
     }
 
     /// <summary>
     /// 用户信息
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct ServerInfoField
     {
         /// <summary>
@@ -86,7 +91,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 深度行情
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct ErrorField
     {
         /// <summary>
@@ -108,7 +113,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 登录回报
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct RspUserLoginField
     {
         /// <summary>
@@ -143,7 +148,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 深度行情N档
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct DepthMarketDataNField
     {
         ///占用总字节大小
@@ -242,7 +247,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// DepthField行情
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct DepthField
     {
         public double Price;
@@ -253,7 +258,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// Tick行情
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct TickField
     {
         public int Date;
@@ -272,7 +277,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// Bar行情
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct BarField
     {
         public int Date;
@@ -290,7 +295,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 发给做市商的询价请求
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct QuoteRequestField
     {
         /// <summary>
@@ -329,7 +334,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 合约信息
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct InstrumentField
     {
         /// <summary>
@@ -392,7 +397,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 账号
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct AccountField
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
@@ -466,7 +471,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 账号
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct SettlementInfoField
     {
         /// <summary>
@@ -483,7 +488,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 订单信息
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct QuoteField
     {
         public double AskQty;
@@ -540,7 +545,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 订单信息
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct OrderField
     {
         /// <summary>
@@ -600,7 +605,7 @@ namespace QuantBox.XAPI
         public string OrderID;
     }
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct OrderIDType
     {
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
@@ -610,7 +615,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 订单信息
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct TradeField
     {
         /// <summary>
@@ -640,7 +645,7 @@ namespace QuantBox.XAPI
         public string TradeID;
     }
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct PositionField
     {
         /// <summary>
@@ -671,7 +676,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 投资者
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct InvestorField
     {
         public IdCardType IdentifiedCardType;
@@ -688,7 +693,7 @@ namespace QuantBox.XAPI
     /// <summary>
     /// 合约信息
     /// </summary>
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public struct HistoricalDataRequestField
     {
         public int Date1;
@@ -721,7 +726,7 @@ namespace QuantBox.XAPI
         public string ExchangeID;
     }
 
-
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public class DepthMarketDataNClass
     {
         public int TradingDay;

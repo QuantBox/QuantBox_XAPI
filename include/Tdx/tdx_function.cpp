@@ -2,10 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <vector>
 
 #include "tdx_function.h"
 #include "tdx_enum.h"
 #include "tdx_field.h"
+#include "tdx_request.h"
+
+using namespace std;
 
 #ifdef TDXAPI_EXPORTS
 
@@ -16,6 +20,14 @@
 如果把这个函数编译到exe中，会导致是由外部的exe中函数来删除了，会出错
 
 */
+
+void GetUpdateTime_HH_mm_ss(char* UpdateTime, int* _HH, int* _mm, int* _ss)
+{
+	*_HH = atoi(&UpdateTime[0]);
+	*_mm = atoi(&UpdateTime[3]);
+	*_ss = atoi(&UpdateTime[6]);
+}
+
 
 void PrintTableHeader(FieldInfo_STRUCT** ppHeader)
 {
@@ -385,6 +397,51 @@ void PrintErrors(Error_STRUCT** pErrs, int count)
 	}
 }
 
+void OutputCSVError(FILE* pFile, Error_STRUCT* pErr)
+{
+	if (pErr == nullptr)
+	{
+		return;
+	}
+
+	fprintf(pFile, "%d,%d,%s\n", pErr->ErrType, pErr->ErrCode, pErr->ErrInfo);
+}
+
+void OutputCSVErrors(FILE* pFile, Error_STRUCT** pErrs)
+{
+	if (pErrs == nullptr)
+		return;
+
+	int i = 0;
+	Error_STRUCT* pErr = pErrs[i];
+	while (pErr != nullptr)
+	{
+		fprintf(pFile, "%d:%d,%d,%s\n", i, pErr->ErrType, pErr->ErrCode, pErr->ErrInfo);
+
+		++i;
+		pErr = pErrs[i];
+	}
+}
+
+void OutputCSVErrors(FILE* pFile, Error_STRUCT** pErrs, int count)
+{
+	if (pErrs == nullptr)
+	{
+		return;
+	}
+
+	for (int i = 0; i < count; ++i)
+	{
+		Error_STRUCT* pErr = pErrs[i];
+		if (pErr)
+		{
+			fprintf(pFile, "%d:%d,%d,%s\n", i, pErr->ErrType, pErr->ErrCode, pErr->ErrInfo);
+		}
+		else
+			fprintf(pFile, "\n");
+	}
+}
+
 void DeleteError(Error_STRUCT* pErr)
 {
 	delete[] pErr;
@@ -451,8 +508,9 @@ void CharTable2GDLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, GDLB_STRUCT
 
 	int col_123 = GetIndexByFieldID(ppFieldInfos, FIELD_GDDM);
 	int col_124 = GetIndexByFieldID(ppFieldInfos, FIELD_GDMC);
-	int col_121 = GetIndexByFieldID(ppFieldInfos, FIELD_ZJZH);
 	int col_125 = GetIndexByFieldID(ppFieldInfos, FIELD_ZHLB);
+	int col_121 = GetIndexByFieldID(ppFieldInfos, FIELD_ZJZH);
+	int col_173 = GetIndexByFieldID(ppFieldInfos, FIELD_XWDM);
 	int col_281 = GetIndexByFieldID(ppFieldInfos, FIELD_RZRQBS);
 	int col_1213 = GetIndexByFieldID(ppFieldInfos, FIELD_BLXX);
 
@@ -468,10 +526,12 @@ void CharTable2GDLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, GDLB_STRUCT
 			strcpy_s(ppResults[i]->ZJZH, ppTable[i * COL_EACH_ROW + col_121]);
 		//if (col_125 >= 0)
 		strcpy_s(ppResults[i]->ZHLB, ppTable[i * COL_EACH_ROW + col_125]);
+		if (col_173 >= 0)
+			strcpy_s(ppResults[i]->XWDM, ppTable[i * COL_EACH_ROW + col_173]);
 		if (col_281 >= 0)
 			strcpy_s(ppResults[i]->RZRQBS, ppTable[i * COL_EACH_ROW + col_281]);
-		//if (col_1213 >= 0)
-		//	strcpy_s(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
+		if (col_1213 >= 0)
+			strcpy_s(ppResults[i]->BLXX, ppTable[i * COL_EACH_ROW + col_1213]);
 
 		ppResults[i]->ZHLB_ = atoi(ppResults[i]->ZHLB);
 		ppResults[i]->RZRQBS_ = atoi(ppResults[i]->RZRQBS);
@@ -656,8 +716,8 @@ void CharTable2CJLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, CJLB_STRUCT
 
 		if (col_150 >= 0)
 			strcpy_s(ppResults[i]->CJRQ, ppTable[i * COL_EACH_ROW + col_150]);
-		//if (col_151 >= 0)
-		strcpy_s(ppResults[i]->CJSJ, ppTable[i * COL_EACH_ROW + col_151]);
+		if (col_151 >= 0)
+			strcpy_s(ppResults[i]->CJSJ, ppTable[i * COL_EACH_ROW + col_151]);
 		//if (col_123 >= 0)
 		strcpy_s(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
 		//if (col_140 >= 0)
@@ -766,13 +826,13 @@ void CharTable2GFLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, GFLB_STRUCT
 			strcpy_s(ppResults[i]->TBFDYK, ppTable[i * COL_EACH_ROW + col_204]);
 		if (col_232 >= 0)
 			strcpy_s(ppResults[i]->SXYK, ppTable[i * COL_EACH_ROW + col_232]);
-		//if (col_230 >= 0)
+		if (col_230 >= 0)
 			strcpy_s(ppResults[i]->CKYKBL, ppTable[i * COL_EACH_ROW + col_230]);
 		if (col_160 >= 0)
 			strcpy_s(ppResults[i]->DJSL, ppTable[i * COL_EACH_ROW + col_160]);
 		//if (col_123 >= 0)
 			strcpy_s(ppResults[i]->GDDM, ppTable[i * COL_EACH_ROW + col_123]);
-		//if (col_100 >= 0)
+		if (col_100 >= 0)
 			strcpy_s(ppResults[i]->JYSDM, ppTable[i * COL_EACH_ROW + col_100]);
 		if (col_101 >= 0)
 			strcpy_s(ppResults[i]->JYSMC, ppTable[i * COL_EACH_ROW + col_101]);
@@ -823,7 +883,7 @@ void CharTable2ZJYE(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, ZJYE_STRUCT
 			strcpy_s(ppResults[i]->KYZJ, ppTable[i * COL_EACH_ROW + col_301]);
 		//if (col_310 >= 0)
 			strcpy_s(ppResults[i]->ZZC, ppTable[i * COL_EACH_ROW + col_310]);
-		//if (col_302 >= 0)
+		if (col_302 >= 0)
 			strcpy_s(ppResults[i]->KQZJ, ppTable[i * COL_EACH_ROW + col_302]);
 		if (col_121 >= 0)
 			strcpy_s(ppResults[i]->ZJZH, ppTable[i * COL_EACH_ROW + col_121]);
@@ -1001,12 +1061,6 @@ void CharTable2HQ(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, HQ_STRUCT*** 
 	}
 }
 
-void GetUpdateTime_HH_mm_ss(char* UpdateTime, int* _HH, int* _mm, int* _ss)
-{
-	*_HH = atoi(&UpdateTime[0]);
-	*_mm = atoi(&UpdateTime[3]);
-	*_ss = atoi(&UpdateTime[6]);
-}
 
 void DeleteStructs(void*** pppStructs)
 {
@@ -1026,6 +1080,146 @@ void DeleteStructs(void*** pppStructs)
 
 	delete[] ppStructs;
 	*pppStructs = nullptr;
+}
+
+
+/*
+6
+A74168961|WK  |05000000100801|1|       0|      |
+013086113|WK  |05000000100801|0|       0|      |
+
+7
+A12121217|ZHT|1|      40690000|28356| 0|主股东|
+015597938|ZHT|0|      40690000|394232|0|主股东|
+
+5
+A341083000|LK|1|                         |主股东|
+0189181400|LK|0|                         |主股东|
+
+8
+E015976151|HT|1|88500918|		12982|1|	|主股东|
+0601605823|HT|0|88500918|		354000|1|	|主股东|
+*/
+void String2GDLB(char* szString, GDLB_STRUCT*** pppResults)
+{
+	*pppResults = nullptr;
+	if (szString == nullptr)
+		return;
+
+	char* pBuf = new char[strlen(szString) + 1];
+	strcpy(pBuf, szString);
+
+	vector<char*> vct;
+
+	// 分好多少列
+	char* token = strtok(pBuf, "\r\n");
+	int i = 0;
+	while (token)
+	{
+		if (i>0)
+		{
+			vct.push_back(token);
+		}
+		token = strtok(nullptr, "\r\n");
+		++i;
+	}
+
+	int count = vct.size();
+
+	GDLB_STRUCT** ppResults = new GDLB_STRUCT*[count + 1]();
+	ppResults[count] = nullptr;
+	*pppResults = ppResults;
+
+	for (int i = 0; i < count;++i)
+	{
+		ppResults[i] = new GDLB_STRUCT();
+
+		vector<char*> v1;
+		vector<char*> v2;
+		vector<char*> v3;
+		char* t = strtok(vct[i], "|");
+		int j = 0;
+		while (t)
+		{
+			int len = strlen(t);
+			if (len == 1)
+			{
+				v2.push_back(t);
+			}
+			else if (len>0)
+			{
+				if (t[0]>127||t[0]<0)
+				{
+					v3.push_back(t);
+				}
+				else
+				{
+					v1.push_back(t);
+				}
+			}
+			t = strtok(nullptr, "|");
+		}
+
+		strcpy_s(ppResults[i]->GDDM, v1[0]);
+		if (v1.size() > 1)
+			strcpy_s(ppResults[i]->ZJZH, v1[1]);
+		if (v1.size() > 2)
+			strcpy_s(ppResults[i]->XWDM, v1[2]);
+
+		strcpy_s(ppResults[i]->ZHLB, v2[0]);
+		if (v2.size() > 1)
+			strcpy_s(ppResults[i]->RZRQBS, v2[1]);
+
+		if (v3.size()>0)
+			strcpy_s(ppResults[i]->GDMC, v3[0]);
+		if (v3.size()>1)
+			strcpy_s(ppResults[i]->BLXX, v3[1]);
+
+		ppResults[i]->ZHLB_ = atoi(ppResults[i]->ZHLB);
+		ppResults[i]->RZRQBS_ = atoi(ppResults[i]->RZRQBS);
+	}
+
+	delete[] pBuf;
+}
+
+void CharTable2Login(char** ppTable, GDLB_STRUCT*** pppResults)
+{
+	*pppResults = nullptr;
+	if (ppTable == nullptr)
+		return;
+
+	// 如果有数据，第一列就不为空
+	int i = 0;
+	int j = 0;
+	char* p = ppTable[i * COL_EACH_ROW + j];
+	while (p != nullptr)
+	{
+		int requstid = atoi(p);
+		if (requstid == REQUEST_GDLB + 1)
+		{
+			String2GDLB(ppTable[i * COL_EACH_ROW + 2], pppResults);
+		}
+
+		++i;
+		p = ppTable[i * COL_EACH_ROW + j];
+	}
+
+	return;
+}
+
+int GetCountStructs(void** ppResults)
+{
+	if (ppResults == nullptr)
+		return -1;
+
+	int i = 0;
+	void* pRow = ppResults[i];
+	while (pRow != 0)
+	{
+		++i;
+		pRow = ppResults[i];
+	}
+	return i;
 }
 
 #else

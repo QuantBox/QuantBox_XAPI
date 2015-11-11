@@ -4,6 +4,7 @@
 #include "ApiDataType.h"
 #include "ApiEnum.h"
 
+#pragma pack(push,1)
 
 struct PositionField
 {
@@ -56,7 +57,6 @@ struct QuoteField
 
 struct OrderField
 {
-
 	OrderType Type;
 	OrderSide Side;
 	QtyType Qty;
@@ -141,6 +141,8 @@ struct UserInfoField
 	UserIDType	UserID;
 	///密码
 	PasswordType	Password;
+	///扩展信息，通达信中用来做通讯密码
+	ExtInfoType		ExtInfo;
 };
 
 
@@ -511,5 +513,7 @@ struct HistoricalDataRequestField
 	///交易所代码
 	ExchangeIDType	ExchangeID;
 };
+
+#pragma pack(pop)//恢复对齐状态
 
 #endif

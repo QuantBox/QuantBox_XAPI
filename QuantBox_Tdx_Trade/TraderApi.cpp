@@ -225,7 +225,7 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Logining, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
-	m_pClient = m_pApi->Login(m_UserInfo.UserID, m_UserInfo.Password, &ppResults, &pErr);
+	m_pClient = m_pApi->Login(m_UserInfo.UserID, m_UserInfo.Password, m_UserInfo.ExtInfo, &ppResults, &pErr);
 
 	if (m_pClient)
 	{
