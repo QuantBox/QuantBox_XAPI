@@ -950,11 +950,11 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 
 	if (ppRS)
 	{
-		// 利用成交编号的大小
+		// 利用成交编号的大小来判断正反序
 		if (!m_TradeListReverse)
 		{
 			int count = GetCountStructs((void**)ppRS);
-			if (count>0 && ppRS[0] && ppRS[count - 1])
+			if (count>1)
 			{
 				long CJBH0 = atol(ppRS[0]->CJBH);
 				long CJBH1 = atol(ppRS[count - 1]->CJBH);
@@ -984,6 +984,12 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 
 			++i;
 		}
+	}
+
+	// 新查出来的反而少了，华泰有合并成交的情况，这种如何处理？
+	// 对同ID的需要累加，有发现累加不对应的，应当
+	if (m_NewTradeList.size()<m_OldTradeList.size())
+	{
 	}
 
 	// 成交列表比较简单，只要新出现的数据就认为是有变化，需要输出
