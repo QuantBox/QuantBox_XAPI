@@ -2,49 +2,6 @@
 #include "TypeConvert.h"
 #include "../include/Tdx/tdx_enum.h"
 
-// 将中文的报价方式转成委托方式，这是根据字符串的特点进行分类
-int BJFS_2_WTFS(char* pIn)
-{
-	char* pX1 = strstr(pIn,"限");
-	if (pX1 == pIn)
-	{
-		// 第一个字是限价
-		return WTFS_Limit;
-	}
-	else
-	{
-		char* pC = strstr(pIn, "撤");
-		if (pC)
-		{
-			char* p5 = strstr(pIn, "五");
-			if (p5)
-			{
-				return WTFS_Five_IOC;
-			}
-			char* pQ = strstr(pIn, "全");
-			if (pQ)
-			{
-				return WTFS_FOK;
-			}
-			return WTFS_IOC; // 剩
-		}
-		else
-		{
-			char* pZ = strstr(pIn, "转");
-			if (pZ)
-			{
-				return WTFS_Five_Limit;
-			}
-			char* pD = strstr(pIn, "对");
-			if (pD)
-			{
-				return WTFS_Best_Reverse;
-			}
-			return WTFS_Best_Forward; // 本
-		}
-	}
-}
-
 OrderType WTFS_2_OrderType(int In)
 {
 	switch (In)
@@ -90,6 +47,8 @@ OrderStatus ZTSM_2_OrderStatus(int In)
 		return OrderStatus::Filled;
 	case ZTSM_AllCancelled:
 		return OrderStatus::Cancelled;
+	case ZTSM_PartiallyFilled:
+			return OrderStatus::PartiallyFilled;
 	default:
 		return OrderStatus::NotSent;
 	}
@@ -106,9 +65,13 @@ ExecType ZTSM_2_ExecType(int In)
 	case ZTSM_Illegal:
 		return ExecType::ExecRejected;
 	case ZTSM_AllFilled:
+	case ZTSM_PartiallyFilled:
 		return ExecType::ExecTrade;
 	case ZTSM_AllCancelled:
+	case ZTSM_PartiallyCancelled:
 		return ExecType::ExecCancelled;
+	
+		return ExecType::ExecTrade;
 	default:
 		return ExecType::ExecNew;
 	}
@@ -121,6 +84,7 @@ bool ZTSM_IsDone(int In)
 	case ZTSM_Illegal:
 	case ZTSM_AllFilled:
 	case ZTSM_AllCancelled:
+	case ZTSM_PartiallyCancelled:
 		return true;
 	}
 	return false;
@@ -161,7 +125,6 @@ void CJLB_2_TradeField(CJLB_STRUCT* pIn, TradeField* pOut)
 	pOut->Time = pIn->CJSJ_;
 	pOut->Side = MMBZ_2_OrderSide(pIn->MMBZ_);
 
-
 	strcpy(pOut->TradeID, pIn->CJBH);
 
 	pOut->Commission = pIn->YJ_ + pIn->YHS_ + pIn->GHF_ + pIn->CJF_;
@@ -181,9 +144,8 @@ void WTLB_2_OrderField_0(WTLB_STRUCT* pIn, OrderField* pOut)
 	pOut->Time = pIn->WTSJ_;
 	pOut->Side = MMBZ_2_OrderSide(pIn->MMBZ_);
 
-	int wtfs = BJFS_2_WTFS(pIn->BJFS);
-	pOut->Type = WTFS_2_OrderType(wtfs);
-	pOut->TimeInForce = WTFS_2_TimeInForce(wtfs);
+	pOut->Type = WTFS_2_OrderType(pIn->BJFS_);
+	pOut->TimeInForce = WTFS_2_TimeInForce(pIn->BJFS_);
 
 	pOut->Status = ZTSM_2_OrderStatus(pIn->ZTSM_);
 	pOut->ExecType = ZTSM_2_ExecType(pIn->ZTSM_);

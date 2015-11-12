@@ -249,7 +249,9 @@ private:
 	time_t						m_QueryTradeTime;
 	time_t						m_QueryOrderTime;
 	int							m_OrderNotUpdateCount;
+	bool						m_TradeListReverse;
+	//TradeIDType					m_FirstTradeID;
 
-	time_t						m_QueryGDLBTime;
+	//time_t						m_QueryGDLBTime;
 };
 

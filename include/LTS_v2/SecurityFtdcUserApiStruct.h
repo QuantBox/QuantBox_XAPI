@@ -418,6 +418,8 @@ struct CSecurityFtdcDepthMarketDataField
 	TSecurityFtdcPriceType	PreIOPV;
 	///基金净值
 	TSecurityFtdcPriceType	IOPV;
+	///动态参考价格
+	TSecurityFtdcPriceType	AuctionPrice;
 	///最后修改时间
 	TSecurityFtdcTimeType	UpdateTime;
 	///最后修改毫秒
@@ -468,6 +470,8 @@ struct CSecurityFtdcDepthMarketDataField
 	TSecurityFtdcDateType	ActionDay;
 	///交易阶段
 	TSecurityFtdcTradingPhaseType	TradingPhase;
+	///开仓限制
+	TSecurityFtdcOpenRestrictionType	OpenRestriction;
 };
 
 ///投资者合约交易权限
@@ -943,6 +947,8 @@ struct CSecurityFtdcTraderOfferField
 	TSecurityFtdcParticipantIDType	ParticipantID;
 	///密码
 	TSecurityFtdcPasswordType	Password;
+	///报盘类型
+	TSecurityFtdcOfferTypeType	OfferType;
 	///安装编号
 	TSecurityFtdcInstallIDType	InstallID;
 	///本地报单编号
@@ -982,6 +988,8 @@ struct CSecurityFtdcMDTraderOfferField
 	TSecurityFtdcParticipantIDType	ParticipantID;
 	///密码
 	TSecurityFtdcPasswordType	Password;
+	///报盘类型
+	TSecurityFtdcOfferTypeType	OfferType;
 	///安装编号
 	TSecurityFtdcInstallIDType	InstallID;
 	///本地报单编号
@@ -1165,7 +1173,7 @@ struct CSecurityFtdcOrderField
 	TSecurityFtdcOrderSysIDType	RelativeOrderSysID;
 	///营业部编号
 	TSecurityFtdcBranchIDType	BranchID;
-	///成交数量
+	///成交金额
 	TSecurityFtdcMoneyType	TradeAmount;
 	///是否ETF
 	TSecurityFtdcBoolType	IsETF;
@@ -2213,6 +2221,8 @@ struct CSecurityFtdcReqUserLoginField
 	TSecurityFtdcAuthCodeType	AuthCode;
 	///随机码
 	TSecurityFtdcAuthCodeType	RandCode;
+	///硬盘序列号
+	TSecurityFtdcHDSerialNumberType	HDSerialNumber;
 };
 
 ///用户登录应答
@@ -2421,6 +2431,8 @@ struct CSecurityFtdcMarketDataStaticField
 	TSecurityFtdcRatioType	CurrDelta;
 	///基金净值
 	TSecurityFtdcPriceType	IOPV;
+	///动态参考价格
+	TSecurityFtdcPriceType	AuctionPrice;
 };
 
 ///行情最新成交属性
@@ -2514,6 +2526,8 @@ struct CSecurityFtdcMarketDataUpdateTimeField
 	TSecurityFtdcDateType	ActionDay;
 	///交易阶段
 	TSecurityFtdcTradingPhaseType	TradingPhase;
+	///开仓限制
+	TSecurityFtdcOpenRestrictionType	OpenRestriction;
 };
 
 ///成交均价

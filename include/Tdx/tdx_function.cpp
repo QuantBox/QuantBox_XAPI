@@ -491,6 +491,96 @@ int GetCountErrors(Error_STRUCT** pErrs)
 	return i;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+int ZTSM_str_2_int(char* pIn)
+{
+	char* pCheng = strstr(pIn, "成");
+	char* pChe = strstr(pIn, "撤");
+	char* pBu = strstr(pIn, "部");
+
+	if (pChe)
+	{
+		if (pBu)
+		{
+			return ZTSM_PartiallyCancelled;
+		}
+		return ZTSM_AllCancelled;
+	}
+	else if (pCheng)
+	{
+		if (pBu)
+		{
+			// 部成是啥？这里需要完成
+			return ZTSM_PartiallyFilled;
+		}
+		return ZTSM_AllFilled;
+	}
+
+	char* pQ = strstr(pIn, "全");
+	char* pY = strstr(pIn, "已");
+	char* pBao = strstr(pIn, "报");
+	char* pF = strstr(pIn, "废");
+
+	if (pF)
+	{
+		return ZTSM_Illegal;
+	}
+
+	return ZTSM_New;
+}
+
+// 将中文的报价方式转成委托方式，这是根据字符串的特点进行分类
+int BJFS_2_WTFS(char* pIn)
+{
+	char* pX1 = strstr(pIn, "限");
+	
+	if (pX1 == pIn)
+	{
+		// 第一个字是限价
+		return WTFS_Limit;
+	}
+	else
+	{
+		char* pMM = strstr(pIn, "买卖");
+		if (pMM)
+		{
+			// 华泰返回买卖是表示限价
+			return WTFS_Limit;
+		}
+		char* pC = strstr(pIn, "撤");
+		if (pC)
+		{
+			char* p5 = strstr(pIn, "五");
+			if (p5)
+			{
+				return WTFS_Five_IOC;
+			}
+			char* pQ = strstr(pIn, "全");
+			if (pQ)
+			{
+				return WTFS_FOK;
+			}
+			return WTFS_IOC; // 剩
+		}
+		else
+		{
+			char* pZ = strstr(pIn, "转");
+			if (pZ)
+			{
+				return WTFS_Five_Limit;
+			}
+			char* pD = strstr(pIn, "对");
+			if (pD)
+			{
+				return WTFS_Best_Reverse;
+			}
+			return WTFS_Best_Forward; // 本
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
 
 void CharTable2GDLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, GDLB_STRUCT*** pppResults)
 {
@@ -538,42 +628,7 @@ void CharTable2GDLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, GDLB_STRUCT
 	}
 }
 
-int ZTSM_str_2_int(char* pIn)
-{
-	char* pCheng = strstr(pIn, "成");
-	char* pChe = strstr(pIn, "撤");
-	char* pBu = strstr(pIn, "部");
 
-	if (pChe)
-	{
-		if (pBu)
-		{
-			return ZTSM_PartiallyCancelled;
-		}
-		return ZTSM_AllCancelled;
-	}
-	else if (pCheng)
-	{
-		if (pBu)
-		{
-			// 部成是啥？这里需要完成
-			return ZTSM_5;
-		}
-		return ZTSM_AllFilled;
-	}
-
-	char* pQ = strstr(pIn, "全");
-	char* pY = strstr(pIn, "已");
-	char* pBao = strstr(pIn, "报");
-	char* pF = strstr(pIn, "废");
-
-	if (pF)
-	{
-		return ZTSM_Illegal;
-	}
-
-	return ZTSM_New;
-}
 
 void CharTable2WTLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, WTLB_STRUCT*** pppResults)
 {
@@ -674,6 +729,8 @@ void CharTable2WTLB(FieldInfo_STRUCT** ppFieldInfos, char** ppTable, WTLB_STRUCT
 		{
 			ppResults[i]->ZTSM_ = ZTSM_str_2_int(ppResults[i]->ZTSM);
 		}
+
+		ppResults[i]->BJFS_ = BJFS_2_WTFS(ppResults[i]->BJFS);
 	}
 }
 

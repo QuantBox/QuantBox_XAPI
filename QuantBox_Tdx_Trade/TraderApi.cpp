@@ -164,8 +164,13 @@ void CTraderApi::OutputQueryTime(time_t t, double db, const char* szSource)
 	ErrorField* pField = (ErrorField*)m_msgQueue->new_block(sizeof(ErrorField));
 
 	pField->ErrorID = 0;
-	sprintf(pField->ErrorMsg, "Time:%s,Add:%d", ctime(&t), (int)db);
+	sprintf(pField->ErrorMsg, "Add:%d,Time:%s", (int)db, ctime(&t));
 	strcpy(pField->Source, szSource);
+
+	// 去了最后的回车
+	int len = strlen(pField->ErrorMsg);
+	pField->ErrorMsg[len - 1] = 0;
+	
 
 	m_msgQueue->Input_NoCopy(ResponeType::OnRtnError, m_msgQueue, m_pClass, true, 0, pField, sizeof(ErrorField), nullptr, 0, nullptr, 0);
 }
@@ -262,7 +267,7 @@ int CTraderApi::_ReqUserLogin(char type, void* pApi1, void* pApi2, double double
 		}
 		else
 		{
-			// 查通达信仿真实验室账号不直接返回股东列表
+			// 查通达信仿真实验室账号不直接返回股东列表，需要主动查询
 			ReqQryInvestor();
 		}
 		
@@ -314,9 +319,9 @@ int CTraderApi::_ReqQryInvestor(char type, void* pApi1, void* pApi2, double doub
 
 	if (IsErrorRspInfo("ReqQryInvestor", pErr))
 	{
-		int _queryTime = QUERY_TIME_MIN;
-		m_QueryGDLBTime = time(nullptr) + _queryTime;
-		OutputQueryTime(m_QueryGDLBTime, _queryTime, "NextQueryInvestor_ReqQryInvestor");
+		//int _queryTime = QUERY_TIME_MIN;
+		//m_QueryGDLBTime = time(nullptr) + _queryTime;
+		//OutputQueryTime(m_QueryGDLBTime, _queryTime, "NextQueryInvestor_ReqQryInvestor");
 
 		DeleteTableBody(ppResults);
 		DeleteError(pErr);
@@ -351,6 +356,8 @@ CTraderApi::CTraderApi(void)
 	m_pClient = nullptr;
 	m_lRequestID = 0;
 	m_nSleep = 1;
+	//m_FirstTradeID[0] = 0;
+	m_TradeListReverse = false;
 
 	// 自己维护两个消息队列
 	m_msgQueue = new CMsgQueue();
@@ -943,28 +950,75 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 
 	if (ppRS)
 	{
+		// 利用成交编号的大小
+		if (!m_TradeListReverse)
+		{
+			int count = GetCountStructs((void**)ppRS);
+			if (count>0 && ppRS[0] && ppRS[count - 1])
+			{
+				long CJBH0 = atol(ppRS[0]->CJBH);
+				long CJBH1 = atol(ppRS[count - 1]->CJBH);
+				if (CJBH0>CJBH1)
+				{
+					m_TradeListReverse = true;
+				}
+			}
+		}
+
 		int i = 0;
 		while (ppRS[i])
 		{
 			TradeField* pField = (TradeField*)m_msgQueue->new_block(sizeof(TradeField));
 
 			CJLB_2_TradeField(ppRS[i], pField);
-
-			m_NewTradeList.push_back(pField);
+			
+			if (m_TradeListReverse)
+			{
+				// 华泰查出来的表后生成的排第一，所以要处理一下
+				m_NewTradeList.push_front(pField);
+			}
+			else
+			{
+				m_NewTradeList.push_back(pField);
+			}
 
 			++i;
 		}
 	}
 
-	// 成交列表比较简单，只要新出现的数据就认为是有变化，需要输出 
+	// 成交列表比较简单，只要新出现的数据就认为是有变化，需要输出
 	int i = 0;
+	list<TradeField*>::iterator it2 = m_OldTradeList.begin();
 	for (list<TradeField*>::iterator it = m_NewTradeList.begin(); it != m_NewTradeList.end(); ++it)
 	{
+		TradeField* pField = *it;
+
+		bool bUpdate = false;
 		if (i >= m_OldTradeList.size())
 		{
-			TradeField* pField = *it;
+			bUpdate = true;
+		}
+		//else
+		//{
+		//	// 相同位置的部分
+		//	TradeField* pOldField = *it2;
+		//	if (pOldField->Qty != pField->Qty)
+		//	{
+		//		bUpdate = true;
+		//	}
+		//}
+
+		if (bUpdate)
+		{
 			m_msgQueue->Input_Copy(ResponeType::OnRtnTrade, m_msgQueue, m_pClass, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
 		}
+
+		// 前一个可能为空，移动到下一个时需要注意
+		if (it2 != m_OldTradeList.end())
+		{
+			++it2;
+		}
+
 		++i;
 	}
 

@@ -91,6 +91,7 @@ struct WTLB_STRUCT
 	int CDSL_;
 	double DJZJ_;
 	int ZTSM_;
+	int BJFS_;
 };
 
 // 成交列表

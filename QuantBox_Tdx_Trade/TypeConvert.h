@@ -7,7 +7,6 @@
 // 两种情况：
 // 1.完全重建
 // 2.部分重建
-int BJFS_2_WTFS(char* pIn);
 bool ZTSM_IsDone(int In);
 bool ZTSM_IsNotSent(int In);
 

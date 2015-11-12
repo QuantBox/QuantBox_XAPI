@@ -743,6 +743,11 @@ typedef char TSecurityFtdcMarketIDType[31];
 typedef char TSecurityFtdcMacAddressType[21];
 
 /////////////////////////////////////////////////////////////////////////
+///TFtdcHDSerialNumberType是一个硬盘序列号类型
+/////////////////////////////////////////////////////////////////////////
+typedef char TSecurityFtdcHDSerialNumberType[21];
+
+/////////////////////////////////////////////////////////////////////////
 ///TFtdcInstrumentNameType是一个合约名称类型
 /////////////////////////////////////////////////////////////////////////
 typedef char TSecurityFtdcInstrumentNameType[21];
@@ -2144,5 +2149,37 @@ typedef char TSecurityFtdcFundClassType;
 #define SECURITY_FTDC_TP_Fuse '4'
 
 typedef char TSecurityFtdcTradingPhaseType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcOpenRestrictionType是一个开仓限制类型
+/////////////////////////////////////////////////////////////////////////
+///无开仓限制
+#define SECURITY_FTDC_OR_None '0'
+///限制备兑开仓
+#define SECURITY_FTDC_OR_NoCoverOpen '1'
+///限制卖出开仓
+#define SECURITY_FTDC_OR_NoSellOpen '2'
+///限制卖出开仓、备兑开仓
+#define SECURITY_FTDC_OR_NoSellAndCoverOpen '3'
+///限制买入开仓
+#define SECURITY_FTDC_OR_NoBuyOpen '4'
+///限制买入开仓、备兑开仓
+#define SECURITY_FTDC_OR_NoBuyAndCoverOpen '5'
+///限制买入开仓、卖出开仓
+#define SECURITY_FTDC_OR_NoBuyAndSellOpen '6'
+///限制买入开仓、卖出开仓、备兑开仓
+#define SECURITY_FTDC_OR_NoBuySellAndCoverOpen '7'
+
+typedef char TSecurityFtdcOpenRestrictionType;
+
+/////////////////////////////////////////////////////////////////////////
+///TFtdcOfferTypeType是一个报盘类型类型
+/////////////////////////////////////////////////////////////////////////
+///普通报盘
+#define SECURITY_FTDC_OT_Normal '0'
+///期权报盘
+#define SECURITY_FTDC_OT_Options '1'
+
+typedef char TSecurityFtdcOfferTypeType;
 
 #endif

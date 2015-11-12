@@ -1,6 +1,7 @@
 #ifndef _QUEUE_STRUCT_H_
 #define _QUEUE_STRUCT_H_
 
+
 struct ResponeItem
 {
 	char		type;	// (RequestType)
@@ -20,5 +21,6 @@ struct ResponeItem
 
 	bool		bNeedDelete;
 };
+
 
 #endif//end of _QUEUE_HEADER_H_
