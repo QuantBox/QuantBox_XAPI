@@ -921,6 +921,122 @@ void CTraderApi::ReqQryTrade()
 		nullptr, 0, nullptr, 0, nullptr, 0);
 }
 
+//////////////////////////////////////////////////////////////////////////
+double GetTradeListQty(list<TradeField*> &tradeList,int count)
+{
+	double Qty = 0;
+	int i = 0;
+	for (list<TradeField*>::iterator it = tradeList.begin(); it != tradeList.end(); ++it)
+	{
+		++i;
+		if (i>count)
+		{
+			break;
+		}
+
+		TradeField* pField = *it;
+		Qty += pField->Qty;
+	}
+	return Qty;
+}
+
+void TradeList2TradeMap(list<TradeField*> &tradeList, unordered_map<string, TradeField*> &tradeMap)
+{
+	// 只在这个函数中new和delete应当没有问题
+	for (unordered_map<string, TradeField*>::iterator it = tradeMap.begin(); it != tradeMap.end(); ++it)
+	{
+		TradeField* pNewField = it->second;
+		delete[] pNewField;
+	}
+	tradeMap.clear();
+
+	// 将多个合约拼接成
+	for (list<TradeField*>::iterator it = tradeList.begin(); it != tradeList.end(); ++it)
+	{
+		TradeField* pField = *it;
+		unordered_map<string, TradeField*>::iterator it2 = tradeMap.find(pField->ID);
+		if (it2 == tradeMap.end())
+		{
+			TradeField* pNewField = new TradeField;
+			memcpy(pNewField, pField, sizeof(TradeField));
+			tradeMap[pField->ID] = pNewField;
+		}
+		else
+		{
+			TradeField* pNewField = it2->second;
+			pNewField->Price = pField->Price;
+			pNewField->Qty += pField->Qty;
+		}
+	}
+}
+
+void CTraderApi::CompareTradeMapAndEmit(unordered_map<string, TradeField*> &oldMap, unordered_map<string, TradeField*> &newMap)
+{
+	for (unordered_map<string, TradeField*>::iterator it = newMap.begin(); it != newMap.end(); ++it)
+	{
+		TradeField* pNewField = it->second;
+		unordered_map<string, TradeField*>::iterator it2 = oldMap.find(pNewField->ID);
+		if (it2 == oldMap.end())
+		{
+			// 没找到,是新单
+			m_msgQueue->Input_Copy(ResponeType::OnRtnTrade, m_msgQueue, m_pClass, 0, 0, pNewField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+		}
+		else
+		{
+			TradeField* pOldField = it2->second;
+			int Qty = pNewField->Qty - pOldField->Qty;
+			if (Qty>0)
+			{
+				// 有变化的单
+				TradeField* pField = new TradeField;
+				memcpy(pField, pNewField, sizeof(TradeField));
+				pField->Qty = Qty;
+				m_msgQueue->Input_Copy(ResponeType::OnRtnTrade, m_msgQueue, m_pClass, 0, 0, pNewField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+				delete[] pField;
+			}
+		}
+	}
+}
+
+void CTraderApi::CompareTradeListAndEmit(list<TradeField*> &oldList, list<TradeField*> &newList)
+{
+	int i = 0;
+	list<TradeField*>::iterator it2 = oldList.begin();
+	for (list<TradeField*>::iterator it = newList.begin(); it != newList.end(); ++it)
+	{
+		TradeField* pField = *it;
+
+		bool bUpdate = false;
+		if (i >= oldList.size())
+		{
+			bUpdate = true;
+		}
+		//else
+		//{
+		//	// 相同位置的部分
+		//	TradeField* pOldField = *it2;
+		//	if (pOldField->Qty != pField->Qty)
+		//	{
+		//		bUpdate = true;
+		//	}
+		//}
+
+		if (bUpdate)
+		{
+			m_msgQueue->Input_Copy(ResponeType::OnRtnTrade, m_msgQueue, m_pClass, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+		}
+
+		// 前一个可能为空，移动到下一个时需要注意
+		if (it2 != oldList.end())
+		{
+			++it2;
+		}
+
+		++i;
+	}
+}
+//////////////////////////////////////////////////////////////////////////
+
 int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
 {
 	FieldInfo_STRUCT** ppFieldInfos = nullptr;
@@ -928,8 +1044,6 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 	Error_STRUCT* pErr = nullptr;
 
 	m_pApi->ReqQueryData(REQUEST_DRCJ, &ppFieldInfos, &ppResults, &pErr);
-	// 测试用，事后要删除
-	//m_pApi->ReqQueryData(REQUEST_LSCJ, &ppFieldInfos, &ppResults, &pErr, "20150801", "20151031");
 
 	if (IsErrorRspInfo("ReqQryTrade", pErr))
 	{
@@ -987,45 +1101,54 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 	}
 
 	// 新查出来的反而少了，华泰有合并成交的情况，这种如何处理？
-	// 对同ID的需要累加，有发现累加不对应的，应当
-	if (m_NewTradeList.size()<m_OldTradeList.size())
+	// 对同ID的需要累加，有发现累加不对应的，应当处理
+	// 同样条数的，也有可能其中的有变化，如何处理？
+	bool bTryMerge = false;
+	int OldTradeListCount = m_OldTradeList.size();
+	int NewTradeListCount = m_NewTradeList.size();
+
+	if (NewTradeListCount < OldTradeListCount)
 	{
+		// 行数变少了，应当是合并了
+		bTryMerge = true;
+	}
+	else
+	{
+		// 行数不变与行数变多都不确定是否为合并列表的模式
+
+		double OldQty = GetTradeListQty(m_OldTradeList, m_OldTradeList.size());
+		double NewQty = GetTradeListQty(m_NewTradeList, m_NewTradeList.size());
+		if (NewQty != OldQty)
+		{
+			// 同样长度成交量发生了变化，可能是合并的列表其中一个新成交了
+			bTryMerge = true;
+		}
 	}
 
-	// 成交列表比较简单，只要新出现的数据就认为是有变化，需要输出
-	int i = 0;
-	list<TradeField*>::iterator it2 = m_OldTradeList.begin();
-	for (list<TradeField*>::iterator it = m_NewTradeList.begin(); it != m_NewTradeList.end(); ++it)
+	if (bTryMerge)
 	{
-		TradeField* pField = *it;
-
-		bool bUpdate = false;
-		if (i >= m_OldTradeList.size())
+		// 合并列表的处理方法
+		if (m_OldTradeMap.size() == 0)
 		{
-			bUpdate = true;
+			TradeList2TradeMap(m_OldTradeList, m_OldTradeMap);
 		}
-		//else
-		//{
-		//	// 相同位置的部分
-		//	TradeField* pOldField = *it2;
-		//	if (pOldField->Qty != pField->Qty)
-		//	{
-		//		bUpdate = true;
-		//	}
-		//}
+		TradeList2TradeMap(m_NewTradeList, m_NewTradeMap);
+		CompareTradeMapAndEmit(m_OldTradeMap, m_NewTradeMap);
 
-		if (bUpdate)
+		// 交换
+		for (unordered_map<string, TradeField*>::iterator it = m_OldTradeMap.begin(); it != m_OldTradeMap.end(); ++it)
 		{
-			m_msgQueue->Input_Copy(ResponeType::OnRtnTrade, m_msgQueue, m_pClass, 0, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+			TradeField* pField = it->second;
+			delete[] pField;
 		}
-
-		// 前一个可能为空，移动到下一个时需要注意
-		if (it2 != m_OldTradeList.end())
-		{
-			++it2;
-		}
-
-		++i;
+		m_OldTradeMap.clear();
+		m_OldTradeMap = m_NewTradeMap;
+		m_NewTradeMap.clear();
+	}
+	else
+	{
+		// 普通的处理方法
+		CompareTradeListAndEmit(m_OldTradeList, m_NewTradeList);
 	}
 
 	// 将老数据清理，防止内存泄漏
@@ -1093,15 +1216,11 @@ int CTraderApi::_ReqQryTradingAccount(char type, void* pApi1, void* pApi2, doubl
 			strcpy(pField->Account, m_pApi->GetAccount());
 		}
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnRspQryTradingAccount, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnRspQryTradingAccount, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(AccountField), nullptr, 0, nullptr, 0);
 	}
 
 	DeleteTableBody(ppResults);
 	DeleteError(pErr);
-
-	//double _queryTime = 5 * QUERY_TIME_MAX;
-	//m_QueryTradeTime = time(nullptr) + _queryTime;
-	//OutputQueryTime(m_QueryTradeTime, _queryTime, "NextQueryTrade_QueryOrder");
 
 	return 0;
 }
@@ -1139,9 +1258,10 @@ int CTraderApi::_ReqQryInvestorPosition(char type, void* pApi1, void* pApi2, dou
 	{
 		PositionField* pField = (PositionField*)m_msgQueue->new_block(sizeof(PositionField));
 
+		// 应当处理一下，可能一个账号对应的有多个，如信用账户
 		GFLB_2_PositionField(ppRS[i], pField);
 
-		m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInvestorPosition, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(TradeField), nullptr, 0, nullptr, 0);
+		m_msgQueue->Input_NoCopy(ResponeType::OnRspQryInvestorPosition, m_msgQueue, m_pClass, i == count - 1, 0, pField, sizeof(PositionField), nullptr, 0, nullptr, 0);
 	}
 
 	DeleteTableBody(ppResults);

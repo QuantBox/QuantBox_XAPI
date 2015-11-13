@@ -203,6 +203,9 @@ private:
 	////其它
 	//virtual void OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRtnInstrumentStatus(CThostFtdcInstrumentStatusField *pInstrumentStatus);
+private:
+	void CompareTradeMapAndEmit(unordered_map<string, TradeField*> &oldMap, unordered_map<string, TradeField*> &newMap);
+	void CompareTradeListAndEmit(list<TradeField*> &oldList, list<TradeField*> &newList);
 
 private:
 	atomic<int>					m_lRequestID;			//请求ID,得保持自增
@@ -242,6 +245,9 @@ private:
 
 	list<TradeField*>			m_OldTradeList;
 	list<TradeField*>			m_NewTradeList;
+	unordered_map<string, TradeField*> m_NewTradeMap;
+	unordered_map<string, TradeField*> m_OldTradeMap;
+
 
 	list<OrderField*>			m_OldOrderList;
 	list<OrderField*>			m_NewOrderList;
