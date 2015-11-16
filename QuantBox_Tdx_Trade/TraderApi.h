@@ -256,8 +256,6 @@ private:
 	time_t						m_QueryOrderTime;
 	int							m_OrderNotUpdateCount;
 	bool						m_TradeListReverse;
-	//TradeIDType					m_FirstTradeID;
-
-	//time_t						m_QueryGDLBTime;
+	bool						m_LastIsMerge;
 };
 

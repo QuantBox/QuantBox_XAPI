@@ -358,6 +358,7 @@ CTraderApi::CTraderApi(void)
 	m_nSleep = 1;
 	//m_FirstTradeID[0] = 0;
 	m_TradeListReverse = false;
+	m_LastIsMerge = false;
 
 	// 自己维护两个消息队列
 	m_msgQueue = new CMsgQueue();
@@ -1070,6 +1071,7 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 			int count = GetCountStructs((void**)ppRS);
 			if (count>1)
 			{
+				// 转成数字的比较，是否会有非数字的情况出现？
 				long CJBH0 = atol(ppRS[0]->CJBH);
 				long CJBH1 = atol(ppRS[count - 1]->CJBH);
 				if (CJBH0>CJBH1)
@@ -1112,9 +1114,13 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 		// 行数变少了，应当是合并了
 		bTryMerge = true;
 	}
-	else
+	else if (OldTradeListCount == 0)
 	{
-		// 行数不变与行数变多都不确定是否为合并列表的模式
+		// 如果上一次的为空，不管这次查出来的是合并还是没有合并，都没有关系，当成没合并处理即可
+	}
+	else if (NewTradeListCount == OldTradeListCount)
+	{
+		// 行数不变，但有可能是其中的一条部分成交的更新，所以检查一下
 
 		double OldQty = GetTradeListQty(m_OldTradeList, m_OldTradeList.size());
 		double NewQty = GetTradeListQty(m_NewTradeList, m_NewTradeList.size());
@@ -1124,12 +1130,32 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 			bTryMerge = true;
 		}
 	}
+	else
+	{
+		// 行数变多了，只要其中上次的部分有变化就需要检查一下
+		double OldQty = GetTradeListQty(m_OldTradeList, m_OldTradeList.size());
+		double NewQty = GetTradeListQty(m_NewTradeList, m_NewTradeList.size());
+		if (NewQty != OldQty)
+		{
+			bTryMerge = true;
+		}
+	}
+
+
 
 	if (bTryMerge)
 	{
 		// 合并列表的处理方法
-		if (m_OldTradeMap.size() == 0)
+		// 如果上次是合并，这次就没有必要再生成一次了
+		if (m_OldTradeMap.size() == 0 || !m_LastIsMerge)
 		{
+			for (unordered_map<string, TradeField*>::iterator it = m_OldTradeMap.begin(); it != m_OldTradeMap.end(); ++it)
+			{
+				TradeField* pField = it->second;
+				delete[] pField;
+			}
+			m_OldTradeMap.clear();
+
 			TradeList2TradeMap(m_OldTradeList, m_OldTradeMap);
 		}
 		TradeList2TradeMap(m_NewTradeList, m_NewTradeMap);
@@ -1144,11 +1170,13 @@ int CTraderApi::_ReqQryTrade(char type, void* pApi1, void* pApi2, double double1
 		m_OldTradeMap.clear();
 		m_OldTradeMap = m_NewTradeMap;
 		m_NewTradeMap.clear();
+		m_LastIsMerge = true;
 	}
 	else
 	{
 		// 普通的处理方法
 		CompareTradeListAndEmit(m_OldTradeList, m_NewTradeList);
+		m_LastIsMerge = false;
 	}
 
 	// 将老数据清理，防止内存泄漏

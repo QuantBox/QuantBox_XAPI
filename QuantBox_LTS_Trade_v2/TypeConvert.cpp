@@ -136,6 +136,17 @@ TSecurityFtdcOrderPriceTypeType OrderType_2_TSecurityFtdcOrderPriceTypeType(Orde
 
 OrderStatus CSecurityFtdcOrderField_2_OrderStatus(CSecurityFtdcOrderField* pIn)
 {
+	//if (0 == pIn->VolumeTotal)
+	//{
+	//	return OrderStatus::Filled;
+	//}
+	//else if (pIn->VolumeTotal == pIn->VolumeTotalOriginal)
+	//{
+	//	return OrderStatus::New;
+	//}
+	//else
+	//	return OrderStatus::PartiallyFilled;
+
 	switch (pIn->OrderStatus)
 	{
 	case SECURITY_FTDC_OST_Canceled:
@@ -147,12 +158,21 @@ OrderStatus CSecurityFtdcOrderField_2_OrderStatus(CSecurityFtdcOrderField* pIn)
 		if (pIn->OrderSubmitStatus == SECURITY_FTDC_OSS_InsertSubmitted)
 			return OrderStatus::New;
 	default:
-		if (pIn->VolumeTotal == 0)
-			return OrderStatus::Filled;
-		else if (pIn->VolumeTotal == pIn->VolumeTotalOriginal)
-			return OrderStatus::New;
-		else
-			return OrderStatus::PartiallyFilled;
+	{
+			   // FIXME:为何部分成交一直走的是全部成交
+			   if (0 == pIn->VolumeTotal)
+			   {
+				   return OrderStatus::Filled;
+			   }
+			   else if (pIn->VolumeTotal == pIn->VolumeTotalOriginal)
+			   {
+				   return OrderStatus::New;
+			   }
+			   else
+				   return OrderStatus::PartiallyFilled;
+	}
+		break;
+
 	}
 }
 

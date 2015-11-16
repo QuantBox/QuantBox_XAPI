@@ -148,11 +148,11 @@ CZC
 
         public static string ToFormattedString([In]this OrderField field)
         {
-            return string.Format("[InstrumentID={0};ExchangeID={1};Side={2};Qty={3};Price={4};OpenClose={5};HedgeFlag={6};"
-                + "LocalID={7};ID={8};OrderID={9};Date={10};Time={11};"
-                + "Type={12};TimeInForce={13};Status={14};ExecType={15};"
-                + "ErrorID={16};Text={17}]",
-                field.InstrumentID, field.ExchangeID, Enum<OrderSide>.ToString(field.Side), field.Qty, field.Price, Enum<OpenCloseType>.ToString(field.OpenClose), Enum<HedgeFlagType>.ToString(field.HedgeFlag),
+            return string.Format("[InstrumentID={0};ExchangeID={1};Side={2};Qty={3};LeavesQty={4};Price={5};OpenClose={6};HedgeFlag={7};"
+                + "LocalID={8};ID={9};OrderID={10};Date={11};Time={12};"
+                + "Type={13};TimeInForce={14};Status={15};ExecType={16};"
+                + "ErrorID={17};Text={18}]",
+                field.InstrumentID, field.ExchangeID, Enum<OrderSide>.ToString(field.Side), field.Qty,field.LeavesQty, field.Price, Enum<OpenCloseType>.ToString(field.OpenClose), Enum<HedgeFlagType>.ToString(field.HedgeFlag),
                 field.LocalID, field.ID, field.OrderID, field.Date, field.Time,
                 Enum<OrderType>.ToString(field.Type), Enum<TimeInForce>.ToString(field.TimeInForce), Enum<OrderStatus>.ToString(field.Status), Enum<ExecType>.ToString(field.ExecType),
                 field.ErrorID, field.Text());
