@@ -1,13 +1,13 @@
-#pragma once
+ï»¿#pragma once
 
-#include "../include/LTS_v2/SecurityFtdcQueryApi.h"
+#include "../include/LTS_v2/SecurityFtdcTraderApi.h"
 #include "../include/ApiStruct.h"
 
 #ifdef _WIN64
-#pragma comment(lib, "../include/LTS_v2/win64/securityqueryapi.lib")
+#pragma comment(lib, "../include/LTS_v2/win64/securitytraderapi.lib")
 #pragma comment(lib, "../lib/QuantBox_Queue_x64.lib")
 #else
-#pragma comment(lib, "../include/LTS_v2/win32/securityqueryapi.lib")
+#pragma comment(lib, "../include/LTS_v2/win32/securitytraderapi.lib")
 #pragma comment(lib, "../lib/QuantBox_Queue_x86.lib")
 #endif
 
@@ -24,10 +24,10 @@ using namespace std;
 
 class CMsgQueue;
 
-class CQueryApi :
-	public CSecurityFtdcQuerySpi
+class CTraderApi :
+	public CSecurityFtdcTraderSpi
 {
-	//ÇëÇóÊı¾İ°üÀàĞÍ
+	//è¯·æ±‚æ•°æ®åŒ…ç±»å‹
 	enum RequestType
 	{
 		E_Init,
@@ -52,11 +52,13 @@ class CQueryApi :
 		E_QrySettlementInfoField,
 		E_QryOrderField,
 		E_QryTradeField,
+
+		E_AuthRandCodeField,
 	};
 
 public:
-	CQueryApi(void);
-	virtual ~CQueryApi(void);
+	CTraderApi(void);
+	virtual ~CTraderApi(void);
 
 	void Register(void* pCallback, void* pClass);
 
@@ -65,137 +67,140 @@ public:
 		UserInfoField* pUserInfo);
 	void Disconnect();
 
-	//int ReqOrderInsert(
-	//	OrderField* pOrder,
-	//	int count,
-	//	OrderIDType* pInOut);
+	int ReqOrderInsert(
+		OrderField* pOrder,
+		int count,
+		OrderIDType* pInOut);
 
-	//int ReqOrderAction(OrderIDType* szIds, int count, OrderIDType* pOutput);
-	//int ReqOrderAction(CSecurityFtdcOrderField *pOrder, int count, OrderIDType* pOutput);
+	int ReqOrderAction(OrderIDType* szIds, int count, OrderIDType* pOutput);
+	int ReqOrderAction(CSecurityFtdcOrderField *pOrder, int count, OrderIDType* pOutput);
 
-	//int ReqQuoteInsert(
-	//	int QuoteRef,
-	//	OrderField* pOrderAsk,
-	//	OrderField* pOrderBid);
+	int ReqQuoteInsert(
+		int QuoteRef,
+		OrderField* pOrderAsk,
+		OrderField* pOrderBid);
 
 	//int ReqQuoteAction(CSecurityFtdcQuoteField *pQuote);
 	//int ReqQuoteAction(const string& szId);
 
-	void ReqQryTradingAccount();
-	void ReqQryInvestorPosition(const string& szInstrumentId, const string& szExchange);
-	void ReqQryInvestorPositionDetail(const string& szInstrumentId);
-	void ReqQryInstrument(const string& szInstrumentId, const string& szExchange);
-	void ReqQryInstrumentCommissionRate(const string& szInstrumentId);
-	void ReqQryInstrumentMarginRate(const string& szInstrumentId, TSecurityFtdcHedgeFlagType HedgeFlag = SECURITY_FTDC_HF_Speculation);
-	void ReqQryDepthMarketData(const string& szInstrumentId);
-	void ReqQrySettlementInfo(const string& szTradingDay);
+	//void ReqQryTradingAccount();
+	//void ReqQryInvestorPosition(const string& szInstrumentId, const string& szExchange);
+	//void ReqQryInvestorPositionDetail(const string& szInstrumentId);
+	//void ReqQryInstrument(const string& szInstrumentId, const string& szExchange);
+	//void ReqQryInstrumentCommissionRate(const string& szInstrumentId);
+	//void ReqQryInstrumentMarginRate(const string& szInstrumentId, TSecurityFtdcHedgeFlagType HedgeFlag = SECURITY_FTDC_HF_Speculation);
+	//void ReqQryDepthMarketData(const string& szInstrumentId);
+	//void ReqQrySettlementInfo(const string& szTradingDay);
 
-	void ReqQryOrder();
-	void ReqQryTrade();
+	//void ReqQryOrder();
+	//void ReqQryTrade();
 
-	void ReqQryInvestor();
+	//void ReqQryInvestor();
 
 private:
-	friend void* __stdcall Query_Q(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	friend void* __stdcall Query(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	void QueryInThread(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
 	void Clear();
 
 	int _Init();
 
-	void ReqUserLogin();
+	void ReqUserLogin(TSecurityFtdcAuthCodeType	RandCode);
 	int _ReqUserLogin(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
-	int _ReqQryInstrument(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
-	int _ReqQryTradingAccount(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
-	int _ReqQryInvestorPosition(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
-	int _ReqQryInvestor(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	void ReqFetchAuthRandCode();
+	int _ReqFetchAuthRandCode(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
-	int _ReqQryOrder(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
-	int _ReqQryTrade(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	//int _ReqQryInstrument(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	//int _ReqQryTradingAccount(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	//int _ReqQryInvestorPosition(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	//int _ReqQryInvestor(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+
+	//int _ReqQryOrder(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
+	//int _ReqQryTrade(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 	//int _ReqQryQuote(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3);
 
 	void OnOrder(CSecurityFtdcOrderField *pOrder, bool bFromQry);
 	void OnTrade(CSecurityFtdcTradeField *pTrade, bool bFromQry);
 	void OnTrade(TradeField *pTrade, bool bFromQry);
 
-	//¼ì²éÊÇ·ñ³ö´í
-	bool IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//ÏòÏûÏ¢¶ÓÁĞÊä³öĞÅÏ¢
-	bool IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo);//²»Êä³öĞÅÏ¢
+	//æ£€æŸ¥æ˜¯å¦å‡ºé”™
+	bool IsErrorRspInfo(const char* szSource, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);//å‘æ¶ˆæ¯é˜Ÿåˆ—è¾“å‡ºä¿¡æ¯
+	bool IsErrorRspInfo(CSecurityFtdcRspInfoField *pRspInfo);//ä¸è¾“å‡ºä¿¡æ¯
 
-	//Á¬½Ó
+	//è¿æ¥
 	virtual void OnFrontConnected();
 	virtual void OnFrontDisconnected(int nReason);
 
-	//ÈÏÖ¤
-	//virtual void OnRspAuthenticate(CSecurityFtdcRspAuthenticateField *pRspAuthenticateField, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//è®¤è¯
+	virtual void OnRspFetchAuthRandCode(CSecurityFtdcAuthRandCodeField *pAuthRandCode, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	virtual void OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspSettlementInfoConfirm(CSecurityFtdcSettlementInfoConfirmField *pSettlementInfoConfirm, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-	virtual void OnRspQryInvestor(CSecurityFtdcInvestorField *pInvestor, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//virtual void OnRspQryInvestor(CSecurityFtdcInvestorField *pInvestor, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-	//ÏÂµ¥
+	//ä¸‹å•
 	virtual void OnRspOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	virtual void OnErrRtnOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, CSecurityFtdcRspInfoField *pRspInfo);
 
-	//³·µ¥
+	//æ’¤å•
 	virtual void OnRspOrderAction(CSecurityFtdcInputOrderActionField *pInputOrderAction, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	virtual void OnErrRtnOrderAction(CSecurityFtdcOrderActionField *pOrderAction, CSecurityFtdcRspInfoField *pRspInfo);
 
-	//±¨µ¥»Ø±¨
-	virtual void OnRspQryOrder(CSecurityFtdcOrderField *pOrder, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//æŠ¥å•å›æŠ¥
+	//virtual void OnRspQryOrder(CSecurityFtdcOrderField *pOrder, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	virtual void OnRtnOrder(CSecurityFtdcOrderField *pOrder);
 
-	//³É½»»Ø±¨
-	virtual void OnRspQryTrade(CSecurityFtdcTradeField *pTrade, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//æˆäº¤å›æŠ¥
+	//virtual void OnRspQryTrade(CSecurityFtdcTradeField *pTrade, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	virtual void OnRtnTrade(CSecurityFtdcTradeField *pTrade);
 
-	//±¨¼ÛÂ¼Èë
+	//æŠ¥ä»·å½•å…¥
 	//virtual void OnRspQuoteInsert(CSecurityFtdcInputQuoteField *pInputQuote, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnErrRtnQuoteInsert(CSecurityFtdcInputQuoteField *pInputQuote, CSecurityFtdcRspInfoField *pRspInfo);
 	//virtual void OnRtnQuote(CSecurityFtdcQuoteField *pQuote);
 
-	//±¨¼Û³·µ¥
+	//æŠ¥ä»·æ’¤å•
 	//virtual void OnRspQuoteAction(CSecurityFtdcInputQuoteActionField *pInputQuoteAction, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnErrRtnQuoteAction(CSecurityFtdcQuoteActionField *pQuoteAction, CSecurityFtdcRspInfoField *pRspInfo);
 
-	//²ÖÎ»
-	virtual void OnRspQryInvestorPosition(CSecurityFtdcInvestorPositionField *pInvestorPosition, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//ä»“ä½
+	//virtual void OnRspQryInvestorPosition(CSecurityFtdcInvestorPositionField *pInvestorPosition, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspQryInvestorPositionDetail(CSecurityFtdcInvestorPositionDetailField *pInvestorPositionDetail, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspQryInvestorPositionCombineDetail(CSecurityFtdcInvestorPositionCombineDetailField *pInvestorPositionCombineDetail, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {};
 
-	//×Ê½ğ
-	virtual void OnRspQryTradingAccount(CSecurityFtdcTradingAccountField *pTradingAccount, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//èµ„é‡‘
+	//virtual void OnRspQryTradingAccount(CSecurityFtdcTradingAccountField *pTradingAccount, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-	//ºÏÔ¼¡¢ÊÖĞø·Ñ
-	virtual void OnRspQryInstrument(CSecurityFtdcInstrumentField *pInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	//åˆçº¦ã€æ‰‹ç»­è´¹
+	//virtual void OnRspQryInstrument(CSecurityFtdcInstrumentField *pInstrument, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspQryInstrumentMarginRate(CSecurityFtdcInstrumentMarginRateField *pInstrumentMarginRate, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRspQryInstrumentCommissionRate(CSecurityFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-	//²éÑ¯ĞĞÇéÏìÓ¦
+	//æŸ¥è¯¢è¡Œæƒ…å“åº”
 	//virtual void OnRspQryDepthMarketData(CSecurityFtdcDepthMarketDataField *pDepthMarketData, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-	//ÇëÇó²éÑ¯Í¶×ÊÕß½áËã½á¹ûÏìÓ¦
+	//è¯·æ±‚æŸ¥è¯¢æŠ•èµ„è€…ç»“ç®—ç»“æœå“åº”
 	//virtual void OnRspQrySettlementInfo(CSecurityFtdcSettlementInfoField *pSettlementInfo, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-	//ÆäËü
+	//å…¶å®ƒ
 	virtual void OnRspError(CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	//virtual void OnRtnInstrumentStatus(CSecurityFtdcInstrumentStatusField *pInstrumentStatus);
 
 private:
-	atomic<int>					m_lRequestID;			//ÇëÇóID,µÃ±£³Ö×ÔÔö
+	atomic<int>					m_lRequestID;			//è¯·æ±‚ID,å¾—ä¿æŒè‡ªå¢
 
-	CSecurityFtdcRspUserLoginField m_RspUserLogin;			//·µ»ØµÄµÇÂ¼³É¹¦ÏìÓ¦£¬Ä¿Ç°ÀûÓÃ´ËÄÚ³ÉÔ±½øĞĞ±¨µ¥ËùÊôÇø·Ö
+	CSecurityFtdcRspUserLoginField m_RspUserLogin;			//è¿”å›çš„ç™»å½•æˆåŠŸå“åº”ï¼Œç›®å‰åˆ©ç”¨æ­¤å†…æˆå‘˜è¿›è¡ŒæŠ¥å•æ‰€å±åŒºåˆ†
 	CSecurityFtdcInvestorField	m_Investor;
 
 	OrderIDType					m_orderInsert_Id;
 	OrderIDType					m_orderAction_Id;
 
 	mutex						m_csOrderRef;
-	int							m_nMaxOrderRef;			//±¨µ¥ÒıÓÃ£¬ÓÃÓÚÇø·Ö±¨µ¥£¬±£³Ö×ÔÔö
+	int							m_nMaxOrderRef;			//æŠ¥å•å¼•ç”¨ï¼Œç”¨äºåŒºåˆ†æŠ¥å•ï¼Œä¿æŒè‡ªå¢
 
-	CSecurityFtdcQueryApi*		m_pApi;					//½»Ò×API
+	CSecurityFtdcTraderApi*		m_pApi;					//äº¤æ˜“API
 	
-	string						m_szPath;				//Éú³ÉÅäÖÃÎÄ¼şµÄÂ·¾¶
+	string						m_szPath;				//ç”Ÿæˆé…ç½®æ–‡ä»¶çš„è·¯å¾„
 	ServerInfoField				m_ServerInfo;
 	UserInfoField				m_UserInfo;
 	int							m_nSleep;
@@ -206,7 +211,7 @@ private:
 
 	unordered_map<string, PositionField*>			m_id_platform_position;
 
-	CMsgQueue*					m_msgQueue;				//ÏûÏ¢¶ÓÁĞÖ¸Õë
+	CMsgQueue*					m_msgQueue;				//æ¶ˆæ¯é˜Ÿåˆ—æŒ‡é’ˆ
 	CMsgQueue*					m_msgQueue_Query;
 	void*						m_pClass;
 };

@@ -103,7 +103,7 @@ public:
 			// 只要上海与深圳，不处理三板
 			return exchange != ExchangeType::NEEQ;
 
-		//type = ExchangeType::SZE;
+		//type = ExchangeType::SZSE;
 		//double1 = 399300;
 
 		int prefix1 = instrument_part1 / 100000;
@@ -112,7 +112,7 @@ public:
 		{
 		case ExchangeType::SSE:
 			return (prefix1 == 6);
-		case ExchangeType::SZE:
+		case ExchangeType::SZSE:
 			return (prefix1 == 0) || (prefix3 == 300);
 		default:
 			break;

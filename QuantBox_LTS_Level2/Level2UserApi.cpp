@@ -27,7 +27,7 @@ ExchangeType TSecurityFtdcExchangeIDType_2_ExchangeType(TSecurityFtdcExchangeIDT
 	case 'S':
 		return ExchangeType::SSE;
 	case 'Z':
-		return ExchangeType::SZE;
+		return ExchangeType::SZSE;
 	default:
 		return ExchangeType::Undefined_;
 	}

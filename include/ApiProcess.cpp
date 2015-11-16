@@ -73,8 +73,8 @@ char* ExchangeType_2_String(ExchangeType exchange)
 		return "INE";
 	case SSE:
 		return "SSE";
-	case SZE:
-		return "SZE";
+	case SZSE:
+		return "SZSE";
 	case NEEQ:
 		return "NEEQ";
 	case HKEx:

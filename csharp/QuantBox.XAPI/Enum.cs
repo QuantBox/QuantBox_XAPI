@@ -94,6 +94,7 @@ namespace QuantBox
         QuoteRequest = 8,
         HistoricalData = 16,
         Instrument = 32,
+        Query = 64,
     };
 
     public enum DepthLevelType : byte

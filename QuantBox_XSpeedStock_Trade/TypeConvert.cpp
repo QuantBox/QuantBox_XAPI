@@ -275,7 +275,7 @@ ExchangeType DFITCSECExchangeIDType_2_ExchangeType(DFITCSECExchangeIDType In)
 	case 'H':
 		return ExchangeType::SSE;
 	case 'Z':
-		return ExchangeType::SZE;
+		return ExchangeType::SZSE;
 	default:
 		return ExchangeType::Undefined_;
 	}

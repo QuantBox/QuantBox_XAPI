@@ -29,6 +29,7 @@ enum ApiType :char
 	QuoteRequest = 8,
 	HistoricalData = 16,
 	Instrument = 32,
+	Query_ = 64,
 };
 
 enum DepthLevelType:char
@@ -224,7 +225,7 @@ enum ExchangeType :char
 	CFFEX, // 中金所
 	INE, // 能源中心
 	SSE, // 上交所
-	SZE, // 深交所
+	SZSE, // 深交所
 	NEEQ, // 全国中小企业股份转让系统,三板，临时这么写
 	HKEx,
 };

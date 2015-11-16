@@ -835,8 +835,7 @@ void CTraderApi::OnTrade(CSecurityFtdcTradeField *pTrade, bool bFromQry)
 			// 是否要通知接口
 		}
 
-		// 查询与交易分离，所以本地计算更新持仓的功能失效
-		//OnTrade(pField, bFromQry);
+		OnTrade(pField, bFromQry);
 	}
 }
 

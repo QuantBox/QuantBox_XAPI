@@ -11,7 +11,8 @@
 
 #include "../QuantBox_Queue/MsgQueue.h"
 
-#include "TypeConvert.h"
+// 这里用的是与交易同一个类型转换
+#include "../QuantBox_LTS_Trade_v2/TypeConvert.h"
 
 #include <cstring>
 #include <assert.h>
@@ -52,6 +53,9 @@ void CQueryApi::QueryInThread(char type, void* pApi1, void* pApi2, double double
 		break;
 	case E_QryTradeField:
 		iRet = _ReqQryTrade(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
+		break;
+	case E_AuthRandCodeField:
+		iRet = _ReqFetchAuthRandCode(type, pApi1, pApi2, double1, double2, ptr1, size1, ptr2, size2, ptr3, size3);
 		break;
 	default:
 		break;
@@ -256,7 +260,8 @@ void CQueryApi::OnFrontConnected()
 {
 	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Connected, 0, nullptr, 0, nullptr, 0, nullptr, 0);
 
-	ReqUserLogin();
+	//ReqUserLogin();
+	ReqFetchAuthRandCode();
 }
 
 void CQueryApi::OnFrontDisconnected(int nReason)
@@ -270,7 +275,43 @@ void CQueryApi::OnFrontDisconnected(int nReason)
 	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
 }
 
-void CQueryApi::ReqUserLogin()
+void CQueryApi::ReqFetchAuthRandCode()
+{
+	CSecurityFtdcAuthRandCodeField* pBody = (CSecurityFtdcAuthRandCodeField*)m_msgQueue_Query->new_block(sizeof(CSecurityFtdcAuthRandCodeField));
+
+	strncpy(pBody->RandCode, "", sizeof(TSecurityFtdcAuthCodeType));
+
+	m_msgQueue_Query->Input_NoCopy(RequestType::E_AuthRandCodeField, m_msgQueue_Query, this, 0, 0,
+		pBody, sizeof(CSecurityFtdcAuthRandCodeField), nullptr, 0, nullptr, 0);
+}
+
+int CQueryApi::_ReqFetchAuthRandCode(char type, void* pApi1, void* pApi2, double double1, double double2, void* ptr1, int size1, void* ptr2, int size2, void* ptr3, int size3)
+{
+	m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Authorizing, 0, nullptr, 0, nullptr, 0, nullptr, 0);
+	return m_pApi->ReqFetchAuthRandCode((CSecurityFtdcAuthRandCodeField*)ptr1, ++m_lRequestID);
+}
+
+void CQueryApi::OnRspFetchAuthRandCode(CSecurityFtdcAuthRandCodeField *pAuthRandCode, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+	RspUserLoginField* pField = (RspUserLoginField*)m_msgQueue->new_block(sizeof(RspUserLoginField));
+
+	if (!IsErrorRspInfo(pRspInfo)
+		&& pAuthRandCode)
+	{
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Authorized, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+
+		ReqUserLogin(pAuthRandCode->RandCode);
+	}
+	else
+	{
+		pField->ErrorID = pRspInfo->ErrorID;
+		strncpy(pField->ErrorMsg, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
+
+		m_msgQueue->Input_NoCopy(ResponeType::OnConnectionStatus, m_msgQueue, m_pClass, ConnectionStatus::Disconnected, 0, pField, sizeof(RspUserLoginField), nullptr, 0, nullptr, 0);
+	}
+}
+
+void CQueryApi::ReqUserLogin(TSecurityFtdcAuthCodeType	RandCode)
 {
 	CSecurityFtdcReqUserLoginField* pBody = (CSecurityFtdcReqUserLoginField*)m_msgQueue_Query->new_block(sizeof(CSecurityFtdcReqUserLoginField));
 
@@ -278,6 +319,8 @@ void CQueryApi::ReqUserLogin()
 	strncpy(pBody->UserID, m_UserInfo.UserID, sizeof(TSecurityFtdcInvestorIDType));
 	strncpy(pBody->Password, m_UserInfo.Password, sizeof(TSecurityFtdcPasswordType));
 	strncpy(pBody->UserProductInfo, m_ServerInfo.UserProductInfo, sizeof(TSecurityFtdcProductInfoType));
+	strncpy(pBody->AuthCode, m_ServerInfo.AuthCode, sizeof(TSecurityFtdcAuthCodeType));
+	strncpy(pBody->RandCode, RandCode, sizeof(TSecurityFtdcAuthCodeType));
 
 	m_msgQueue_Query->Input_NoCopy(RequestType::E_ReqUserLoginField, m_msgQueue_Query, this, 0, 0,
 		pBody, sizeof(CSecurityFtdcReqUserLoginField), nullptr, 0, nullptr, 0);
@@ -468,75 +511,75 @@ void CQueryApi::OnRspUserLogin(CSecurityFtdcRspUserLoginField *pRspUserLogin, CS
 //	return nRet;
 //}
 
-void CQueryApi::OnRspOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	OrderIDType orderId = { 0 };
-	if (pInputOrder)
-	{
-		sprintf(orderId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputOrder->OrderRef);
-	}
-	else
-	{
-		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
-	}
+//void CQueryApi::OnRspOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+//{
+//	OrderIDType orderId = { 0 };
+//	if (pInputOrder)
+//	{
+//		sprintf(orderId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputOrder->OrderRef);
+//	}
+//	else
+//	{
+//		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+//	}
+//
+//	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
+//	if (it == m_id_platform_order.end())
+//	{
+//		// 没找到？不应当，这表示出错了
+//		//assert(false);
+//	}
+//	else
+//	{
+//		// 找到了，要更新状态
+//		// 得使用上次的状态
+//		OrderField* pField = it->second;
+//		strcpy(pField->ID, orderId);
+//		pField->ExecType = ExecType::ExecRejected;
+//		pField->Status = OrderStatus::Rejected;
+//		pField->ErrorID = pRspInfo->ErrorID;
+//		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
+//		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
+//	}
+//}
 
-	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
-	if (it == m_id_platform_order.end())
-	{
-		// 没找到？不应当，这表示出错了
-		//assert(false);
-	}
-	else
-	{
-		// 找到了，要更新状态
-		// 得使用上次的状态
-		OrderField* pField = it->second;
-		strcpy(pField->ID, orderId);
-		pField->ExecType = ExecType::ExecRejected;
-		pField->Status = OrderStatus::Rejected;
-		pField->ErrorID = pRspInfo->ErrorID;
-		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
-		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
-	}
-}
-
-void CQueryApi::OnErrRtnOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, CSecurityFtdcRspInfoField *pRspInfo)
-{
-	OrderIDType orderId = { 0 };
-	if (pInputOrder)
-	{
-		sprintf(orderId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputOrder->OrderRef);
-	}
-	else
-	{
-		IsErrorRspInfo(pRspInfo, 0, true);
-	}
-
-	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
-	if (it == m_id_platform_order.end())
-	{
-		// 没找到？不应当，这表示出错了
-		//assert(false);
-		// LTS在开始连接时也会收到此回报，无语啊
-	}
-	else
-	{
-		// 找到了，要更新状态
-		// 得使用上次的状态
-		OrderField* pField = it->second;
-		strcpy(pField->ID, orderId);
-		pField->ExecType = ExecType::ExecRejected;
-		pField->Status = OrderStatus::Rejected;
-		pField->ErrorID = pRspInfo->ErrorID;
-		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
-		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
-	}
-}
-
-void CQueryApi::OnRtnTrade(CSecurityFtdcTradeField *pTrade)
-{
-	OnTrade(pTrade,false);
-}
+//void CQueryApi::OnErrRtnOrderInsert(CSecurityFtdcInputOrderField *pInputOrder, CSecurityFtdcRspInfoField *pRspInfo)
+//{
+//	OrderIDType orderId = { 0 };
+//	if (pInputOrder)
+//	{
+//		sprintf(orderId, "%d:%d:%s", m_RspUserLogin.FrontID, m_RspUserLogin.SessionID, pInputOrder->OrderRef);
+//	}
+//	else
+//	{
+//		IsErrorRspInfo(pRspInfo, 0, true);
+//	}
+//
+//	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
+//	if (it == m_id_platform_order.end())
+//	{
+//		// 没找到？不应当，这表示出错了
+//		//assert(false);
+//		// LTS在开始连接时也会收到此回报，无语啊
+//	}
+//	else
+//	{
+//		// 找到了，要更新状态
+//		// 得使用上次的状态
+//		OrderField* pField = it->second;
+//		strcpy(pField->ID, orderId);
+//		pField->ExecType = ExecType::ExecRejected;
+//		pField->Status = OrderStatus::Rejected;
+//		pField->ErrorID = pRspInfo->ErrorID;
+//		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
+//		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
+//	}
+//}
+//
+//void CQueryApi::OnRtnTrade(CSecurityFtdcTradeField *pTrade)
+//{
+//	OnTrade(pTrade,false);
+//}
 
 //int CQueryApi::ReqOrderAction(OrderIDType* szIds, int count, OrderIDType* pOutput)
 //{
@@ -593,70 +636,70 @@ void CQueryApi::OnRtnTrade(CSecurityFtdcTradeField *pTrade)
 //	return nRet;
 //}
 
-void CQueryApi::OnRspOrderAction(CSecurityFtdcInputOrderActionField *pInputOrderAction, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	OrderIDType orderId = { 0 };
-	if (pInputOrderAction)
-	{
-		sprintf(orderId, "%d:%d:%s", pInputOrderAction->FrontID, pInputOrderAction->SessionID, pInputOrderAction->OrderRef);
-	}
-	else
-	{
-		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
-	}
+//void CQueryApi::OnRspOrderAction(CSecurityFtdcInputOrderActionField *pInputOrderAction, CSecurityFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+//{
+//	OrderIDType orderId = { 0 };
+//	if (pInputOrderAction)
+//	{
+//		sprintf(orderId, "%d:%d:%s", pInputOrderAction->FrontID, pInputOrderAction->SessionID, pInputOrderAction->OrderRef);
+//	}
+//	else
+//	{
+//		IsErrorRspInfo(pRspInfo, nRequestID, bIsLast);
+//	}
+//
+//	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
+//	if (it == m_id_platform_order.end())
+//	{
+//		// 没找到？不应当，这表示出错了
+//		//assert(false);
+//	}
+//	else
+//	{
+//		// 找到了，要更新状态
+//		// 得使用上次的状态
+//		OrderField* pField = it->second;
+//		pField->ExecType = ExecType::ExecCancelReject;
+//		pField->ErrorID = pRspInfo->ErrorID;
+//		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
+//		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
+//	}
+//}
 
-	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
-	if (it == m_id_platform_order.end())
-	{
-		// 没找到？不应当，这表示出错了
-		//assert(false);
-	}
-	else
-	{
-		// 找到了，要更新状态
-		// 得使用上次的状态
-		OrderField* pField = it->second;
-		pField->ExecType = ExecType::ExecCancelReject;
-		pField->ErrorID = pRspInfo->ErrorID;
-		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
-		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
-	}
-}
+//void CQueryApi::OnErrRtnOrderAction(CSecurityFtdcOrderActionField *pOrderAction, CSecurityFtdcRspInfoField *pRspInfo)
+//{
+//	OrderIDType orderId = { 0 };
+//	if (pOrderAction)
+//	{
+//		sprintf(orderId, "%d:%d:%s", pOrderAction->FrontID, pOrderAction->SessionID, pOrderAction->OrderRef);
+//	}
+//	else
+//	{
+//		IsErrorRspInfo(pRspInfo, 0, true);
+//	}
+//
+//	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
+//	if (it == m_id_platform_order.end())
+//	{
+//		// 没找到？不应当，这表示出错了
+//		//assert(false);
+//	}
+//	else
+//	{
+//		// 找到了，要更新状态
+//		// 得使用上次的状态
+//		OrderField* pField = it->second;
+//		pField->ExecType = ExecType::ExecCancelReject;
+//		pField->ErrorID = pRspInfo->ErrorID;
+//		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
+//		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
+//	}
+//}
 
-void CQueryApi::OnErrRtnOrderAction(CSecurityFtdcOrderActionField *pOrderAction, CSecurityFtdcRspInfoField *pRspInfo)
-{
-	OrderIDType orderId = { 0 };
-	if (pOrderAction)
-	{
-		sprintf(orderId, "%d:%d:%s", pOrderAction->FrontID, pOrderAction->SessionID, pOrderAction->OrderRef);
-	}
-	else
-	{
-		IsErrorRspInfo(pRspInfo, 0, true);
-	}
-
-	unordered_map<string, OrderField*>::iterator it = m_id_platform_order.find(orderId);
-	if (it == m_id_platform_order.end())
-	{
-		// 没找到？不应当，这表示出错了
-		//assert(false);
-	}
-	else
-	{
-		// 找到了，要更新状态
-		// 得使用上次的状态
-		OrderField* pField = it->second;
-		pField->ExecType = ExecType::ExecCancelReject;
-		pField->ErrorID = pRspInfo->ErrorID;
-		strncpy(pField->Text, pRspInfo->ErrorMsg, sizeof(ErrorMsgType));
-		m_msgQueue->Input_Copy(ResponeType::OnRtnOrder, m_msgQueue, m_pClass, 0, 0, pField, sizeof(OrderField), nullptr, 0, nullptr, 0);
-	}
-}
-
-void CQueryApi::OnRtnOrder(CSecurityFtdcOrderField *pOrder)
-{
-	OnOrder(pOrder,false);
-}
+//void CQueryApi::OnRtnOrder(CSecurityFtdcOrderField *pOrder)
+//{
+//	OnOrder(pOrder,false);
+//}
 
 void CQueryApi::ReqQryTradingAccount()
 {

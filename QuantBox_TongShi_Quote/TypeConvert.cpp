@@ -8,7 +8,7 @@ ExchangeType Market_2_ExchangeType(WORD In)
 	case SH_MARKET_EX:
 		return ExchangeType::SSE;
 	case SZ_MARKET_EX:
-		return ExchangeType::SZE;
+		return ExchangeType::SZSE;
 	case HK_MARKET_EX:
 		return ExchangeType::HKEx;
 	case SB_MARKET_EX:
