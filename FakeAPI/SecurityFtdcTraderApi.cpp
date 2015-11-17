@@ -7,14 +7,14 @@
 #include "../include/LTS_v2/SecurityFtdcTraderApi.h"
 
 
-class MyClass :public CSecurityFtdcTraderApi
+class MyClassLTS :public CSecurityFtdcTraderApi
 {
 
 public:
-	/////创建TraderApi
-	/////@param pszFlowPath 存贮订阅信息文件的目录，默认为当前目录
-	/////@return 创建出的UserApi
-	//static CSecurityFtdcTraderApi *CreateFtdcTraderApi(const char *pszFlowPath = "");
+	///创建TraderApi
+	///@param pszFlowPath 存贮订阅信息文件的目录，默认为当前目录
+	///@return 创建出的UserApi
+	static CSecurityFtdcTraderApi *CreateFtdcTraderApi(const char *pszFlowPath = "");
 
 	///删除接口对象本身
 	///@remark 不再使用本接口对象时,调用该函数删除接口对象
@@ -138,6 +138,6 @@ private:
 
 CSecurityFtdcTraderApi *CSecurityFtdcTraderApi::CreateFtdcTraderApi(const char *pszFlowPath)
 {
-	return new MyClass();
+	return new MyClassLTS();
 }
 
