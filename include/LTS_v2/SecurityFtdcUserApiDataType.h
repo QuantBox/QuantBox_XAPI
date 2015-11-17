@@ -689,6 +689,16 @@ typedef char TSecurityFtdcAllWithoutTradeType;
 typedef char TSecurityFtdcHandlePositionAlgoIDType;
 
 /////////////////////////////////////////////////////////////////////////
+///TFtdcOpenRestrictTypeType是一个期权开仓限制类型类型
+/////////////////////////////////////////////////////////////////////////
+///买入开仓
+#define SECURITY_FTDC_ORT_BuyOpen '0'
+///所有开仓
+#define SECURITY_FTDC_ORT_AllOpen '1'
+
+typedef char TSecurityFtdcOpenRestrictTypeType;
+
+/////////////////////////////////////////////////////////////////////////
 ///TFtdcTradeParamIDType是一个交易系统参数代码类型
 /////////////////////////////////////////////////////////////////////////
 ///系统加密算法
@@ -709,6 +719,10 @@ typedef char TSecurityFtdcHandlePositionAlgoIDType;
 #define SECURITY_FTDC_TPID_DeriveWithdrawRatio 'D'
 ///期权行权冻结可用起始时间
 #define SECURITY_FTDC_TPID_ExecuteStartTime 'T'
+///只可偿还历史融券负债
+#define SECURITY_FTDC_TPID_OnlyRepayHisStock 'H'
+///期权开仓限制类型
+#define SECURITY_FTDC_TPID_OpenRestrictType 'X'
 
 typedef char TSecurityFtdcTradeParamIDType;
 
@@ -2106,7 +2120,7 @@ typedef char TSecurityFtdcCloseDirectionType;
 ///在途证券
 #define SECURITY_FTDC_DT_UnavailStock '2'
 ///赎回在途资金
-#define SECURITY_FTDC_DT_UnavailRedMoney '2'
+#define SECURITY_FTDC_DT_UnavailRedMoney '3'
 
 typedef char TSecurityFtdcDelivTypeType;
 

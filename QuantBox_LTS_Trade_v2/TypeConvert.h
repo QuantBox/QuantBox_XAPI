@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../include/LTS/SecurityFtdcUserApiDataType.h"
-#include "../include/LTS/SecurityFtdcUserApiStruct.h"
+#include "../include/LTS_v2/SecurityFtdcUserApiDataType.h"
+#include "../include/LTS_v2/SecurityFtdcUserApiStruct.h"
 #include "../include/ApiStruct.h"
 
 

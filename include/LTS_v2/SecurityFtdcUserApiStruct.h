@@ -755,18 +755,18 @@ struct CSecurityFtdcInvestorOptionsPositionField
 	TSecurityFtdcInstrumentIDType	InstrumentID;
 	///最大多头仓位限制
 	TSecurityFtdcLargeVolumeType	MaxLongPositionLimit;
-	///最大买开量限制
-	TSecurityFtdcLargeVolumeType	MaxBuyVolLimit;
+	///最大开仓量限制
+	TSecurityFtdcLargeVolumeType	MaxOpenVolLimit;
 	///最大总仓位限制
 	TSecurityFtdcLargeVolumeType	MaxPositionLimit;
 	///多头持仓
 	TSecurityFtdcLargeVolumeType	LongPosition;
 	///空头持仓
 	TSecurityFtdcLargeVolumeType	ShortPosition;
-	///买开量
-	TSecurityFtdcLargeVolumeType	BuyVolume;
-	///买开冻结量
-	TSecurityFtdcLargeVolumeType	BuyFrozenVolume;
+	///当日开仓量
+	TSecurityFtdcLargeVolumeType	TodayOpenVolume;
+	///当日开仓冻结量
+	TSecurityFtdcLargeVolumeType	TodayOpenFrozenVolume;
 	///多头冻结持仓
 	TSecurityFtdcLargeVolumeType	LongFrozenPosition;
 	///空头冻结持仓

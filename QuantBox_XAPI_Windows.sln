@@ -61,6 +61,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuantBox_Tdx_Trade", "Quant
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuantBox_LTS_Query_v2", "QuantBox_LTS_Query_v2\QuantBox_LTS_Query_v2.vcxproj", "{51D11C21-C4A7-4F07-9658-B8BA223684B8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FakeAPI", "FakeAPI\FakeAPI.vcxproj", "{358586C9-A4B8-43E4-8376-59C68F0F6211}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -611,6 +613,24 @@ Global
 		{51D11C21-C4A7-4F07-9658-B8BA223684B8}.Release|Win32.ActiveCfg = Release|Win32
 		{51D11C21-C4A7-4F07-9658-B8BA223684B8}.Release|Win32.Build.0 = Release|Win32
 		{51D11C21-C4A7-4F07-9658-B8BA223684B8}.Release|x64.ActiveCfg = Release|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Debug|Win32.ActiveCfg = Debug|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Debug|Win32.Build.0 = Debug|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Debug|x64.ActiveCfg = Debug|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Debug64|Any CPU.ActiveCfg = Debug|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Debug64|Mixed Platforms.ActiveCfg = Debug|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Debug64|Mixed Platforms.Build.0 = Debug|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Debug64|Win32.ActiveCfg = Debug|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Debug64|Win32.Build.0 = Debug|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Debug64|x64.ActiveCfg = Debug|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Release|Any CPU.ActiveCfg = Release|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Release|Win32.ActiveCfg = Release|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Release|Win32.Build.0 = Release|Win32
+		{358586C9-A4B8-43E4-8376-59C68F0F6211}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
