@@ -100,7 +100,7 @@ void CMsgQueue::RunInThread()
 			// 空闲时过来等1ms,没等到就回去再试
 			// 如过正好等到了，就立即去试，应当会快一点吧?
 			unique_lock<mutex> lck(m_mtx);
-			m_cv.wait_for(lck, std::chrono::seconds(1), [this]{return m_bRunning == false; });
+			m_cv.wait_for(lck, std::chrono::microseconds(1), [this]{return m_bRunning == false; });
 		}
 	}
 
